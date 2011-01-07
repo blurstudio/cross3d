@@ -812,7 +812,8 @@ class StudiomaxScene( AbstractScene ):
 		set_appdata		= mxs.setAppData
 		is_kindof		= mxs.isKindOf
 		geoclass		= mxs.GeometryClass
-		unique_id		= mxs.blurUtil.uniqueId
+		unique_id		= mxs.blurUtil.uniqueId
+		processed		= {}
 		
 		self.setUpdatesEnabled(False)
 		
@@ -845,8 +846,14 @@ class StudiomaxScene( AbstractScene ):
 			else:
 				baseMaterial 	= self._cachedNativeMaterial( MaterialCacheType.BaseMaterial, mid )
 			
-			# record simple material override
-			obj.material = matlib.createOverride( baseMaterial, nativeMaterial, options = options )
+			# assign the override for the material based on the options
+			uid					= unique_id(baseMaterial)
+			overrideMaterial 	= processed.get( uid )
+			if ( not overrideMaterial ):
+				overrideMaterial 	= matlib.createMaterialOverride( baseMaterial, nativeMaterial, options = options )
+				processed[uid] 		= overrideMaterial
+				
+			obj.material = overrideMaterial
 			
 		self.setUpdatesEnabled(True)
 				
