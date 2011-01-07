@@ -1,0 +1,179 @@
+##
+#	\namespace	blur3d.classes.studiomax.studiomaxscenepropset
+#
+#	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
+#				does not have a native Property Set instance, we will have to control all of the data ourselves
+#	
+#	\author		eric@blur.com
+#	\author		Blur Studio
+#	\date		09/08/10
+#
+
+from Py3dsMax import mxs
+from blur3d.classes.abstract.abstractscenepropset	import AbstractScenePropSet
+
+class StudiomaxScenePropSet( AbstractScenePropSet ):
+	def __init__( self, scene, nativePropSet ):
+		# in Max, since we don't have native property sets, we'll store a pointer to this self as the native pointer
+		AbstractScenePropSet.__init__( self, scene, self )
+		
+		# we will control property sets
+		self._keys 		= []
+		self._values 	= {}
+		self._active	= {}
+		self._custom	= {}
+		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												protected methods
+	#------------------------------------------------------------------------------------------------------------------------
+	def _activeString( self ):
+		"""
+			\remarks	converts the current key/active pairing to a string separated by '|'
+			\return		<str>
+		"""
+		output = []
+		for key in self._keys:
+			if ( self.isActiveProperty(key) ):
+				output.append( '1' )
+			else:
+				output.append( '0' )
+		return '|'.join( output )
+	
+	def _defineProperty( self, propname, value, custom = False ):
+		"""
+			\remarks	define the inputed propname with the current value, tagging whether or not it is a custom property
+			\param		propname	<str>
+			\param		value		<variant>
+			\param		custom		<bool>
+		"""
+		propname = str( propname )
+		
+		# record the property
+		self._keys.append( propname )
+		self._active[propname] = False	
+		self._values[ propname ] = value
+		self._custom[ propname ] = custom
+	
+	def _setActiveString( self, activeString ):
+		"""
+			\remarks	set the active values for these properties by the inputed value string, which contains a true/false flag per property separated by a '|'
+			\param		activeString		<str>
+			\return		<bool> success
+		"""
+		actives = str(activeString).split( '|' )
+		for index, key in enumerate(self._keys):
+			try:
+				self.activateProperty( key, actives[index] == '1' )
+			except:
+				break
+		return True
+	
+	def _setValueString( self, valueString ):
+		"""
+			\remarks	sets the value for these properties by the inputed value string, which contains the properties with a '|' separating the values
+			\param		valueString		<str>
+			\return		<bool> success
+		"""
+		values = str(valueString).split( '|' )
+		for index, key in enumerate(self._keys):
+			try:
+				self.setValue( key, eval(values[index]) )
+			except:
+				break
+		return True
+		
+	def _valueString( self ):
+		"""
+			\remarks	returns the current key/value pairing to a string separated by '|'
+			\return		<str>
+		"""
+		output = []
+		for key in self._keys:
+			output.append( str(self.value(key)) )
+		return '|'.join( output )
+		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												public methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
+	def activateProperty( self, propname, state ):
+		self._active[propname] = state
+	
+	def activeProperties( self ):
+		return [ propname for propname in self._active if self._active[propname] ]
+	
+	def isCustomProperty( self, propname ):
+		return self._custom.get(str(propname),False)
+	
+	def propertyNames( self ):
+		return self._keys
+	
+	def setValue( self, propname, value ):
+		propname = str(propname)
+		if ( propname in self._values ):
+			self._values[propname] = value
+			return True
+		return False
+	
+	def toolTip( self ):
+		tips = {}
+		for key, active in self._active.items():
+			if ( active ):
+				tips[key] = '%s: %s' % (key,self.value(key))
+		keys = tips.keys()
+		keys.sort()
+		
+		return ', '.join( [ tips[key] for key in keys ] )
+	
+	def value( self, propname, default = None ):
+		return self._values.get( str(propname),default )
+
+#--------------------------------------------------------------------------------
+
+class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
+	def __init__( self, scene, nativePropSet ):
+		StudiomaxScenePropSet.__init__( self, scene, nativePropSet )
+		
+		# define basic properties
+		self._defineProperty( 'renderable', 					True )
+		self._defineProperty( 'inheritVisibility', 				True )
+		self._defineProperty( 'primaryVisibility', 				True )
+		self._defineProperty( 'secondaryVisibility', 			True )
+		self._defineProperty( 'receiveShadows', 				True )
+		self._defineProperty( 'castShadows', 					True )
+		self._defineProperty( 'applyAtmospherics', 				True )
+		self._defineProperty( 'renderOccluded', 				False )
+		self._defineProperty( 'gbufferchannel', 				0 )
+		
+		# define vray properties
+		self._defineProperty( 'VRay_MoBlur_GeomSamples', 		2, 			custom = True )
+		self._defineProperty( 'VRay_GI_Generate', 				True, 		custom = True )
+		self._defineProperty( 'VRay_GI_Receive', 				True, 		custom = True )
+		self._defineProperty( 'VRay_GI_Multipier', 				1, 			custom = True )
+		self._defineProperty( 'VRay_GI_GenerateMultipier', 		1, 			custom = True )
+		self._defineProperty( 'VRay_Caustics_Generate', 		True, 		custom = True )
+		self._defineProperty( 'VRay_Caustics_Receive', 			True, 		custom = True )
+		self._defineProperty( 'VRay_Caustics_Multipier', 		1, 			custom = True )
+		self._defineProperty( 'VRay_MoBlur_DefaultGeomSamples', True, 		custom = True )
+		self._defineProperty( 'VRay_Matte_Enable', 				False, 		custom = True )
+		self._defineProperty( 'VRay_Matte_Alpha', 				1, 			custom = True )
+		self._defineProperty( 'VRay_Matte_Shadows', 			False, 		custom = True )
+		self._defineProperty( 'VRay_Matte_ShadowAlpha', 		False, 		custom = True )
+		self._defineProperty( 'VRay_Matte_ShadowBrightness', 	1, 			custom = True )
+		self._defineProperty( 'VRay_Matte_ReflectionAmount', 	1, 			custom = True )
+		self._defineProperty( 'VRay_Matte_RefractionAmount', 	1, 			custom = True )
+		self._defineProperty( 'VRay_Matte_GIAmount', 			1, 			custom = True )
+		self._defineProperty( 'VRay_Matte_GI_OtherMattes', 		True, 		custom = True )
+		self._defineProperty( 'VRay_Surface_Priority', 			0, 			custom = True )
+		self._defineProperty( 'VRay_GI_VisibleToGI', 			True, 		custom = True )
+
+		# define mr properties
+		self._defineProperty( 'Mr_castModeFGIllum', 			1 )
+		self._defineProperty( 'MR_rcvFGIllum', 					True )
+		self._defineProperty( 'GenerateGlobalIllum', 			True )
+		self._defineProperty( 'RcvGlobalIllum', 				True )
+		
+# register the class to the system
+from blur3d import classes
+classes.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
+classes.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )
