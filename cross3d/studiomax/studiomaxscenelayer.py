@@ -714,6 +714,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		self._scene.setUpdatesEnabled(False)
 		self._nativePointer.ishidden = state
+		AbstractSceneLayer.setHidden( self, state )
 		self._scene.setUpdatesEnabled(True)
 		return True
 		

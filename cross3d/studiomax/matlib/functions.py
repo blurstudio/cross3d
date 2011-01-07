@@ -213,11 +213,11 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		options = MaterialOverrideOptions.KeepOpacity | MaterialOverrideOptions.KeepDisplacement
 	
 	# make sure we have at least some overriding options or a base material to work from
-	if ( not (options or baseMaterial) ):
+	if ( not options ):
 		return overrideMaterial
 	
 	# make sure we have an overrideMaterial to work from
-	if ( not overrideMaterial ):
+	if ( not (overrideMaterial and baseMaterial) ):
 		return overrideMaterial
 	
 	# store maxscript values that we use more than once (faster)

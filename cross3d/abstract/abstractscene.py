@@ -491,6 +491,21 @@ class AbstractScene( QObject ):
 		
 		return []
 	
+	def _nativeToggleVisibleOptions( self, nativeObjects, options = None ):
+		"""
+			\remarks	[abstract] toggle the inputed object's visibility settings based on the inputed options
+			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
+			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return False
+	
 	def _nativeWorldLayer( self ):
 		"""
 			\remarks	[abstract]		returns the native world layer from the scene
@@ -1367,7 +1382,16 @@ class AbstractScene( QObject ):
 									version of the software being run.
 			\return		<str>
 		"""
-		return ''
+		return ''
+	
+	def toggleVisibleOptions( self, objects, options = None ):
+		"""
+			\remarks	toggle the visible options for the inputed objects
+			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
+			\param		options		<blur3d.constants.VisibilityToggleOptions>
+			\return		<bool> success
+		"""
+		return self._nativeToggleVisibleOptions( [ obj.nativePointer() for obj in objects ], options )
 	
 	def update( self ):
 		"""

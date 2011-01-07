@@ -413,15 +413,27 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
-	def setHidden( self, state ):
+	def setHidden( self, state, options = None ):
 		"""
 			\remarks	set the hidden state for the objects on this layer
 			\sa			hide, unhide, _nativeObjets, blur3d.api.Scene._hideNativeObjects
-			\param		state	<bool>
+			\param		state		<bool>
+			\param		options		<blur3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
-		return self._scene._hideNativeObjects( self._nativeObjects(), state )
-	
+		objs = self._nativeObjects()
+		self._scene._hideNativeObjects( objs, state )
+		
+		# use the default toggling options
+		if ( options == None ):
+			from blur3d.constants import VisibilityToggleOptions
+			options = VisibilityToggleOptions.ToggleLights | VisibilityToggleOptions.ToggleCaches | VisibilityToggleOptions.ToggleAtmospherics | VisibilityToggleOptions.ToggleFX
+		
+		if ( options ):
+			self._scene._nativeToggleVisibleOptions( objs, options )
+		
+		return True
+		
 	def setSelected( self, state ):
 		"""
 			\remarks	sets the selected state of the objects on this layer

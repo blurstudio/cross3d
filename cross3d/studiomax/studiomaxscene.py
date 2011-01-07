@@ -598,6 +598,27 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.selection
 	
+	def _nativeToggleVisibleOptions( self, nativeObjects, options = None ):
+		"""
+			\remarks	implements the AbstractScene._nativeToggleVisibleOptions method to toggle the visible state of the inputed options for the given objects
+			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\return		<bool> success
+		"""
+		from blur3d.constants 	import VisibilityToggleOptions
+		from Py3dsMax 			import mxs
+		
+		# store maxscript values
+		is_kindof 	= mxs.isKindOf
+		mlight		= mxs.Light
+		
+		for obj in nativeObjects:
+			# toggle lights
+			if ( options & VisibilityToggleOptions.ToggleLights ):
+				if ( is_kindof( obj, mlight ) ):
+					obj.on = not obj.ishidden
+		return True
+	
 	def _nativeWorldLayer( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeWorldLayer to return the native world layer of the scene
