@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.studiomax.studiomaxscenepropset
+#	\namespace	blur3d.api.studiomax.studiomaxscenepropset
 #
 #	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
 #				does not have a native Property Set instance, we will have to control all of the data ourselves
@@ -10,7 +10,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.classes.abstract.abstractscenepropset	import AbstractScenePropSet
+from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
 
 class StudiomaxScenePropSet( AbstractScenePropSet ):
 	def __init__( self, scene, nativePropSet ):
@@ -174,6 +174,6 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 		self._defineProperty( 'RcvGlobalIllum', 				True )
 		
 # register the class to the system
-from blur3d import classes
-classes.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
-classes.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )
+from blur3d import api
+api.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
+api.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )

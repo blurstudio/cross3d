@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenelayergroup
+#	\namespace	blur3d.api.abstract.abstractscenelayergroup
 #
 #	\remarks	The AbstractSceneLayerGroup provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
@@ -79,7 +79,7 @@ class AbstractSceneLayerGroup:
 		"""
 			\remarks	add the layers to this layer group
 			\sa			addSelection, _addNativeLayers
-			\param		layers		<list> [ <blur3d.classes.SceneLayer>, .. ]
+			\param		layers		<list> [ <blur3d.api.SceneLayer>, .. ]
 			\return		<bool> success
 		"""
 		return self._addNativeLayers( [ layer.nativeLayer() for layer in layers ] )
@@ -180,9 +180,9 @@ class AbstractSceneLayerGroup:
 	def layers( self ):
 		"""
 			\remarks	returns the SceneLayer's that are associated with this layer
-			\return		<list> [ <blur3d.classes.SceneLayer>, .. ]
+			\return		<list> [ <blur3d.api.SceneLayer>, .. ]
 		"""
-		from blur3d.classes import SceneLayer
+		from blur3d.api import SceneLayer
 		return [ SceneLayer( self._scene, lay ) for lay in self._nativeLayers() ]
 	
 	def remove( self, removeLayers = False, removeObjects = False ):
@@ -205,7 +205,7 @@ class AbstractSceneLayerGroup:
 	def scene( self ):
 		"""
 			\remarks	return the scene instance that this layer is a member of
-			\return		<blur3d.classes.Scene>
+			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
@@ -220,7 +220,7 @@ class AbstractSceneLayerGroup:
 	def setFrozen( self, state ):
 		"""
 			\remarks	set the frozen (locked) state for the layers in this layer group
-			\sa			freeze, unfreeze, _nativeLayers, blur3d.classes.Scene._freezeNativeLayers
+			\sa			freeze, unfreeze, _nativeLayers, blur3d.api.Scene._freezeNativeLayers
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -263,7 +263,7 @@ class AbstractSceneLayerGroup:
 	def setHidden( self, state ):
 		"""
 			\remarks	set the hidden state for the layers on this layer
-			\sa			hide, unhide, _nativeObjets, blur3d.classes.Scene._hideNativeLayers
+			\sa			hide, unhide, _nativeObjets, blur3d.api.Scene._hideNativeLayers
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -290,7 +290,7 @@ class AbstractSceneLayerGroup:
 	def setSelected( self, state ):
 		"""
 			\remarks	sets the selected state of the layers on this layer
-			\sa			deselect, setSelected, _nativeLayers, blur3d.classes.Scene.setSelection
+			\sa			deselect, setSelected, _nativeLayers, blur3d.api.Scene.setSelection
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -318,5 +318,5 @@ class AbstractSceneLayerGroup:
 
 
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneLayerGroup', AbstractSceneLayerGroup, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneLayerGroup', AbstractSceneLayerGroup, ifNotFound = True )

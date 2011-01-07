@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenemap
+#	\namespace	blur3d.api.abstract.abstractscenemap
 #
 #	\remarks	The AbstractSceneMap class provides an interface to editing maps in a Scene environment for any DCC application
 #	
@@ -140,7 +140,7 @@ class AbstractSceneMap:
 	def scene( self ):
 		"""
 			\remarks	return the scene instance that this map is linked to
-			\return		<blur3d.classes.Scene>
+			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
@@ -185,5 +185,5 @@ class AbstractSceneMap:
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
 	
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneMap', AbstractSceneMap, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneMap', AbstractSceneMap, ifNotFound = True )

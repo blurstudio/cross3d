@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractsceneobjectgroup
+#	\namespace	blur3d.api.abstract.abstractsceneobjectgroup
 #
 #	\remarks	The AbstractSceneObjectGroup class provides an interface for working on sets of SceneObject's as a singular group
 #	
@@ -23,9 +23,9 @@ class AbstractSceneObjectGroup:
 		# define custom properties
 		self._scene					= scene
 		self._nativePointer			= nativeGroup
-		self._materialOverride		= None			# blur3d.classes.SceneMaterial 					- material to be used as the override material for the objects in this group
-		self._materialOverrideFlags	= 0				# blur3d.constants.MaterialDuplicateOptions		- options to be used when overriding materials
-		self._propSetOverride		= None			# blur3d.classes.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
+		self._materialOverride		= None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group
+		self._materialOverrideFlags	= 0				# blur3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
+		self._propSetOverride		= None			# blur3d.api.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -62,7 +62,7 @@ class AbstractSceneObjectGroup:
 	def _clearNativeMaterialOverride( self ):
 		"""
 			\remarks	[virtual] clear the native objects of any material overrides for this group
-			\sa			blur3d.classes.Scene._clearNativeMaterialOverride
+			\sa			blur3d.api.Scene._clearNativeMaterialOverride
 			\return		<bool> success
 		"""
 		return self._scene._clearNativeMaterialOverride( self._nativeObjects() )
@@ -70,7 +70,7 @@ class AbstractSceneObjectGroup:
 	def _clearNativePropSetOverride( self ):
 		"""
 			\remarks	[virtual] clear the native objects of any property set overrides for this group
-			\sa			blur3d.classes.Scene._clearNativePropSetOverride
+			\sa			blur3d.api.Scene._clearNativePropSetOverride
 			\return		<bool> success
 		"""
 		return self._scene._clearNativePropSetOverride( self._nativeObjects() )
@@ -102,19 +102,22 @@ class AbstractSceneObjectGroup:
 		
 		return None
 	
-	def _setNativeMaterialOverride( self, nativeMaterial ):
+	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
 		"""
 			\remarks	[virtual] set the current override materials for this object group
-			\sa			blur3d.classes.Scene._setNativeMaterialOverride
+			\sa			blur3d.api.Scene._setNativeMaterialOverride
 			\param		<variant> nativeMaterial || None
 			\return		<bool> success
 		"""
-		return self._scene._setNativeMaterialOverride( self._nativeObjects(), nativeMaterial )
+		if ( options == -1 ):
+			options = self.materialOverrideFlags()
+			
+		return self._scene._setNativeMaterialOverride( self._nativeObjects(), nativeMaterial, options = options )
 	
 	def _setNativePropSetOverride( self, nativePropSet ):
 		"""
 			\remarks	[virtual] set the current override property set for this object group
-			\sa			blur3d.classes.Scene._setNativePropSetOverride
+			\sa			blur3d.api.Scene._setNativePropSetOverride
 			\param		<variant> nativePropSet || None
 			\return		<bool> success
 		"""
@@ -127,10 +130,10 @@ class AbstractSceneObjectGroup:
 		"""
 			\remarks	add the objects to this layer
 			\sa			addSelection, _addNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
-		return self._addNativeObjects( [ object.nativeObject() for object in objects ] )
+		return self._addNativeObjects( [ object.nativePointer() for object in objects ] )
 	
 	def addSelection( self ):
 		"""
@@ -183,7 +186,7 @@ class AbstractSceneObjectGroup:
 		"""
 			\remarks	return whether or not the inputed flag is set in the override options
 			\sa			clearMaterialOverrideFlags, materialOverrideFlags, setMaterialOverrideFlag, setMaterialOverrideFlags
-			\param		flag	<blur3d.constants.MaterialDuplicateOptions>
+			\param		flag	<blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> exists
 		"""
 		return (self._materialOverrideFlags & flag) != 0
@@ -261,19 +264,19 @@ class AbstractSceneObjectGroup:
 	def objects( self ):
 		"""
 			\remarks	returns the SceneObject's that are associated with this layer
-			\return		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
-		from blur3d.classes import SceneObject
+		from blur3d.api import SceneObject
 		return [ SceneObject( self._scene, obj ) for obj in self._nativeObjects() ]
 	
 	def materialOverride( self ):
 		"""
 			\remarks	return the current override material for this object set
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
 		nativeMaterial = self._nativeMaterialOverride()
 		if ( nativeMaterial ):
-			from blur3d.classes import SceneMaterial
+			from blur3d.api import SceneMaterial
 			return SceneMaterial( self.scene(), nativeMaterial )
 		return None
 	
@@ -281,14 +284,14 @@ class AbstractSceneObjectGroup:
 		"""
 			\remarks	return the duplication flags for the override material
 			\sa			clearMaterialOverrideFlags, hasMaterialOverrideFlag, setMaterialOverrideFlag, setMaterialOverrideFlags
-			\return		<blur3d.constants.MaterialDuplicateOptions>
+			\return		<blur3d.constants.MaterialOverrideOptions>
 		"""
 		return self._materialOverrideFlags
 	
 	def propSetOverride( self ):
 		"""
 			\remarks	return the current override prop set for this object set
-			\return		<blur3d.classes.SceneObjectPropSet> || None
+			\return		<blur3d.api.SceneObjectPropSet> || None
 		"""
 		return self._propSetOverride
 	
@@ -310,7 +313,7 @@ class AbstractSceneObjectGroup:
 	def scene( self ):
 		"""
 			\remarks	return the scene instance that this layer is a member of
-			\return		<blur3d.classes.Scene>
+			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
@@ -337,24 +340,28 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
-	def setMaterialOverride( self, material ):
+	def setMaterialOverride( self, material, options = -1 ):
 		"""
 			\remarks	set the override material on the objects for this set
 			\sa			_setNativeMaterialOverride
-			\param		material	<blur3d.classes.SceneMaterial> || None
+			\param		material	<blur3d.api.SceneMaterial> || None
+			\param		options		<blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
 		nativeMaterial = None
 		if ( material ):
 			nativeMaterial = material.nativePointer()
+		
+		if ( options == -1 ):
+			options = self.materialOverrideFlags()
 			
-		return self._setNativeMaterialOverride( nativeMaterial )
+		return self._setNativeMaterialOverride( nativeMaterial, options = options )
 		
 	def setMaterialOverrideFlag( self, flag, state = True ):
 		"""
 			\remarks	set the inputed flag on or off based on the state
 			\sa			clearMaterialOverrideFlags, hasMaterialOverrideFlag, materialOverrideFlags, setMaterialOverrideFlags
-			\param		flag	<blur3d.constants.MaterialDuplicateOptions>
+			\param		flag	<blur3d.constants.MaterialOverrideOptions>
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -368,7 +375,7 @@ class AbstractSceneObjectGroup:
 		"""
 			\remarks	set all of the duplication flags for override materials
 			\sa			clearMaterialOverrideFlags, hasMaterialOverrideFlag, materialOverrideFlags, setMaterialOverrideFlag
-			\param		flags	<blur3d.constants.MaterialDuplicateOptions>
+			\param		flags	<blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
 		self._materialOverrideFlags = flags
@@ -377,7 +384,7 @@ class AbstractSceneObjectGroup:
 	def setPropSetOverride( self, propSet ):
 		"""
 			\remarks	set the override properties on the objects that are a part of this object group
-			\param		propSet		<blur3d.classes.SceneObjectPropSet>
+			\param		propSet		<blur3d.api.SceneObjectPropSet>
 			\return		<bool> success
 		"""
 		return self._setNativePropSetOverride( propSet.nativePointer() )
@@ -385,7 +392,7 @@ class AbstractSceneObjectGroup:
 	def setFrozen( self, state ):
 		"""
 			\remarks	set the frozen (locked) state for the objects on this layer
-			\sa			freeze, unfreeze, _nativeObjects, blur3d.classes.Scene._freezeNativeObjects
+			\sa			freeze, unfreeze, _nativeObjects, blur3d.api.Scene._freezeNativeObjects
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -409,7 +416,7 @@ class AbstractSceneObjectGroup:
 	def setHidden( self, state ):
 		"""
 			\remarks	set the hidden state for the objects on this layer
-			\sa			hide, unhide, _nativeObjets, blur3d.classes.Scene._hideNativeObjects
+			\sa			hide, unhide, _nativeObjets, blur3d.api.Scene._hideNativeObjects
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -418,7 +425,7 @@ class AbstractSceneObjectGroup:
 	def setSelected( self, state ):
 		"""
 			\remarks	sets the selected state of the objects on this layer
-			\sa			deselect, setSelected, _nativeObjects, blur3d.classes.Scene.setSelection
+			\sa			deselect, setSelected, _nativeObjects, blur3d.api.Scene.setSelection
 			\param		state	<bool>
 			\return		<bool> success
 		"""
@@ -442,5 +449,5 @@ class AbstractSceneObjectGroup:
 
 
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneObjectGroup', AbstractSceneObjectGroup, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneObjectGroup', AbstractSceneObjectGroup, ifNotFound = True )

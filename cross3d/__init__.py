@@ -17,7 +17,7 @@ def init():
 	for filename in filenames:
 		modname = os.path.normpath( filename ).split( os.path.sep )[-2]
 		if ( modname != 'abstract' ):
-			pckg = 'blur3d.classes.%s' % modname
+			pckg = 'blur3d.api.%s' % modname
 			
 			# try to import the overrides
 			try:
@@ -32,15 +32,15 @@ def init():
 			except:
 				continue
 	
-	# import the abstract classes for default implementations of classes
+	# import the abstract api for default implementations of api
 	import abstract
 	abstract.init()
 
 def registerSymbol( name, value, ifNotFound = False ):
 	# initialize a value in the dictionary
-	import blur3d.classes
-	if ( ifNotFound and name in blur3d.classes.__dict__ ):
+	import blur3d.api
+	if ( ifNotFound and name in blur3d.api.__dict__ ):
 		return
 		
-	blur3d.classes.__dict__[ name ] = value
+	blur3d.api.__dict__[ name ] = value
 	

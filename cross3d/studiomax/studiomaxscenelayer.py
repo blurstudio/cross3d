@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.studiomax.studiomaxscenelayer
+#	\namespace	blur3d.api.studiomax.studiomaxscenelayer
 #
 #	\remarks	The StudiomaxSceneLayer class provides implementation of the AbstractSceneLayer class as it applys to 3d Studio Max scenes
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.classes.abstract.abstractscenelayer	import AbstractSceneLayer
+from blur3d.api.abstract.abstractscenelayer	import AbstractSceneLayer
 
 #-----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ class LayerMetaData( MXSCustAttribDef ):
 		usages 		= list( self.value( 'altPropUsages', [] ) )
 		ids 		= list( self.value( 'altPropIds', [] ) )
 		
-		from blur3d.classes import SceneObjectPropSet
+		from blur3d.api import SceneObjectPropSet
 		baseProp = SceneObjectPropSet( None, None )
 		
 		values.append( baseProp._valueString() ) 
@@ -232,7 +232,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def _nativeLayerGroup( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer._nativeLayerGroup method to retrieve the SceneLayerGroup that this layer belongs to
-			\return		<blur3d.classes.SceneLayerGroup>
+			\return		<blur3d.api.SceneLayerGroup>
 		"""
 		index	= self.metaData().value( 'groupIndex' ) - 1
 		names 	= list(self._scene.metaData().value('layerGroupNames'))
@@ -303,7 +303,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._altMtlCache = mtls
 		return True
 	
-	def _setNativeMaterialOverride( self, nativeMaterial ):
+	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
 		"""
 			\remarks	reimplements the AbstractSceneObjectGroup._setNativeMaterialOverride method to set the overriden material for this layer instance,
 						marking that it is using a material from the global material cache if necessary
@@ -325,7 +325,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		else:
 			data.setValue( 'mtlLibindex', 0 )
 		
-		return AbstractSceneLayer._setNativeMaterialOverride( self, nativeMaterial )
+		return AbstractSceneLayer._setNativeMaterialOverride( self, nativeMaterial, options = options )
 		
 	def _setNativeLayerGroup( self, nativeLayerGroup ):
 		"""
@@ -374,7 +374,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def altMaterialFlags( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer.altMaterialFlags method to return a list of material duplication flags for this layer
-			\return		<list> [ <blur3d.constants.MaterialDuplicateOptions>, .. ]
+			\return		<list> [ <blur3d.constants.MaterialOverrideOptions>, .. ]
 		"""
 		if ( self._altMtlFlagsCache == None ):
 			self._altMtlFlagsCache = []
@@ -382,13 +382,13 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			keepDisplacement 	= list(self.metaData().value( 'keepDisplacement' ))
 			keepOpacity			= list(self.metaData().value( 'keepOpacity' ))
 			
-			from blur3d.constants import MaterialDuplicateOptions
+			from blur3d.constants import MaterialOverrideOptions
 			for i in range( len( keepDisplacement ) ):
 				flags = 0
 				if ( keepDisplacement[i] ):
-					flags |= MaterialDuplicateOptions.KeepDisplacement
+					flags |= MaterialOverrideOptions.KeepDisplacement
 				if ( keepOpacity[i] ):
-					flags |= MaterialDuplicateOptions.KeepOpacity
+					flags |= MaterialOverrideOptions.KeepOpacity
 					
 				self._altMtlFlagsCache.append(flags)
 				
@@ -399,10 +399,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\remarks	implements the AbstractSceneLayer.altPropSets method to retrive the alternate SceneObjectPropSet's for this layer
 			\sa			altPropSetCount, altPropAt, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
 						setCurrentAltPropSetIndex
-			\return		<list> [ <blur3d.classes.SceneObjectPropSet>, .. ]
+			\return		<list> [ <blur3d.api.SceneObjectPropSet>, .. ]
 		"""
 		if ( self._altPropCache == None ):
-			from blur3d.classes import SceneObjectPropSet
+			from blur3d.api import SceneObjectPropSet
 			
 			cache 			= []
 			data 			= self.metaData()
@@ -596,16 +596,16 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def setAltMaterialFlags( self, flags ):
 		"""
 			\remarks	implements the AbstractSceneLayer.setAltMaterialFlags method to set the alternate material flags for this instance
-			\param		flags	<list> [ <blur3d.constants.MaterialDuplicateOptions>
+			\param		flags	<list> [ <blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
 		keepDisp = []
 		keepOpac = []
 		
-		from blur3d.constants import MaterialDuplicateOptions
+		from blur3d.constants import MaterialOverrideOptions
 		for flag in flags:
-			keepDisp.append( (flag & MaterialDuplicateOptions.KeepDisplacement) != 0 )
-			keepOpac.append( (flag & MaterialDuplicateOptions.KeepOpacity) != 0 )
+			keepDisp.append( (flag & MaterialOverrideOptions.KeepDisplacement) != 0 )
+			keepOpac.append( (flag & MaterialOverrideOptions.KeepOpacity) != 0 )
 			
 		data = self.metaData()
 		data.setValue( 'keepDisplacement', 	keepDisp )
@@ -638,8 +638,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		altPropUsages = []
 		
 		# use blank prop strings for empty sets
-		from blur3d.classes import SceneObjectPropSet
+		from blur3d.api import SceneObjectPropSet
 		blank 		= SceneObjectPropSet( self._scene, None )
+		blankValues = blank._valueString()
+		blankUsages = blank._activeString()
 		
 		newSets = []
 		for propSet in propSets:
@@ -735,5 +737,5 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		return True
 		
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneLayer', StudiomaxSceneLayer )
+from blur3d import api
+api.registerSymbol( 'SceneLayer', StudiomaxSceneLayer )

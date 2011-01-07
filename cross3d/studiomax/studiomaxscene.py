@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.studiomax.studiomaxscene
+#	\namespace	blur3d.api.studiomax.studiomaxscene
 #
 #	\remarks	The StudiomaxScene class will define all the operations for Studiomax scene interaction.  
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax 								import mxs
-from blur3d.classes.abstract.abstractscene 	import AbstractScene
+from blur3d.api.abstract.abstractscene 	import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
 from mxscustattribdef import MXSCustAttribDef
@@ -234,7 +234,7 @@ class StudiomaxScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		from blur3d.constants 			import MaterialCacheType
-		from blur3d.classes.studiomax 	import StudiomaxAppData
+		from blur3d.api.studiomax 	import StudiomaxAppData
 		
 		# store the methods we're going to use
 		get_userprop 	= mxs.getUserProp
@@ -281,8 +281,8 @@ class StudiomaxScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		# store the methods we're going to use
-		from blur3d.classes 			import SceneObjectPropSet
-		from blur3d.classes.studiomax 	import StudiomaxAppData
+		from blur3d.api 			import SceneObjectPropSet
+		from blur3d.api.studiomax 	import StudiomaxAppData
 		
 		get_appdata		= mxs.getAppData
 		del_appdata		= mxs.deleteAppData
@@ -374,7 +374,7 @@ class StudiomaxScene( AbstractScene ):
 		
 		# create a VRay renderer
 		elif ( classname == RendererType.VRay ):
-			renderers = mxs.rendererClass.classes
+			renderers = mxs.rendererClass.api
 			
 			# find the installed V_Ray renderer
 			for renderer in renderers:
@@ -384,7 +384,7 @@ class StudiomaxScene( AbstractScene ):
 		
 		# create a specific renderer
 		else:
-			renderers = mxs.rendererClass.classes
+			renderers = mxs.rendererClass.api
 			
 			# find the installed V_Ray renderer
 			for renderer in renderers:
@@ -725,8 +725,8 @@ class StudiomaxScene( AbstractScene ):
 			\param		nativePropSet	<variant>
 			\return		<bool> success
 		"""
-		from blur3d.classes 			import SceneObjectPropSet
-		from blur3d.classes.studiomax 	import StudiomaxAppData
+		from blur3d.api 			import SceneObjectPropSet
+		from blur3d.api.studiomax 	import StudiomaxAppData
 		
 		get_appdata		= mxs.getAppData
 		del_appdata		= mxs.deleteAppData
@@ -793,7 +793,7 @@ class StudiomaxScene( AbstractScene ):
 		
 		return True
 	
-	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = 0 ):
+	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None ):
 		"""
 			\remarks	implements AbstractScene._setNativeMaterialOverride to apply this material as an override to the inputed objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
@@ -801,8 +801,9 @@ class StudiomaxScene( AbstractScene ):
 			\param		options			<blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
-		from blur3d.constants 			import MaterialOverrideOptions, MaterialCacheType
-		from blur3d.classes.studiomax 	import StudiomaxAppData
+		from blur3d.constants 		import MaterialOverrideOptions, MaterialCacheType
+		from blur3d.api.studiomax	import matlib
+		from blur3d.api.studiomax 	import StudiomaxAppData
 		
 		# store the methods we're going to use
 		get_userprop 	= mxs.getUserProp
@@ -812,10 +813,6 @@ class StudiomaxScene( AbstractScene ):
 		is_kindof		= mxs.isKindOf
 		geoclass		= mxs.GeometryClass
 		unique_id		= mxs.blurUtil.uniqueId
-		
-		# default option is to keep opacity and displacement
-		if ( options == None ):
-			options = MaterialOverrideOptions.KeepOpacity | MaterialOverrideOptions.KeepDisplacement
 		
 		self.setUpdatesEnabled(False)
 		
@@ -849,16 +846,8 @@ class StudiomaxScene( AbstractScene ):
 				baseMaterial 	= self._cachedNativeMaterial( MaterialCacheType.BaseMaterial, mid )
 			
 			# record simple material override
-			if ( not options ):
-				obj.material = nativeMaterial
+			obj.material = matlib.createOverride( baseMaterial, nativeMaterial, options = options )
 			
-			# reocrd duplicated material override
-			else:
-				obj.material = nativeMaterial
-#				mtype 			= BaseMaterialType.findTypeOf( baseMaterial )
-#				newmtl 			= mtype.override( baseMaterial, override, option )
-#				obj.material 	= newmtl
-		
 		self.setUpdatesEnabled(True)
 				
 		return True
@@ -1100,7 +1089,7 @@ class StudiomaxScene( AbstractScene ):
 	def setLayerGroups( self, layerGroups ):
 		"""
 			\remarks	reimplements the AbstractScene.setLayerGroups method to set the scene layer groups to the inputed list
-			\param		layerGroups		<list> [ <blur3d.classes.SceneLayerGroup> layerGroup, .. ]
+			\param		layerGroups		<list> [ <blur3d.api.SceneLayerGroup> layerGroup, .. ]
 			\return		<bool> success
 		"""
 		groupNames 	= []
@@ -1139,5 +1128,5 @@ class StudiomaxScene( AbstractScene ):
 		return output % str( mxs.maxversion()[0] )
 
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'Scene', StudiomaxScene )
+from blur3d import api
+api.registerSymbol( 'Scene', StudiomaxScene )

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.studiomax.studiomaxsceneobject
+#	\namespace	blur3d.api.studiomax.studiomaxsceneobject
 #
 #	\remarks	The StudiomaxSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to 3d Studio Max scenes
@@ -10,7 +10,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.classes.abstract.abstractsceneobject import AbstractSceneObject
+from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
 class StudiomaxSceneObject( AbstractSceneObject ):
 	AppDataAltMtlIndex		= 1108
@@ -319,5 +319,5 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		return True
 
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneObject', StudiomaxSceneObject )
+from blur3d import api
+api.registerSymbol( 'SceneObject', StudiomaxSceneObject )

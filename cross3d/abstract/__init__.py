@@ -11,7 +11,7 @@
 
 def init():
 	"""
-		\remarks	initializes the original abstract classes, registering them to the classes module when necessary
+		\remarks	initializes the original abstract classes, registering them to the api module when necessary
 	"""
 	import abstractscene
 	import abstractsceneobject

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenepropset
+#	\namespace	blur3d.api.abstract.abstractscenepropset
 #
 #	\remarks	The AbstractScenePropSet defines a class that creates a generic property set of information for any attribute that is being used
 #	
@@ -131,5 +131,5 @@ class AbstractScenePropSet:
 		return default
 
 # register the class to the system
-from blur3d import classes
-classes.registerSymbol( 'ScenePropSet', AbstractScenePropSet )
+from blur3d import api
+api.registerSymbol( 'ScenePropSet', AbstractScenePropSet )

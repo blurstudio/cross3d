@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractsceneobject
+#	\namespace	blur3d.api.abstract.abstractsceneobject
 #
 #	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the blur3d system
 #				This class will provide a generic overview structure for all manipulations of 3d objects
@@ -246,7 +246,7 @@ class AbstractSceneObject:
 			\remarks	returns the child at a particular index for this object
 			\sa			childCount, children, findChild, _nativeChildren
 			\param		index	<int>
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeChildren = self._nativeChildren()
 		if ( 0 <= index and index < len(nativeChildren) ):
@@ -265,9 +265,9 @@ class AbstractSceneObject:
 		"""
 			\remarks	returns SceneObject wrappers over the children for this object
 			\sa			childAt, childCount, findChild, _nativeChildren
-			\return		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
-		from blur3d.classes import SceneObject
+		from blur3d.api import SceneObject
 		scene = self._scene
 		return [ SceneObject( scene, native ) for native in self._nativeChildren() ]
 	
@@ -285,11 +285,11 @@ class AbstractSceneObject:
 			\sa			childAt, childCount, children, _nativeChildren, _findNativeChild
 			\param		name	<str>
 			\param		recursive <bool>
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeChild = self._findNativeChild( name, recursive = recursive )
 		if ( nativeChild ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self._scene, nativeChild )
 		return None
 
@@ -386,11 +386,11 @@ class AbstractSceneObject:
 		"""
 			\remarks	returns the SceneLayer that this object is on, or none if no layer found
 			\sa			setLayer, _nativeLayer
-			\return		<blur3d.classes.SceneLayer> || None
+			\return		<blur3d.api.SceneLayer> || None
 		"""
 		nativeLayer = self._nativeLayer()
 		if ( nativeLayer ):
-			from blur3d.classes import SceneLayer
+			from blur3d.api import SceneLayer
 			return SceneLayer( self._scene, nativeLayer )
 		return None
 	
@@ -398,11 +398,11 @@ class AbstractSceneObject:
 		"""
 			\remarks	returns the SceneMaterial that this object is using, or none if no scene material was found
 			\sa			setMaterial, _nativeMaterial, _setNativeMaterial
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
 		nativeMaterial = self._nativeMaterial()
 		if ( nativeMaterial ):
-			from blur3d.classes import SceneMaterial
+			from blur3d.api import SceneMaterial
 			return SceneMaterial( self._scene, nativeMaterial )
 		return None
 	
@@ -410,11 +410,11 @@ class AbstractSceneObject:
 		"""
 			\remarks	returns the SceneObject that is the model for this object
 			\sa			setModel, _nativeModel, _setNativeModel
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeModel = self._nativeModel()
 		if ( nativeModel ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self._scene, nativeModel )
 		return None
 	
@@ -465,11 +465,11 @@ class AbstractSceneObject:
 		"""
 			\remarks	returns the parent item for this object
 			\sa			setParent, _nativeParent, _setNativeParent
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeParent = self._nativeParent()
 		if ( nativeParent ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self._scene, nativeParent )
 		return None
 	
@@ -492,7 +492,7 @@ class AbstractSceneObject:
 	def scene( self ):
 		"""
 			\remarks	returns the scene that this object is a part of
-			\return		<blur3d.classes.Scene>
+			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
@@ -553,7 +553,7 @@ class AbstractSceneObject:
 		"""
 			\remarks	sets the layer for this object to the inputed SceneLayer
 			\sa			layer, _setNativeLayer
-			\param		layer	<blur3d.classes.SceneLayer> || None
+			\param		layer	<blur3d.api.SceneLayer> || None
 			\return		<bool> success
 		"""
 		nativeLayer = None
@@ -566,7 +566,7 @@ class AbstractSceneObject:
 		"""
 			\remarks	sets the material for this object to the inputed SceneMaterial
 			\sa			material, _nativeMaterial, _setNativeMaterial
-			\param		material	<blur3d.classes.SceneMaterial> || None
+			\param		material	<blur3d.api.SceneMaterial> || None
 			\return		<bool> success
 		"""
 		nativeMaterial = None
@@ -579,12 +579,12 @@ class AbstractSceneObject:
 		"""
 			\remarks	sets the model for this object to the inputed SceneObject
 			\sa			model, _setNativeModel
-			\param		model	<blur3d.classes.SceneObject> || None
+			\param		model	<blur3d.api.SceneObject> || None
 			\return		<bool> success
 		"""
 		nativeModel = None
 		if ( model ):
-			nativeModel = model.nativeObject()
+			nativeModel = model.nativePointer()
 			
 		return self._setNativeModel( nativeModel )
 	
@@ -622,18 +622,18 @@ class AbstractSceneObject:
 		"""
 			\remarks	sets the parent for this object to the inputed item
 			\sa			parent, _nativeParent, _setNativeParent
-			\param		parent	<blur3d.classes.SceneObject> || None
+			\param		parent	<blur3d.api.SceneObject> || None
 			\return		<bool> success
 		"""
-		from blur3d.classes import ObjectType
+		from blur3d.api import ObjectType
 		
 		# set the model in particular
 		if ( parent and parent.isObjectType( ObjectType.Model ) ):
-			return self._setNativeModel( parent.nativeObject() )
+			return self._setNativeModel( parent.nativePointer() )
 		
 		nativeParent = None
 		if ( parent ):
-			nativeParent = parent.nativeObject()
+			nativeParent = parent.nativePointer()
 		return self._setNativeParent( nativeParent )
 			
 	def setProperty( self, key, value ):
@@ -743,5 +743,5 @@ class AbstractSceneObject:
 		return icon
 
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneObject', AbstractSceneObject, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneObject', AbstractSceneObject, ifNotFound = True )

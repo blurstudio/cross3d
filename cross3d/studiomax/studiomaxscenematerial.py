@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenematerial
+#	\namespace	blur3d.api.abstract.abstractscenematerial
 #
 #	\remarks	The AbstractSceneMaterial class provides an interface to editing materials in a Scene environment for any DCC application
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax 										import mxs
-from blur3d.classes.abstract.abstractscenematerial 	import AbstractSceneMaterial
+from blur3d.api.abstract.abstractscenematerial 	import AbstractSceneMaterial
 
 class StudiomaxSceneMaterial( AbstractSceneMaterial ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -91,5 +91,5 @@ class StudiomaxSceneMaterial( AbstractSceneMaterial ):
 		return True
 		
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneMaterial', StudiomaxSceneMaterial )
+from blur3d import api
+api.registerSymbol( 'SceneMaterial', StudiomaxSceneMaterial )

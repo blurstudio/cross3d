@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenematerial
+#	\namespace	blur3d.api.abstract.abstractscenematerial
 #
 #	\remarks	The AbstractSceneMaterial class provides an interface to editing materials in a Scene environment for any DCC application
 #	
@@ -140,7 +140,7 @@ class AbstractSceneMaterial:
 	def scene( self ):
 		"""
 			\remarks	return the scene instance that this material is linked to
-			\return		<blur3d.classes.Scene>
+			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
@@ -185,5 +185,5 @@ class AbstractSceneMaterial:
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
 	
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneMaterial', AbstractSceneMaterial, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneMaterial', AbstractSceneMaterial, ifNotFound = True )

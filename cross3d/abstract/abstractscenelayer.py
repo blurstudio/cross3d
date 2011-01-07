@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscenelayer
+#	\namespace	blur3d.api.abstract.abstractscenelayer
 #
 #	\remarks	The AbstractSceneLayer provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
@@ -162,7 +162,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 			\remarks	add the inputed material to the list of possible alternate materials for this layer
 			\sa			altMaterials, setAltMaterials
-			\param		material	<blur3d.classes.SceneMaterial>
+			\param		material	<blur3d.api.SceneMaterial>
 			\return		<bool> success
 		"""
 		altMtls = self.altMaterials()
@@ -173,7 +173,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 			\remarks	add the property set to the list of possible alternate property sets for this layer
 			\sa			altPropSets, setAltPropSets
-			\param		propSet		<blur3d.classes.ScenePropSet>
+			\param		propSet		<blur3d.api.ScenePropSet>
 			\return		<bool> success
 		"""
 		propSets = self.altPropSets()
@@ -186,13 +186,13 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\sa			altMaterialCount, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials, 
 						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
 			\param		index	<int>
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
 		mtls = self._nativeAltMaterials()
 		if ( 0 <= index and index < len(mtls) ):
 			mtl = mtls[index]
 			if ( mtl ):
-				from blur3d.classes import SceneMaterial
+				from blur3d.api import SceneMaterial
 				return SceneMaterial( self._scene, mtl )
 			else:
 				return None
@@ -212,9 +212,9 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	return a list of the alternate materials held by this layer
 			\sa			altMaterialAt, altMaterialCount, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials, 
 						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<list> [ <blur3d.classes.SceneMaterial>, .. ]
+			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
 		"""
-		from blur3d.classes import SceneMaterial
+		from blur3d.api import SceneMaterial
 		output = []
 		for mtl in self._nativeAltMaterials():
 			if ( mtl ):
@@ -252,7 +252,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	retrive the alternate SceneObjectPropSet at the inputed index
 			\sa			altPropSetCount, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
 						setCurrentAltPropSetIndex
-			\return		<blur3d.classes.SceneObjectPropSet> || None
+			\return		<blur3d.api.SceneObjectPropSet> || None
 		"""
 		propsets = self.altPropSets()
 		if ( 0 <= index and index < len(propsets) ):
@@ -273,7 +273,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	[abstract]	retrive the alternate SceneObjectPropSet's for this layer
 			\sa			altPropSetCount, altPropAt, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
 						setCurrentAltPropSetIndex
-			\return		<list> [ <blur3d.classes.SceneObjectPropSet>, .. ]
+			\return		<list> [ <blur3d.api.SceneObjectPropSet>, .. ]
 		"""
 		from blurdev import debug
 		
@@ -405,11 +405,11 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 			\remarks	return the layer group that this layer belongs to
 			\sa			_nativeLayerGroup
-			\return		<blur3d.classes.SceneLayerGroup> || None
+			\return		<blur3d.api.SceneLayerGroup> || None
 		"""
 		nativeGroup = self._nativeLayerGroup()
 		if ( nativeGroup ):
-			from blur3d.classes import SceneLayerGroup
+			from blur3d.api import SceneLayerGroup
 			return SceneLayerGroup( self._scene, nativeGroup )
 		return None
 	
@@ -625,7 +625,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		# apply an override state
 		if ( 0 <= index and index < len(mtls) ):
 			self._altMtlIndex = index
-			return self.setMaterialOverride( mtls[index] )
+			return self.setMaterialOverride( mtls[index], options = self.altMaterialFlagsAt(index) )
 			
 		# clear an override state
 		elif ( index == -1 ):
@@ -695,7 +695,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 			\remarks	set the layer group that this layer is associated with
 			\sa			layerGroup, _setNativeLayerGroup
-			\param		layerGroup	<blur3d.classes.SceneLayerGroup> || None
+			\param		layerGroup	<blur3d.api.SceneLayerGroup> || None
 			\return		<bool> success
 		"""
 		nativeGroup = None
@@ -766,5 +766,5 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		return QColor()
 	
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'SceneLayer', AbstractSceneLayer, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'SceneLayer', AbstractSceneLayer, ifNotFound = True )

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.classes.abstract.abstractscene
+#	\namespace	blur3d.api.abstract.abstractscene
 #
 #	\remarks	The AbstractScene class will define all the operations for scene interaction.  Everything for the 3d abstraction layer of the blur3d
 #				package will access information from a Scene instance.  This way, you can have a reference to a Studiomax scene, a Softimage scene, a
@@ -565,7 +565,7 @@ class AbstractScene( QObject ):
 		
 		return False
 	
-	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = 0 ):
+	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None ):
 		"""
 			\remarks	[abstract] set the material override for the inputed objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
@@ -686,11 +686,11 @@ class AbstractScene( QObject ):
 	def activeLayer( self ):
 		"""
 			\remarks	returns the currently active layer of the scene
-			\return		<blur3d.classes.SceneLayer> || None
+			\return		<blur3d.api.SceneLayer> || None
 		"""
 		lay = self._nativeActiveLayer()
 		if ( lay ):
-			from blur3d.classes import SceneLayer
+			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
 	
@@ -699,7 +699,7 @@ class AbstractScene( QObject ):
 			\remarks	cache the inputed map in the scene for the given cache type
 			\sa			_cacheNativeMap
 			\param		cacheType	<blur3d.constants.MapCacheType>
-			\param		sceneMap	<blur3d.classes.SceneMap>
+			\param		sceneMap	<blur3d.api.SceneMap>
 			\return		<bool> success
 		"""
 		return self._cacheNativeMap( cacheType, sceneMap.nativePointer() )
@@ -709,7 +709,7 @@ class AbstractScene( QObject ):
 			\remarks	cache the inputed material in the scene for the given cache type
 			\sa			_cacheNativeMaterial
 			\param		cacheType	<blur3d.constants.MaterialCacheType>
-			\param		material	<blur3d.classes.SceneMaterial>
+			\param		material	<blur3d.api.SceneMaterial>
 			\return		<bool> success
 		"""
 		return self._cacheNativeMaterial( cacheType, material.nativePointer() )
@@ -721,11 +721,11 @@ class AbstractScene( QObject ):
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\param		mapId		<str>
 			\param		default		<variant>	default return value if not found
-			\return		<blur3d.classes.SceneMap> || None
+			\return		<blur3d.api.SceneMap> || None
 		"""
 		nativeMap =  self._cachedNativeMap( cacheType, mapId )
 		if ( nativeMap ):
-			from blur3d.classes import SceneMap
+			from blur3d.api import SceneMap
 			return SceneMap( self, nativeMap )
 		return None
 	
@@ -734,9 +734,9 @@ class AbstractScene( QObject ):
 			\remarks	return the cached maps for this scene for the given cache type
 			\sa			_cachedNativeMaps
 			\param		cacheType		<blur3d.constants.MapCacheType>
-			\return		<list> [ <blur3d.classes.SceneMap> map, .. ]
+			\return		<list> [ <blur3d.api.SceneMap> map, .. ]
 		"""
-		from blur3d.classes import SceneMap
+		from blur3d.api import SceneMap
 		return [ SceneMap( self, nativeMap ) for nativeMap in self._cachedNativeMaps( cacheType ) ]
 	
 	def cachedMaterial( self, cacheType, materialId, default = None ):
@@ -746,11 +746,11 @@ class AbstractScene( QObject ):
 			\param		cacheType	<blur3d.constants.MaterialCacheType>
 			\param		materialId	<str>
 			\param		default		<variant>	default return value if not found
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
 		nativeMaterial = self._cachedNativeMaterial( cacheType, materialId, default = default )
 		if ( nativeMaterial ):
-			from blur3d.classes import SceneMaterial
+			from blur3d.api import SceneMaterial
 			return SceneMaterial( self, nativeMaterial )
 		return None
 	
@@ -759,9 +759,9 @@ class AbstractScene( QObject ):
 			\remarks	return the cached materials for this scene given the inputed cache type
 			\sa			_cachedNativeMaterials
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
-			\return		<list> [ <blur3d.classes.SceneMaterial> material, .. ]
+			\return		<list> [ <blur3d.api.SceneMaterial> material, .. ]
 		"""
-		from blur3d.classes import SceneMaterial
+		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) ]
 	
 	def checkForSave( self ):
@@ -781,7 +781,7 @@ class AbstractScene( QObject ):
 	def clearMaterialOverride( self, objects ):
 		"""
 			\remarks	clear the inputed objects of any material overrides that are applied
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._clearNativeMaterialOverride( [ obj.nativePointer() for obj in objects ] )
@@ -789,7 +789,7 @@ class AbstractScene( QObject ):
 	def clearPropSetOverride( self, objects ):
 		"""
 			\remarks	clear the inputed objects of any property set overrides that are applied
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._clearNativePropSetOverride( [ obj.nativePointer() for obj in objects ] )
@@ -806,12 +806,12 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
 			\param		name 		<str>
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
-			\return		<blur3d.classes.SceneLayer> || None
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\return		<blur3d.api.SceneLayer> || None
 		"""
 		lay = self._createNativeLayer( name, nativeObjects = [ obj.nativePointer() for obj in objects ] )
 		if ( lay ):
-			from blur3d.classes import SceneLayer
+			from blur3d.api import SceneLayer
 			layer = SceneLayer( self, lay )
 			self.layerCreated.emit( layer )
 			return layer
@@ -822,23 +822,23 @@ class AbstractScene( QObject ):
 			\remarks	create a new group of layers with the inputed names
 			\sa			layerGroups, _createNativeLayerGroup
 			\param		name		<str>
-			\param		layers		<list> [ <blur3d.classes.SceneLayer>, .. ]
-			\return		<blur3d.classes.SceneLayerGroup> || None
+			\param		layers		<list> [ <blur3d.api.SceneLayer>, .. ]
+			\return		<blur3d.api.SceneLayerGroup> || None
 		"""
 		nativeGroup = self._createNativeLayerGroup( name, nativeLayers = [ layer.nativePointer() for layer in layers ] )
 		if ( nativeGroup ):
-			from blur3d.classes import SceneLayerGroup
+			from blur3d.api import SceneLayerGroup
 			return SceneLayerGroup( self, nativeGroup )
 		return None
 		
 	def createModel( self, name = 'New Model', objects = [] ):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeModel = self._createNativeModel( name = name, nativeObjects = [ obj.nativePointer() for obj in objects ] )
 		if ( nativeModel ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self, nativeModel )
 		return None
 		
@@ -866,11 +866,11 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	return the current environment map from the scene
 			\sa			setEnvironmentMap, _nativeEnvironmentMap
-			\return		<blur3d.classes.SceneMap> || None
+			\return		<blur3d.api.SceneMap> || None
 		"""
 		nativeMap = self._nativeEnvironmentMap()
 		if ( nativeMap ):
-			from blur3d.classes import SceneMap
+			from blur3d.api import SceneMap
 			return SceneMap( self, nativeMap )
 		return None
 	
@@ -878,11 +878,11 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	return the current environment map override for this scene
 			\sa			setEnvironmentMapOverride, _nativeEnvironmentOverride
-			\return		<blur3d.classes.SceneMap> || None
+			\return		<blur3d.api.SceneMap> || None
 		"""
 		nativeMap = self._nativeEnvironmentMapOverride()
 		if ( nativeMap ):
-			from blur3d.classes import SceneMap
+			from blur3d.api import SceneMap
 			return SceneMap( self, nativeMap )
 		return None
 	
@@ -890,7 +890,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	locks/freezes the inputed nodes based on the state
 			\sa			_freezeNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -901,11 +901,11 @@ class AbstractScene( QObject ):
 			\remarks	looks up an individual object by its name
 			\sa			_findNativeObject
 			\param		objectName	<str>
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		nativeObject = self._findNativeObject( objectName )
 		if ( nativeObject ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self, nativeObject )
 		return None
 		
@@ -914,11 +914,11 @@ class AbstractScene( QObject ):
 			\remarks	looks up a layer based on the inputed name
 			\sa			_findNativeLayer
 			\param		layerName	<str>
-			\return		<blur3d.classes.SceneLayer> || None
+			\return		<blur3d.api.SceneLayer> || None
 		"""
 		nativeLayer = self._findNativeLayer( layerName )
 		if ( nativeLayer ):
-			from blur3d.classes import SceneLayer
+			from blur3d.api import SceneLayer
 			return SceneLayer( self, nativeLayer )
 		return None
 	
@@ -927,11 +927,11 @@ class AbstractScene( QObject ):
 			\remarks	look up a layer group based on the inputed name
 			\sa			_findNativeLayerGroup
 			\param		groupName	<str>
-			\return		<blur3d.classes.SceneLayerGroup> || None
+			\return		<blur3d.api.SceneLayerGroup> || None
 		"""
 		nativeLayerGroup = self._findNativeLayerGroup( groupName )
 		if ( nativeLayerGroup ):
-			from blur3d.classes import SceneLayerGroup
+			from blur3d.api import SceneLayerGroup
 			return SceneLayerGroup( self, nativeLayerGroup )
 		return None
 	
@@ -964,9 +964,9 @@ class AbstractScene( QObject ):
 	def getMaterial( self ):
 		"""
 			\remarks	invokes the application's ability to let a user select a Material from the scene
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
-		from blur3d.classes import SceneMaterial
+		from blur3d.api import SceneMaterial
 		mtl = self._getNativeMaterial()
 		if ( mtl ):
 			return SceneMaterial( self, mtl )
@@ -975,9 +975,9 @@ class AbstractScene( QObject ):
 	def getMap( self ):
 		"""
 			\remarks	invokes the application's ability to let a user select a Material from the scene
-			\return		<blur3d.classes.SceneMaterial> || None
+			\return		<blur3d.api.SceneMaterial> || None
 		"""
-		from blur3d.classes import SceneMap
+		from blur3d.api import SceneMap
 		nativeMap = self._getNativeMap()
 		if ( nativeMap ):
 			return SceneMap( self, nativeMap )
@@ -998,7 +998,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	hides the inputed objects based on the given state
 			\sa			_hideNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -1015,7 +1015,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	isolates (hides all other objects) or unisolates the inputed objects in the scene
 			\sa			_isolateNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -1025,18 +1025,18 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	collects all the layers in the scene and returns them
 			\sa			createLayer, findLayer
-			\return		<list> [ <blur3d.classes.SceneLayer>, .. ]
+			\return		<list> [ <blur3d.api.SceneLayer>, .. ]
 		"""
-		from blur3d.classes import SceneLayer
+		from blur3d.api import SceneLayer
 		return [ SceneLayer( self, nativeLayer ) for nativeLayer in self._nativeLayers() ]
 	
 	def layerGroups( self ):
 		"""
 			\remarks	collect all the layer groups and their corresponding layers
 			\sa			createLayerGroup, findLayerGroup
-			\return		<dict> { <str> groupName: <list> [ <blur3d.classes.SceneLayer>, .. ], .. }
+			\return		<dict> { <str> groupName: <list> [ <blur3d.api.SceneLayer>, .. ], .. }
 		"""
-		from blur3d.classes import SceneLayerGroup
+		from blur3d.api import SceneLayerGroup
 		return [ SceneLayerGroup( self, nativeLayerGroup ) for nativeLayerGroup in self._nativeLayerGroups() ]
 	
 	def loadFile( self, filename = '' ):
@@ -1057,17 +1057,17 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	loads all the materials from a given material library file
 			\param		filename	<str>
-			\return		<list> [ <blur3d.classes.SceneMaterial> ]
+			\return		<list> [ <blur3d.api.SceneMaterial> ]
 		"""
-		from blur3d.classes import SceneMaterial
+		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, nativeMaterial ) for nativeMaterial in self._loadNativeMaterialsFromLibrary( filename ) ]
 	
 	def objects( self ):
 		"""
 			\remarks	returns a list of all the objects in the scene wrapped as SceneObjects
-			\return		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
-		from blur3d.classes import SceneObject
+		from blur3d.api import SceneObject
 		return [ SceneObject( self, obj ) for obj in self._nativeObjects() ]
 	
 	def property( self, key, default = None ):
@@ -1123,7 +1123,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	removes the objects from the scene
 			\sa			_removeNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._removeNativeObjects( [ obj.nativePointer() for obj in objects ] )
@@ -1132,7 +1132,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	renames the inputed objects to the inputed names
 			\sa			_renameNativeObjects
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\param		names		<list> [ <str>, .. ]
 			\param		display		<bool> 	tags whether or not the names are display names or object names
 			\return		<bool> success
@@ -1169,11 +1169,11 @@ class AbstractScene( QObject ):
 	def rootObject( self ):
 		"""
 			\remarks	returns the root object of the scene
-			\return		<blur3d.classes.SceneObject> || None
+			\return		<blur3d.api.SceneObject> || None
 		"""
 		native = self._nativeRootObject()
 		if ( native ):
-			from blur3d.classes import SceneObject
+			from blur3d.api import SceneObject
 			return SceneObject( self, native )
 		return None
 	
@@ -1202,16 +1202,16 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	returns the currently selected objects from the scene
 			\sa			_nativeSelection
-			\return		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
-		from blur3d.classes import SceneObject
+		from blur3d.api import SceneObject
 		return [ SceneObject( self, obj ) for obj in self._nativeSelection() ]
 	
 	def setEnvironmentMap( self, sceneMap ):
 		"""
 			\remarks	set the current environment map in the scene to the inputed map
 			\sa			environmentMap, _setNativeEnvironmentMap
-			\param		sceneMap		<blur3d.classes.SceneMap>
+			\param		sceneMap		<blur3d.api.SceneMap>
 			\return		<bool> success
 		"""
 		nativeMap = None
@@ -1224,7 +1224,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	override the current environment map in the scene to the inputed map
 			\sa			setEnvironmentMap, _setNativeEnvironmentMapOverride
-			\param		sceneMap		<blur3d.classes.SceneMap>
+			\param		sceneMap		<blur3d.api.SceneMap>
 			\return		<bool> success
 		"""
 		nativeMap = None
@@ -1238,7 +1238,7 @@ class AbstractScene( QObject ):
 			\remarks	set the cached map for this scene at the inputed index to the given map
 			\param		cacheType		<blur3d.constants.MapCacheType>
 			\param		index			<int>
-			\param		sceneMap		<blur3d.classes.SceneMap> || None
+			\param		sceneMap		<blur3d.api.SceneMap> || None
 			\return		<bool> success
 		"""
 		nativeMaps = self._cachedNativeMaps( cacheType )
@@ -1256,7 +1256,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	set the cached maps for this scene for the given cacheType
 			\param		cacheType		<blur3d.constants.MapCacheType>
-			\param		sceneMaps		<list> [ <blur3d.classes.SceneMap> map, .. ]
+			\param		sceneMaps		<list> [ <blur3d.api.SceneMap> map, .. ]
 			\return		<bool> success
 		"""
 		return self._setCachedNativeMaps( [ sceneMap.nativePointer() for sceneMap in sceneMaps ] )
@@ -1266,7 +1266,7 @@ class AbstractScene( QObject ):
 			\remarks	set the cached material for this scene at the inputed index to the given material
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
 			\param		index			<int>
-			\param		material		<blur3d.classes.SceneMaterial> || None
+			\param		material		<blur3d.api.SceneMaterial> || None
 			\return		<bool> success
 		"""
 		nativeMaterials = self._cachedNativeMaterials( cacheType )
@@ -1284,7 +1284,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	set the cached materials for this scene for the given cacheType
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
-			\param		materials		<list> [ <blur3d.classes.SceneMaterial> material, .. ]
+			\param		materials		<list> [ <blur3d.api.SceneMaterial> material, .. ]
 			\return		<bool> success
 		"""
 		return self._setCachedNativeMaterials( cacheType, [ material.nativePointer() for material in materials ] )
@@ -1307,8 +1307,8 @@ class AbstractScene( QObject ):
 	def setPropSetOverride( self, objects, propSet ):
 		"""
 			\remarks	set the override property set for the inputed objects to the given propset
-			\param		objects		<list> [ <blur3d.classes.SceneObject> object, .. ]
-			\param		propSet		<blur3d.classes.ScenePropSet>
+			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
+			\param		propSet		<blur3d.api.ScenePropSet>
 			\return		<bool> success
 		"""
 		nativePropSet = None
@@ -1317,23 +1317,23 @@ class AbstractScene( QObject ):
 		
 		return self._setNativePropSetOverride( self, [ obj.nativePointer() for obj in objects ], nativePropSet )
 	
-	def setMaterialOverride( self, objects, material, options = 0 ):
+	def setMaterialOverride( self, objects, material, options = None ):
 		"""
 			\remarks	set the override material for the inputed objects to the given material
-			\param		objects		<list> [ <blur3d.classes.SceneObject> object, .. ]
-			\param		material	<blur3d.classes.SceneMaterial>
+			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
+			\param		material	<blur3d.api.SceneMaterial>
 			\param		options		<blur3d.constants.MaterialOverrideOptions>
 		"""
 		nativeMaterial = None
 		if ( material ):
 			nativeMaterial = material.nativePointer()
 			
-		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options )
+		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options )
 	
 	def setSelection( self, objects ):
 		"""
 			\remarks	selects the inputed objects in the scene
-			\param		objects		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._setNativeSelection( [ obj.nativePointer() for obj in objects ] )
@@ -1403,22 +1403,22 @@ class AbstractScene( QObject ):
 	def visibleObjects( self ):
 		"""
 			\remarks	returns the objects that are currently visible in the scene
-			\return		<list> [ <blur3d.classes.SceneObject>, .. ]
+			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
-		from blur3d.classes import SceneObject
+		from blur3d.api import SceneObject
 		return [ SceneObject( self, nativeObject ) for nativeObject in self._visibleNativeObjects() ]
 	
 	def worldLayer( self ):
 		"""
 			\remarks	[virtual]	returns the base world layer for the scene
-			\return		<blur3d.classes.SceneLayer> || None
+			\return		<blur3d.api.SceneLayer> || None
 		"""
 		lay = self._nativeWorldLayer()
 		if ( lay ):
-			from blur3d.classes import SceneLayer
+			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
 	
 # register the symbol
-from blur3d import classes
-classes.registerSymbol( 'Scene', AbstractScene, ifNotFound = True )
+from blur3d import api
+api.registerSymbol( 'Scene', AbstractScene, ifNotFound = True )
