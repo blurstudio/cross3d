@@ -164,6 +164,13 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 			ldata.setValue( 'groupIndex', names.index(oname) + 1 )
 		
 		return True
+	
+	def setHidden( self, state ):
+		AbstractSceneLayerGroup.setHidden( self, state )
+		
+		# toggle caches
+		from blur3d.api.studiomax.cachelib import pointcache
+		pointcache.toggleSceneCaches()
 		
 	def setOpen( self, state ):
 		"""

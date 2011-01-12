@@ -254,8 +254,15 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# load the material from the alternate materials
 		index = data.value( 'currentAltPropIndex' )
 		if ( index ):
-			return list(data.value( 'altMtls' ))[index-1]
-		
+			mtls = list(data.value( 'altMtls' ))
+			index -= 1
+			if ( 0 <= index and index < len(mtls) ):
+				return mtls[index]
+			else:
+				from blurdev import debug
+				debug.debugObject( self._nativeMaterialOverride, '%i index is out of range of %i alt materials for %s layer.' % (index,len(mtls),self.layerName()) )
+				return None
+				
 		# load the material from the material library
 		index = data.value( 'mtlLibindex' )
 		if ( index ):
@@ -419,7 +426,25 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			self._altPropCache = cache
 			
 		return self._altPropCache
+		
+	def currentAltMaterialIndex( self ):
+		"""
+			\remarks	retrive the index of the currently applied alternate material for this layer
+			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterial, setAltMaterialAt, setAltMaterials, 
+						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
+			\return		<int> index
+		"""
+		return self.metaData().value( 'currentAltMtlIndex', 0 ) - 1
 	
+	def currentAltPropSetIndex( self ):
+		"""
+			\remarks	retrive the index of the currently applied alternate material for this layer
+			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterial, setAltMaterialAt, setAltMaterials, 
+						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
+			\return		<int> index
+		"""
+		return self.metaData().value( 'currentAltPropIndex', 0 ) - 1
+		
 	def hasProperty( self, key ):
 		"""
 			\remarks	implements the AbstractSceneLayer.hasProperty method to return whether or not a given property exists for this layer
@@ -716,6 +741,11 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._nativePointer.ishidden = state
 		AbstractSceneLayer.setHidden( self, state )
 		self._scene.setUpdatesEnabled(True)
+		
+		# toggle the visible options state when the scene is enabled
+		if ( self._scene.updatesEnabled() ):
+			self._scene._nativeToggleVisibleOptions( self.objects(), not self.isHidden() )
+		
 		return True
 		
 	def setLayerName( self, layerName ):

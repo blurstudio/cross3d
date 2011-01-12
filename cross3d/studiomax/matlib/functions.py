@@ -210,7 +210,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 	
 	# use default options when none are supplied
 	if ( options == None ):
-		options = MaterialOverrideOptions.KeepOpacity | MaterialOverrideOptions.KeepDisplacement
+		options = MaterialOverrideOptions.All
 	
 	# make sure we have at least some overriding options or a base material to work from
 	if ( not options ):
