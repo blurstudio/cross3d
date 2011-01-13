@@ -744,7 +744,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		
 		# toggle the visible options state when the scene is enabled
 		if ( self._scene.updatesEnabled() ):
-			self._scene._nativeToggleVisibleOptions( self.objects(), not self.isHidden() )
+			self._scene._nativeToggleVisibleOptions( self._nativeObjects(), not self.isHidden() )
 		
 		return True
 		
