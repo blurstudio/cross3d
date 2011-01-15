@@ -7,16 +7,17 @@
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		03/15/10
-#
-
-def init():
-	"""
-		\remarks	initializes the original abstract classes, registering them to the api module when necessary
-	"""
-	import abstractscene
-	import abstractsceneobject
-	import abstractsceneobjectgroup
-	import abstractscenelayer
-	import abstractscenelayergroup
-	import abstractscenematerial
+#
+
+def init():
+	"""
+		\remarks	initializes the original abstract classes, registering them to the api module when necessary
+	"""
+	import abstractscene
+	import abstractsceneobject
+	import abstractsceneobjectgroup
+	import abstractscenelayer
+	import abstractscenelayergroup
+	import abstractscenematerial
 	import abstractscenemap
+	import abstractsceneatmospheric

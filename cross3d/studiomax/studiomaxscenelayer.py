@@ -166,19 +166,38 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._altPropCache		= None
 		self._altMtlCache		= None
 		self._altMtlFlagsCache	= None
-		self._nativeObjectCache	= None
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def __del__( self ):
-		if ( self._nativeObjectCache ):
-			del self._nativeObjectCache
-		if ( self._metaData ):
-			del self._metaData
-		if ( self._altMtlCache ):
-			del self._altMtlCache
+	def _addNativeAtmospherics( self, nativeAtmos ):
+		"""
+			\remarks	implements the AbstractSceneObjectGroup._addNativeAtmospherics method to add a list of atmospherics to this layer
+			\param		nativeAtmos		<list> [ <Py3dsMax.mxs.Atmospheric> || <Py3dsMax.mxs.Effect> nativeAtmos ]
+			\return		<bool> success
+		"""
+		data 		= self.metaData()
+		atm 		= list(data.value('linkedAtmos'))
+		unique_id	= mxs.blurUtil.uniqueId
 		
+		for atmos in nativeAtmos:
+			uid = unique_id( atmos )
+			if ( not uid in atm ):
+				atm.append( uid )
+		
+		data.setValue( 'linkedAtmos', atm )
+		
+		# reset the id's on other layers
+		for layer in self._scene.layers():
+			if ( layer == self ):
+				continue
+			
+			latm = list(layer.metaData().value( 'linkedAtmos' ))
+			latm = [ i for i in latm if not i in atm ]
+			layer.metaData().setValue( 'linkedAtmos', latm )
+		
+		return True
+	
 	def _addNativeObjects( self, nativeObjects ):
 		"""
 			\remarks	implements the AbstractSceneObjectGroup._addNativeObjects method to add the native objects to the layer
@@ -238,6 +257,33 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			
 		return self._altMtlCache
 	
+	def _nativeAtmospherics( self ):
+		"""
+			\remarks	implements the AbstractObjectGroup._nativeAtmospherics method to return a list of the atmospheric instances linked to this layer
+			\return		<list> [ <Py3dsMax.mxs.Atmospheric> || <Py3dsMax.mxs.Effect> nativeAtmospheric, .. ]
+		"""
+		unique_id 	= mxs.blurUtil.uniqueId
+		atm			= list(self.metaData().value('linkedAtmos'))
+		get_atmos	= mxs.getAtmospheric
+		get_effect	= mxs.getEffect
+		output		= []
+		
+		# collect the atmospherics
+		for i in range( mxs.numAtmospherics ):
+			atmos 	= get_atmos(i+1)
+			uid		= unique_id(atmos)
+			if ( uid in atm ):
+				output.append(atmos)
+		
+		# collect the effects
+		for i in range( mxs.numEffects ):
+			effect	= get_effect(i+1)
+			uid		= unique_id(effect)
+			if ( uid in atm ):
+				output.append(effect)
+			
+		return output
+	
 	def _nativeLayerGroup( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer._nativeLayerGroup method to retrieve the SceneLayerGroup that this layer belongs to
@@ -255,9 +301,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\sa			objects
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
-		#if ( not self._nativeObjectCache ):
-		#	self._nativeObjectCache = mxs.pyhelper.getLayerNodes( self._nativePointer )
-		#return self._nativeObjectCache
 		return mxs.pyhelper.getLayerNodes( self._nativePointer )
 	
 	def _nativeMaterialOverride( self ):
@@ -358,6 +401,31 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			self.metaData().setValue( 'groupIndex', names.index( nativeLayerGroup ) + 1 )	# preserve maxscripts 1-based indexing for the Maxscript Onion
 			return True
 		return False
+	
+	def _setNativeAtmospherics( self, nativeAtmospherics ):
+		"""
+			\remarks	implements the AbstractObjectGroup._setNativeAtmospherics method to set the inputed list of atmospherics
+			\param		nativeAtmospherics	<list> [ <Py3dsMax.mxs.Atmospheric> nativeAtmospheric, .. ]
+			\return		<bool> success
+		"""
+		atm 		= []
+		unique_id 	= mxs.blurUtil.uniqueId
+		
+		# collect the id's for this layer
+		for atmos in nativeAtmospherics:
+			atm.append( unique_id( atmos ) )
+		self.metaData().setValue( 'linkedAtmos', atm )
+		
+		# reset the id's on other layers
+		for layer in self._scene.layers():
+			if ( layer == self ):
+				continue
+			
+			latm = list(layer.metaData().value( 'linkedAtmos' ))
+			latm = [ i for i in latm if not i in atm ]
+			layer.metaData().setValue( 'linkedAtmos', latm )
+		
+		return True
 	
 	def _setNativeProperty( self, key, nativeValue ):
 		"""

@@ -232,6 +232,20 @@ class AbstractScene( QObject ):
 		
 		return False
 	
+	def _findNativeAtmospheric( self, atmosName ):
+		"""
+			\remarks	[abstract] look up the native atmospheric from this scene instance
+			\param		atmosName	<str>
+			\return		<variant> nativeAtmospheric || None
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return None
+	
 	def _findNativeObject( self, objectName ):
 		"""
 			\remarks	[abstract] looks up an object based on the inputed name
@@ -384,6 +398,19 @@ class AbstractScene( QObject ):
 			raise NotImplementedError
 		
 		return None
+	
+	def _nativeAtmospherics( self ):
+		"""
+			\remarks	[abstract]	return the native atmospheric instances for this scene
+			\return		<list> [ <variant> nativeAtmospheric, .. ]
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return []
 	
 	def _nativeEnvironmentMap( self ):
 		"""
@@ -709,6 +736,15 @@ class AbstractScene( QObject ):
 			return SceneLayer( self, lay )
 		return None
 	
+	def atmospherics( self ):
+		"""
+			\remarks	returns the atmospheric instances from this scene
+			\return		<list> [ <blur3d.api.SceneAtmospheric>, .. ]
+		"""
+		from blur3d.api import SceneAtmospheric
+		nativeAtmos = self._nativeAtmospherics()
+		return [ SceneAtmospheric( self, atmos ) for atmos in nativeAtmos ]
+	
 	def cacheMap( self, cacheType, sceneMap ):
 		"""
 			\remarks	cache the inputed map in the scene for the given cache type
@@ -911,19 +947,19 @@ class AbstractScene( QObject ):
 		"""
 		return self._freezeNativeObjects( [ obj.nativePointer() for obj in objects ], state )
 	
-	def findObject( self, objectName ):
+	def findAtmospheric( self, atmosName ):
 		"""
-			\remarks	looks up an individual object by its name
-			\sa			_findNativeObject
-			\param		objectName	<str>
-			\return		<blur3d.api.SceneObject> || None
+			\remarks	look up an atmospheric based on the inputed name
+			\sa			_findNativeAtmospheric
+			\param		atmosName	<str>
+			\return		<blur3d.api.SceneAtmospheric> || None
 		"""
-		nativeObject = self._findNativeObject( objectName )
-		if ( nativeObject ):
-			from blur3d.api import SceneObject
-			return SceneObject( self, nativeObject )
+		nativeAtmos = self._findNativeAtmospheric( atmosName )
+		if ( nativeAtmos ):
+			from blur3d.api import SceneAtmospheric
+			return SceneAtmospheric( self, nativeAtmos )
 		return None
-		
+	
 	def findLayer( self, layerName ):
 		"""
 			\remarks	looks up a layer based on the inputed name
@@ -950,6 +986,19 @@ class AbstractScene( QObject ):
 			return SceneLayerGroup( self, nativeLayerGroup )
 		return None
 	
+	def findObject( self, objectName ):
+		"""
+			\remarks	looks up an individual object by its name
+			\sa			_findNativeObject
+			\param		objectName	<str>
+			\return		<blur3d.api.SceneObject> || None
+		"""
+		nativeObject = self._findNativeObject( objectName )
+		if ( nativeObject ):
+			from blur3d.api import SceneObject
+			return SceneObject( self, nativeObject )
+		return None
+		
 	def fileType( self ):
 		"""
 			\remarks	[abstract]	returns the main file type for this type of application

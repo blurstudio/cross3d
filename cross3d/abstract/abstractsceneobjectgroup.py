@@ -30,11 +30,11 @@ class AbstractSceneObjectGroup:
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def _addNativeObjects( self, nativeObjects ):
+	def _addNativeAtmospherics( self, nativeAtmospherics ):
 		"""
-			\remarks	[abstract]	add the native objects to the object group
-			\sa			addObjects, addSelection
-			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
+			\remarks	[abstract] add the native atmospherics to the object group
+			\sa			addAtmospherics
+			\param		nativeAtmospherics	<list> [ <variant> nativeAtmospheric, .. ]
 			\return		<bool> success
 		"""
 		from blurdev import debug
@@ -45,10 +45,11 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
-	def _clearNativeObjects( self ):
+	def _addNativeObjects( self, nativeObjects ):
 		"""
-			\remarks	[abstract] clear the native objects from this group
-			\sa			clearObjects
+			\remarks	[abstract]	add the native objects to the object group
+			\sa			addObjects, addSelection
+			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
 		from blurdev import debug
@@ -74,6 +75,20 @@ class AbstractSceneObjectGroup:
 			\return		<bool> success
 		"""
 		return self._scene._clearNativePropSetOverride( self._nativeObjects() )
+	
+	def _nativeAtmospherics( self ):
+		"""
+			\remarks	[abstract] return a list of the atmospherics that are associated with this object group
+			\sa			atmospherics
+			\return		<list> [ <variant> nativeAtmospheric, .. ]
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return []
 	
 	def _nativeObjects( self ):
 		"""
@@ -102,6 +117,20 @@ class AbstractSceneObjectGroup:
 		
 		return None
 	
+	def _setNativeAtmospherics( self, nativeAtmospherics ):
+		"""
+			\remarks	[abstract] set the linked atmopherics to this object group to the inputed list of atmospherics
+			\param		nativeAtmospherics	<list> [ <variant> nativeAtmospheric, .. ]
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return False
+	
 	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
 		"""
 			\remarks	[virtual] set the current override materials for this object group
@@ -126,9 +155,18 @@ class AbstractSceneObjectGroup:
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	def addAtmospherics( self, atmospherics ):
+		"""
+			\remarks	add the atmospherics to this object group
+			\sa			_addNativeAtmospherics
+			\param		atmospherics <list> [ <blur3d.api.SceneAtmospheric>, .. ]
+			\return		<bool> success
+		"""
+		return self._addNativeAtmospherics( [ atmos.nativePointer() for atmos in atmospherics ] )
+	
 	def addObjects( self, objects ):
 		"""
-			\remarks	add the objects to this layer
+			\remarks	add the objects to this object group
 			\sa			addSelection, _addNativeObjects
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
@@ -137,11 +175,20 @@ class AbstractSceneObjectGroup:
 	
 	def addSelection( self ):
 		"""
-			\remarks	add the selected scene objects to this layer
+			\remarks	add the selected scene objects to this object group
 			\sa			addObjects, _addNativeObjects
 			\return		<bool> success
 		"""
 		return self._addNativeObjects( self._scene._nativeSelection() )
+	
+	def atmospherics( self ):
+		"""
+			\remarks	return a list of the atmospherics that are part of this object group
+			\sa			_nativeAtmospherics
+			\return		<list> [ <blur3d.api.SceneAtmospheric>, .. ]
+		"""
+		from blur3d.api import SceneAtmospheric
+		return [ SceneAtmospheric( self._scene, atmos ) for atmos in self._nativeAtmospherics() ]
 	
 	def clearMaterialOverride( self ):
 		"""
@@ -168,7 +215,7 @@ class AbstractSceneObjectGroup:
 	
 	def deselect( self ):
 		"""
-			\remarks	deselects the objects on this layer from the scene
+			\remarks	deselects the objects on this object group from the scene
 			\sa			select, setSelected
 			\return		<bool> success
 		"""
@@ -176,7 +223,7 @@ class AbstractSceneObjectGroup:
 	
 	def freeze( self ):
 		"""
-			\remarks	freezes (locks) the objects on this layer in the scene
+			\remarks	freezes (locks) the objects on this object group in the scene
 			\sa			setFrozen, unfreeze
 			\return		<bool> success
 		"""
@@ -193,7 +240,7 @@ class AbstractSceneObjectGroup:
 	
 	def hide( self ):
 		"""
-			\remarks	hides the objects on this layer in the scene
+			\remarks	hides the objects on this object group in the scene
 			\sa			setHidden, unhide
 			\return		<bool> success
 		"""
@@ -201,7 +248,7 @@ class AbstractSceneObjectGroup:
 	
 	def isEmpty( self ):
 		"""
-			\remarks	returns whether or not this layer is empty (contains no chidren)
+			\remarks	returns whether or not this object group is empty (contains no chidren)
 			\sa			_nativeObjects
 			\return		<bool> empty
 		"""
@@ -233,6 +280,14 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
+	def isVisible( self ):
+		"""
+			\remarks	return whether or not this object group is visible
+			\sa			isHidden
+			\return		<bool> visible
+		"""
+		return not self.isHidden()
+	
 	def isolate( self ):
 		"""
 			\remarks	isolates the objects in this group in the scene
@@ -263,7 +318,7 @@ class AbstractSceneObjectGroup:
 	
 	def objects( self ):
 		"""
-			\remarks	returns the SceneObject's that are associated with this layer
+			\remarks	returns the SceneObject's that are associated with this object group
 			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
 		from blur3d.api import SceneObject
@@ -297,9 +352,9 @@ class AbstractSceneObjectGroup:
 	
 	def remove( self, removeObjects = False ):
 		"""
-			\remarks	[abstract] remove the layer from the scene (objects included when desired)
-			\param		removeObjects	<bool>	when true, the objects on the layer should be removed from the scene, otherwise
-												only the layer should be removed
+			\remarks	[abstract] remove the object group from the scene (objects included when desired)
+			\param		removeObjects	<bool>	when true, the objects on the object group should be removed from the scene, otherwise
+												only the object group should be removed
 			\return		<bool> success
 		"""
 		from blurdev import debug
@@ -312,14 +367,14 @@ class AbstractSceneObjectGroup:
 	
 	def scene( self ):
 		"""
-			\remarks	return the scene instance that this layer is a member of
+			\remarks	return the scene instance that this object group is a member of
 			\return		<blur3d.api.Scene>
 		"""
 		return self._scene
 	
 	def select( self ):
 		"""
-			\remarks	selects the items on this layer
+			\remarks	selects the items on this object group
 			\sa			deselect, setSelected
 			\return		<bool> success
 		"""
@@ -327,7 +382,7 @@ class AbstractSceneObjectGroup:
 	
 	def setActive( self, state ):
 		"""
-			\remarks	[abstract] mark this layer as the active scene layer
+			\remarks	[abstract] mark this object group as the active scene object group
 			\sa			isActive
 			\param		state	<bool>
 			\return		<bool> success
@@ -381,6 +436,15 @@ class AbstractSceneObjectGroup:
 		self._materialOverrideFlags = flags
 		return True
 	
+	def setAtmospherics( self, atmospherics ):
+		"""
+			\remarks	sets the atmospherics that are associated with this object group to the inputed list of atmospherics
+			\sa			atmospherics, _setNativeAtmospherics
+			\param		atmospherics	<list> [ <blur3d.api.SceneAtmospheric>, .. ]
+			\return		<bool> success
+		"""
+		return self._setNativeAtmospherics( [ atmos.nativePointer() for atmos in atmospherics ] )
+	
 	def setPropSetOverride( self, propSet ):
 		"""
 			\remarks	set the override properties on the objects that are a part of this object group
@@ -391,7 +455,7 @@ class AbstractSceneObjectGroup:
 	
 	def setFrozen( self, state ):
 		"""
-			\remarks	set the frozen (locked) state for the objects on this layer
+			\remarks	set the frozen (locked) state for the objects on this object group
 			\sa			freeze, unfreeze, _nativeObjects, blur3d.api.Scene._freezeNativeObjects
 			\param		state	<bool>
 			\return		<bool> success
@@ -400,7 +464,7 @@ class AbstractSceneObjectGroup:
 	
 	def setGroupName( self, groupName ):
 		"""
-			\remarks	[abstract] set the group name for this layer instance
+			\remarks	[abstract] set the group name for this object group instance
 			\sa			layerName
 			\param		layerName	<str>
 			\return		<bool> success
@@ -415,7 +479,7 @@ class AbstractSceneObjectGroup:
 	
 	def setHidden( self, state, options = None ):
 		"""
-			\remarks	set the hidden state for the objects on this layer
+			\remarks	set the hidden state for the objects on this object group
 			\sa			hide, unhide, _nativeObjets, blur3d.api.Scene._hideNativeObjects
 			\param		state		<bool>
 			\param		options		<blur3d.constants.VisibilityToggleOptions>
@@ -427,16 +491,24 @@ class AbstractSceneObjectGroup:
 		
 	def setSelected( self, state ):
 		"""
-			\remarks	sets the selected state of the objects on this layer
+			\remarks	sets the selected state of the objects on this object group
 			\sa			deselect, setSelected, _nativeObjects, blur3d.api.Scene.setSelection
 			\param		state	<bool>
 			\return		<bool> success
 		"""
 		return self._scene._setNativeSelection( self._nativeObjects() )
 	
+	def setVisible( self, state ):
+		"""
+			\remarks	set whether or not this object group is visible
+			\param		state	<bool>
+			\return		success
+		"""
+		return self.setHidden( not state )
+	
 	def unhide( self ):
 		"""
-			\remarks	unhides the objects on this layer
+			\remarks	unhides the objects on this object group
 			\sa			hide, setHidden
 			\return		<bool> success
 		"""
@@ -444,7 +516,7 @@ class AbstractSceneObjectGroup:
 	
 	def unfreeze( self ):
 		"""
-			\remarks	unfreezes the objects on this layer
+			\remarks	unfreezes the objects on this object group
 			\sa			freeze, setFrozen
 			\return		<bool> success
 		"""

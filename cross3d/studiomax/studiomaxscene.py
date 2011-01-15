@@ -523,6 +523,15 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.layerManager.current
 	
+	def _nativeAtmospherics( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeAtmospherics method to return a list of the atmospheric instances in this scene
+			\return		<list> [ <Py3dsMax.mxs.Atmospheric> nativeAtmospheric, .. ]
+		"""
+		get_atmos 	= mxs.getAtmospheric
+		get_effect 	= mxs.getEffect
+		return [ get_atmos( i+1 ) for i in range( mxs.numAtmospherics ) ] + [ get_effect( i + 1 ) for i in range( mxs.numEffects ) ]
+	
 	def _nativeEnvironmentMap( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeEnvironmentMap method to return the native map for the environment of this scene

@@ -8,16 +8,17 @@
 #	\author		Blur Studio
 #	\date		03/15/10
 #
-
-from blurdev.enum import enum
-
-StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
-
+
+from blurdev.enum import enum
+
+StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
+
 def init():
-	import studiomaxscene	
-	import studiomaxsceneobject	
-	import studiomaxscenelayer	
-	import studiomaxscenelayergroup	
-	import studiomaxscenematerial	
-	import studiomaxscenepropset
+	import studiomaxscene	
+	import studiomaxsceneobject	
+	import studiomaxscenelayer	
+	import studiomaxscenelayergroup	
+	import studiomaxscenematerial	
+	import studiomaxscenepropset
 	import studiomaxscenemap
+	import studiomaxsceneatmospheric

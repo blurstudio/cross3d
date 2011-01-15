@@ -19,3 +19,6 @@ def toggleCaches( object, state ):
 	"""
 	from blur3d.api.studiomax.cachelib import pointcache
 	pointcache.toggleCaches( object, state )
+	
+	from blur3d.api.studiomax.cachelib import transformcache
+	transformcache.toggleCaches( object, state )
