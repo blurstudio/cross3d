@@ -816,6 +816,11 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<bool> success
 		"""
 		self._nativePointer.ishidden = state
+		
+		# update the atmospherics on this layer
+		for atmos in self.atmospherics():
+			atmos.setEnabled( not state )
+		
 		return True
 		
 	def setLayerName( self, layerName ):
