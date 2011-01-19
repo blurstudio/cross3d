@@ -175,13 +175,6 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		
 		return True
 	
-	def setHidden( self, state ):
-		AbstractSceneLayerGroup.setHidden( self, state )
-		
-		# toggle caches
-#		from blur3d.api.studiomax.cachelib import pointcache
-#		pointcache.toggleSceneCaches()
-		
 	def setOpen( self, state ):
 		"""
 			\remarks	implements the AbstractLayerGroup.setOpen method to set whether or not the layer group is open

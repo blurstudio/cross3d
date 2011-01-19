@@ -817,6 +817,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		self._nativePointer.ishidden = state
 		
+		# update the objects on this layer
+		for obj in self._nativeObjects():
+			obj.ishidden = state
+		
 		# update the atmospherics on this layer
 		for atmos in self.atmospherics():
 			atmos.setEnabled( not state )
