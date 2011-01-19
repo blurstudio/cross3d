@@ -22,8 +22,6 @@
 from PyQt4.QtCore import QObject, pyqtSignal
 
 class AbstractScene( QObject ):
-	# define the Qt signals
-	
 	# layer signals
 	layerStateChanged			= pyqtSignal()
 	layerCreated				= pyqtSignal('PyQt_PyObject')
@@ -31,6 +29,9 @@ class AbstractScene( QObject ):
 	layerRemoved 				= pyqtSignal('PyQt_PyObject')
 	layerGroupCreated			= pyqtSignal('str')
 	layerGroupRemoved			= pyqtSignal('str')
+	
+	# create the scene instance
+	_instance = None
 	
 	def __init__( self ):
 		QObject.__init__( self )
@@ -203,10 +204,10 @@ class AbstractScene( QObject ):
 		
 		return None
 		
-	def _createNativeRenderer( classname ):
+	def _createNativeRenderer( self, rendererType ):
 		"""
-			\remaks		[abstract]	creates a new renderer based on the inputed classname for this scene
-			\param		classname		<str>
+			\remaks		[abstract]		creates a new renderer based on the inputed renderer type for this scene
+			\param		rendererType	<blur3d.constants.RendererType>
 			\return		<variant> nativeRenderer || None
 		"""
 		from blurdev import debug
@@ -853,6 +854,18 @@ class AbstractScene( QObject ):
 		"""
 		return self.setSelection( [] )
 	
+	def createRenderer( self, rendererType ):
+		"""
+			\remarks	create a new renderer of the inputed type
+			\param		rendererType	<blur3d.constants.RendererType>
+			\return		<blur3d.api.Renderer>
+		"""
+		nativeRenderer = self._createNativeRenderer( rendererType )
+		if ( nativeRenderer ):
+			from blur3d.api import SceneRenderer
+			return SceneRenderer( self, nativeRenderer )
+		return None
+	
 	def createLayer( self, name, objects = [] ):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
@@ -1493,6 +1506,13 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
+	
+	@staticmethod
+	def instance():
+		if ( not AbstractScene._instance ):
+			from blur3d.api import Scene
+			AbstractScene._instance = Scene()
+		return AbstractScene._instance
 	
 # register the symbol
 from blur3d import api

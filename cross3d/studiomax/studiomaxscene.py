@@ -352,10 +352,10 @@ class StudiomaxScene( AbstractScene ):
 				nativeObject.parent = output
 		return output
 	
-	def _createNativeRenderer( rendererType ):
+	def _createNativeRenderer( self, rendererType ):
 		"""
 			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed classname for this scene
-			\param		rendererType		<blur3d.constants.RendererType> || <str>
+			\param		rendererType		<blur3d.constants.RendererType>
 			\return		<Py3dsMax.mxs.Renderer> nativeRenderer || None
 		"""
 		from blur3d.constants import RendererType
@@ -557,8 +557,10 @@ class StudiomaxScene( AbstractScene ):
 			\sa			setUpdatesEnabled, update
 			\return		<bool> success
 		"""
-		mxs.redrawViews()
-		return True
+		if ( not mxs.isSceneRedrawDisabled() ):
+			mxs.redrawViews()
+			return True
+		return False
 	
 	def _nativeLayers( self ):
 		"""
@@ -969,6 +971,7 @@ class StudiomaxScene( AbstractScene ):
 	def _setNativeUpdatesEnabled( self, state ):
 		"""
 			\remarks	[virtual] reimplements the AbstractScene._setNativeUpdatesEnabled to enable/disable scene updates
+			\sa			setUpdatesEnabled
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -987,7 +990,9 @@ class StudiomaxScene( AbstractScene ):
 			mxs.resumeEditing()
 			
 			# enable scene redrawing and refresh the views
-			mxs.enableSceneRedraw()
+			while ( mxs.isSceneRedrawDisabled() ):
+				mxs.enableSceneRedraw()
+				
 			mxs.redrawViews()
 	
 		else:
