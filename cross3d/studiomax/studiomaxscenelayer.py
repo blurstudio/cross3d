@@ -808,6 +808,11 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<bool> success
 		"""
 		self._nativePointer.isfrozen = state
+		
+		# sync object frozen properties
+		for obj in self._nativeObjects():
+			obj.isfrozen = state
+		
 		return True
 	
 	def setHidden( self, state ):
