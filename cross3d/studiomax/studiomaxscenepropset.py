@@ -1,35 +1,35 @@
 ##
 #	\namespace	blur3d.api.studiomax.studiomaxscenepropset
 #
-#	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
+#	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
 #				does not have a native Property Set instance, we will have to control all of the data ourselves
 #	
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		09/08/10
 #
-
-from Py3dsMax import mxs
-from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
 
-class StudiomaxScenePropSet( AbstractScenePropSet ):
-	def __init__( self, scene, nativePropSet ):
-		# in Max, since we don't have native property sets, we'll store a pointer to this self as the native pointer
-		AbstractScenePropSet.__init__( self, scene, self )
-		
+from Py3dsMax import mxs
+from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
+
+class StudiomaxScenePropSet( AbstractScenePropSet ):
+	def __init__( self, scene, nativePropSet ):
+		# in Max, since we don't have native property sets, we'll store a pointer to this self as the native pointer
+		AbstractScenePropSet.__init__( self, scene, self )
+		
 		# we will control property sets
 		self._keys 		= []
 		self._values 	= {}
 		self._active	= {}
-		self._custom	= {}
-		
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												protected methods
+		self._custom	= {}
+		
 	#------------------------------------------------------------------------------------------------------------------------
-	def _activeString( self ):
-		"""
-			\remarks	converts the current key/active pairing to a string separated by '|'
-			\return		<str>
+	# 												protected methods
+	#------------------------------------------------------------------------------------------------------------------------
+	def _activeString( self ):
+		"""
+			\remarks	converts the current key/active pairing to a string separated by '|'
+			\return		<str>
 		"""
 		output = []
 		for key in self._keys:
@@ -39,12 +39,12 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 				output.append( '0' )
 		return '|'.join( output )
 	
-	def _defineProperty( self, propname, value, custom = False ):
-		"""
-			\remarks	define the inputed propname with the current value, tagging whether or not it is a custom property
-			\param		propname	<str>
-			\param		value		<variant>
-			\param		custom		<bool>
+	def _defineProperty( self, propname, value, custom = False ):
+		"""
+			\remarks	define the inputed propname with the current value, tagging whether or not it is a custom property
+			\param		propname	<str>
+			\param		value		<variant>
+			\param		custom		<bool>
 		"""
 		propname = str( propname )
 		
@@ -52,69 +52,69 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 		self._keys.append( propname )
 		self._active[propname] = False	
 		self._values[ propname ] = value
-		self._custom[ propname ] = custom
+		self._custom[ propname ] = custom
 	
-	def _setActiveString( self, activeString ):
-		"""
-			\remarks	set the active values for these properties by the inputed value string, which contains a true/false flag per property separated by a '|'
-			\param		activeString		<str>
-			\return		<bool> success
+	def _setActiveString( self, activeString ):
+		"""
+			\remarks	set the active values for these properties by the inputed value string, which contains a true/false flag per property separated by a '|'
+			\param		activeString		<str>
+			\return		<bool> success
 		"""
 		actives = str(activeString).split( '|' )
 		for index, key in enumerate(self._keys):
 			try:
 				self.activateProperty( key, actives[index] == '1' )
 			except:
-				break
-		return True
+				break
+		return True
 	
-	def _setValueString( self, valueString ):
-		"""
-			\remarks	sets the value for these properties by the inputed value string, which contains the properties with a '|' separating the values
-			\param		valueString		<str>
-			\return		<bool> success
+	def _setValueString( self, valueString ):
+		"""
+			\remarks	sets the value for these properties by the inputed value string, which contains the properties with a '|' separating the values
+			\param		valueString		<str>
+			\return		<bool> success
 		"""
 		values = str(valueString).split( '|' )
 		for index, key in enumerate(self._keys):
 			try:
 				self.setValue( key, eval(values[index]) )
 			except:
-				break
+				break
 		return True
 		
-	def _valueString( self ):
-		"""
-			\remarks	returns the current key/value pairing to a string separated by '|'
-			\return		<str>
+	def _valueString( self ):
+		"""
+			\remarks	returns the current key/value pairing to a string separated by '|'
+			\return		<str>
 		"""
 		output = []
 		for key in self._keys:
 			output.append( str(self.value(key)) )
-		return '|'.join( output )
-		
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												public methods
-	#------------------------------------------------------------------------------------------------------------------------
-	
-	def activateProperty( self, propname, state ):
-		self._active[propname] = state
-	
-	def activeProperties( self ):
-		return [ propname for propname in self._active if self._active[propname] ]
-	
-	def isCustomProperty( self, propname ):
-		return self._custom.get(str(propname),False)
-	
-	def propertyNames( self ):
-		return self._keys
-	
-	def setValue( self, propname, value ):
+		return '|'.join( output )
+		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												public methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
+	def activateProperty( self, propname, state ):
+		self._active[propname] = state
+	
+	def activeProperties( self ):
+		return [ propname for propname in self._active if self._active[propname] ]
+	
+	def isCustomProperty( self, propname ):
+		return self._custom.get(str(propname),False)
+	
+	def propertyNames( self ):
+		return self._keys
+	
+	def setValue( self, propname, value ):
 		propname = str(propname)
 		if ( propname in self._values ):
 			self._values[propname] = value
 			return True
-		return False
-	
+		return False
+	
 	def toolTip( self ):
 		tips = {}
 		for key, active in self._active.items():
@@ -124,15 +124,18 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 		keys.sort()
 		
 		return ', '.join( [ tips[key] for key in keys ] )
-	
+	
 	def value( self, propname, default = None ):
-		return self._values.get( str(propname),default )
-
-#--------------------------------------------------------------------------------
-
-class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
-	def __init__( self, scene, nativePropSet ):
-		StudiomaxScenePropSet.__init__( self, scene, nativePropSet )
+		return self._values.get( str(propname), default )
+
+#--------------------------------------------------------------------------------
+
+class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
+	# handle old name conversion
+	castModeFgIllumDict = { 'objcolor': 1, 'black': 2, 'invisible': 3 }
+	
+	def __init__( self, scene, nativePropSet ):
+		StudiomaxScenePropSet.__init__( self, scene, nativePropSet )
 		
 		# define basic properties
 		self._defineProperty( 'renderable', 					True )
@@ -172,8 +175,63 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 		self._defineProperty( 'MR_rcvFGIllum', 					True )
 		self._defineProperty( 'GenerateGlobalIllum', 			True )
 		self._defineProperty( 'RcvGlobalIllum', 				True )
-		
-# register the class to the system
-from blur3d import api
-api.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
+	
+	def _setValueString( self, valueString ):
+		"""
+			\remarks	sets the value for these properties by the inputed value string, which contains the properties with a '|' separating the values
+			\param		valueString		<str>
+			\return		<bool> success
+		"""
+		values = str(valueString).split( '|' )
+		for index, key in enumerate(self._keys):
+			val 	= values[index]
+			cval 	= self._values.get( str(key) )
+			
+			if ( type(cval) == bool ):
+				val = val == '1' or val == 'True'
+			else:
+				val = eval(val)
+			
+			self._values[str(key)] = val
+			
+		return True
+		
+	def _valueString( self ):
+		"""
+			\remarks	returns the current key/value pairing to a string separated by '|'
+			\return		<str>
+		"""
+		output = []
+		for key in self._keys:
+			val = self._values.get( str(key), 1 )
+			
+			# record booleans as integers
+			if ( type(val) == bool ):
+				val = int(val)
+				
+			output.append( str(val) )
+		
+		return '|'.join( output )
+		
+	def setValue( self, key, value ):
+		if ( key == 'Mr_castModeFGIllum' ):
+			value = self.castModeFgIllumDict.get( str(value).lower(), value )
+		
+		return StudiomaxScenePropSet.setValue( self, key, value )
+	
+	def value( self, key ):
+		value = StudiomaxScenePropSet.value( self, key )
+		
+		# map this property from a name to an integer
+		if ( key == 'Mr_castModeFGIllum' ):
+			for n, val in self.castModeFgIllumDict.items():
+				if ( val == value ):
+					return mxs.pyhelper.namify(n)
+				
+		return value
+			
+		
+# register the class to the system
+from blur3d import api
+api.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
 api.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )

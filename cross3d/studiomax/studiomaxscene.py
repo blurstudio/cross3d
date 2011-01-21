@@ -874,7 +874,8 @@ class StudiomaxScene( AbstractScene ):
 					else:
 						value = obj.property( key )
 					
-					nprop.setValue( key, self._fromNativeValue(value) )
+					if ( value != None ):
+						nprop.setValue( key, self._fromNativeValue(value) )
 				
 				# collect the initial base properties
 				valueString = nprop._valueString()
