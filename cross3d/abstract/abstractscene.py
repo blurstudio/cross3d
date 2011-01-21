@@ -814,7 +814,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <blur3d.api.SceneMaterial> material, .. ]
 		"""
 		from blur3d.api import SceneMaterial
-		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) ]
+		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
 	
 	def checkForSave( self ):
 		"""

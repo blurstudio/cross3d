@@ -84,14 +84,14 @@ class SceneMetaData( MXSCustAttribDef ):
 		cls.setAttrName( 'OnionData' )
 		
 		# define overall parameters
-		cls.defineParam( 'version', 			'float', 		paramId = 'v' )
+		cls.defineParam( 'version', 				'float', 		paramId = 'v' )
 		
 		# define layer groups
-		cls.defineParam( 'layerGroupNames', 	'stringTab', 	paramId = 'gn' )
-		cls.defineParam( 'layerGroupStates', 	'boolTab',		paramId = 'go' )
+		cls.defineParam( 'layerGroupNames', 		'stringTab', 	paramId = 'gn' )
+		cls.defineParam( 'layerGroupStates', 		'boolTab',		paramId = 'go' )
 		
 		# define the scene material override list
-		cls.defineParam( 'materialLibraryList',	'materialTab',	paramId = 'mtl' )
+		cls.defineParam( 'materialLibraryList',		'materialTab',	paramId = 'mtl' )
 		
 		# define the material cache
 		cls.defineParam( 'baseMaterialCache',		'materialTab',	paramId = 'ms' )
@@ -505,8 +505,10 @@ class StudiomaxScene( AbstractScene ):
 		from PyQt4.QtGui import QFileDialog
 		filename = QFileDialog.getOpenFileName( None, 'Load Material Library', '', 'Material Library files (*.mat)' )
 		if ( filename ):
-			mlib 	= mxs.loadTempMaterialLibrary( str(filename) )
-			output 	= list(mlib)
+			is_kindof	= mxs.isKindOf
+			TextureMap	= mxs.TextureMap
+			mlib 		= mxs.loadTempMaterialLibrary( str(filename) )
+			output 		= [ mtl for mtl in mlib if not is_kindof( mtl, TextureMap ) ]
 			
 			# clear the material library - this is a memory intensive section
 			del mlib
