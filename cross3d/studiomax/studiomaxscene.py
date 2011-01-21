@@ -241,12 +241,12 @@ class StudiomaxScene( AbstractScene ):
 		set_userprop	= mxs.setUserProp
 		get_appdata		= mxs.getAppData
 		del_appdata		= mxs.deleteAppData
-		is_kindof		= mxs.isKindOf
+		superclassof	= mxs.superClassOf
 		geoclass		= mxs.GeometryClass
 		
 		for obj in nativeObjects:
 			# ignore non-geometric objects
-			if ( not is_kindof(obj, geoclass) ):
+			if ( not superclassof(obj) == geoclass ):
 				continue
 				
 			# pull the app data
@@ -914,14 +914,14 @@ class StudiomaxScene( AbstractScene ):
 		set_userprop	= mxs.setUserProp
 		get_appdata		= mxs.getAppData
 		set_appdata		= mxs.setAppData
-		is_kindof		= mxs.isKindOf
+		superclassof	= mxs.superClassOf
 		geoclass		= mxs.GeometryClass
 		unique_id		= mxs.blurUtil.uniqueId
 		processed		= {}
 		
 		for obj in nativeObjects:
 			# ignore non-geometric objects
-			if ( not is_kindof(obj, geoclass) ):
+			if ( not superclassof(obj) == geoclass ):
 				continue
 				
 			# pull the app data
