@@ -354,22 +354,22 @@ class StudiomaxScene( AbstractScene ):
 	
 	def _createNativeRenderer( self, rendererType ):
 		"""
-			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed classname for this scene
+			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed rendererType for this scene
 			\param		rendererType		<blur3d.constants.RendererType>
 			\return		<Py3dsMax.mxs.Renderer> nativeRenderer || None
 		"""
 		from blur3d.constants import RendererType
 		
 		# create a scanline renderer
-		if ( classname == RendererType.Scanline ):
+		if ( rendererType == RendererType.Scanline ):
 			return mxs.Default_Scanline_Renderer()
 		
 		# create a Mental Ray renderer
-		elif ( classname == RendererType.MentalRay ):
+		elif ( rendererType == RendererType.MentalRay ):
 			return mxs.mental_ray_renderer()
 		
 		# create a VRay renderer
-		elif ( classname == RendererType.VRay ):
+		elif ( rendererType == RendererType.VRay ):
 			renderers = mxs.rendererClass.api
 			
 			# find the installed V_Ray renderer
@@ -385,7 +385,7 @@ class StudiomaxScene( AbstractScene ):
 			# find the installed V_Ray renderer
 			for renderer in renderers:
 				clsname = str(renderer)
-				if ( clsname == classname ):
+				if ( clsname == rendererType ):
 					return renderer()
 					
 		return None
