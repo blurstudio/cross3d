@@ -242,6 +242,14 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return str(self._nativePointer.name)
 		
+	def objectId( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.objectId to look up the unique name for this object and returns it
+			\sa			displayName, setDisplayName, setObjectName
+			\return		<str> name
+		"""
+		return mxs.blurUtil.uniqueId( self._nativePointer )
+		
 	def property( self, key, default = None ):
 		"""
 			\remarks	implements the AbstractSceneObject.property to return the value for the property of this object, or the default value if not found

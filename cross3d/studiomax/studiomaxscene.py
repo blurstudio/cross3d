@@ -557,18 +557,19 @@ class StudiomaxScene( AbstractScene ):
 			\return		<variant>
 		"""
 		classof = mxs.classof
+		cls		= classof( nativeValue )
 		
 		# return the value as a QColor
-		if ( classof( nativeValue ) == mxs.Color ):
+		if ( cls == mxs.Color ):
 			from PyQt4.QtGui import QColor
 			return QColor( nativeValue.r, nativeValue.g, nativeValue.b )
 		
 		# convert value from a Time
-		if ( classof( nativeValue ) == mxs.Time ):
+		if ( cls == mxs.Time ):
 			return int(nativeValue)
 		
 		# convert from name to a String
-		if ( classof( nativeValue ) == mxs.Name ):
+		if ( cls == mxs.Name ):
 			return str(nativeValue)
 		
 		# return the standard value
@@ -946,7 +947,7 @@ class StudiomaxScene( AbstractScene ):
 			\param		nativeRenderer	<variant>
 			\return		<bool> success
 		"""
-		mxs.renderers.current = nativeRenderer
+		mxs.pyhelper.setCurrentRenderer( nativeRenderer )
 		return True
 	
 	def _setNativeCustomProperty( self, key, value ):
