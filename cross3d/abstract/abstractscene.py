@@ -51,7 +51,7 @@ class AbstractScene( QObject ):
 			\return		<bool> changed
 		"""		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 			
 		return nativeMap
@@ -64,7 +64,7 @@ class AbstractScene( QObject ):
 			\return		<bool> changed
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -78,7 +78,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -92,7 +92,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMaterial || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -104,7 +104,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeMap, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -116,7 +116,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -128,7 +128,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -140,7 +140,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -153,7 +153,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayer || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -165,7 +165,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayerGroup || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -178,7 +178,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeObject || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -190,7 +190,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeRenderer || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -201,7 +201,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeRenderer || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -214,7 +214,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -226,7 +226,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeAtmospheric || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -239,7 +239,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeObject || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -252,7 +252,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayer || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -265,7 +265,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayerGroup || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -278,7 +278,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMaterial || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -291,7 +291,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -304,7 +304,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -324,7 +324,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeObject || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -335,7 +335,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMaterial || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -346,7 +346,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -359,7 +359,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -372,7 +372,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -384,7 +384,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -396,7 +396,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayer || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -407,7 +407,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -420,7 +420,7 @@ class AbstractScene( QObject ):
 			\return		<variant>
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -431,7 +431,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -442,7 +442,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -454,7 +454,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -465,7 +465,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeLayer, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -477,7 +477,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeLayerGroup, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -489,7 +489,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -501,7 +501,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeMap, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -512,7 +512,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -523,7 +523,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeObject || None
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -534,7 +534,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -547,7 +547,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -559,7 +559,7 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeLayer
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -571,7 +571,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -585,7 +585,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -598,7 +598,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -611,7 +611,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -623,7 +623,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -636,7 +636,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -650,7 +650,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -662,7 +662,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -674,7 +674,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -687,7 +687,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -699,7 +699,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -711,7 +711,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -737,7 +737,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -842,7 +842,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -939,7 +939,7 @@ class AbstractScene( QObject ):
 			\return		<str>
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -1087,7 +1087,7 @@ class AbstractScene( QObject ):
 			\return		<str>
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -1098,7 +1098,7 @@ class AbstractScene( QObject ):
 			\return		<list> [ <str>, .. ]
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -1142,7 +1142,7 @@ class AbstractScene( QObject ):
 			\sa			restoreHeldState
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 	
 	def hideObjects( self, objects, state ):
@@ -1197,7 +1197,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -1243,7 +1243,7 @@ class AbstractScene( QObject ):
 			\return		<variant>
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -1345,7 +1345,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -1357,7 +1357,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -1387,7 +1387,7 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -1522,7 +1522,7 @@ class AbstractScene( QObject ):
 			\return		<bool>
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False

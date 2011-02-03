@@ -40,7 +40,7 @@ class AbstractSceneMaterial:
 			\return		<variant>
 		"""		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -54,7 +54,7 @@ class AbstractSceneMaterial:
 			\retrun		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -68,7 +68,7 @@ class AbstractSceneMaterial:
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -81,7 +81,7 @@ class AbstractSceneMaterial:
 			\return		<bool> found
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -93,7 +93,7 @@ class AbstractSceneMaterial:
 			\return		<str> name
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -105,7 +105,7 @@ class AbstractSceneMaterial:
 			\return		<int> id
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return 0
@@ -155,7 +155,7 @@ class AbstractSceneMaterial:
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -168,7 +168,7 @@ class AbstractSceneMaterial:
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False

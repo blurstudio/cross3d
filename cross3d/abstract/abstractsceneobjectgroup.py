@@ -40,7 +40,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -55,7 +55,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -85,7 +85,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -99,7 +99,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return []
@@ -112,7 +112,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return None
@@ -126,7 +126,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -265,7 +265,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -278,7 +278,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -307,7 +307,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -367,7 +367,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -397,7 +397,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -483,7 +483,7 @@ class AbstractSceneObjectGroup:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False

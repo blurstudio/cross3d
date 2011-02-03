@@ -40,7 +40,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return default
@@ -56,7 +56,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -72,7 +72,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -87,7 +87,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -101,7 +101,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -115,7 +115,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return 0
@@ -167,7 +167,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -182,7 +182,7 @@ class AbstractSceneMap:
 		from blurdev import debug
 		
 		# when debugging, raise an error
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False

@@ -36,7 +36,7 @@ class AbstractScenePropSet:
 		"""
 		from blurdev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -48,7 +48,7 @@ class AbstractScenePropSet:
 		"""
 		from bludev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -60,7 +60,7 @@ class AbstractScenePropSet:
 		"""
 		from bludev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return ''
@@ -72,7 +72,7 @@ class AbstractScenePropSet:
 		"""
 		from bludev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return 0
@@ -91,7 +91,7 @@ class AbstractScenePropSet:
 			\return		<bool> custom
 		"""
 		from blurdev import debug
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		return False
 	
@@ -116,7 +116,7 @@ class AbstractScenePropSet:
 			\return		<list> [ <str> propname, .. ]
 		"""
 		from blurdev import debug
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		return []
 	
@@ -141,7 +141,7 @@ class AbstractScenePropSet:
 		"""
 		from bludev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -154,7 +154,7 @@ class AbstractScenePropSet:
 		"""
 		from bludev import debug
 		
-		if ( not debug.debugLevel() ):
+		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		
 		return False
@@ -167,7 +167,7 @@ class AbstractScenePropSet:
 			\return		<bool> success
 		"""
 		from blurdev import debug
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		return False
 	
@@ -177,7 +177,7 @@ class AbstractScenePropSet:
 			\return		<str>
 		"""
 		from blurdev import debug
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		return ''
 	
@@ -189,7 +189,7 @@ class AbstractScenePropSet:
 			\return		<variant>
 		"""
 		from blurdev import debug
-		if ( debug.debugLevel() ):
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
 			raise NotImplementedError
 		return default
 	
