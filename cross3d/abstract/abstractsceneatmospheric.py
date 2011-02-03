@@ -179,6 +179,19 @@ class AbstractSceneAtmospheric:
 		"""
 		return self._scene._fromNativeValue( self._nativeProperty( key, default ) )
 	
+	def recordXml( self, xml ):
+		"""
+			\remarks	record the atmospheric to the inputed xml node
+			\param		xml		<blurdev.XML.XMLElement>
+			\return		<bool> success
+		"""
+		if ( not xml ):
+			return False
+		
+		xml.setAttribute( 'name', self.atmosName() )
+		xml.setAttribute( 'id',		self.atmosId() )
+		return True
+	
 	def scene( self ):
 		"""
 			\remarks	return the scene instance that this atmospheric is linked to
@@ -240,6 +253,16 @@ class AbstractSceneAtmospheric:
 			\retrun		<bool> success
 		"""
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
+	
+	@staticmethod
+	def fromXml( scene, xml ):
+		"""
+			\remarks	restore the atmospheric from the inputed xml node
+			\param		scene	<blur3d.api.Scene>
+			\param		xml		<blurdev.XML.XMLElement>
+			\return		<blurdev.api.SceneAtmospheric> || None
+		"""
+		return scene.findAtmospheric( atmosName = xml.attribute( 'name' ), atmosId = int(xml.attribute('id',0)) )
 	
 # register the symbol
 from blur3d import api

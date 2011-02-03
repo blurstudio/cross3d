@@ -167,6 +167,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._altMtlCache		= None
 		self._altMtlFlagsCache	= None
 		
+		# initialize the data properly
+		self._altMtlIndex		= self.metaData().value( 'currentAltMtlIndex', 0 ) - 1
+		self._altPropIndex		= self.metaData().value( 'currentAltPropIndex', 0 ) - 1
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -307,7 +311,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		data = self.metaData()
 		
 		# load the material from the alternate materials
-		index = data.value( 'currentAltPropIndex' )
+		index = data.value( 'currentAltMtlIndex' )
 		if ( index ):
 			mtls = list(data.value( 'altMtls' ))
 			index -= 1
@@ -327,6 +331,24 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			if ( 0 <= index and index < len(mtls) ):
 				return mtls[index]
 		
+		return None
+	
+	def _nativePropSetOverride( self ):
+		data = self.metaData()
+		
+		# load the propset
+		index = data.value( 'currentAltPropIndex' )
+		if ( index ):
+			propSets = self.altPropSets()
+			index 	-= 1
+			
+			if ( 0 <= index and index < len(propSets) ):
+				return propSets[index]
+			else:
+				from blurdev import debug
+				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(mtls),self.layerName()) )
+				return None
+				
 		return None
 	
 	def _nativeProperty( self, key, default = None ):
@@ -376,18 +398,58 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		data = self.metaData()
 		if ( nativeMaterial ):
 			from blur3d.constants import MaterialCacheType
-			nativeMaterials = list(self._scene._cachedNativeMaterials( MaterialCacheType.MaterialOverrideList ))
-			if ( nativeMaterial in nativeMaterials ):
-				data.setValue( 'mtlLibindex', 			nativeMaterials.index(nativeMaterial) + 1 )
-				data.setValue( 'currentAltMtlIndex', 	0 )
+			
+			# set the native alternatematerial
+			altmtls = self._nativeAltMaterials()
+			if ( nativeMaterial in altmtls ):
+				index = altmtls.index(nativeMaterial)
+				self._altMtlIndex = index
+				data.setValue( 'mtlLibindex', 			0 )
+				data.setValue( 'currentAltMtlIndex', 	index + 1 )
 				data.setValue( 'mrShaderIndex', 		0 )
-				self._altMtlIndex = -1
+			
 			else:
-				data.setValue( 'mtlLibindex', 0 )
+				# see if the material is in the material library
+				nativeMaterials = list(self._scene._cachedNativeMaterials( MaterialCacheType.MaterialOverrideList ))
+				if ( nativeMaterial in nativeMaterials ):
+					self._altMtlIndex = -1
+					data.setValue( 'mtlLibindex', 			nativeMaterials.index(nativeMaterial) + 1 )
+					data.setValue( 'currentAltMtlIndex', 	0 )
+					data.setValue( 'mrShaderIndex', 		0 )
+		
+		# clear the alternate material state
 		else:
-			data.setValue( 'mtlLibindex', 0 )
+			self._altMtlIndex = -1
+			data.setValue( 'mtlLibindex', 			0 )
+			data.setValue( 'currentAltMtlIndex', 	0 )
+			data.setValue( 'mrShaderIndex', 		0 )
+			
 		
 		return AbstractSceneLayer._setNativeMaterialOverride( self, nativeMaterial, options = options )
+	
+	def _setNativePropSetOverride( self, nativePropSet ):
+		"""
+			\remarks	reimplements the AbstractSceneObjectGroup._setNativePropSetOverride method to set the overriden propset for this layer instance,
+						marking that it is using a propset from the global propset cache if necessary
+			\param		nativePropSet	<blur3d.api.ScenePropSet>
+			\return		<bool> success
+		"""
+		# check to see if we are setting this to one of our cached native propset indexes
+		data = self.metaData()
+		if ( nativePropSet ):
+			mpropset = self.altPropSets()
+			if ( nativePropSet in mpropset ):
+				index	= mpropset.index(nativePropSet)
+				nativePropSet = mpropset[index]
+				data.setValue( 'currentAltPropIndex', index + 1 )
+			else:
+				data.setValue( 'currentAltPropIndex', 0 )
+				nativePropSet = None
+		else:
+			data.setValue( 'currentAltPropIndex', 0 )
+			nativePropSet = None
+		
+		return AbstractSceneLayer._setNativePropSetOverride( self, nativePropSet )
 		
 	def _setNativeLayerGroup( self, nativeLayerGroup ):
 		"""
@@ -495,10 +557,12 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			data 			= self.metaData()
 			altPropValues	= list(data.value('altPropValues'))
 			altPropUsages	= list(data.value('altPropUsages'))
+			altPropIds		= list(data.value('altPropIds'))
 			scene			= self._scene
 			
 			for i in range(len(altPropValues)):
 				altProp = SceneObjectPropSet( scene, None )
+				altProp.setPropSetId( altPropIds[i] )
 				altProp._setValueString( altPropValues[i] )
 				altProp._setActiveString( altPropUsages[i] )
 				cache.append(altProp)
@@ -506,25 +570,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			self._altPropCache = cache
 			
 		return self._altPropCache
-		
-	def currentAltMaterialIndex( self ):
-		"""
-			\remarks	retrive the index of the currently applied alternate material for this layer
-			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterial, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<int> index
-		"""
-		return self.metaData().value( 'currentAltMtlIndex', 0 ) - 1
-	
-	def currentAltPropSetIndex( self ):
-		"""
-			\remarks	retrive the index of the currently applied alternate material for this layer
-			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterial, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<int> index
-		"""
-		return self.metaData().value( 'currentAltPropIndex', 0 ) - 1
-		
+			
 	def hasProperty( self, key ):
 		"""
 			\remarks	implements the AbstractSceneLayer.hasProperty method to return whether or not a given property exists for this layer
@@ -589,7 +635,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<int> id
 		"""
 		return mxs.blurUtil.uniqueId( self._nativePointer.layerAsRefTarg )
-		
+	
 	def metaData( self ):
 		if ( not self._metaData ):
 			layerName 	= str(self.layerName())
@@ -772,7 +818,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 						to the Studiomax meta data
 			\sa			AbstractSceneLayer.setCurrentAltMaterialIndex
 			\param		index	<int>
-			\return		<bool> success
+			\return		<bool> changed
 		"""
 		if ( AbstractSceneLayer.setCurrentAltMaterialIndex( self, index ) ):
 			self.metaData().setValue( 'currentAltMtlIndex', index + 1 )
@@ -785,7 +831,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 						to the Studiomax meta data
 			\sa			AbstractSceneLayer.setCurrentAltPropSetIndex
 			\param		index	<int>
-			\return		<bool> success
+			\return		<bool> changed
 		"""
 		if ( AbstractSceneLayer.setCurrentAltPropSetIndex( self, index ) ):
 			self.metaData().setValue( 'currentAltPropIndex', index + 1 )
@@ -829,7 +875,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# update the atmospherics on this layer
 		for atmos in self.atmospherics():
 			atmos.setEnabled( not state )
-		
+			
 		return True
 		
 	def setLayerName( self, layerName ):

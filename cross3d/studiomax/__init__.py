@@ -22,3 +22,4 @@ def init():
 	import studiomaxscenepropset
 	import studiomaxscenemap
 	import studiomaxsceneatmospheric
+	import studiomaxscenerenderer

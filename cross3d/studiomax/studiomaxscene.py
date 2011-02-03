@@ -8,6 +8,7 @@
 #	\date		03/15/10
 #
 
+from blurdev import debug
 from Py3dsMax 								import mxs
 from blur3d.api.abstract.abstractscene 	import AbstractScene
 
@@ -41,14 +42,42 @@ EnvironmentMapsHolder.register()
 
 #-----------------------------------------------------------------------------
 
+class CustomProperties( MXSCustAttribDef ):
+	def init( self ):
+		MXSCustAttribDef.init( self )
+		self.setValue( 'keys', [] )
+		self.setValue( 'values', [] )
+		
+	@classmethod
+	def define( cls ):
+		cls.setAttrName( 'BlurCustomProperties' )
+		cls.defineParam( 'keys', 'stringTab' )
+		cls.defineParam( 'values', 'stringTab' )
+
+CustomProperties.register()
+		
+#-----------------------------------------------------------------------------
+
 class SceneMetaData( MXSCustAttribDef ):
 	version 	= 1.63
 	
 	def __init__( self, mxsInstance ):
 		MXSCustAttribDef.__init__( self, mxsInstance )
 		
-		self._mapsHolder = None
-		self._mapHolder = None
+		self._mapsHolder 		= None
+		self._mapHolder 		= None
+		self._custProperties 	= None
+	
+	def customProperties( self ):
+		# pull the custom properties value
+		if ( not self._custProperties ):
+			root = mxs.rootNode
+			data = CustomProperties.find(root)
+			if ( not data ):	
+				data = CustomProperties.createUnique(root)
+			self._custProperties = data
+		
+		return self._custProperties
 	
 	def environmentMapCache( self ):
 		# pull the map holder value
@@ -106,6 +135,8 @@ class StudiomaxScene( AbstractScene ):
 		
 		# create custom properties
 		self._metaData 			= None
+		self._mapCache			= None
+		self._materialCache		= None
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -307,7 +338,7 @@ class StudiomaxScene( AbstractScene ):
 				del_appdata( obj, altpropindex )
 		
 		return True
-		
+	
 	def _createNativeLayer( self, name, nativeObjects = [] ):
 		"""
 			\remarks	implements the AbstractScene._createNativeLayer method to return a new Studiomax layer
@@ -370,17 +401,17 @@ class StudiomaxScene( AbstractScene ):
 		
 		# create a VRay renderer
 		elif ( rendererType == RendererType.VRay ):
-			renderers = mxs.rendererClass.api
+			renderers = mxs.rendererClass.classes
 			
 			# find the installed V_Ray renderer
 			for renderer in renderers:
 				clsname = str(renderer)
-				if ( clsname.startswith( 'V_Ray_' ) ):
+				if ( not clsname.startswith( 'V_Ray_RT' ) and clsname.startswith( 'V_Ray_' ) ):
 					return renderer()
 		
 		# create a specific renderer
 		else:
-			renderers = mxs.rendererClass.api
+			renderers = mxs.rendererClass.classes
 			
 			# find the installed V_Ray renderer
 			for renderer in renderers:
@@ -389,6 +420,13 @@ class StudiomaxScene( AbstractScene ):
 					return renderer()
 					
 		return None
+	
+	def _currentNativeRenderer( self ):
+		"""
+			\remarks	implements AbstractScene._currentNativeRenderer method to return the current native renderer for this scene instance
+			\return		<Py3dsMax.mxs.Renderer> nativeRenderer || None
+		"""
+		return mxs.renderers.current
 	
 	def _exportNativeObjects( self, objects, filename = '' ):
 		"""
@@ -399,16 +437,24 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.saveNodes( objects, filename )
 	
-	def _findNativeObject( self, objectName ):
+	def _findNativeObject( self, objectName = '', objectId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeObject to look up an object based on the inputed name
 			\sa			findNativeObject
 			\param		objectName	<str>
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
-		return mxs.getNodeByName( str(objectName) )
+		objectName 	= str(objectName)
+		output 		= None
+		if ( objectName ):
+			output = mxs.getNodeByName( str(objectName) )
 		
-	def _findNativeLayer( self, layerName ):
+		if ( not output and objectId ):
+			output = mxs.refByUniqueId( objectId )
+		
+		return output
+		
+	def _findNativeLayer( self, layerName = '', layerId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeLayer to look up a layer based on the inputed name
 			\sa			findNativeLayer
@@ -417,10 +463,17 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		if ( layerName == 'World Layer' ):
 			layerName = '0'
-			
-		return mxs.layerManager.getLayerFromName( str(layerName) )
 		
-	def _findNativeLayerGroup( self, groupName ):
+		output = None
+		if ( layerName ):
+			output = mxs.layerManager.getLayerFromName( str(layerName) )
+		
+		if ( not output and layerId ):
+			output = mxs.layerManager.refByUniqueId( layerId )
+			
+		return output
+		
+	def _findNativeLayerGroup( self, groupName = '', groupId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeLayerGroup to look up a layer group based on the inputed name
 			\sa			findNativeLayer
@@ -433,6 +486,45 @@ class StudiomaxScene( AbstractScene ):
 			return groupName
 		return None
 	
+	def _findNativeMaterial( self, materialName = '', materialId = 0 ):
+		"""
+			\remarks	implements the AbstractScene._findNativeMaterial to look up an material based on the inputed name
+			\sa			findNativeMaterial
+			\param		materialName	<str>
+			\return		<Py3dsMax.mxs.Material> nativeMaterial || None
+		"""
+		materialName 	= str(materialName)
+		if ( not (materialName or materialId) ):
+			return None
+		
+		uniqueid = mxs.blurUtil.uniqueId
+		for material in self._nativeMaterials():
+			if ( material.name == materialName or uniqueid(material) == materialId ):
+				return material
+		
+		debug.debugObject( self._findNativeMaterial, 'could not find material (%s - %s)' % (materialName,materialId) )
+				
+		return None
+		
+	def _findNativeMap( self, mapName = '', mapId = 0 ):
+		"""
+			\remarks	implements the AbstractScene._findNativeMap to look up an map based on the inputed name
+			\sa			findNativeMap
+			\param		mapName	<str>
+			\return		<Py3dsMax.mxs.Map> nativeMap || None
+		"""
+		mapName 	= str(mapName)
+		
+		if ( not (mapName or mapId) ):
+			return None
+		
+		uniqueid = mxs.blurUtil.uniqueId
+		for nmap in self._collectNativeMaps():
+			if ( nmap.name == mapName or uniqueid(nmap) == mapId ):
+				return nmap
+				
+		return None
+		
 	def _freezeNativeObjects( self, nativeObjects, state ):
 		"""
 			\remarks	implements the AbstractScene._freezeNativeObjects method to freeze(lock)/unfreeze(unlock) the inputed objects
@@ -481,6 +573,13 @@ class StudiomaxScene( AbstractScene ):
 		
 		# return the standard value
 		return AbstractScene._fromNativeValue( self, nativeValue )
+	
+	def _getNativeObject( self ):
+		"""
+			\remarks	[abstract]	invokes the application's ability to let a user select a Object from the scene
+			\return		<Py3dsMax.mxs.Object> nativeObject || None
+		"""
+		return mxs.selectByName( single = True )
 	
 	def _getNativeMaterial( self ):
 		"""
@@ -533,6 +632,21 @@ class StudiomaxScene( AbstractScene ):
 		get_atmos 	= mxs.getAtmospheric
 		get_effect 	= mxs.getEffect
 		return [ get_atmos( i+1 ) for i in range( mxs.numAtmospherics ) ] + [ get_effect( i + 1 ) for i in range( mxs.numEffects ) ]
+	
+	def _nativeCustomProperty( self, key, default = None ):
+		"""
+			\remarks	implements the AbstractScene._nativeCustomProperty method to return a value for the inputed key for a custom scene property
+			\param		key		<str>
+			\param		default	<variant>
+			\return		<variant>
+		"""
+		key		= str(key)
+		props 	= self.metaData().customProperties()
+		keys	= list(props.value('keys'))
+		if ( key in keys ):
+			values	= list(props.value('values'))
+			return values[keys.index(key)]
+		return default
 	
 	def _nativeEnvironmentMap( self ):
 		"""
@@ -588,6 +702,53 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.objects
 	
+	def _nativeMaterials( self ):
+		get_instances	= mxs.getClassInstances
+		mclasses 		= mxs.Material.classes
+		output			= []
+		
+		# collect all the materials
+		for mclass in mclasses:
+			output += get_instances(mclass)
+			
+		# include material list
+		mlist = list(self.metaData().value( 'materialLibraryList' ))
+		for m in mlist:
+			if ( m and not m in output ):
+				output.append(m)
+				
+		# include material cache
+		mcache = list(self.metaData().value( 'baseMaterialCache' ))
+		for m in mcache:
+			if ( m and not m in output ):
+				output.append(m)
+		
+		# include layer materials
+		for layer in self.layers():
+			for m in layer._nativeAltMaterials():
+				if ( m and not m in output ):
+					output.append(m)
+		
+		# define the material cache
+		return output
+	
+	def _nativeMaps( self ):
+		get_instances	= mxs.getClassInstances
+		mclasses 		= mxs.TextureMap.classes
+		output			= []
+		
+		# collect all the maps
+		for mclass in mclasses:
+			output += get_instances(mclass)
+		
+		# include material list
+		mlist = list(self.metaData().environmentMapsCache().value( 'environmentMaps' ))
+		for m in mlist:
+			if ( m and not m in output ):
+				output.append(m)
+				
+		return output
+		
 	def _nativeRootObject( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeRootObject to return the native root object of the scene
@@ -778,6 +939,42 @@ class StudiomaxScene( AbstractScene ):
 			return True
 		
 		return False
+	
+	def _setCurrentNativeRenderer( self, nativeRenderer ):
+		"""
+			\remarks	implements the AbstractScene._setCurrentNativeRenderer method to set the current renderer to the inputed native renderer
+			\param		nativeRenderer	<variant>
+			\return		<bool> success
+		"""
+		mxs.renderers.current = nativeRenderer
+		return True
+	
+	def _setNativeCustomProperty( self, key, value ):
+		"""
+			\remarks	implements the AbstractScene._nativeCustomProperty method to set a value for the inputed key for a custom scene property
+			\param		key		<str>
+			\param		value	<variant>
+			\return		<bool> success
+		"""
+		key		= str(key)
+		value	= str(value)
+		props 	= self.metaData().customProperties()
+		keys	= list(props.value('keys'))
+		values	= list(props.value('values'))
+		
+		# replace an existing property
+		if ( key in keys ):
+			values[keys.index(key)] = value
+		
+		# set a new property
+		else:
+			keys.append(key)
+			values.append(value)
+		
+		props.setValue( 'keys', 	keys )
+		props.setValue( 'values', 	values )
+		
+		return True
 	
 	def _setNativeEnvironmentMap( self, nativeMap ):
 		"""

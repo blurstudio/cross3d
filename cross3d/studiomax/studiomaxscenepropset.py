@@ -13,15 +13,22 @@ from Py3dsMax import mxs
 from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
 
 class StudiomaxScenePropSet( AbstractScenePropSet ):
+	def __eq__( self, other ):
+		if ( isinstance( other, StudiomaxScenePropSet ) ):
+			return self.propSetId() == other.propSetId()
+		return False
+		
 	def __init__( self, scene, nativePropSet ):
 		# in Max, since we don't have native property sets, we'll store a pointer to this self as the native pointer
 		AbstractScenePropSet.__init__( self, scene, self )
 		
 		# we will control property sets
-		self._keys 		= []
-		self._values 	= {}
-		self._active	= {}
-		self._custom	= {}
+		self._keys 			= []
+		self._values 		= {}
+		self._active		= {}
+		self._custom		= {}
+		self._propSetName	= 'Property Set'
+		self._propSetId		= mxs.blurUtil.genUniqueId()
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -108,6 +115,18 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 	def propertyNames( self ):
 		return self._keys
 	
+	def propSetName( self ):
+		return self._propSetName
+	
+	def propSetId( self ):
+		return self._propSetId
+	
+	def setPropSetName( self, propSetName ):
+		self._propSetName = propSetName
+	
+	def setPropSetId( self, propSetId ):
+		self._propSetId = propSetId
+	
 	def setValue( self, propname, value ):
 		propname = str(propname)
 		if ( propname in self._values ):
@@ -127,6 +146,16 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 	
 	def value( self, propname, default = None ):
 		return self._values.get( str(propname), default )
+	
+	@staticmethod
+	def fromXml( scene, xml ):
+		if ( not xml ):
+			return None
+			
+		propset = StudiomaxScenePropSet( scene, None )
+		propset.setPropSetName( xml.attribute( 'name' ) )
+		propset.setPropSetId( int(xml.attribute( 'id', 0 )) )
+		return propset
 
 #--------------------------------------------------------------------------------
 

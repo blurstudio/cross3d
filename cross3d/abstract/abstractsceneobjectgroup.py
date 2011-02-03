@@ -150,7 +150,10 @@ class AbstractSceneObjectGroup:
 			\param		<variant> nativePropSet || None
 			\return		<bool> success
 		"""
-		return self._scene._setNativePropSetOverride( self._nativeObjects(), nativePropSet )
+		if ( nativePropSet ):
+			return self._scene._setNativePropSetOverride( self._nativeObjects(), nativePropSet )
+		else:
+			return self._scene._clearNativePropSetOverride( self._nativeObjects() )
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -348,7 +351,11 @@ class AbstractSceneObjectGroup:
 			\remarks	return the current override prop set for this object set
 			\return		<blur3d.api.SceneObjectPropSet> || None
 		"""
-		return self._propSetOverride
+		from blur3d.api import ScenePropSet
+		nativePropSet = self._nativePropSetOverride()
+		if ( nativePropSet and not isinstance( nativePropSet, ScenePropSet ) ):
+			return ScenePropSet( self.scene(), nativePropSet )
+		return nativePropSet
 	
 	def remove( self, removeObjects = False ):
 		"""
@@ -451,7 +458,11 @@ class AbstractSceneObjectGroup:
 			\param		propSet		<blur3d.api.SceneObjectPropSet>
 			\return		<bool> success
 		"""
-		return self._setNativePropSetOverride( propSet.nativePointer() )
+		nativePropSet = None
+		if ( propSet ):
+			nativePropSet = propSet.nativePointer()
+		
+		return self._setNativePropSetOverride( nativePropSet )
 	
 	def setFrozen( self, state ):
 		"""

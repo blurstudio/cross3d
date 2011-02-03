@@ -346,6 +346,30 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return False
 	
+	def indexOfAltMaterial( self, material ):
+		"""
+			\remarks	return the index of the inputed material for the current layer
+			\param		material	<blur3d.api.SceneMaterial>
+			\return		<int> index (-1 if not found)
+		"""
+		mtls = self.altMaterials()
+		try:
+			return mtls.index(material)
+		except:
+			return -1
+	
+	def indexOfAltPropSet( self, propSet ):
+		"""
+			\remarks	return the index of the inputed property set for the current layer
+			\param		propSet		<blur3d.api.ScenePropSet>
+			\return		<int> index (-1 if not found)
+		"""
+		propSets = self.altPropSets()
+		try:
+			return propSets.index(propSet)
+		except:
+			return -1
+	
 	def isActive( self ):
 		"""
 			\remarks	[abstract] return whether or not this layer is currently active in the scene
@@ -464,6 +488,74 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		if ( nativeValue != None ):
 			return self._scene._fromNativeValue( nativeValue )
 		return default
+	
+	def recordXml( self, xml ):
+		"""
+			\remarks	define a way to record this layer to xml
+			\param		xml		<blurdev.XML.XMLElement>
+			\return		<bool> success
+		"""
+		if ( not xml ):
+			return False
+		
+		xml.setAttribute( 'name', 	self.layerName() )
+		xml.setAttribute( 'id', 	self.layerId() )
+		return True
+	
+	def recordLayerState( self, xml ):
+		"""
+			\remarks	records the layer's current state to xml
+			\param		xml		<blurdev.XML.XMLElement>
+			\return		<bool> success
+		"""
+		# don't bother recording hidden layers
+		if ( not self.isVisible() ):
+			return False
+		
+		# record the layer state
+		node = xml.addNode( 'layer' )
+		node.setAttribute( 'name', 		self.layerName() )
+		node.setAttribute( 'id', 		self.layerId() )
+		
+		# record the propSetOverride
+		propSet = self.propSetOverride()
+		if ( propSet ):
+			propSet.recordXml( node.addNode( 'propSetOverride' ) )
+		
+		# record the material override
+		material = self.materialOverride()
+		if ( material ):
+			material.recordXml( node.addNode( 'materialOverride' ) )
+		
+		# record the environment override for the world layer
+		if ( self.isWorldLayer() ):
+			override = self._scene.environmentMapOverride()
+			if ( override ):
+				override.recordXml( node.addNode( 'environmentMapOverride' ) )
+		
+		return True
+	
+	def restoreLayerState( self, xml ):
+		"""
+			\remarks	restore the layer's state from the inputed xml
+			\param		xml		<blurdev.XML.XMLDocument>
+			\return		<bool> success
+		"""
+		if ( not xml ):
+			return False
+		
+		# set visible
+		self.setVisible(True)
+		
+		# determine the alterante state for this layer
+		scene = self._scene
+		from blur3d.api import SceneMaterial, SceneMap, SceneObjectPropSet
+		self.setPropSetOverride( 	SceneObjectPropSet.fromXml( scene, xml.findChild( 'propSetOverride' ) ) )
+		self.setMaterialOverride( 	SceneMaterial.fromXml( 		scene, xml.findChild( 'materialOverride' ) ) )
+		
+		# restore environment override
+		if ( self.isWorldLayer() ):
+			scene.setEnvironmentMapOverride( SceneMap.fromXml( scene, xml.findChild( 'environmentMapOverride' ) ) )
 	
 	def removeAltMaterialAt( self, index ):
 		"""
@@ -612,11 +704,11 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	set the current index for the alternate material, applying the alternate material when necessary
 			\sa			setMaterialOverride, altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterialAt
 						setAltMaterials, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<bool> success
+			\return		<bool> changed
 		"""
 		# do not need to reprocess
 		if ( index == self._altMtlIndex ):
-			return True
+			return False
 		
 		mtls = self.altMaterials()
 		
@@ -637,11 +729,11 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	set the current index for the alternate object property set, applyting the set to the objects on this layer when necessary
 			\sa			setPropSetOverride, altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, 
 						setAltPropSets
-			\return		<bool> success
+			\return		<bool> changed
 		"""
 		# do not need to reprocess
 		if ( index == self._altPropIndex ):
-			return True
+			return False
 		
 		propsets = self.altPropSets()
 		
@@ -763,6 +855,17 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		from PyQt4.QtGui import QColor
 		return QColor()
 	
+	@staticmethod
+	def fromXml( scene, xml ):
+		"""
+			\remarks	create a new layer from the inputed xml data
+			\param		xml		<blurdev.XML.XMLElement>
+			\return		
+		"""
+		if ( xml ):
+			return scene.findLayer( layerName = xml.attribute( 'name' ), layerId = int(xml.attribute( 'id',0 )) )
+		return None
+		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneLayer', AbstractSceneLayer, ifNotFound = True )

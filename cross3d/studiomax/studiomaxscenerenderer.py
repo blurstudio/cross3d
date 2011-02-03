@@ -23,10 +23,7 @@ class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 			\param		default		<variant>	(auto-converted from the application's native value)
 			\return		<variant>
 		"""
-		try:
-			return self._nativePointer.property( str(key) )
-		except:
-			return default
+		return self._nativePointer.property( str(key) )
 		
 	def _setNativeProperty( self, key, nativeValue ):
 		"""
@@ -36,12 +33,9 @@ class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 			\param		value	<variant>	(pre-converted to the application's native value)
 			\retrun		<bool> success
 		"""
-		try:
-			self._nativePointer.setProperty( str( key ), nativeValue )
-			return True
-		except:
-			return False
-	
+		self._nativePointer.setProperty( str( key ), nativeValue )
+		return True
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -63,6 +57,24 @@ class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 			\return		<bool> found
 		"""
 		return mxs.isProperty( self._nativePointer, str(key) ) or mxs.hasProperty( self._nativePointer, str(key) )
+	
+	def rendererType( self ):
+		"""
+			\remarks	implements AbstractSceneRenderer.rendererType to return the renderer type for this instance
+			\sa			setRendererType
+			\return		<blur3d.constants.RendererType>
+		"""
+		from blur3d.constants import RendererType
+		classname = str(mxs.classof(self._nativePointer)).lower()
+		
+		if ( classname == 'default_scanline_renderer' ):
+			return RendererType.Scanline
+		elif ( classname == 'mental_ray_renderer' ):
+			return RendererType.MentalRay
+		elif ( 'v_ray' in classname ):
+			return RendererType.VRay
+		
+		return 0
 		
 # register the symbol
 from blur3d import api

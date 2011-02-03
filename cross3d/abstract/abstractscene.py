@@ -19,6 +19,7 @@
 #	\date		03/15/10
 #
 
+from blurdev import debug
 from PyQt4.QtCore import QObject, pyqtSignal
 
 class AbstractScene( QObject ):
@@ -48,9 +49,7 @@ class AbstractScene( QObject ):
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\param		nativeMap	<variant>
 			\return		<bool> changed
-		"""
-		from blurdev import debug
-		
+		"""		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -64,8 +63,6 @@ class AbstractScene( QObject ):
 			\param		nativeMaterial	<variant>
 			\return		<bool> changed
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -80,8 +77,6 @@ class AbstractScene( QObject ):
 			\param		default		<variant>	value to return if the id was not found
 			\return		<variant> nativeMap || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -96,8 +91,6 @@ class AbstractScene( QObject ):
 			\param		default			<variant>	value to return if the id was not found
 			\return		<variant> nativeMaterial || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -110,8 +103,6 @@ class AbstractScene( QObject ):
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\return		<list> [ <variant> nativeMap, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -124,8 +115,6 @@ class AbstractScene( QObject ):
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -138,8 +127,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -152,8 +139,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -167,8 +152,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<variant> nativeLayer || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -181,8 +164,6 @@ class AbstractScene( QObject ):
 			\param		name			<str>
 			\return		<variant> nativeLayerGroup || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -196,8 +177,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -210,14 +189,23 @@ class AbstractScene( QObject ):
 			\param		rendererType	<blur3d.constants.RendererType>
 			\return		<variant> nativeRenderer || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return None
+	
+	def _currentNativeRenderer( self ):
+		"""
+			\remarks	[abstract]	return the current native renderer for this scene instance
+			\return		<variant> nativeRenderer || None
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
 		
+		return None
+	
 	def _exportNativeObjects( self, nativeObjects ):
 		"""
 			\remarks	[abstract]			exports the inputed native objects to the given filename
@@ -225,67 +213,83 @@ class AbstractScene( QObject ):
 			\param		filename			<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return False
 	
-	def _findNativeAtmospheric( self, atmosName ):
+	def _findNativeAtmospheric( self, atmosName = '', atmosId = 0 ):
 		"""
 			\remarks	[abstract] look up the native atmospheric from this scene instance
 			\param		atmosName	<str>
 			\return		<variant> nativeAtmospheric || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return None
 	
-	def _findNativeObject( self, objectName ):
+	def _findNativeObject( self, objectName = '', objectId = 0 ):
 		"""
 			\remarks	[abstract] looks up an object based on the inputed name
 			\sa			findNativeObject
 			\param		objectName	<str>
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return None
 	
-	def _findNativeLayer( self, layerName ):
+	def _findNativeLayer( self, layerName = '', layerId = 0 ):
 		"""
 			\remarks	[abstract] looks up a layer based on the inputed name
 			\sa			findNativeLayer
 			\param		layerName	<str>
 			\return		<variant> nativeLayer || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return None
 	
-	def _findNativeLayerGroup( self, groupName ):
+	def _findNativeLayerGroup( self, groupName = '', groupId = 0):
 		"""
 			\remarks	[abstract] look up a layer group based on the inputed name
 			\sa			findNativeLayer
 			\param		layerName	<str>
 			\return		<variant> nativeLayerGroup || None
 		"""
-		from blurdev import debug
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
 		
+		return None
+	
+	def _findNativeMaterial( self, materialName = '', materialId = 0 ):
+		"""
+			\remarks	[abstract] looks up an material based on the inputed name
+			\sa			findNativeMaterial
+			\param		materialName	<str>
+			\return		<variant> nativeMaterial || None
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return None
+	
+	def _findNativeMap( self, mapName = '', mapId = 0 ):
+		"""
+			\remarks	[abstract] looks up an map based on the inputed name
+			\sa			findNativeMap
+			\param		mapName	<str>
+			\return		<variant> nativeMap || None
+		"""
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -299,8 +303,6 @@ class AbstractScene( QObject ):
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -316,13 +318,22 @@ class AbstractScene( QObject ):
 		# by default, we assume all conversions have already occurred
 		return nativeValue
 	
+	def _getNativeObject( self ):
+		"""
+			\remarks	[abstract]	invokes the application's ability to let a user select a Object from the scene
+			\return		<variant> nativeObject || None
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return None
+		
 	def _getNativeMaterial( self ):
 		"""
 			\remarks	[abstract]	invokes the application's ability to let a user select a Material from the scene
 			\return		<variant> nativeMaterial || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -334,8 +345,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	invokes the application's ability to let a user select a Map from the scene
 			\return		<variant> nativeMap || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -349,8 +358,6 @@ class AbstractScene( QObject ):
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -364,8 +371,6 @@ class AbstractScene( QObject ):
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -378,8 +383,6 @@ class AbstractScene( QObject ):
 			\param		filename	<str>
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -392,8 +395,6 @@ class AbstractScene( QObject ):
 			\param		name			<str>
 			\return		<variant> nativeLayer || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -405,21 +406,30 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	return the native atmospheric instances for this scene
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return []
 	
+	def _nativeCustomProperty( self, key, default = None ):
+		"""
+			\remarks	[abstract] return the native property for the inputed key
+			\param		key			<str>
+			\param		default		<variant>
+			\return		<variant>
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return default
+		
 	def _nativeEnvironmentMap( self ):
 		"""
 			\remarks	[abstract] return the current scene environment map
 			\return		<variant> nativeMap || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -431,8 +441,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract] return the current scene environment map override
 			\return		<variant> nativeMap || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -445,8 +453,6 @@ class AbstractScene( QObject ):
 			\sa			setUpdatesEnabled, update
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -458,8 +464,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]		returns a list of the native layers in this scene
 			\return		<list> [ <variant> nativeLayer, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -472,8 +476,30 @@ class AbstractScene( QObject ):
 			\sa			layerGroups
 			\return		<list> [ <variant> nativeLayerGroup, .. ]
 		"""
-		from blurdev import debug
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
 		
+		return []
+	
+	def _nativeMaterials( self ):
+		"""
+			\remarks	[abstract] collect all the materials in this scene
+			\sa			materials
+			\return		<list> [ <variant> nativeMaterial, .. ]
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return []
+	
+	def _nativeMaps( self ):
+		"""
+			\remarks	[abstract] collect all the maps in this scene
+			\sa			maps
+			\return		<list> [ <variant> nativeMap, .. ]
+		"""
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -485,8 +511,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract] 	returns the native objects from the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -498,8 +522,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract] 	returns the native root object of the scen
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -511,8 +533,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract] 	returns the selected objects from the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -526,8 +546,6 @@ class AbstractScene( QObject ):
 			\param		options			<blur3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -540,8 +558,6 @@ class AbstractScene( QObject ):
 			\param		name			<str>
 			\return		<variant> nativeLayer
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -554,8 +570,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -570,8 +584,6 @@ class AbstractScene( QObject ):
 			\param		display		<bool> 	tags whether or not the names are display names or object names
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -585,8 +597,6 @@ class AbstractScene( QObject ):
 			\param		nativeMaps	<list> [ <variant> nativeMap, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -600,8 +610,31 @@ class AbstractScene( QObject ):
 			\param		nativeMaterials		<list> [ <variant> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
 		
+		return False
+	
+	def _setCurrentNativeRenderer( self, nativeRenderer ):
+		"""
+			\remarks	[abstract] set the current renderer to the inputed native renderer
+			\param		nativeRenderer	<variant>
+			\return		<bool> success
+		"""
+		# when debugging, raise an error
+		if ( debug.debugLevel() ):
+			raise NotImplementedError
+		
+		return False
+	
+	def _setNativeCustomProperty( self, key, value ):
+		"""
+			\remarks	[abstract] set the custom property on this scene to the inputed value
+			\param		key		<str>
+			\param		value	<variant>
+			\return		<bool> success
+		"""
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -616,8 +649,6 @@ class AbstractScene( QObject ):
 			\param		options			<blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -630,8 +661,6 @@ class AbstractScene( QObject ):
 			\param		nativeMap	<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -644,8 +673,6 @@ class AbstractScene( QObject ):
 			\param		nativeMap	<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -659,8 +686,6 @@ class AbstractScene( QObject ):
 			\param		nativePropSet	<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -673,8 +698,6 @@ class AbstractScene( QObject ):
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -687,8 +710,6 @@ class AbstractScene( QObject ):
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -715,8 +736,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]		returns the visible objects in the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -822,8 +841,6 @@ class AbstractScene( QObject ):
 									this method will return false.  Returns true if the scene is saved, or otherwise is approved by the user to continue the next operation
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -905,19 +922,45 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneObject
 			return SceneObject( self, nativeModel )
 		return None
+	
+	def currentLayerState( self ):
+		"""
+			\remarks	records the current layer state to xml and returns the string
+			\return		<str> layerState
+		"""
+		from blurdev.XML import XMLDocument
+		doc = XMLDocument()
+		self.recordLayerState( doc )
+		return doc.toxml()
 		
 	def currentFileName( self ):
 		"""
 			\remarks	[abstract]	returns the current filename for the scene that is active in the application
 			\return		<str>
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return ''
+	
+	def currentRenderer( self ):
+		"""
+			\remarks	return the current renderer assigned to this scene
+			\return		<blur3d.api.SceneRenderer> || None
+		"""
+		nativeRenderer = self._currentNativeRenderer()
+		if ( nativeRenderer ):
+			from blur3d.api import SceneRenderer
+			return SceneRenderer( self, nativeRenderer )
+		return None
+	
+	def customProperty( self, key, default = None ):
+		"""
+			\remarks	return a custom property in the scene with the given key
+			\return		<variant>
+		"""
+		return self._fromNativeValue( self._nativeCustomProperty( key, default ) )
 	
 	def emitLayerStateChanged( self ):
 		"""
@@ -960,56 +1003,82 @@ class AbstractScene( QObject ):
 		"""
 		return self._freezeNativeObjects( [ obj.nativePointer() for obj in objects ], state )
 	
-	def findAtmospheric( self, atmosName ):
+	def findAtmospheric( self, atmosName = '', atmosId = 0 ):
 		"""
 			\remarks	look up an atmospheric based on the inputed name
 			\sa			_findNativeAtmospheric
 			\param		atmosName	<str>
 			\return		<blur3d.api.SceneAtmospheric> || None
 		"""
-		nativeAtmos = self._findNativeAtmospheric( atmosName )
+		nativeAtmos = self._findNativeAtmospheric( atmosName, atmosId )
 		if ( nativeAtmos ):
 			from blur3d.api import SceneAtmospheric
 			return SceneAtmospheric( self, nativeAtmos )
 		return None
 	
-	def findLayer( self, layerName ):
+	def findLayer( self, layerName = '', layerId = 0 ):
 		"""
 			\remarks	looks up a layer based on the inputed name
 			\sa			_findNativeLayer
 			\param		layerName	<str>
 			\return		<blur3d.api.SceneLayer> || None
 		"""
-		nativeLayer = self._findNativeLayer( layerName )
+		nativeLayer = self._findNativeLayer( layerName, layerId )
 		if ( nativeLayer ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, nativeLayer )
 		return None
 	
-	def findLayerGroup( self, groupName ):
+	def findLayerGroup( self, groupName = '', groupId = 0):
 		"""
 			\remarks	look up a layer group based on the inputed name
 			\sa			_findNativeLayerGroup
 			\param		groupName	<str>
 			\return		<blur3d.api.SceneLayerGroup> || None
 		"""
-		nativeLayerGroup = self._findNativeLayerGroup( groupName )
+		nativeLayerGroup = self._findNativeLayerGroup( groupName, groupId )
 		if ( nativeLayerGroup ):
 			from blur3d.api import SceneLayerGroup
 			return SceneLayerGroup( self, nativeLayerGroup )
 		return None
 	
-	def findObject( self, objectName ):
+	def findObject( self, objectName = '', objectId = 0 ):
 		"""
 			\remarks	looks up an individual object by its name
 			\sa			_findNativeObject
 			\param		objectName	<str>
 			\return		<blur3d.api.SceneObject> || None
 		"""
-		nativeObject = self._findNativeObject( objectName )
+		nativeObject = self._findNativeObject( objectName, objectId )
 		if ( nativeObject ):
 			from blur3d.api import SceneObject
 			return SceneObject( self, nativeObject )
+		return None
+	
+	def findMaterial( self, materialName = '', materialId = 0 ):
+		"""
+			\remarks	looks up an individual material by its name
+			\sa			_findNativeMaterial
+			\param		materialName	<str>
+			\return		<blur3d.api.SceneMaterial> || None
+		"""
+		nativeMaterial = self._findNativeMaterial( materialName, materialId )
+		if ( nativeMaterial ):
+			from blur3d.api import SceneMaterial
+			return SceneMaterial( self, nativeMaterial )
+		return None
+		
+	def findMap( self, mapName = '', mapId = 0 ):
+		"""
+			\remarks	looks up an individual map by its name
+			\sa			_findNativeMap
+			\param		mapName	<str>
+			\return		<blur3d.api.SceneMap> || None
+		"""
+		nativeMap = self._findNativeMap( mapName, mapId )
+		if ( nativeMap ):
+			from blur3d.api import SceneMap
+			return SceneMap( self, nativeMap )
 		return None
 		
 	def fileType( self ):
@@ -1017,8 +1086,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	returns the main file type for this type of application
 			\return		<str>
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1030,13 +1097,22 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	returns the associated file types for this type of application
 			\return		<list> [ <str>, .. ]
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return []
+	
+	def getObject( self ):
+		"""
+			\remarks	invokes the application's ability to let a user select an Object from the scene
+			\return		<blur3d.api.Object> || None
+		"""
+		from blur3d.api import SceneObject
+		object = self._getNativeObject()
+		if ( object ):
+			return SceneObject( self, object )
+		return None
 	
 	def getMaterial( self ):
 		"""
@@ -1065,8 +1141,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	protects the current scene as it is to allow for manipulation and provide a restore point
 			\sa			restoreHeldState
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1122,8 +1196,6 @@ class AbstractScene( QObject ):
 			\param		filename	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1138,6 +1210,22 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, nativeMaterial ) for nativeMaterial in self._loadNativeMaterialsFromLibrary( filename ) ]
+	
+	def materials( self ):
+		"""
+			\remarks	returns a list of all the materials in the scene wrapped as SceneMaterials
+			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
+		"""
+		from blur3d.api import SceneMaterial
+		return [ SceneMaterial( self, obj ) for obj in self._nativeMaterials() ]
+	
+	def maps( self ):
+		"""
+			\remarks	returns a list of all the maps in the scene wrapped as SceneMaps
+			\return		<list> [ <blur3d.api.SceneMap>, .. ]
+		"""
+		from blur3d.api import SceneMap
+		return [ SceneMap( self, obj ) for obj in self._nativeMaps() ]
 	
 	def objects( self ):
 		"""
@@ -1154,45 +1242,82 @@ class AbstractScene( QObject ):
 			\param		default		<variant>	default value to return if no value was found
 			\return		<variant>
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
 		
 		return default
 	
-	def recordLayerState( self ):
+	def recordLayerState( self, xml ):
 		"""
 			\remarks	records the layer state to XML text
 			\sa			restoreLayerState, SceneLayer.recordLayerState
 			\return		<str>
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
-		root = doc.addNode( 'layers' )
-		for layer in self.layers():
-			layer.recordLayerState( root )
-		return doc.toxml()
+		layerState 	= xml.addNode( 'layerState' )
+		layers		= self.layers()
+		for layer in layers:
+			layer.recordLayerState( layerState )
 	
-	def restoreLayerState( self, layerState ):
+	def restoreLayerState( self, xml ):
 		"""
 			\remarks	restores the layer state from the inputed XML text
 			\sa			recordLayerState, SceneLayer.restoreLayerState
 			\return		<bool> success
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
-		if ( doc.parse( layerState ) ):
-			root = doc.root()
-			if ( root.nodeName == 'layers' ):
+		layerState = xml.findChild( 'layerState' )
+		if ( not layerState ):
+			return False
 			
-				for layer in self.layers():
-					layer.restoreLayerState( root )
-					
-				self.layerStateChanged.emit()
-				return True
-		return False
+		# create a layer mapping
+		layers 			= self.layers()
+		layernamemap 	= {}
+		layeridmap		= {}
+		for layer in layers:
+			layernamemap[ str(layer.layerName()) ] 	= layer
+			layeridmap[ str(layer.layerId()) ] 		= layer
+		
+		# create the progress dialog
+		from PyQt4.QtGui import QProgressDialog
+		progress = QProgressDialog( 'Loading State', '', 0, len(layers) + 1 )
+		progress.setWindowTitle( 'Loading Layer State' )
+		progress.show()
+		
+		# go through the layers in the xml layer state mapping found layers to the scene layers
+		processed = []
+		for i, layerXml in enumerate(layerState.children()):
+			# store the recorded name
+			name = layerXml.attribute( 'name' )
+			
+			# update the progress dialog
+			progress.setValue(i)
+			progress.setLabelText( 'Loading %s...' % name )
+			
+			# lookup the layer by name
+			if ( name in layernamemap ):
+				layer = layernamemap[name]
+				layer.restoreLayerState( layerXml )
+				processed.append(layer)
+				continue
+			
+			# lookup the layer by id
+			lid = layerXml.attribute( 'id' )
+			if ( name in layeridmap ):
+				layer = layeridmap[name]
+				layer.restoreLayerState( layerXml )
+				processed.append(layer)
+				continue
+		
+		# next hide all the layers taht are not part of the state
+		unprocessed = [ layer for layer in layers if not layer in processed ]
+		progress.setValue( 1 )
+		progress.setMaximum( len(unprocessed) + 1 )
+		for i, layer in enumerate(unprocessed):
+			progress.setValue(i+1)
+			progress.setLabelText( 'Hiding %s...' % layer.layerName() )
+			layer.setVisible(False)
+		
+		return True
 	
 	def removeObjects( self, objects ):
 		"""
@@ -1219,8 +1344,6 @@ class AbstractScene( QObject ):
 			\remarks	[abstract]	resets this scene for all the data and in the application
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1233,8 +1356,6 @@ class AbstractScene( QObject ):
 			\sa			holdCurrentState
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1265,8 +1386,6 @@ class AbstractScene( QObject ):
 			\param		filename 	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
@@ -1364,6 +1483,37 @@ class AbstractScene( QObject ):
 		"""
 		return self._setCachedNativeMaterials( cacheType, [ material.nativePointer() for material in materials ] )
 	
+	def setCurrentLayerState( self, layerState ):
+		"""
+			\remarks	restore the layer state from the inputed xml string
+			\param		layerState	<str>
+			\return		<bool> success
+		"""
+		from blurdev.XML import XMLDocument
+		doc = XMLDocument()
+		doc.parse(layerState)
+		return self.restoreLayerState(doc)
+	
+	def setCurrentRenderer( self, renderer ):
+		"""
+			\remarks	set the current scene renderer to this class type
+			\param		renderer	<blur3d.api.SceneRenderer>
+			\return		<bool> success
+		"""
+		nativeRenderer = None
+		if ( renderer ):
+			nativeRenderer = renderer.nativePointer()
+		return self._setCurrentNativeRenderer( nativeRenderer )
+	
+	def setCustomProperty( self, key, value ):
+		"""
+			\remarks	set the custom property value for the inputed key in this scene to the given value
+			\param		key		<str>
+			\param		value	<variant>
+			\return		<bool> success
+		"""
+		return self._setNativeCustomProperty( key, self._toNativeValue(value) )
+	
 	def setProperty( self, key, value ):
 		"""
 			\remarks	[abstract]	sets the global scene property to the inputed value
@@ -1371,8 +1521,6 @@ class AbstractScene( QObject ):
 			\param		value		<variant>
 			\return		<bool>
 		"""
-		from blurdev import debug
-		
 		# when debugging, raise an error
 		if ( debug.debugLevel() ):
 			raise NotImplementedError
