@@ -446,7 +446,7 @@ class StudiomaxScene( AbstractScene ):
 		objectName 	= str(objectName)
 		output 		= None
 		if ( objectName ):
-			output = mxs.getNodeByName( str(objectName) )
+			output = mxs.getNogyName( str(objectName) )
 		
 		if ( not output and objectId ):
 			output = mxs.refByUniqueId( objectId )
@@ -703,13 +703,14 @@ class StudiomaxScene( AbstractScene ):
 		return mxs.objects
 	
 	def _nativeMaterials( self ):
-		get_instances	= mxs.getClassInstances
-		mclasses 		= mxs.Material.classes
-		output			= []
+		#get_instances	= mxs.getClassInstances
+		#mclasses 		= mxs.Material.classes
+		#output			= []
 		
 		# collect all the materials
-		for mclass in mclasses:
-			output += get_instances(mclass)
+		#for mclass in mclasses:
+		#	output += get_instances(mclass)
+		output = list(mxs.sceneMaterials)
 			
 		# include material list
 		mlist = list(self.metaData().value( 'materialLibraryList' ))
@@ -734,12 +735,7 @@ class StudiomaxScene( AbstractScene ):
 	
 	def _nativeMaps( self ):
 		get_instances	= mxs.getClassInstances
-		mclasses 		= mxs.TextureMap.classes
-		output			= []
-		
-		# collect all the maps
-		for mclass in mclasses:
-			output += get_instances(mclass)
+		output			= get_instances(mxs.BitmapTexture)
 		
 		# include material list
 		mlist = list(self.metaData().environmentMapsCache().value( 'environmentMaps' ))

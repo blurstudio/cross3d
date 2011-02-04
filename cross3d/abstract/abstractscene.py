@@ -1279,10 +1279,14 @@ class AbstractScene( QObject ):
 			\sa			recordLayerState, SceneLayer.restoreLayerState
 			\return		<bool> success
 		"""
+		watch = debug.Stopwatch( 'AbstractScene.restoreLayerState' )
+		
 		layerState = xml.findChild( 'layerState' )
 		if ( not layerState ):
+			watch.stop()
 			return False
-			
+		
+		watch.startLap( 'Mapping Layers' )
 		# create a layer mapping
 		layers 			= self.layers()
 		layernamemap 	= {}
@@ -1290,8 +1294,10 @@ class AbstractScene( QObject ):
 		for layer in layers:
 			layernamemap[ str(layer.layerName()) ] 	= layer
 			layeridmap[ str(layer.layerId()) ] 		= layer
+		watch.stopLap()
 		
 		# create a material caching
+		watch.startLap( 'Caching Materials' )
 		materials		= self.materials()
 		materialcache	= { 'name': {}, 'id': {} }
 		for material in materials:
@@ -1299,8 +1305,10 @@ class AbstractScene( QObject ):
 			materialcache[ 'id' ][ material.materialId() ] 		= material
 		
 		self._materialCache = materialcache
+		watch.stopLap()
 		
 		# create a map caching
+		watch.startLap( 'Caching Maps' )
 		maps			= self.maps()
 		mapcache		= { 'name': {}, 'id': {} }
 		for m in maps:
@@ -1308,6 +1316,7 @@ class AbstractScene( QObject ):
 			mapcache[ 'id' ][ m.mapId() ] 		= map
 		
 		self._mapCache = mapcache
+		watch.stopLap()
 		
 		# create the progress dialog
 		from PyQt4.QtGui import QProgressDialog
@@ -1328,7 +1337,9 @@ class AbstractScene( QObject ):
 			# lookup the layer by name
 			if ( name in layernamemap ):
 				layer = layernamemap[name]
+				watch.startLap( 'Restoring %s' % name )
 				layer.restoreLayerState( layerXml )
+				watch.stopLap()
 				processed.append(layer)
 				continue
 			
@@ -1336,7 +1347,9 @@ class AbstractScene( QObject ):
 			lid = layerXml.attribute( 'id' )
 			if ( name in layeridmap ):
 				layer = layeridmap[name]
+				watch.startLap( 'Restoring %s' % name )
 				layer.restoreLayerState( layerXml )
+				watch.stopLap()
 				processed.append(layer)
 				continue
 		
@@ -1347,10 +1360,15 @@ class AbstractScene( QObject ):
 		for i, layer in enumerate(unprocessed):
 			progress.setValue(i+1)
 			progress.setLabelText( 'Hiding %s...' % layer.layerName() )
+			
+			watch.startLap( 'Hiding %s' % layer.layerName() )
 			layer.setVisible(False)
+			watch.stopLap()
 		
 		self._materialCache = None
 		self._mapCache 		= None
+		
+		watch.stop()
 		
 		return True
 	
@@ -1524,10 +1542,22 @@ class AbstractScene( QObject ):
 			\param		layerState	<str>
 			\return		<bool> success
 		"""
+		# create a stopwatch
+		watch = debug.Stopwatch( 'AbstractScene.setCurrentLayerState' )
+		
 		from blurdev.XML import XMLDocument
 		doc = XMLDocument()
+		
+		watch.startLap( 'Parsing State' )
 		doc.parse(layerState)
-		return self.restoreLayerState(doc)
+		watch.stopLap()
+		
+		watch.startLap( 'Restoring Layer State' )
+		result = self.restoreLayerState(doc)
+		watch.stopLap()
+		watch.stop()
+		
+		return result
 	
 	def setCurrentRenderer( self, renderer ):
 		"""
