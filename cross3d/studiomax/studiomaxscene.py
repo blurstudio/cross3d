@@ -136,7 +136,6 @@ class StudiomaxScene( AbstractScene ):
 		# create custom properties
 		self._metaData 			= None
 		self._mapCache			= None
-		self._materialCache		= None
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods

@@ -38,7 +38,9 @@ class AbstractScene( QObject ):
 		QObject.__init__( self )
 		
 		# create custom properties
-		self._updatesDisabled = 0
+		self._updatesDisabled 	= 0
+		self._materialCache		= None
+		self._mapCache			= None
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -1062,11 +1064,17 @@ class AbstractScene( QObject ):
 			\param		materialName	<str>
 			\return		<blur3d.api.SceneMaterial> || None
 		"""
-		nativeMaterial = self._findNativeMaterial( materialName, materialId )
-		if ( nativeMaterial ):
-			from blur3d.api import SceneMaterial
-			return SceneMaterial( self, nativeMaterial )
-		return None
+		if ( self._materialCache != None ):
+			mtl = self._materialCache['id'].get(materialId)
+			if ( not mtl ):
+				mtl = self._materialCache['name'].get(materialName)
+			return mtl
+		else:
+			nativeMaterial = self._findNativeMaterial( materialName, materialId )
+			if ( nativeMaterial ):
+				from blur3d.api import SceneMaterial
+				return SceneMaterial( self, nativeMaterial )
+			return None
 		
 	def findMap( self, mapName = '', mapId = 0 ):
 		"""
@@ -1075,11 +1083,17 @@ class AbstractScene( QObject ):
 			\param		mapName	<str>
 			\return		<blur3d.api.SceneMap> || None
 		"""
-		nativeMap = self._findNativeMap( mapName, mapId )
-		if ( nativeMap ):
-			from blur3d.api import SceneMap
-			return SceneMap( self, nativeMap )
-		return None
+		if ( self._mapCache != None ):
+			m = self._mapCache['id'].get(mapId)
+			if ( not m ):
+				m = self._mapCache['name'].get(mapName)
+			return m
+		else:
+			nativeMap = self._findNativeMap( mapName, mapId )
+			if ( nativeMap ):
+				from blur3d.api import SceneMap
+				return SceneMap( self, nativeMap )
+			return None
 		
 	def fileType( self ):
 		"""
@@ -1277,6 +1291,24 @@ class AbstractScene( QObject ):
 			layernamemap[ str(layer.layerName()) ] 	= layer
 			layeridmap[ str(layer.layerId()) ] 		= layer
 		
+		# create a material caching
+		materials		= self.materials()
+		materialcache	= { 'name': {}, 'id': {} }
+		for material in materials:
+			materialcache[ 'name' ][ material.materialName() ] 	= material
+			materialcache[ 'id' ][ material.materialId() ] 		= material
+		
+		self._materialCache = materialcache
+		
+		# create a map caching
+		maps			= self.maps()
+		mapcache		= { 'name': {}, 'id': {} }
+		for m in maps:
+			mapcache[ 'name' ][ m.mapName() ] 	= map
+			mapcache[ 'id' ][ m.mapId() ] 		= map
+		
+		self._mapCache = mapcache
+		
 		# create the progress dialog
 		from PyQt4.QtGui import QProgressDialog
 		progress = QProgressDialog( 'Loading State', '', 0, len(layers) + 1 )
@@ -1316,6 +1348,9 @@ class AbstractScene( QObject ):
 			progress.setValue(i+1)
 			progress.setLabelText( 'Hiding %s...' % layer.layerName() )
 			layer.setVisible(False)
+		
+		self._materialCache = None
+		self._mapCache 		= None
 		
 		return True
 	

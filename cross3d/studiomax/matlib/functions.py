@@ -239,7 +239,10 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		
 		for i in range( count ):
 			# determine the actual overriding material based on if the override material is a multi/sub or not
-			replaceMaterial = multi_material[i] if ( is_kindof( overrideMaterial, multi_material ) ) else overrideMaterial
+			if ( is_kindof( overrideMaterial, multi_material ) ):
+				replaceMaterial = multi_material[i]
+			else:
+				replaceMaterial = overrideMaterial
 			subMaterial 	= baseMaterial[i]
 			
 			# check to see if this is a mental ray holder material
@@ -265,7 +268,10 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		
 		count = get_numsubmtls( baseMaterial )
 		for i in range( count ):
-			replaceMaterial = multi_material[i] if ( is_kindof( overrideMaterial, multi_material ) ) else overrideMaterial
+			if ( is_kindof( overrideMaterial, multi_material ) ):
+				replaceMaterial = multi_material[i]
+			else:
+				replaceMaterial = overrideMaterial
 			subMaterial		= get_submtl( baseMaterial, i + 1 )
 			
 			if ( subMaterial ):
@@ -277,8 +283,15 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		return outputMaterial
 	
 	# process all other materials
-	opacityMap 	= findOpacityMap( baseMaterial ) 		if ( options & MaterialOverrideOptions.KeepOpacity ) 		else None
-	displMap	= findDisplacementMap( baseMaterial )	if ( options & MaterialOverrideOptions.KeepDisplacement )	else None
+	if ( options & MaterialOverrideOptions.KeepOpacity ):
+		opacityMap 	= findOpacityMap( baseMaterial )
+	else:
+		opacityMap = None
+		
+	if ( options & MaterialOverrideOptions.KeepDisplacement ):
+		displMap	= findDisplacementMap( baseMaterial )
+	else:
+		displMap 	= None
 			
 	# return the new material
 	return buildMaterialFrom( overrideMaterial, opacityMap = opacityMap, displacementMap = displMap )
@@ -299,12 +312,16 @@ def findDisplacementMap( material ):
 			return material.displacementMap
 		elif ( is_prop( material, 'mental_ray__material_custom_attribute' ) ):
 			mrattr = material.mental_ray__material_custom_attribute
-			return mrattr.displacement if ( mrattr.displacementOn and not mrattr.displacementLocked ) else None
+			if ( mrattr.displacementOn and not mrattr.displacementLocked ):
+				return mrattr.displacement
 		return None
 	
 	# return a vray material's displacement map
 	elif ( cls == mxs.VrayMtl ):
-		return material.texmap_displacement if material.texmap_displacement_on else None
+		if material.texmap_displacement_on:
+			return material.texmap_displacement 
+		else:
+			return None
 	
 	# return an arch design's material
 	elif ( cls == mxs.Arch___Design__mi ):
@@ -313,7 +330,10 @@ def findDisplacementMap( material ):
 		# first check for mental ray properties
 		if ( is_prop( material, 'mental_ray__material_custom_attribute' ) ):
 			mrattr = material.mental_ray__material_custom_attribute
-			outMap = mrattr.displacement if ( mrattr.displacementOn and not mrattr.displacementLocked ) else None
+			if ( mrattr.displacementOn and not mrattr.displacementLocked ):
+				outMap = mrattr.displacement
+			else:
+				outMap = None
 		
 		# create a custom output material to match the output amount
 		if ( not outMap and material.displacementMap and material.displacement_map_on ):
@@ -331,7 +351,8 @@ def findDisplacementMap( material ):
 	elif ( cls == mxs.Blend ):
 		if ( is_prop( material, 'mental_ray__material_custom_attribute' ) ):
 			mrattr = material.mental_ray__material_custom_attribute
-			return mrattr.displacement if ( mrattr.displacementOn and not mrattr.displacementLocked ) else None
+			if ( mrattr.displacementOn and not mrattr.displacementLocked ):
+				return mrattr.displacement
 		return None
 	
 	# return skin shader displacements
@@ -340,7 +361,8 @@ def findDisplacementMap( material ):
 	
 	# return a mental ray displacement
 	elif ( cls == mxs.mental_ray ):
-		return material.displacement if material.displaceOn else None
+		if material.displaceOn:
+			return material.displacement
 	
 	return None
 	
@@ -354,22 +376,27 @@ def findOpacityMap( material ):
 	
 	# return a standard material's opacity map
 	if ( cls == mxs.StandardMaterial ):
-		return material.opacityMap if material.opacityMapEnable else None
+		if material.opacityMapEnable:
+			return material.opacityMap
 	
 	# return a vray material's opacity map
 	elif ( cls == mxs.VrayMtl ):
-		return material.texmap_opacity if material.texmap_opacity_on else None
+		if material.texmap_opacity_on:
+			return material.texmap_opacity
 	
 	# return a vray light material's opacity map
 	elif ( cls == mxs.VrayLightMtl ):
-		return material.opacity_texmap if material.opacity_texmap_on else None
+		if material.opacity_texmap_on:
+			return material.opacity_texmap
 	
 	# return a matte's opactiy map
 	elif ( cls in (mxs.Matte_Shadow_Reflection_mi,mxs.mr_Matte_Shadow_Reflection_Mtl) ):
-		return material.opacity_shader if material.opacity_connected else None
+		if material.opacity_connected:
+			return material.opacity_shader
 	
 	# return an arch design's opacity map
 	elif ( cls == mxs.Arch___Design__mi ):
-		return material.cutout_map if material.cutoutmap_on else None
+		if material.cutoutmap_on:
+			return material.cutout_map
 	
 	return None
