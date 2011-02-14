@@ -633,6 +633,13 @@ class StudiomaxScene( AbstractScene ):
 		get_effect 	= mxs.getEffect
 		return [ get_atmos( i+1 ) for i in range( mxs.numAtmospherics ) ] + [ get_effect( i + 1 ) for i in range( mxs.numEffects ) ]
 	
+	def _nativeCameras( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeCameras method to return a list of the camera instances in this scene
+			\return		<list> [ <Py3dsMax.mxs.Camera> nativeCamera, .. ]
+		"""
+		return mxs.cameras
+	
 	def _nativeCustomProperty( self, key, default = None ):
 		"""
 			\remarks	implements the AbstractScene._nativeCustomProperty method to return a value for the inputed key for a custom scene property
@@ -667,17 +674,6 @@ class StudiomaxScene( AbstractScene ):
 			return maps[index-1]
 		return None
 	
-	def _nativeRefresh( self ):
-		"""
-			\remarks	implements the AbstractScene._nativeRefresh method to refreshe the contents of the current scene
-			\sa			setUpdatesEnabled, update
-			\return		<bool> success
-		"""
-		if ( not mxs.isSceneRedrawDisabled() ):
-			mxs.redrawViews()
-			return True
-		return False
-	
 	def _nativeLayers( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeLayers method to return a list of the native layers in this scene
@@ -694,13 +690,6 @@ class StudiomaxScene( AbstractScene ):
 			\return		<list> [ <str> nativeLayerGroup, .. ]
 		"""
 		return self.metaData().value( 'layerGroupNames' )
-	
-	def _nativeObjects( self ):
-		"""
-			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
-			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
-		"""
-		return mxs.objects
 	
 	def _nativeMaterials( self ):
 		#get_instances	= mxs.getClassInstances
@@ -745,6 +734,24 @@ class StudiomaxScene( AbstractScene ):
 				
 		return output
 		
+	def _nativeObjects( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
+			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+		"""
+		return mxs.objects
+	
+	def _nativeRefresh( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeRefresh method to refreshe the contents of the current scene
+			\sa			setUpdatesEnabled, update
+			\return		<bool> success
+		"""
+		if ( not mxs.isSceneRedrawDisabled() ):
+			mxs.redrawViews()
+			return True
+		return False
+	
 	def _nativeRootObject( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeRootObject to return the native root object of the scene

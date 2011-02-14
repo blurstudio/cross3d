@@ -22,3 +22,4 @@ def init():
 	import abstractscenemap
 	import abstractsceneatmospheric
 	import abstractscenerenderer
+	import abstractscenecamera

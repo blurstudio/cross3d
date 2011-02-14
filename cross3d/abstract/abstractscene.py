@@ -414,6 +414,17 @@ class AbstractScene( QObject ):
 		
 		return []
 	
+	def _nativeCameras( self ):
+		"""
+			\remarks	[abstract] return a collection of the cameras in this scene
+			\return		<list> [ <variant> nativeCamera, .. ]
+		"""
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return []
+	
 	def _nativeCustomProperty( self, key, default = None ):
 		"""
 			\remarks	[abstract] return the native property for the inputed key
@@ -836,6 +847,15 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
+	
+	def cameras( self ):
+		"""
+			\remarks	return a list of all the camera objects in this scene
+			\sa			_nativeCameras
+			\return		<list> [ <blur3d.api.SceneCamera>, .. ]
+		"""
+		from blur3d.api import SceneCamera
+		return [ SceneCamera( self, nativeCamera ) for nativeCamera in self._nativeCameras() ]
 	
 	def checkForSave( self ):
 		"""

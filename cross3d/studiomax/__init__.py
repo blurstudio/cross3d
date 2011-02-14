@@ -23,3 +23,4 @@ def init():
 	import studiomaxscenemap
 	import studiomaxsceneatmospheric
 	import studiomaxscenerenderer
+	import studiomaxscenecamera
