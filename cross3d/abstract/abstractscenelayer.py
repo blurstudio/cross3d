@@ -283,6 +283,32 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return []
 	
+	def defineAltMaterialAt( self, index, material ):
+		"""
+			\remarks	defines a new material for the inputed index, provided the material at that index is not already defined
+			\sa			altMaterialAt, setAltMaterialAt
+			\param		index		<int>
+			\param		material	<blur3d.api.SceneMaterial>
+			\return		<bool> success
+		"""
+		existing = self.altMaterialAt(index)
+		if ( not existing ):
+			return self.setAltMaterialAt( index, material )
+		return False
+	
+	def defineAltPropSetAt( self, index, propSet ):
+		"""
+			\remarks	defines a new property set for the inputed index, provided the property set at that index is not already defined
+			\sa			altPropSetAt, setAltPropSetAt
+			\param		index	<int>
+			\param		propSet	<blur3d.api.ScenePropSet>
+			\return		<bool> success
+		"""
+		existing = self.altPropSetAt(index)
+		if ( not (existing and existing.isActive()) ):
+			return self.setAltPropSetAt( index, propSet )
+		return False
+	
 	def currentAltMaterialIndex( self ):
 		"""
 			\remarks	retrive the index of the currently applied alternate material for this layer
@@ -738,7 +764,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		propsets = self.altPropSets()
 		
 		# apply an override state
-		if ( 0 <= index and index < len(propsets) ):
+		if ( 0 <= index and index < len(propsets) and propsets[index].isActive() ):
 			if ( self.setPropSetOverride( propsets[index] ) ):
 				self._altPropIndex = index
 				return True

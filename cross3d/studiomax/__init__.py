@@ -14,6 +14,10 @@ from blurdev.enum import enum
 StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
 
 def init():
+	# make sure we can import maxscript
+	from Py3dsMax import mxs
+	
+	# load the maxscript classes
 	import studiomaxscene	
 	import studiomaxsceneobject	
 	import studiomaxscenelayer	

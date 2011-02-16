@@ -383,8 +383,26 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<bool> success
 		"""
 		mtls = list( nativeMaterials )
-		self.metaData().setValue( 'altMtls', mtls )
+		data = self.metaData()
+		
+		# make sure we have the proper amount of displacements/opacities
+		opac 	= list(data.value( 'keepOpacity' ))
+		displ 	= list(data.value( 'keepDisplacement' ))
+		
+		mtlcount = len(mtls)
+		while ( len(opac) < mtlcount ):
+			opac.append(False)
+			
+		while ( len(displ) < mtlcount ):
+			displ.append(False)
+		
+		# set the data
+		data.setValue( 'altMtls', mtls )
+		data.setValue( 'keepOpacity', opac )
+		data.setValue( 'keepDisplacement', displ )
+		
 		self._altMtlCache = mtls
+		self._altMtlFlagsCache = None
 		return True
 	
 	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
@@ -540,6 +558,8 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 					flags |= MaterialOverrideOptions.KeepOpacity
 					
 				self._altMtlFlagsCache.append(flags)
+		
+			print self._altMtlFlagsCache
 				
 		return self._altMtlFlagsCache
 				
@@ -750,6 +770,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\param		flags	<list> [ <blur3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
+		
 		keepDisp = []
 		keepOpac = []
 		
@@ -757,7 +778,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		for flag in flags:
 			keepDisp.append( (flag & MaterialOverrideOptions.KeepDisplacement) != 0 )
 			keepOpac.append( (flag & MaterialOverrideOptions.KeepOpacity) != 0 )
-			
+		
 		data = self.metaData()
 		data.setValue( 'keepDisplacement', 	keepDisp )
 		data.setValue( 'keepOpacity',	 	keepOpac )
@@ -785,8 +806,9 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<bool> success
 		"""
 		# set the set values
-		altPropValues = []
-		altPropUsages = []
+		altPropValues 	= []
+		altPropUsages 	= []
+		altPropIds		= []
 		
 		# use blank prop strings for empty sets
 		from blur3d.api import SceneObjectPropSet
@@ -799,15 +821,18 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			if ( propSet ):
 				altPropValues.append( propSet._valueString() )
 				altPropUsages.append( propSet._activeString() )
+				altPropIds.append( propSet.propSetId() )
 				newSets.append( propSet )
 			else:
 				altPropValues.append( blankValues )
 				altPropUsages.append( blankUsages )
+				altPropIds.append( 0 )
 				newSets.append( SceneObjectPropSet( self._scene, None ) )
 			
 		data = self.metaData()
 		data.setValue( 'altPropValues', altPropValues )
 		data.setValue( 'altPropUsages', altPropUsages )
+		data.setValue( 'altPropIds', altPropIds )
 		
 		self._altPropCache = newSets
 		return True
