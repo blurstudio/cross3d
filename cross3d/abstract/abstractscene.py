@@ -1747,6 +1747,14 @@ class AbstractScene( QObject ):
 			AbstractScene._instance = Scene()
 		return AbstractScene._instance
 	
+	@staticmethod
+	def clearInstance():
+		AbstractScene._instance = None
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Scene', AbstractScene, ifNotFound = True )
+
+# connect the clear instance method to when a scene is invalidated
+import blurdev
+blurdev.core.sceneInvalidated.connect( AbstractScene.clearInstance )
