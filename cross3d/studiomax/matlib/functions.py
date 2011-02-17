@@ -10,17 +10,18 @@
 
 from Py3dsMax import mxs
 
-def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
+def buildMaterialFrom( material, opacityMap = None, displacementMap = None, bumpMap = None ):
 	"""
 		\remarks	creates a new material using the properties from the inputed material as its base,
 					creating the material with an inputed opacity and displacement map overrides
 		\param		material		<Py3dsMax.mxs.Material>
 		\param		opacityMap		<Py3dsMax.mxs.Map>
 		\param		displacementMap	<Py3dsMax.mxs.Map>
+		\param		bumpMap			<Py3dsMax.mxs.Map>
 		\return		<Py3dsMax.mxs.Material> builtMaterial
 	"""
 	# if there is no opacity of displacement map, then there is no need to modify the inputed material
-	if ( not (opacityMap or displacementMap) ):	
+	if ( not (opacityMap or displacementMap or bumpMap) ):	
 		return material
 	
 	# store useful methods
@@ -28,6 +29,8 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 	class_of	= mxs.classof
 	is_prop		= mxs.isproperty
 	cls 		= class_of( material )
+	
+	#----------------------------------------
 	
 	# GK 02/05/10 if texture is nested in a "Displacement 3D" or "Height Map" texture, get the root map
 	# and use it in the material's own displacement slot. (trying to maintain some comaptibility between vray and mental ray here.)
@@ -45,6 +48,8 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 		displacementTexture = displacementMap
 		displacementMap 	= displacementMap.heightMap
 	
+	#----------------------------------------
+	
 	# build a matte shadow reflection material
 	if ( cls in (mxs.Matte_Shadow_Reflection__mi,mxs.mr_Matte_Shadow_Reflection_Mtl) ):
 		matteMtl 					= mcopy( material )
@@ -57,7 +62,8 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 			dispTexture 		= mxs.Displacement_3D__3dsmax()
 			dispTexture.map 	= displacementMap
 		
-		output.displacement = displacementTexture
+		output.displacement 	= displacementTexture
+		output.bump				= bumpMap
 		return output
 	
 	# build a standard material
@@ -67,6 +73,11 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 		# use the opacity map
 		if ( opacityMap ):
 			output.opacityMap = opacityMap
+		
+		# use the bump map
+		if ( bumpMap ):
+			output.bumpMap = bumpMap
+			output.bumpMapAmount = 100
 		
 		# use the displacement map
 		if ( displacementMap ):
@@ -87,15 +98,23 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 	elif ( cls == mxs.VrayMtl ):
 		output = mcopy( material )
 		
+		# use the bump map
+		if ( bumpMap ):	
+			output.texmap_bump					= bumpMap
+			output.texmap_bump_on				= True
+			output.texmap_bump_multiplier		= 100
+		
 		# use the opacity map
 		if ( opacityMap ):
-			output.texmap_opacity 		= opacityMap
-			output.texmap_opacity_on 	= True
+			output.texmap_opacity 				= opacityMap
+			output.texmap_opacity_on 			= True
+			output.texmap_opacity_multiplier	= 100
 		
 		# use the displacementmap
 		if ( displacementMap ):
-			output.texmap_displacement 		= displacementMap
-			output.texmap_displacement_on 	= True
+			output.texmap_displacement 				= displacementMap
+			output.texmap_displacement_on 			= True
+			output.texmap_displacement_multiplier	= 100
 		
 		return output
 	
@@ -118,6 +137,11 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 		# displace the texture
 		if ( not displacementTexture ):
 			output.displacementMap = displacementMap
+		
+		# use the bump map
+		if ( bumpMap ):
+			output.bump_map 	= bumpMap
+			output.bump_map_amt = 1.0
 		
 		# displace the property
 		elif ( is_prop( material, 'mental_ray__material_custom_attribute' ) ):
@@ -144,10 +168,23 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 	elif ( cls in (mxs.SSS_Fast_Skin_Material_Displace__mi,mxs.SSS_Fast_Skin___w__Disp___mi) ):
 		if ( displacementMap ):
 			output = mcopy( material )
+			
+			# use the bump map
+			if ( bumpMap ):
+				if ( mxs.classof( bumpMap != mxs.Bump__3dsmax ) ):
+					bumpTexture 	= mxs.Bump__3dsmax
+					bumpTexture.map	= bumpMap
+					output.bump		= bumpTexture
+				else:
+					output.bump = bumpMap
+			
+			# use the displacement texture
 			if ( not displacementTexture ):
 				displacementTexture = mxs.Displacement_3D__3dsmax()
 				displacementTexture.map = displacementMap
+				
 			output.displace = displacementTexture
+			
 			return output
 		return material
 	
@@ -178,7 +215,7 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 		output.numsubs 	= count
 		
 		for i in range(count):
-			output[i] = buildMaterialFrom( material[i], opacityMap = opacityMap, displacementMap = displacementMap )
+			output[i] = buildMaterialFrom( material[i], opacityMap = opacityMap, displacementMap = displacementMap, bumpMap = bumpMap )
 		
 		return output
 	
@@ -192,7 +229,7 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None ):
 			set_submtl = mxs.setSubMtl
 			
 			for i in range( output ):
-				set_submtl( output, i + 1, buildMaterialFrom( get_submtl( material, i + 1 ), opacityMap = opacityMap, displacementMap = displacementMap ) )
+				set_submtl( output, i + 1, buildMaterialFrom( get_submtl( material, i + 1 ), opacityMap = opacityMap, displacementMap = displacementMap, bumpMap = bumpMap ) )
 			
 			return output
 	
@@ -291,12 +328,79 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		
 	if ( options & MaterialOverrideOptions.KeepDisplacement ):
 		displMap	= findDisplacementMap( baseMaterial )
+		bumpMap		= findBumpMap( baseMaterial )
 	else:
 		displMap 	= None
+		bumpMap		= None
 			
 	# return the new material
-	return buildMaterialFrom( overrideMaterial, opacityMap = opacityMap, displacementMap = displMap )
+	return buildMaterialFrom( overrideMaterial, opacityMap = opacityMap, displacementMap = displMap, bumpMap = bumpMap )
 
+def findBumpMap( material ):
+	"""
+		\remarks	looks for the bump map for the inputed material based on its type
+		\param		material	<Py3dsMax.mxs.Material>
+		\return		<Py3dsMax.mxs.Map> opacityMap || None
+	"""
+	cls = mxs.classof( material )
+	
+	# return a standard material's bump map
+	if ( cls == mxs.StandardMaterial ):
+		if ( material.bumpMapEnable ):
+			bumpmap = material.bumpMap
+			if ( output and material.bumpMapAmount != 100 ):
+				bumpTexture = mxs.Output()
+				bumpTexture.map1 = bumpmap
+				bumpTexture.output.bump_amount = ( material.bumpMapAmount / 100.0 )
+				return bumpTexture
+			return bumpmap
+		return None
+	
+	# return a vray bump map
+	if ( cls in (mxs.VrayMtl,mxs.VrayFastSSS2) ):
+		if ( material.texmap_bump_on ):
+			bumpmap = material.texmap_bump
+			if ( bumpmap and material.texmap_bump_multiplier != 100 ):
+				bumpTexture = mxs.Output()
+				bumpTexture.map1 = bumpmap
+				bumpTexture.output.bump_amount = ( material.texmap_bump_multiplier / 100.0 )
+				return bumpTexture
+			return bumpmap
+		return None
+	
+	# return a matte bump
+	if ( cls in (mxs.Matte_Shadow_Reflection__mi,mxs.mr_Matte_Shadow_Reflection_Mtl) ):
+		return material.bump
+	
+	# return an arch-design material
+	if ( cls == mxs.Arch___Design__mi ):
+		if ( material.bump_map_on ):
+			bumpmap = material.bump_map
+			if ( bumpmap and material.bump_map_amt != 1.0 ):
+				bumpTexture = mxs.Output()
+				bumpTexture.map1 = bumpmap
+				bumpTexture.output.bump_amount = mtl.bump_map_amt
+				return bumpTexture
+			return bumpmap
+		return None
+	
+	# return a skin bump map
+	if ( cls in (mxs.SSS_Fast_Skin___w__Disp___mi,mxs.SSS_Fast_Skin___mi,mxs.SSS_Fast_Skin_Material_Displace__mi,mxs.SSS_Fast_Skin_Material__mi,mxs.SSS_Fast_Material__mi) ):
+		if ( mxs.classof(material.bump) == mxs.Bump__3dsmax ):
+			bumpmap = material.bump.map
+			if ( bumpmap ):
+				bumpTexture = mxs.Output()
+				bumpTexture.map1 = bumpmap
+				bumpTexture.output.bump_amount = material.bump.multiplier
+				return bumpTexture
+			return None
+				
+		else:
+			return material.bump
+	
+	# no bump map found
+	return None
+	
 def findDisplacementMap( material ):
 	"""
 		\remarks	looks for the displacement map for the inputed material based on its type
