@@ -894,8 +894,14 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._nativePointer.ishidden = state
 		
 		# update the objects on this layer
-		for obj in self._nativeObjects():
-			obj.ishidden = state
+		nativeObjects = self._nativeObjects()
+		if ( state ):
+			mxs.hide( nativeObjects )
+		else:
+			mxs.unhide( nativeObjects )
+		
+		# toggle visible rendering options
+		self._scene._toggleNativeVisibleState( nativeObjects )
 		
 		# update the atmospherics on this layer
 		for atmos in self.atmospherics():

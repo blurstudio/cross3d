@@ -552,19 +552,6 @@ class AbstractScene( QObject ):
 		
 		return []
 	
-	def _nativeToggleVisibleOptions( self, nativeObjects = None, options = None ):
-		"""
-			\remarks	[abstract] toggle the inputed object's visibility settings based on the inputed options
-			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
-			\param		options			<blur3d.constants.VisibilityToggleOptions>
-			\return		<bool> success
-		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def _nativeWorldLayer( self ):
 		"""
 			\remarks	[abstract]		returns the native world layer from the scene
@@ -743,6 +730,19 @@ class AbstractScene( QObject ):
 		
 		# by default, we assume that any other type can be naturally processed
 		return pyValue
+	
+	def _toggleNativeVisibleState( self, nativeObjects = None, options = None ):
+		"""
+			\remarks	[abstract] toggle the inputed object's visibility settings based on the inputed options
+			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
+			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\return		<bool> success
+		"""
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return False
 	
 	def _visibleNativeObjects( self ):
 		"""
@@ -1677,7 +1677,7 @@ class AbstractScene( QObject ):
 		"""
 		return ''
 	
-	def toggleVisibleOptions( self, objects = None, options = None ):
+	def toggleVisibleState( self, objects = None, options = None ):
 		"""
 			\remarks	toggle the visible options for the inputed objects
 			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
@@ -1688,7 +1688,7 @@ class AbstractScene( QObject ):
 		if ( objects != None ):
 			nativeObjects = [ obj.nativePointer() for obj in objects ]
 			
-		return self._nativeToggleVisibleOptions( nativeObjects, options )
+		return self._toggleNativeVisibleState( nativeObjects, options )
 	
 	def update( self ):
 		"""

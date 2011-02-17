@@ -766,105 +766,6 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.selection
 	
-	def _nativeToggleVisibleOptions( self, nativeObjects = None, options = None ):
-		"""
-			\remarks	implements the AbstractScene.toggleVisibleOptions method to toggle the visible state of the inputed options for the given objects
-			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
-			\param		options			<blur3d.constants.VisibilityToggleOptions>
-			\return		<bool> success
-		"""
-		from blur3d.api.studiomax 	import cachelib
-		from blur3d.constants 		import VisibilityToggleOptions
-		from Py3dsMax 				import mxs
-		from blur3d.api.studiomax 	import cachelib
-		
-		# toggle all the visibility options by default
-		if ( options == None ):
-			options = VisibilityToggleOptions.All
-	
-		if ( not options ):
-			return False
-			
-		if ( nativeObjects == None ):
-			nativeObjects = mxs.objects
-	
-		# store maxscript values
-		superclassof		= mxs.superClassOf
-		classof				= mxs.classof
-		B2_Main_Light		= mxs.B2_Main_Light
-		VRaySun				= mxs.VraySun
-		VRayIES				= mxs.VRayIES
-		VRayAmbientLight	= mxs.VRayAmbientLight
-		Light_Portal		= mxs.Light_Portal
-		XRefObject			= mxs.XRefObject
-		Missing_Light		= mxs.Missing_Light
-		Light				= mxs.Light
-		Event				= mxs.Event
-		FumeFX				= mxs.FumeFX
-		PF_Source			= mxs.PF_Source
-		
-		for obj in nativeObjects:
-			state 	= not obj.ishidden
-			msuper	= superclassof( obj )
-			mcls 	= classof( obj )
-			
-			# toggle lights
-			if ( options & VisibilityToggleOptions.ToggleLights ):
-				if ( msuper == Light ):
-					# update a brazil 2 light
-					if ( mcls == B2_Main_Light ):
-						obj.base_parameters.enabled_on = state
-					
-					# update vray lights
-					elif ( mcls in (VRaySun,VRayIES,VRayAmbientLight) ):
-						obj.enabled = state
-					
-					# update a light portal
-					elif ( mcls == Light_Portal ):
-						obj.portal_on = state
-						obj.renderable = state
-					
-					# update an xref object
-					elif ( mcls == XRefObject ):
-						obj.actualBaseObject.on = state
-						obj.renderable = state
-					
-					# update a missing light
-					elif ( mcls == Missing_Light ):
-						print 'Warning: Missing Lights found in the Scene'
-				
-					# update a default light
-					else:
-						obj.renderable 	= state
-						obj.on 			= state
-					
-					# don't bother processing future checks if this was a light
-					continue
-					
-			# toggle fx
-			if ( options & VisibilityToggleOptions.ToggleFX ):
-				# update an event
-				if ( mcls == Event ):
-					if ( obj.layer.name != '0' ):
-						obj.activate( state )
-					continue
-				
-				# update a fume effect
-				elif ( mcls == FumeFX ):
-					obj.renderable = state
-					continue
-				
-				# update a particle flow source
-				elif ( mcls == PF_Source ):
-					obj.enable_particles = state
-					obj.baseObject.activateParticles( state )
-					continue
-		
-			if ( options & VisibilityToggleOptions.ToggleCaches ):
-				cachelib.toggleCaches( obj, state )
-					
-		return True
-		
 	def _nativeWorldLayer( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeWorldLayer to return the native world layer of the scene
@@ -1228,6 +1129,106 @@ class StudiomaxScene( AbstractScene ):
 		# return the standard value
 		return AbstractScene._toNativeValue( self, pyValue )
 	
+	def _toggleNativeVisibleState( self, nativeObjects = None, options = None ):
+		"""
+			\remarks	implements the AbstractScene.toggleVisibleOptions method to toggle the visible state of the inputed options for the given objects
+			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\return		<bool> success
+		"""
+		from blur3d.api.studiomax 	import cachelib
+		from blur3d.constants 		import VisibilityToggleOptions
+		from Py3dsMax 				import mxs
+		from blur3d.api.studiomax 	import cachelib
+		
+		# toggle all the visibility options by default
+		if ( options == None ):
+			options = VisibilityToggleOptions.All
+	
+		if ( not options ):
+			return False
+			
+		if ( nativeObjects == None ):
+			nativeObjects = mxs.objects
+	
+		# store maxscript values
+		superclassof		= mxs.superClassOf
+		classof				= mxs.classof
+		B2_Main_Light		= mxs.B2_Main_Light
+		VRaySun				= mxs.VraySun
+		VRayIES				= mxs.VRayIES
+		VRayAmbientLight	= mxs.VRayAmbientLight
+		Light_Portal		= mxs.Light_Portal
+		XRefObject			= mxs.XRefObject
+		Missing_Light		= mxs.Missing_Light
+		Light				= mxs.Light
+		Event				= mxs.Event
+		FumeFX				= mxs.FumeFX
+		PF_Source			= mxs.PF_Source
+		
+		for obj in nativeObjects:
+			state 	= not obj.ishidden
+			msuper	= superclassof( obj )
+			mcls 	= classof( obj )
+			
+			# toggle lights
+			if ( options & VisibilityToggleOptions.ToggleLights ):
+				if ( msuper == Light ):
+					# update a brazil 2 light
+					if ( mcls == B2_Main_Light ):
+						obj.base_parameters.enabled_on = state
+					
+					# update vray lights
+					elif ( mcls in (VRaySun,VRayIES,VRayAmbientLight) ):
+						obj.enabled = state
+					
+					# update a light portal
+					elif ( mcls == Light_Portal ):
+						obj.portal_on = state
+						obj.renderable = state
+					
+					# update an xref object
+					elif ( mcls == XRefObject ):
+						obj.actualBaseObject.on = state
+						obj.renderable = state
+					
+					# update a missing light
+					elif ( mcls == Missing_Light ):
+						print 'Warning: Missing Lights found in the Scene'
+				
+					# update a default light
+					else:
+						obj.renderable 	= state
+						obj.on 			= state
+					
+					# don't bother processing future checks if this was a light
+					continue
+					
+			# toggle fx
+			if ( options & VisibilityToggleOptions.ToggleFX ):
+				# update an event
+				if ( mcls == Event ):
+					if ( obj.layer.name != '0' ):
+						obj.activate( state )
+					continue
+				
+				# update a fume effect
+				elif ( mcls == FumeFX ):
+					obj.renderable = state
+					continue
+				
+				# update a particle flow source
+				elif ( mcls == PF_Source ):
+					obj.enable_particles = state
+					obj.baseObject.activateParticles( state )
+					continue
+					
+			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
+#			if ( options & VisibilityToggleOptions.ToggleCaches ):
+#				cachelib.toggleCaches( obj, state )
+					
+		return True
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
