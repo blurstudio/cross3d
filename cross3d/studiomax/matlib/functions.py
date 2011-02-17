@@ -225,6 +225,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 	multi_material	= mxs.MultiMaterial
 	class_of		= mxs.classOf
 	get_submtl		= mxs.getSubMtl
+	set_submtl 		= mxs.setSubMtl
 	get_numsubmtls	= mxs.getNumSubMtls
 	
 	# process XRef materials
