@@ -316,7 +316,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		mtls = []
 		for obj in self._nativeObjects():
 			omtl = obj.material
-			if ( not omtl in mtls ):
+			if ( omtl and not omtl in mtls ):
 				mtls.append(omtl)
 		return mtls
 	
