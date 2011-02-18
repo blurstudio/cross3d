@@ -129,8 +129,8 @@ class LayerMetaData( MXSCustAttribDef ):
 		
 		# define alternate material overrides per base material
 		cls.defineParam( 'baseMtlIds',		'intTab',			paramId = 'oi' )
-		cls.defineParam( 'altMtlIds',		'intTab',			paramId = 'omi' )
 		cls.defineParam( 'baseMtlNames',	'stringTab',		paramId = 'ns' )
+		cls.defineParam( 'altMtlIndexes',	'intTab',			paramId = 'omi' )
 		cls.defineParam( 'overrideMtls',	'intTab',			paramId = 'om' )
 		
 		# define alternate properties per layer
@@ -306,6 +306,19 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
 		return mxs.pyhelper.getLayerNodes( self._nativePointer )
+		
+	def _nativeMaterials( self ):
+		"""
+			\remarks	implements the AbstractSceneObjectGroup._nativeMaterials method to return a list of the native materials that are currently on this layer
+			\sa			materials
+			\return		<list> [ <Py3dsMax.mxs.Material> nativeMaterial, .. ]
+		"""
+		mtls = []
+		for obj in self._nativeObjects():
+			omtl = obj.material
+			if ( not omtl in mtls ):
+				mtls.append(omtl)
+		return mtls
 	
 	def _nativeMaterialOverride( self ):
 		data = self.metaData()
@@ -405,7 +418,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self._altMtlFlagsCache = None
 		return True
 	
-	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
+	def _setNativeMaterialOverride( self, nativeMaterial, options = -1, advancedState = None ):
 		"""
 			\remarks	reimplements the AbstractSceneObjectGroup._setNativeMaterialOverride method to set the overriden material for this layer instance,
 						marking that it is using a material from the global material cache if necessary
@@ -443,7 +456,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			data.setValue( 'mrShaderIndex', 		0 )
 			
 		
-		return AbstractSceneLayer._setNativeMaterialOverride( self, nativeMaterial, options = options )
+		return AbstractSceneLayer._setNativeMaterialOverride( self, nativeMaterial, options = options, advancedState = advancedState )
 	
 	def _setNativePropSetOverride( self, nativePropSet ):
 		"""
@@ -538,6 +551,41 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	def advancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	implements the AbstractSceneLayer.advancedAltMaterialStateAt method to return a mapping for the advanced alternate material status of a given alternate material
+						slot
+			\param		index	<int>
+			\return		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> overrideMaterial, <bool> ignored), .. }
+		"""
+		data 				= self.metaData()
+		altMaterialIndexes	= list(data.value( 'altMtlIndexes' ))
+		baseMaterialIds		= list(data.value( 'baseMtlIds' ))
+		baseMaterialNames	= list(data.value( 'baseMtlNames' ))
+		overrideMtls		= list(data.value( 'overrideMtls' ))
+		
+		output = {}
+		
+		from blur3d.api import SceneMaterial
+		
+		# collect all the material overrides for the inputed alternate material index
+		index += 1 # match maxscript 1-based array's
+		for i, altMtlIndex in enumerate(altMaterialIndexes):
+			# by compiliing a list of all the recroded materials for that index
+			if ( altMtlIndex == index ):
+				# determine the base material override
+				nativeOverride = overrideMtls[i]
+				if ( nativeOverride ):
+					overrideMaterial 	= SceneMaterial( self.scene(), nativeOverride )
+					ignoreOverride		= False
+				else:
+					overrideMaterial	= None
+					ignoreOverride		= True
+				
+				output[baseMaterialIds[i]] = (overrideMaterial,ignoreOverride)
+		
+		return output
+		
 	def altMaterialFlags( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer.altMaterialFlags method to return a list of material duplication flags for this layer
@@ -559,8 +607,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 					
 				self._altMtlFlagsCache.append(flags)
 		
-			print self._altMtlFlagsCache
-				
 		return self._altMtlFlagsCache
 				
 	def altPropSets( self ):
@@ -590,7 +636,16 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			self._altPropCache = cache
 			
 		return self._altPropCache
-			
+		
+	def hasAdvancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	[abstract] return whether or not an advanced state for an alternate material has been defined for the inputed
+						alternate material index
+			\param		index	<int>
+			\return		<bool> found
+		"""
+		return (index+1) in list(self.metaData().value('altMtlIndexes') )
+	
 	def hasProperty( self, key ):
 		"""
 			\remarks	implements the AbstractSceneLayer.hasProperty method to return whether or not a given property exists for this layer
@@ -730,6 +785,53 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# remove this layer
 		return mxs.layerManager.deleteLayerByName( my_layer.name )
 	
+	def removeAdvancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	implements the AbstractSceneLayer.clearAdvancedAltMaterialState method to remove the advanced state for the inputed
+						alternate material index
+			\param		index	<int>
+			\return		<bool> success
+		"""
+		data 				= self.metaData()
+		
+		# collect the data
+		altMaterialIndexes	= list(data.value( 'altMtlIndexes' ))
+		baseMaterialIds		= list(data.value( 'baseMtlIds' ))
+		baseMaterialNames	= list(data.value( 'baseMtlNames' ))
+		overrideMtls		= list(data.value( 'overrideMtls' ))
+		
+		# make the index match maxscripts 1-based arrays
+		index += 1
+		
+		# create the new data
+		newAltMaterialIndexes	= []
+		newBaseMaterialIds		= []
+		newBaseMaterialNames	= []
+		newOverrideMtls			= []
+		
+		# preserve other override's information
+		for i, altMtlIndex in enumerate(altMaterialIndexes):
+			# remove references to the current index
+			if ( altMtlIndex == index ):
+				continue
+			
+			# decrement the references to future indexes
+			elif ( index < altMtlIndex ):
+				altMtlIndex -= 1
+			
+			newAltMaterialIndexes.append( 	altMtlIndex )
+			newBaseMaterialIds.append( 		baseMaterialIds[i] )
+			newBaseMaterialNames.append( 	baseMaterialNames[i] )
+			newOverrideMtls.append(			overrideMtls[i] )
+		
+		# record the data
+		data.setValue( 'altMtlIndexes', 	newAltMaterialIndexes )
+		data.setValue( 'baseMtlIds',		newBaseMaterialIds )
+		data.setValue( 'baseMtlNames',		newBaseMaterialNames )
+		data.setValue( 'overrideMtls',		newOverrideMtls )
+		
+		return True
+		
 	def removeAltMaterialAt( self, index ):
 		"""
 			\remarks	reimplement the AbstractSceneLayer.removeAltMaterialAt method to only allow the removal of a property set if there is more than 1 remaining
@@ -764,6 +866,58 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			
 		return self._nativePointer.current
 	
+	def setAdvancedAltMaterialStateAt( self, index, altMaterialState ):
+		"""
+			\remarks	implements AbstractSceneLayer.setAdvancedAltMaterialStateAt method to set a mapping for the advanced alternate material status of a given alternate material
+						slot
+			\param		index	<int>
+			\param		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+			\return		<bool> success
+		"""
+		data = self.metaData()
+		
+		# grab the old data
+		altMaterialIndexes	= list(data.value( 'altMtlIndexes' ))
+		baseMaterialIds		= list(data.value( 'baseMtlIds' ))
+		baseMaterialNames	= list(data.value( 'baseMtlNames' ))
+		overrideMtls		= list(data.value( 'overrideMtls' ))
+		
+		# create the new data
+		newAltMaterialIndexes	= []
+		newBaseMaterialIds		= []
+		newBaseMaterialNames	= []
+		newOverrideMtls			= []
+		
+		# preserve other override's information
+		index += 1 # match maxscript 1-based array's
+		for i, altMtlIndex in enumerate(altMaterialIndexes):
+			if ( altMtlIndex != index ):
+				newAltMaterialIndexes.append( 	altMaterialIndexes[i] )
+				newBaseMaterialIds.append( 		baseMaterialIds[i] )
+				newBaseMaterialNames.append( 	baseMaterialNames[i] )
+				newOverrideMtls.append( 		overrideMtls[i] )
+		
+		# record new alternate material information
+		for baseMaterialId, state in altMaterialState.items():
+			overrideMtl, ignoreMtl = state
+			if ( not (ignoreMtl or overrideMtl) ):
+				continue
+			elif ( overrideMtl ):
+				overrideMtl = overrideMtl.nativePointer()
+				
+			newAltMaterialIndexes.append( index )
+			newBaseMaterialIds.append( baseMaterialId )
+			newBaseMaterialNames.append( '' )
+			newOverrideMtls.append( overrideMtl )
+		
+		# record the data
+		data.setValue( 'altMtlIndexes', 	newAltMaterialIndexes )
+		data.setValue( 'baseMtlIds',		newBaseMaterialIds )
+		data.setValue( 'baseMtlNames',		newBaseMaterialNames )
+		data.setValue( 'overrideMtls',		newOverrideMtls )
+		
+		return True
+		
 	def setAltMaterialFlags( self, flags ):
 		"""
 			\remarks	implements the AbstractSceneLayer.setAltMaterialFlags method to set the alternate material flags for this instance

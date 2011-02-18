@@ -104,6 +104,19 @@ class AbstractSceneObjectGroup:
 		
 		return []
 	
+	def _nativeMaterials( self ):
+		"""
+			\remarks	[abstract] return a list of all the native materials that are contained within this object group
+			\return		<list> [ <variant> nativeMaterial, .. ]
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return []
+	
 	def _nativeMaterialOverride( self ):
 		"""
 			\remarks	[abstract] return the current override material for this object group
@@ -131,23 +144,25 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
-	def _setNativeMaterialOverride( self, nativeMaterial, options = -1 ):
+	def _setNativeMaterialOverride( self, nativeMaterial, options = -1, advancedState = None ):
 		"""
 			\remarks	[virtual] set the current override materials for this object group
 			\sa			blur3d.api.Scene._setNativeMaterialOverride
-			\param		<variant> nativeMaterial || None
+			\param		nativeMaterial 	<variant> || None
+			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
 		if ( options == -1 ):
 			options = self.materialOverrideFlags()
 			
-		return self._scene._setNativeMaterialOverride( self._nativeObjects(), nativeMaterial, options = options )
+		return self._scene._setNativeMaterialOverride( self._nativeObjects(), nativeMaterial, options = options, advancedState = advancedState )
 	
 	def _setNativePropSetOverride( self, nativePropSet ):
 		"""
 			\remarks	[virtual] set the current override property set for this object group
 			\sa			blur3d.api.Scene._setNativePropSetOverride
-			\param		<variant> nativePropSet || None
+			\param		nativePropSet 	<variant> || None
 			\return		<bool> success
 		"""
 		if ( nativePropSet ):
@@ -327,6 +342,15 @@ class AbstractSceneObjectGroup:
 		from blur3d.api import SceneObject
 		return [ SceneObject( self._scene, obj ) for obj in self._nativeObjects() ]
 	
+	def materials( self ):
+		"""
+			\remarks	return a list of all the materials contained within this object group
+			\sa			_nativeMaterials
+			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
+		"""
+		from blur3d.api import SceneMaterial
+		return [ SceneMaterial( self._scene, mtl ) for mtl in self._nativeMaterials() ]
+	
 	def materialOverride( self ):
 		"""
 			\remarks	return the current override material for this object set
@@ -402,12 +426,13 @@ class AbstractSceneObjectGroup:
 		
 		return False
 	
-	def setMaterialOverride( self, material, options = -1 ):
+	def setMaterialOverride( self, material, options = -1, advancedState = None ):
 		"""
 			\remarks	set the override material on the objects for this set
 			\sa			_setNativeMaterialOverride
-			\param		material	<blur3d.api.SceneMaterial> || None
-			\param		options		<blur3d.constants.MaterialOverrideOptions>
+			\param		material		<blur3d.api.SceneMaterial> || None
+			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
 		nativeMaterial = None
@@ -417,7 +442,7 @@ class AbstractSceneObjectGroup:
 		if ( options == -1 ):
 			options = self.materialOverrideFlags()
 			
-		return self._setNativeMaterialOverride( nativeMaterial, options = options )
+		return self._setNativeMaterialOverride( nativeMaterial, options = options, advancedState = advancedState )
 		
 	def setMaterialOverrideFlag( self, flag, state = True ):
 		"""

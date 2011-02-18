@@ -179,6 +179,21 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		propSets = self.altPropSets()
 		propSets.append( propSet )
 		return self.setAltPropSets( propSets )
+	
+	def advancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	[abstract] return a mapping for the advanced alternate material status of a given alternate material
+						slot
+			\param		index	<int>
+			\return		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return {}
 		
 	def altMaterialAt( self, index ):
 		"""
@@ -355,6 +370,21 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		flags = self.altMaterialFlags()
 		if ( 0 <= index and index < len( flags ) ):
 			return (flags[index] & flag) != 0
+		return False
+	
+	def hasAdvancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	[abstract] return whether or not an advanced state for an alternate material has been defined for the inputed
+						alternate material index
+			\param		index	<int>
+			\return		<bool> found
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
 		return False
 	
 	def hasProperty( self, key ):
@@ -591,7 +621,26 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 		altMtls = self.altMaterials()
 		if ( 0 <= index and index < len(altMtls) ):
-			return self.setAltMaterials( altMtls[:index] + altMtls[index+1:] )
+			# reset the alternate materials for this layer
+			self.setAltMaterials( altMtls[:index] + altMtls[index+1:] )
+			
+			# remove any advanced alternate material states at the given index
+			self.removeAdvancedAltMaterialStateAt(index)
+			return True
+		return False
+	
+	def removeAdvancedAltMaterialStateAt( self, index ):
+		"""
+			\remarks	[abstract] remove the advanced alternate material state from the layer at the alternate material index
+			\param		index		<int>
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
 		return False
 	
 	def removeAltPropSetAt( self, index ):
@@ -741,7 +790,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		# apply an override state
 		if ( 0 <= index and index < len(mtls) ):
 			self._altMtlIndex = index
-			return self.setMaterialOverride( mtls[index], options = self.altMaterialFlagsAt(index) )
+			return self.setMaterialOverride( mtls[index] )
 			
 		# clear an override state
 		elif ( index == -1 ):
@@ -792,6 +841,25 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			return self.setLayerGroup( layerGroup )
 		return False
 	
+	def setMaterialOverride( self, material, options = -1, advancedState = None ):
+		"""
+			\remarks	overloads the AbstractSceneObjectGroup.setMaterialOverride method to make sure we get recorded alternate properties
+						before applying overrides
+			\param		material		<blur3d.gui.SceneMaterial>
+			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+			\return		<bool> success
+		"""
+		amtls = self.altMaterials()
+		
+		# make sure we have the advanced material state options
+		if ( material in amtls ):
+			index			= amtls.index(material)
+			options 		= self.altMaterialFlagsAt( index )
+			advancedState	= self.advancedAltMaterialStateAt( index )
+		
+		return AbstractSceneObjectGroup.setMaterialOverride( self, material, options = options, advancedState = advancedState )
+	
 	def setLayerName( self, name ):
 		"""
 			\remarks	[abstract] set the layer name for this layer
@@ -839,6 +907,22 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	[abstract] set the unique layer id for this layer instance
 			\sa			layerId
 			\param		layerId		<int>
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return False
+	
+	def setAdvancedAltMaterialStateAt( self, index, altMaterialState ):
+		"""
+			\remarks	[abstract] set a mapping for the advanced alternate material status of a given alternate material
+						slot
+			\param		index	<int>
+			\param		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
 			\return		<bool> success
 		"""
 		from blurdev import debug

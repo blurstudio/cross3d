@@ -11,9 +11,11 @@
 from blurdev import debug
 
 class AbstractSceneMaterial:
+	iconCache = {}
+	
 	def __eq__( self, other ):
 		"""
-			\remarks	compares this instance to another object
+			\remarks	compares this instance to another material
 			\param		other	<variant>
 			\return		<bool> equal
 		"""
@@ -58,6 +60,17 @@ class AbstractSceneMaterial:
 			raise NotImplementedError
 		
 		return False
+	
+	def _nativeSubmaterials( self ):
+		"""
+			\remarks	[abstract] return the native sub-materials for this material instance
+			\return		<list> [ <variant> nativeMaterial, .. ]
+		"""
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+		
+		return []
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -86,6 +99,13 @@ class AbstractSceneMaterial:
 		
 		return False
 	
+	def icon( self ):
+		"""
+			\remarks	return the icon for this material type
+			\return		<QIcon>
+		"""
+		return AbstractSceneMaterial.cachedIcon( self.materialType() )
+	
 	def materialName( self ):
 		"""
 			\remarks	[abstract] return the name of this material instance
@@ -109,6 +129,14 @@ class AbstractSceneMaterial:
 			raise NotImplementedError
 		
 		return 0
+	
+	def materialType( self ):
+		"""
+			\remarks	[virtual] return the material type for this material instance
+			\return		<blur3d.constants.MaterialType>
+		"""
+		from blur3d.constants import MaterialType
+		return MaterialType.Generic
 	
 	def nativePointer( self ):
 		"""
@@ -182,6 +210,37 @@ class AbstractSceneMaterial:
 			\retrun		<bool> success
 		"""
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
+	
+	def submaterials( self ):
+		"""
+			\remarks	return a list of the sub-materials for this instance
+			\sa			setSubmaterials, _nativeSubmaterials
+			\return		<list> [ <blur3d.gui.SceneMaterial>, .. ]
+		"""
+		from blur3d.api import SceneMaterial
+		return [ SceneMaterial( self._scene, mtl ) for mtl in self._nativeSubmaterials() ]
+	
+	@staticmethod
+	def cachedIcon( materialType ):
+		icon = AbstractSceneMaterial.iconCache.get( materialType )
+		
+		# return a cached icon
+		if ( icon ):
+			return icon
+		
+		# create an icon cache
+		from blur3d.constants 	import MaterialType
+		
+		# create a default icon
+		if ( materialType & MaterialType.Generic ):
+			iconfile = 'img/materials/default.png'
+		
+		# create the QIcon
+		import blur3d
+		from PyQt4.QtGui 		import QIcon
+		icon = QIcon( blur3d.resourcePath( iconfile ) )
+		AbstractSceneMaterial.iconCache[ materialType ] = icon
+		return icon
 	
 	@staticmethod
 	def fromXml( scene, xml ):

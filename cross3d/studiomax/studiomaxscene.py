@@ -998,17 +998,22 @@ class StudiomaxScene( AbstractScene ):
 		
 		return True
 	
-	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None ):
+	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None, advancedState = None ):
 		"""
 			\remarks	implements AbstractScene._setNativeMaterialOverride to apply this material as an override to the inputed objects
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\param		nativeMaterial	<Py3dsMax.mxs.Material> nativeMaterial
 			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
 		from blur3d.constants 		import MaterialOverrideOptions, MaterialCacheType
 		from blur3d.api.studiomax	import matlib
 		from blur3d.api.studiomax 	import StudiomaxAppData
+		
+		# use the advanced state for the override system
+		if ( advancedState == None ):
+			advancedState = {}
 		
 		# store the methods we're going to use
 		get_userprop 	= mxs.getUserProp
@@ -1051,9 +1056,27 @@ class StudiomaxScene( AbstractScene ):
 			
 			# assign the override for the material based on the options
 			uid					= unique_id(baseMaterial)
+			
+			# look up the advanced system for this material
+			advancedMaterial, ignored = advancedState.get(uid, (None,False) )
+			
+			# if the advanced state says we should ignore this material, then continue processing
+			if ( ignored ):
+				obj.material = baseMaterial
+				continue
+				
+			# use the override material and check to see if we've already processed this material
 			overrideMaterial 	= processed.get( uid )
+			
+			# if we have not processed this material yet
 			if ( not overrideMaterial ):
-				overrideMaterial 	= matlib.createMaterialOverride( baseMaterial, nativeMaterial, options = options )
+				# check to see if we should use an advanced material option for the override vs. the inputed override
+				if ( advancedMaterial ):
+					processMaterial = advancedMaterial.nativePointer()
+				else:
+					processMaterial = nativeMaterial
+				
+				overrideMaterial 	= matlib.createMaterialOverride( baseMaterial, processMaterial, options = options )
 				processed[uid] 		= overrideMaterial
 				
 			obj.material = overrideMaterial

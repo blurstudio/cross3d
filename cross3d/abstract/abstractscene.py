@@ -641,12 +641,13 @@ class AbstractScene( QObject ):
 		
 		return False
 	
-	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None ):
+	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None, advancedState = None ):
 		"""
 			\remarks	[abstract] set the material override for the inputed objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		nativeMaterial	<variant>
 			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
 		# when debugging, raise an error
@@ -1625,18 +1626,19 @@ class AbstractScene( QObject ):
 		
 		return self._setNativePropSetOverride( self, [ obj.nativePointer() for obj in objects ], nativePropSet )
 	
-	def setMaterialOverride( self, objects, material, options = None ):
+	def setMaterialOverride( self, objects, material, options = None, advancedState = None ):
 		"""
 			\remarks	set the override material for the inputed objects to the given material
 			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
 			\param		material	<blur3d.api.SceneMaterial>
 			\param		options		<blur3d.constants.MaterialOverrideOptions>
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 		"""
 		nativeMaterial = None
 		if ( material ):
 			nativeMaterial = material.nativePointer()
 			
-		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options )
+		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options, advancedState = advancedState )
 	
 	def setSelection( self, objects ):
 		"""
