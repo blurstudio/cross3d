@@ -348,7 +348,7 @@ def findBumpMap( material ):
 	if ( cls == mxs.StandardMaterial ):
 		if ( material.bumpMapEnable ):
 			bumpmap = material.bumpMap
-			if ( output and material.bumpMapAmount != 100 ):
+			if ( bumpmap and material.bumpMapAmount != 100 ):
 				bumpTexture = mxs.Output()
 				bumpTexture.map1 = bumpmap
 				bumpTexture.output.bump_amount = ( material.bumpMapAmount / 100.0 )
