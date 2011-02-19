@@ -131,7 +131,7 @@ class LayerMetaData( MXSCustAttribDef ):
 		cls.defineParam( 'baseMtlIds',		'intTab',			paramId = 'oi' )
 		cls.defineParam( 'baseMtlNames',	'stringTab',		paramId = 'ns' )
 		cls.defineParam( 'altMtlIndexes',	'intTab',			paramId = 'omi' )
-		cls.defineParam( 'overrideMtls',	'intTab',			paramId = 'om' )
+		cls.defineParam( 'overrideMtls',	'materialTab',		paramId = 'om' )
 		
 		# define alternate properties per layer
 		cls.defineParam( 'currentAltPropIndex',	'integer',			paramId = 'pi' )
@@ -902,13 +902,16 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			overrideMtl, ignoreMtl = state
 			if ( not (ignoreMtl or overrideMtl) ):
 				continue
+				
 			elif ( overrideMtl ):
 				overrideMtl = overrideMtl.nativePointer()
-				
+			
 			newAltMaterialIndexes.append( index )
 			newBaseMaterialIds.append( baseMaterialId )
 			newBaseMaterialNames.append( '' )
 			newOverrideMtls.append( overrideMtl )
+		
+		print newOverrideMtls
 		
 		# record the data
 		data.setValue( 'altMtlIndexes', 	newAltMaterialIndexes )
