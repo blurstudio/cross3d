@@ -638,7 +638,9 @@ class StudiomaxScene( AbstractScene ):
 			\remarks	implements the AbstractScene._nativeCameras method to return a list of the camera instances in this scene
 			\return		<list> [ <Py3dsMax.mxs.Camera> nativeCamera, .. ]
 		"""
-		return mxs.cameras
+		is_kindof 	= mxs.isKindOf
+		Camera		= mxs.Camera
+		return [ cam for cam in mxs.cameras if is_kindof( cam, Camera ) ]
 	
 	def _nativeCustomProperty( self, key, default = None ):
 		"""
