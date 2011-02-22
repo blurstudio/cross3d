@@ -332,7 +332,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				return mtls[index]
 			else:
 				from blurdev import debug
-				debug.debugObject( self._nativeMaterialOverride, '%i index is out of range of %i alt materials for %s layer.' % (index,len(mtls),self.layerName()) )
+				debug.debugObject( self._nativeMaterialOverride, '%i index is out of range of %i alt materials for %s layer.' % (index,len(mtls),self.name()) )
 				return None
 				
 		# load the material from the material library
@@ -359,7 +359,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				return propSets[index]
 			else:
 				from blurdev import debug
-				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(mtls),self.layerName()) )
+				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(mtls),self.name()) )
 				return None
 				
 		return None
@@ -628,7 +628,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			
 			for i in range(len(altPropValues)):
 				altProp = SceneObjectPropSet( scene, None )
-				altProp.setPropSetId( altPropIds[i] )
+				altProp.setUniqueId( altPropIds[i] )
 				altProp._setValueString( altPropValues[i] )
 				altProp._setActiveString( altPropUsages[i] )
 				cache.append(altProp)
@@ -692,29 +692,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		return self.metaData().value( 'groupOrder' )
 	
-	def layerName( self ):
-		"""
-			\remarks	implements the AbstractSceneLayer.layerName method to retrieve the unique layer name for this layer
-			\sa			layerName
-			\return		<str> name
-		"""
-		name = self._nativePointer.name
-		if ( name == '0' ):
-			return 'World Layer'
-		return name
-	
-	def layerId( self ):
-		"""
-			\remarks	implements the AbstractSceneLayer.layerId method to retrieve the unique layer id for this layer instance
-			\sa			setLayerId
-			\return		<int> id
-		"""
-		return mxs.blurUtil.uniqueId( self._nativePointer.layerAsRefTarg )
-	
 	def metaData( self ):
 		if ( not self._metaData ):
-			layerName 	= str(self.layerName())
-			layerId		= self.layerId()
+			layerName 	= str(self.name())
+			layerId		= self.uniqueId()
 			
 			# grab the cust attribute by the layer name
 			root		= mxs.rootNode
@@ -742,14 +723,25 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				metaData = LayerMetaData.createUnique( root )
 				
 				# initialize some more data
-				metaData.setValue( 'layerId', 	self.layerId() )
-				metaData.setValue( 'layerName', str( self.layerName() ) )
+				metaData.setValue( 'layerId', 	self.uniqueId() )
+				metaData.setValue( 'layerName', str( self.name() ) )
 				metaData.setValue( 'groupIndex', 1 )
 				metaData.setValue( 'groupOrder', order )
 			
 			self._metaData = metaData
 			
 		return self._metaData
+	
+	def name( self ):
+		"""
+			\remarks	implements the AbstractSceneLayer.name method to retrieve the unique layer name for this layer
+			\sa			name
+			\return		<str> name
+		"""
+		name = self._nativePointer.name
+		if ( name == '0' ):
+			return 'World Layer'
+		return name
 	
 	def remove( self, removeObjects = False ):
 		"""
@@ -978,7 +970,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			if ( propSet ):
 				altPropValues.append( propSet._valueString() )
 				altPropUsages.append( propSet._activeString() )
-				altPropIds.append( propSet.propSetId() )
+				altPropIds.append( propSet.uniqueId() )
 				newSets.append( propSet )
 			else:
 				altPropValues.append( blankValues )
@@ -1066,25 +1058,33 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			
 		return True
 		
-	def setLayerName( self, layerName ):
+	def setName( self, name ):
 		"""
-			\remarks	implements the AbstractSceneLayer.setLayerName method to set the layer name for this layer instance
-			\sa			layerName
-			\param		layerName	<str>
+			\remarks	implements the AbstractSceneLayer.setName method to set the layer name for this layer instance
+			\sa			name
+			\param		name	<str>
 			\return		<bool> success
 		"""
-		return self._nativePointer.setname( str(layerName) )
+		return self._nativePointer.setname( str(name) )
 	
-	def setLayerId( self, layerId ):
+	def setUniqueId( self, uniqueId ):
 		"""
-			\remarks	implements the AbstractSceneLayer.setLayerName method to set the unique layer id for this layer instance
-			\sa			layerId
-			\param		layerId		<int>
+			\remarks	implements the AbstractSceneLayer.setUniqueId method to set the unique layer id for this layer instance
+			\sa			uniqueId
+			\param		uniqueId		<int>
 			\return		<bool> success
 		"""
-		mxs.blurUtil.setUniqueId( self._nativePointer.layerAsRefTarg, layerId )
+		mxs.blurUtil.setUniqueId( self._nativePointer.layerAsRefTarg, uniqueId )
 		return True
 		
+	def uniqueId( self ):
+		"""
+			\remarks	implements the AbstractSceneLayer.uniqueId method to retrieve the unique layer id for this layer instance
+			\sa			setUniqueId
+			\return		<int> id
+		"""
+		return mxs.blurUtil.uniqueId( self._nativePointer.layerAsRefTarg )
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneLayer', StudiomaxSceneLayer )

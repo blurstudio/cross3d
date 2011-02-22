@@ -22,9 +22,9 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 			output += layer._nativeObjects()
 		return output
 		
-	def groupName( self ):
+	def name( self ):
 		"""
-			\remarks	implements the AbstractSceneLayerGroup.groupName method to retrieve the unique layer name for this layer
+			\remarks	implements the AbstractSceneLayerGroup.name method to retrieve the unique layer name for this layer
 			\return		<str> name
 		"""
 		return self._nativePointer
@@ -34,7 +34,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 			\remarks	returns the index that this layer group is currently in
 			\return		<int>
 		"""
-		name 	= str(self.groupName())
+		name 	= str(self.name())
 		gn 		= list(self._scene.metaData().value( 'layerGroupNames' ))
 		if ( name in gn ):
 			return gn.index( name )
@@ -49,7 +49,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		names 	= list(data.value('layerGroupNames'))
 		states 	= list(data.value('layerGroupStates'))
 		
-		name 	= str(self.groupName())
+		name 	= str(self.name())
 		if ( name in names ):
 			return states[names.index(name)]
 		return False
@@ -62,7 +62,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		gi		= self.groupOrder()
 		output 	= []
 		for layer in self._scene.layers():
-			if ( layer.layerName() == 'World Layer' ):
+			if ( layer.name() == 'World Layer' ):
 				continue
 				
 			data 	= layer.metaData()
@@ -104,7 +104,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 				ldata.setValue( 'groupIndex', 1 )
 		
 		# remove this group from the scene
-		index = names.index( self.groupName() )
+		index = names.index( self.name() )
 		names 	= names[:index] + names[index+1:]
 		states 	= states[:index] + states[index+1:]
 		
@@ -113,27 +113,27 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		
 		return True
 	
-	def setGroupName( self, groupName ):
+	def setName( self, name ):
 		"""
-			\remarks	implements the AbstractLayerGroup.setGroupName method to set the name for this layer group
-			\param		groupName	<str>
+			\remarks	implements the AbstractLayerGroup.setName method to set the name for this layer group
+			\param		name	<str>
 			\return		<bool> changed
 		"""
 		# make sure we are changing
-		if ( groupName == self.groupName() ):
+		if ( name == self.name() ):
 			return False
 			
-		groupName 	= str(groupName)
+		name	 	= str(name)
 		data		= self._scene.metaData()
 		names 		= list(data.value( 'layerGroupNames' ))
 		
 		# make sure we have a unique name
-		if ( groupName in names ):
+		if ( name in names ):
 			return False
 		
-		index 				= names.index(self.groupName())
-		names[index] 		= groupName
-		self._nativePointer = groupName
+		index 				= names.index(self.name())
+		names[index] 		= name
+		self._nativePointer = name
 		data.setValue( 'layerGroupNames', names )
 		return True
 	
@@ -147,7 +147,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		if ( groupOrder == self.groupOrder() ):
 			return False
 		
-		groupName 	= str(self.groupName())
+		groupName 	= str(self.name())
 		data		= self._scene.metaData()
 		orignames	= list(data.value('layerGroupNames'))
 		states		= list(data.value('layerGroupStates'))
@@ -184,7 +184,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		names 	= list(data.value('layerGroupNames'))
 		states 	= list(data.value('layerGroupStates'))
 		
-		name 	= str(self.groupName())
+		name 	= str(self.name())
 		if ( name in names ):
 			states[names.index(name)] = state
 			data.setValue( 'layerGroupStates', states )

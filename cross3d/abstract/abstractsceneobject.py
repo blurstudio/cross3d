@@ -9,23 +9,13 @@
 #	\date		03/15/10
 #
 
-class AbstractSceneObject:
+from abstractscenewrapper import AbstractSceneWrapper
+
+class AbstractSceneObject( AbstractSceneWrapper ):
 	iconCache = {}
-	
-	def __eq__( self, other ):
-		"""
-			\remarks	determines whether one 3dObject instance is equal to another by comparing the pointers to their native object pointers
-			\param		other	<variant>
-			\return		<bool> success
-		"""
-		if ( isinstance( other, AbstractSceneObject ) ):
-			return self._nativePointer == other._nativePointer
-		return False
-		
 	def __init__( self, scene, nativeObject ):
-		# define custom properties
-		self._scene			= scene
-		self._nativePointer = nativeObject
+		AbstractSceneWrapper.__init__( self, scene, nativeObject )
+		
 		self._objectType	= self._typeOfNativeObject( nativeObject )
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -230,7 +220,7 @@ class AbstractSceneObject:
 	def displayName( self ):
 		"""
 			\remarks	[abstract]	looks up the display name for this object and returns it
-			\sa			objectName, setDisplayName, setObjectName
+			\sa			name, setDisplayName, setName
 			\return		<str> name
 		"""
 		from blurdev import debug
@@ -300,21 +290,6 @@ class AbstractSceneObject:
 			\return		<bool> success
 		"""
 		return self.setFrozen( True )
-	
-	def hasProperty( self, key ):
-		"""
-			\remarks	[abstract]	returns whether or not the inputed key is a property of this object
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
 	
 	def hide( self ):
 		"""
@@ -418,41 +393,6 @@ class AbstractSceneObject:
 			return SceneObject( self._scene, nativeModel )
 		return None
 	
-	def nativePointer( self ):
-		"""
-			\remarks	return the pointer to the native object that is wrapped
-			\return		<variant> nativeObject
-		"""
-		return self._nativePointer
-		
-	def objectName( self ):
-		"""
-			\remarks	[abstract]	looks up the unique name for this object and returns it
-			\sa			displayName, setDisplayName, setObjectName
-			\return		<str> name
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-	
-	def objectId( self ):
-		"""
-			\remarks	[abstract] retrieve the unique object for this object and returns it
-			\sa			setObjectId
-			\return		<int> id
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return 0
-	
 	def objectType( self ):
 		"""
 			\remarks	returns the type of object this wrapper represents for the native object
@@ -473,42 +413,6 @@ class AbstractSceneObject:
 			return SceneObject( self._scene, nativeParent )
 		return None
 	
-	def property( self, key, default = None ):
-		"""
-			\remarks	[abstract] returns the value for the property of this object, or the default value if not found
-			\sa			hasProperty, setProperty
-			\param		key			<str>
-			\param		default		<variant>	default return value if not found
-			\return		<variant>
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return default
-	
-	def recordXml( self, xml ):
-		"""
-			\remarks	define a way to record this object to xml
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		<bool> success
-		"""
-		if ( not xml ):
-			return False
-		
-		xml.setAttribute( 'name', 	self.objectName() )
-		xml.setAttribute( 'id', 	self.objectId() )
-		return True
-	
-	def scene( self ):
-		"""
-			\remarks	returns the scene that this object is a part of
-			\return		<blur3d.api.Scene>
-		"""
-		return self._scene
-	
 	def select( self ):
 		"""
 			\remarks	selects this object in the scene
@@ -520,7 +424,7 @@ class AbstractSceneObject:
 	def setDisplayName( self, name ):
 		"""
 			\remarks	[abstract]	sets the display name for this object
-			\sa			displayName, objectName, setObjectName
+			\sa			displayName, name, setName
 			\param		name	<str>
 			\return		<bool> success
 		"""
@@ -601,36 +505,6 @@ class AbstractSceneObject:
 			
 		return self._setNativeModel( nativeModel )
 	
-	def setObjectName( self, name ):
-		"""
-			\remarks	[abstract]	sets the full name for this object
-			\sa			displayName, objectName, setDisplayName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
-	def setObjectId( self, objectId ):
-		"""
-			\remarks	[abstract] set the unique object for this object to the inputed id
-			\sa			objectId
-			\param		objectId	<int>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def setParent( self, parent ):
 		"""
 			\remarks	sets the parent for this object to the inputed item
@@ -649,22 +523,6 @@ class AbstractSceneObject:
 			nativeParent = parent.nativePointer()
 		return self._setNativeParent( nativeParent )
 			
-	def setProperty( self, key, value ):
-		"""
-			\remarks	[abstract] sets the inputed object's property key to the given value
-			\sa			hasProperty, property
-			\param		key		<str>
-			\param		value	<variant>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def setSelected( self, state ):
 		"""
 			\remarks	[abstract]  selects/deselects this object
@@ -763,7 +621,7 @@ class AbstractSceneObject:
 			\return		
 		"""
 		if ( xml ):
-			return scene.findObject( objectName = xml.attribute( 'name' ), objectId = int(xml.attribute( 'id', 0 )) )
+			return scene.findObject( name = xml.attribute( 'name' ), uniqueId = int(xml.attribute( 'id', 0 )) )
 		return None
 
 # register the symbol

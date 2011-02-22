@@ -15,7 +15,7 @@ from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
 class StudiomaxScenePropSet( AbstractScenePropSet ):
 	def __eq__( self, other ):
 		if ( isinstance( other, StudiomaxScenePropSet ) ):
-			return self.propSetId() == other.propSetId()
+			return self.uniqueId() == other.uniqueId()
 		return False
 		
 	def __init__( self, scene, nativePropSet ):
@@ -27,8 +27,8 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 		self._values 		= {}
 		self._active		= {}
 		self._custom		= {}
-		self._propSetName	= 'Property Set'
-		self._propSetId		= mxs.blurUtil.genUniqueId()
+		self._name			= 'Property Set'
+		self._uniqueId		= mxs.blurUtil.genUniqueId()
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -115,17 +115,14 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 	def propertyNames( self ):
 		return self._keys
 	
-	def propSetName( self ):
-		return self._propSetName
+	def name( self ):
+		return self._name
 	
-	def propSetId( self ):
-		return self._propSetId
+	def setName( self, name ):
+		self._name = name
 	
-	def setPropSetName( self, propSetName ):
-		self._propSetName = propSetName
-	
-	def setPropSetId( self, propSetId ):
-		self._propSetId = propSetId
+	def setUniqueId( self, uniqueId ):
+		self._uniqueId = uniqueId
 	
 	def setValue( self, propname, value ):
 		propname = str(propname)
@@ -144,6 +141,9 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 		
 		return ', '.join( [ tips[key] for key in keys ] )
 	
+	def uniqueId( self ):
+		return self._uniqueId
+	
 	def value( self, propname, default = None ):
 		return self._values.get( str(propname), default )
 	
@@ -153,8 +153,8 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 			return None
 			
 		propset = StudiomaxScenePropSet( scene, None )
-		propset.setPropSetName( xml.attribute( 'name' ) )
-		propset.setPropSetId( int(xml.attribute( 'id', 0 )) )
+		propset.setName( xml.attribute( 'name' ) )
+		propset.setUniqueId( int(xml.attribute( 'id', 0 )) )
 		return propset
 
 #--------------------------------------------------------------------------------

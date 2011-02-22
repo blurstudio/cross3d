@@ -8,21 +8,13 @@
 #	\date		09/08/10
 #
 
-class AbstractSceneObjectGroup:
-	def __eq__( self, other ):
-		"""
-			\remarks	determines whether one 3dObject instance is equal to another by comparing the pointers to their native object pointers
-			\param		other	<variant>
-			\return		<bool> success
-		"""
-		if ( isinstance( other, AbstractSceneObjectGroup ) ):
-			return self._nativePointer == other._nativePointer
-		return False
-		
+from abstractscenewrapper import AbstractSceneWrapper
+
+class AbstractSceneObjectGroup( AbstractSceneWrapper ):
 	def __init__( self, scene, nativeGroup ):
+		AbstractSceneWrapper.__init__( self, scene, nativeGroup )
+		
 		# define custom properties
-		self._scene					= scene
-		self._nativePointer			= nativeGroup
 		self._materialOverride		= None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group
 		self._materialOverrideFlags	= 0				# blur3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
 		self._propSetOverride		= None			# blur3d.api.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
@@ -314,19 +306,6 @@ class AbstractSceneObjectGroup:
 		"""
 		return self._scene._isolateNativeObjects( self._nativeObjects() )
 	
-	def groupName( self ):
-		"""
-			\remarks	[abstract] retrieve the group name for this object group instance
-			\return		<str> name
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-	
 	def nativePointer( self ):
 		"""
 			\remarks	return the pointer to the native object that is wrapped
@@ -395,13 +374,6 @@ class AbstractSceneObjectGroup:
 			raise NotImplementedError
 		
 		return False
-	
-	def scene( self ):
-		"""
-			\remarks	return the scene instance that this object group is a member of
-			\return		<blur3d.api.Scene>
-		"""
-		return self._scene
 	
 	def select( self ):
 		"""
@@ -497,21 +469,6 @@ class AbstractSceneObjectGroup:
 			\return		<bool> success
 		"""
 		return self._scene._freezeNativeObjects( self._nativeObjects(), state )
-	
-	def setGroupName( self, groupName ):
-		"""
-			\remarks	[abstract] set the group name for this object group instance
-			\sa			layerName
-			\param		layerName	<str>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
 	
 	def setHidden( self, state, options = None ):
 		"""

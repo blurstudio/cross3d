@@ -64,32 +64,32 @@ class StudiomaxSceneMap( AbstractSceneMap ):
 		"""
 		return mxs.isProperty( self._nativePointer, str(key) ) or mxs.hasProperty( self._nativePointer, str(key) )
 	
-	def mapName( self ):
+	def name( self ):
 		"""
-			\remarks	implements AbstractSceneMap.mapName to return the name of this map instance
-			\sa			setMapName
+			\remarks	implements AbstractSceneMap.name to return the name of this map instance
+			\sa			setName
 			\return		<str> name
 		"""
 		return self._nativePointer.name
 	
-	def mapId( self ):
+	def setName( self, name ):
 		"""
-			\remarks	implements AbstractSceneMap.mapId to return the unique id for this map instance
-			\sa			setMapId
+			\remarks	implements AbstractSceneMap.setName to set the name of this map instance
+			\sa			name
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		self._nativePointer.name = name
+		return True
+		
+	def uniqueId( self ):
+		"""
+			\remarks	implements AbstractSceneMap.uniqueId to return the unique id for this map instance
+			\sa			setUniqueId
 			\return		<int> id
 		"""
 		return mxs.blurUtil.uniqueId( self._nativePointer )
 	
-	def setMapName( self, mapName ):
-		"""
-			\remarks	implements AbstractSceneMap.mapId to set the name of this map instance
-			\sa			mapName
-			\param		mapName	<str>
-			\return		<bool> success
-		"""
-		self._nativePointer.name = mapName
-		return True
-		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneMap', StudiomaxSceneMap )

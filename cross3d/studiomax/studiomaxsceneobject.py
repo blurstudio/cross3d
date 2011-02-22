@@ -195,7 +195,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	def displayName( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.displayName method to look up the display name for this object and returns it
-			\sa			objectName, setDisplayName, setObjectName
+			\sa			name, setDisplayName, setName
 			\return		<str> name
 		"""
 		return self._nativePointer.name.split( '.' )[-1]
@@ -234,21 +234,13 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.isselected
 		
-	def objectName( self ):
+	def name( self ):
 		"""
-			\remarks	implements the AbstractSceneObject.objectName to look up the unique name for this object and returns it
-			\sa			displayName, setDisplayName, setObjectName
+			\remarks	implements the AbstractSceneObject.name to look up the unique name for this object and returns it
+			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
 		return str(self._nativePointer.name)
-		
-	def objectId( self ):
-		"""
-			\remarks	implements the AbstractSceneObject.objectId to look up the unique name for this object and returns it
-			\sa			displayName, setDisplayName, setObjectName
-			\return		<str> name
-		"""
-		return mxs.blurUtil.uniqueId( self._nativePointer )
 		
 	def property( self, key, default = None ):
 		"""
@@ -266,7 +258,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	def setDisplayName( self, name ):
 		"""
 			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
-			\sa			displayName, objectName, setObjectName
+			\sa			displayName, name, setName
 			\param		name	<str>
 			\return		<bool> success
 		"""
@@ -295,10 +287,10 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		self._nativePointer.ishidden = state
 		return True
 		
-	def setObjectName( self, name ):
+	def setName( self, name ):
 		"""
-			\remarks	implements the AbstractSceneObject.setObjectName to set the full name for this object
-			\sa			displayName, objectName, setDisplayName
+			\remarks	implements the AbstractSceneObject.setName to set the full name for this object
+			\sa			displayName, name, setDisplayName
 			\param		name	<str>
 			\return		<bool> success
 		"""
@@ -326,6 +318,14 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		self._nativePointer.isselected = state
 		return True
 
+	def uniqueId( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.uniqueId to look up the unique name for this object and returns it
+			\sa			displayName, setDisplayName, setName
+			\return		<str> name
+		"""
+		return mxs.blurUtil.uniqueId( self._nativePointer )
+		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneObject', StudiomaxSceneObject )

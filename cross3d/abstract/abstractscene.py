@@ -71,11 +71,11 @@ class AbstractScene( QObject ):
 		
 		return False
 	
-	def _cachedNativeMap( self, cacheType, mapId, default = None ):
+	def _cachedNativeMap( self, cacheType, uniqueId, default = None ):
 		"""
 			\remarks	[abstract] return the cached map for the inputed material id
 			\param		cacheType	<blur3d.constants.MapCacheType>
-			\param		mapId		<str>
+			\param		uniqueId		<str>
 			\param		default		<variant>	value to return if the id was not found
 			\return		<variant> nativeMap || None
 		"""
@@ -85,11 +85,11 @@ class AbstractScene( QObject ):
 		
 		return default
 	
-	def _cachedNativeMaterial( self, cacheType, materialId, default = None ):
+	def _cachedNativeMaterial( self, cacheType, uniqueId, default = None ):
 		"""
 			\remarks	[abstract] return the cached material for the inputed material id
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
-			\param		materialId		<str>
+			\param		uniqueId		<str>
 			\param		default			<variant>	value to return if the id was not found
 			\return		<variant> nativeMaterial || None
 		"""
@@ -221,10 +221,10 @@ class AbstractScene( QObject ):
 		
 		return False
 	
-	def _findNativeAtmospheric( self, atmosName = '', atmosId = 0 ):
+	def _findNativeAtmospheric( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	[abstract] look up the native atmospheric from this scene instance
-			\param		atmosName	<str>
+			\param		name	<str>
 			\return		<variant> nativeAtmospheric || None
 		"""
 		# when debugging, raise an error
@@ -233,11 +233,11 @@ class AbstractScene( QObject ):
 		
 		return None
 	
-	def _findNativeObject( self, objectName = '', objectId = 0 ):
+	def _findNativeObject( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	[abstract] looks up an object based on the inputed name
 			\sa			findNativeObject
-			\param		objectName	<str>
+			\param		name	<str>
 			\return		<variant> nativeObject || None
 		"""
 		# when debugging, raise an error
@@ -246,11 +246,11 @@ class AbstractScene( QObject ):
 		
 		return None
 	
-	def _findNativeLayer( self, layerName = '', layerId = 0 ):
+	def _findNativeLayer( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	[abstract] looks up a layer based on the inputed name
 			\sa			findNativeLayer
-			\param		layerName	<str>
+			\param		name	<str>
 			\return		<variant> nativeLayer || None
 		"""
 		# when debugging, raise an error
@@ -259,11 +259,11 @@ class AbstractScene( QObject ):
 		
 		return None
 	
-	def _findNativeLayerGroup( self, groupName = '', groupId = 0):
+	def _findNativeLayerGroup( self, name = '', uniqueId = 0):
 		"""
 			\remarks	[abstract] look up a layer group based on the inputed name
 			\sa			findNativeLayer
-			\param		layerName	<str>
+			\param		name	<str>
 			\return		<variant> nativeLayerGroup || None
 		"""
 		# when debugging, raise an error
@@ -272,11 +272,11 @@ class AbstractScene( QObject ):
 		
 		return None
 	
-	def _findNativeMaterial( self, materialName = '', materialId = 0 ):
+	def _findNativeMaterial( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	[abstract] looks up an material based on the inputed name
 			\sa			findNativeMaterial
-			\param		materialName	<str>
+			\param		name	<str>
 			\return		<variant> nativeMaterial || None
 		"""
 		# when debugging, raise an error
@@ -285,11 +285,11 @@ class AbstractScene( QObject ):
 		
 		return None
 	
-	def _findNativeMap( self, mapName = '', mapId = 0 ):
+	def _findNativeMap( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	[abstract] looks up an map based on the inputed name
 			\sa			findNativeMap
-			\param		mapName	<str>
+			\param		name	<str>
 			\return		<variant> nativeMap || None
 		"""
 		# when debugging, raise an error
@@ -799,16 +799,16 @@ class AbstractScene( QObject ):
 		"""
 		return self._cacheNativeMaterial( cacheType, material.nativePointer() )
 	
-	def cachedMap( self, cacheType, mapId, default = None ):
+	def cachedMap( self, cacheType, uniqueId, default = None ):
 		"""
 			\remarks	return the cached map given the inputed id
 			\sa			_cachedNativeMap
 			\param		cacheType	<blur3d.constants.MapCacheType>
-			\param		mapId		<str>
+			\param		uniqueId		<str>
 			\param		default		<variant>	default return value if not found
 			\return		<blur3d.api.SceneMap> || None
 		"""
-		nativeMap =  self._cachedNativeMap( cacheType, mapId )
+		nativeMap =  self._cachedNativeMap( cacheType, uniqueId )
 		if ( nativeMap ):
 			from blur3d.api import SceneMap
 			return SceneMap( self, nativeMap )
@@ -824,16 +824,16 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMap
 		return [ SceneMap( self, nativeMap ) for nativeMap in self._cachedNativeMaps( cacheType ) ]
 	
-	def cachedMaterial( self, cacheType, materialId, default = None ):
+	def cachedMaterial( self, cacheType, uniqueId, default = None ):
 		"""
 			\remarks	return the cached material given the inputed id
 			\sa			_cachedNativeMaterial
 			\param		cacheType	<blur3d.constants.MaterialCacheType>
-			\param		materialId	<str>
+			\param		uniqueId	<str>
 			\param		default		<variant>	default return value if not found
 			\return		<blur3d.api.SceneMaterial> || None
 		"""
-		nativeMaterial = self._cachedNativeMaterial( cacheType, materialId, default = default )
+		nativeMaterial = self._cachedNativeMaterial( cacheType, uniqueId, default = default )
 		if ( nativeMaterial ):
 			from blur3d.api import SceneMaterial
 			return SceneMaterial( self, nativeMaterial )
@@ -1026,91 +1026,91 @@ class AbstractScene( QObject ):
 		"""
 		return self._freezeNativeObjects( [ obj.nativePointer() for obj in objects ], state )
 	
-	def findAtmospheric( self, atmosName = '', atmosId = 0 ):
+	def findAtmospheric( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	look up an atmospheric based on the inputed name
 			\sa			_findNativeAtmospheric
-			\param		atmosName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneAtmospheric> || None
 		"""
-		nativeAtmos = self._findNativeAtmospheric( atmosName, atmosId )
+		nativeAtmos = self._findNativeAtmospheric( name, uniqueId )
 		if ( nativeAtmos ):
 			from blur3d.api import SceneAtmospheric
 			return SceneAtmospheric( self, nativeAtmos )
 		return None
 	
-	def findLayer( self, layerName = '', layerId = 0 ):
+	def findLayer( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	looks up a layer based on the inputed name
 			\sa			_findNativeLayer
-			\param		layerName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneLayer> || None
 		"""
-		nativeLayer = self._findNativeLayer( layerName, layerId )
+		nativeLayer = self._findNativeLayer( name, uniqueId )
 		if ( nativeLayer ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, nativeLayer )
 		return None
 	
-	def findLayerGroup( self, groupName = '', groupId = 0):
+	def findLayerGroup( self, name = '', uniqueId = 0):
 		"""
 			\remarks	look up a layer group based on the inputed name
 			\sa			_findNativeLayerGroup
-			\param		groupName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneLayerGroup> || None
 		"""
-		nativeLayerGroup = self._findNativeLayerGroup( groupName, groupId )
+		nativeLayerGroup = self._findNativeLayerGroup( name, uniqueId )
 		if ( nativeLayerGroup ):
 			from blur3d.api import SceneLayerGroup
 			return SceneLayerGroup( self, nativeLayerGroup )
 		return None
 	
-	def findObject( self, objectName = '', objectId = 0 ):
+	def findObject( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	looks up an individual object by its name
 			\sa			_findNativeObject
-			\param		objectName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneObject> || None
 		"""
-		nativeObject = self._findNativeObject( objectName, objectId )
+		nativeObject = self._findNativeObject( name, uniqueId )
 		if ( nativeObject ):
 			from blur3d.api import SceneObject
 			return SceneObject( self, nativeObject )
 		return None
 	
-	def findMaterial( self, materialName = '', materialId = 0 ):
+	def findMaterial( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	looks up an individual material by its name
 			\sa			_findNativeMaterial
-			\param		materialName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneMaterial> || None
 		"""
 		if ( self._materialCache != None ):
-			mtl = self._materialCache['id'].get(materialId)
+			mtl = self._materialCache['id'].get(uniqueId)
 			if ( not mtl ):
-				mtl = self._materialCache['name'].get(materialName)
+				mtl = self._materialCache['name'].get(name)
 			return mtl
 		else:
-			nativeMaterial = self._findNativeMaterial( materialName, materialId )
+			nativeMaterial = self._findNativeMaterial( name, uniqueId )
 			if ( nativeMaterial ):
 				from blur3d.api import SceneMaterial
 				return SceneMaterial( self, nativeMaterial )
 			return None
 		
-	def findMap( self, mapName = '', mapId = 0 ):
+	def findMap( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	looks up an individual map by its name
 			\sa			_findNativeMap
-			\param		mapName	<str>
+			\param		name	<str>
 			\return		<blur3d.api.SceneMap> || None
 		"""
 		if ( self._mapCache != None ):
-			m = self._mapCache['id'].get(mapId)
+			m = self._mapCache['id'].get(uniqueId)
 			if ( not m ):
-				m = self._mapCache['name'].get(mapName)
+				m = self._mapCache['name'].get(name)
 			return m
 		else:
-			nativeMap = self._findNativeMap( mapName, mapId )
+			nativeMap = self._findNativeMap( name, uniqueId )
 			if ( nativeMap ):
 				from blur3d.api import SceneMap
 				return SceneMap( self, nativeMap )
@@ -1220,7 +1220,7 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	collect all the layer groups and their corresponding layers
 			\sa			createLayerGroup, findLayerGroup
-			\return		<dict> { <str> groupName: <list> [ <blur3d.api.SceneLayer>, .. ], .. }
+			\return		<dict> { <str> name: <list> [ <blur3d.api.SceneLayer>, .. ], .. }
 		"""
 		from blur3d.api import SceneLayerGroup
 		return [ SceneLayerGroup( self, nativeLayerGroup ) for nativeLayerGroup in self._nativeLayerGroups() ]
@@ -1313,8 +1313,8 @@ class AbstractScene( QObject ):
 		layernamemap 	= {}
 		layeridmap		= {}
 		for layer in layers:
-			layernamemap[ str(layer.layerName()) ] 	= layer
-			layeridmap[ str(layer.layerId()) ] 		= layer
+			layernamemap[ str(layer.name()) ] 	= layer
+			layeridmap[ str(layer.uniqueId()) ] 		= layer
 		watch.stopLap()
 		
 		# create a material caching
@@ -1322,8 +1322,8 @@ class AbstractScene( QObject ):
 		materials		= self.materials()
 		materialcache	= { 'name': {}, 'id': {} }
 		for material in materials:
-			materialcache[ 'name' ][ material.materialName() ] 	= material
-			materialcache[ 'id' ][ material.materialId() ] 		= material
+			materialcache[ 'name' ][ material.name() ] 	= material
+			materialcache[ 'id' ][ material.uniqueId() ] 		= material
 		
 		self._materialCache = materialcache
 		watch.stopLap()
@@ -1333,8 +1333,8 @@ class AbstractScene( QObject ):
 		maps			= self.maps()
 		mapcache		= { 'name': {}, 'id': {} }
 		for m in maps:
-			mapcache[ 'name' ][ m.mapName() ] 	= map
-			mapcache[ 'id' ][ m.mapId() ] 		= map
+			mapcache[ 'name' ][ m.name() ] 	= map
+			mapcache[ 'id' ][ m.uniqueId() ] 		= map
 		
 		self._mapCache = mapcache
 		watch.stopLap()
@@ -1380,9 +1380,9 @@ class AbstractScene( QObject ):
 		progress.setMaximum( len(unprocessed) + 1 )
 		for i, layer in enumerate(unprocessed):
 			progress.setValue(i+1)
-			progress.setLabelText( 'Hiding %s...' % layer.layerName() )
+			progress.setLabelText( 'Hiding %s...' % layer.name() )
 			
-			watch.startLap( 'Hiding %s' % layer.layerName() )
+			watch.startLap( 'Hiding %s' % layer.name() )
 			layer.setVisible(False)
 			watch.stopLap()
 		
@@ -1715,7 +1715,7 @@ class AbstractScene( QObject ):
 			\param		basename	<str>
 			\return		<str> unique name
 		"""
-		names 	= [ str(layer.layerName()) for layer in self.layers() ]
+		names 	= [ str(layer.name()) for layer in self.layers() ]
 		index 	= 2
 		name 	= basename
 		while ( name in names ):

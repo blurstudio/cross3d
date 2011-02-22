@@ -24,7 +24,7 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 	
 	def _nativeProperty( self, key, default = None ):
 		"""
-			\remarks	implements AbstractSceneAtmospheric._nativeProperty to return the value of the property defined by the inputed key
+			\remarks	implements AbstractSceneWrapper._nativeProperty to return the value of the property defined by the inputed key
 			\sa			hasProperty, setProperty, _nativeProperty, AbstractScene._fromNativeValue
 			\param		key			<str>
 			\param		default		<variant>	(auto-converted from the application's native value)
@@ -37,7 +37,7 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 		
 	def _setNativeProperty( self, key, nativeValue ):
 		"""
-			\remarks	implements AbstractSceneAtmospheric._setNativeProperty to set the value of the property defined by the inputed key
+			\remarks	implements AbstractSceneWrapper._setNativeProperty to set the value of the property defined by the inputed key
 			\sa			hasProperty, property, setProperty, AbstractScene._toNativeValue
 			\param		key		<str>
 			\param		value	<variant>	(pre-converted to the application's native value)
@@ -52,25 +52,17 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def atmosName( self ):
+	def name( self ):
 		"""
-			\remarks	implements AbstractSceneAtmospheric.atmosphericName to return the name of this atmospheric instance
-			\sa			setAtmosphericName
+			\remarks	implements AbstractSceneWrapper.name to return the name of this atmospheric instance
+			\sa			setName
 			\return		<str> name
 		"""
 		return self._nativePointer.name
 	
-	def atmosId( self ):
-		"""
-			\remarks	implements AbstractSceneAtmospheric.atmosphericId to return the unique id for this atmospheric instance
-			\sa			setAtmosphericId
-			\return		<int> id
-		"""
-		return mxs.blurUtil.uniqueId( self._nativePointer )
-		
 	def hasProperty( self, key ):
 		"""
-			\remarks	implements AbstractSceneAtmospheric.hasProperty to check to see if the inputed property name exists for this atmospheric
+			\remarks	implements AbstractSceneWrapper.hasProperty to check to see if the inputed property name exists for this atmospheric
 			\sa			property, setProperty
 			\param		key		<str>
 			\return		<bool> found
@@ -97,14 +89,14 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 				return l
 		return None
 	
-	def setAtmosName( self, atmosphericName ):
+	def setName( self, name ):
 		"""
-			\remarks	implements AbstractSceneAtmospheric.atmosphericId to set the name of this atmosepheric instance
-			\sa			atmosphericName
-			\param		atmosphericName	<str>
+			\remarks	implements AbstractSceneWrapper.setName to set the name of this atmosepheric instance
+			\sa			name
+			\param		name	<str>
 			\return		<bool> success
 		"""
-		self._nativePointer.name = atmosphericName
+		self._nativePointer.name = name
 		return True
 	
 	def setEnabled( self, state ):
@@ -115,6 +107,14 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 		"""
 		mxs.setActive( self._nativePointer, state )
 		return True
+		
+	def uniqueId( self ):
+		"""
+			\remarks	implements AbstractSceneWrapper.uniqueId to return the unique id for this atmospheric instance
+			\sa			setUniqueId
+			\return		<int> id
+		"""
+		return mxs.blurUtil.uniqueId( self._nativePointer )
 		
 # register the symbol
 from blur3d import api

@@ -80,32 +80,32 @@ class StudiomaxSceneMaterial( AbstractSceneMaterial ):
 		"""
 		return mxs.isProperty( self._nativePointer, str(key) ) or mxs.hasProperty( self._nativePointer, str(key) )
 	
-	def materialName( self ):
+	def name( self ):
 		"""
-			\remarks	implements AbstractSceneMaterial.materialName to return the name of this material instance
-			\sa			setMaterialName
+			\remarks	implements AbstractSceneMaterial.name to return the name of this material instance
+			\sa			setName
 			\return		<str> name
 		"""
 		return self._nativePointer.name
 	
-	def materialId( self ):
+	def setName( self, name ):
 		"""
-			\remarks	implements AbstractSceneMaterial.materialId to return the unique id for this material instance
-			\sa			setMaterialId
+			\remarks	implements AbstractSceneMaterial.setName to set the name of this material instance
+			\sa			name
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		self._nativePointer.name = name
+		return True
+		
+	def uniqueId( self ):
+		"""
+			\remarks	implements AbstractSceneMaterial.uniqueId to return the unique id for this material instance
+			\sa			setUniqueId
 			\return		<int> id
 		"""
 		return mxs.blurUtil.uniqueId( self._nativePointer )
 	
-	def setMaterialName( self, materialName ):
-		"""
-			\remarks	implements AbstractSceneMaterial.materialId to set the name of this material instance
-			\sa			materialName
-			\param		materialName	<str>
-			\return		<bool> success
-		"""
-		self._nativePointer.name = materialName
-		return True
-		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneMaterial', StudiomaxSceneMaterial )

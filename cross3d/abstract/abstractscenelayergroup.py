@@ -10,22 +10,9 @@
 #	\date		09/08/10
 #
 
-class AbstractSceneLayerGroup:
-	def __eq__( self, other ):
-		"""
-			\remarks	determines whether one SceneLayerGroup instance is equal to another by comparing the pointers to their native group pointers
-			\param		other	<variant>
-			\return		<bool> success
-		"""
-		if ( isinstance( other, AbstractSceneLayerGroup ) ):
-			return self._nativePointer == other._nativePointer
-		return False
-		
-	def __init__( self, scene, nativeLayerGroup ):
-		# define custom properties
-		self._scene					= scene
-		self._nativePointer 		= nativeLayerGroup
-	
+from abstractscenewrapper import AbstractSceneWrapper
+
+class AbstractSceneLayerGroup( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -127,21 +114,6 @@ class AbstractSceneLayerGroup:
 		
 		return -1
 	
-	def hasProperty( self, key ):
-		"""
-			\remarks	[abstract] return whether or not a given property exists for this layer
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def hide( self ):
 		"""
 			\remarks	hides the layers on this layer in the scene
@@ -170,26 +142,6 @@ class AbstractSceneLayerGroup:
 			raise NotImplementedError
 		
 		return False
-	
-	def groupName( self ):
-		"""
-			\remarks	[abstract] retrieve the unique layer name for this layer
-			\return		<str> name
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-	
-	def nativePointer( self ):
-		"""
-			\remarks	return the pointer to the native object that is wrapped
-			\return		<variant> nativeLayer
-		"""
-		return self._nativePointer
 	
 	def layers( self ):
 		"""
@@ -249,21 +201,6 @@ class AbstractSceneLayerGroup:
 		for layer in self.layers():
 			layer.setFrozen( state )
 		return True
-	
-	def setGroupName( self, layerName ):
-		"""
-			\remarks	[abstract] set the name for this layer group instance
-			\sa			layerName
-			\param		layerName	<str>
-			\return		<bool> changed
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
 	
 	def setGroupOrder( self, groupOrder ):
 		"""

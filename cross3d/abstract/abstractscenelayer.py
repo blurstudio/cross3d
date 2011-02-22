@@ -52,21 +52,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return None
 	
-	def _nativeProperty( self, key, default = None ):
-		"""
-			\remarks	[abstract] return the native value for this layer's property defined by the key
-			\param		key			<str>
-			\param		default		<variant>	value to return if not found
-			\return		<variant> nativeValue
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return default
-	
 	def _setNativeAltMaterialAt( self, index, nativeMaterial ):
 		"""
 			\remarks	[abstract] set the material in the alternate materials list at the inputed index to the given material
@@ -101,21 +86,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\remarks	[abstract] set the layer group that this layer belongs to
 			\sa			layerGroup, setLayerGroup, _nativeLayerGroup
 			\param		<variant> nativeLayerGroup || None
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
-	def _setNativeProperty( self, key, nativeValue ):
-		"""
-			\remarks	[abstract] return the native value for this layer's property defined by the key
-			\param		key				<str>
-			\param		nativeValue		<variant>
 			\return		<bool> success
 		"""
 		from blurdev import debug
@@ -387,21 +357,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return False
 	
-	def hasProperty( self, key ):
-		"""
-			\remarks	[abstract] return whether or not a given property exists for this layer
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def indexOfAltMaterial( self, material ):
 		"""
 			\remarks	return the index of the inputed material for the current layer
@@ -504,60 +459,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return -1
 	
-	def layerName( self ):
-		"""
-			\remarks	[abstract] retrieve the layer name for this layer
-			\sa			groupName
-			\return		<str> name
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-		
-	def layerId( self ):
-		"""
-			\remarks	[abstract] retrieve the unique layer id for this layer instance
-			\sa			setLayerId
-			\return		<int> id
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return 0
-		
-	def property( self, key, default = None ):
-		"""
-			\remarks	return the given property from this layer
-			\sa			hasProperty, setProperty, _nativeProperty, _setNativeProperty
-			\param		key			<str>
-			\param		default		<variant>	default return value for a non-found property
-			\return		<variant> value
-		"""
-		nativeValue = self._nativeProperty( key )
-		if ( nativeValue != None ):
-			return self._scene._fromNativeValue( nativeValue )
-		return default
-	
-	def recordXml( self, xml ):
-		"""
-			\remarks	define a way to record this layer to xml
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		<bool> success
-		"""
-		if ( not xml ):
-			return False
-		
-		xml.setAttribute( 'name', 	self.layerName() )
-		xml.setAttribute( 'id', 	self.layerId() )
-		return True
-	
 	def recordLayerState( self, xml ):
 		"""
 			\remarks	records the layer's current state to xml
@@ -570,8 +471,8 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		# record the layer state
 		node = xml.addNode( 'layer' )
-		node.setAttribute( 'name', 		self.layerName() )
-		node.setAttribute( 'id', 		self.layerId() )
+		node.setAttribute( 'name', 		self.name() )
+		node.setAttribute( 'id', 		self.uniqueId() )
 		
 		# record the propSetOverride
 		propSet = self.propSetOverride()
@@ -832,7 +733,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 	def setGroupName( self, name ):
 		"""
 			\remarks	implements the AbstractSceneObjectGroup.groupName method to set the group name for this object group instance
-			\sa			setLayerName
+			\sa			groupName
 			\param		name	<str>
 			\return		<bool> success
 		"""
@@ -859,21 +760,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			advancedState	= self.advancedAltMaterialStateAt( index )
 		
 		return AbstractSceneObjectGroup.setMaterialOverride( self, material, options = options, advancedState = advancedState )
-	
-	def setLayerName( self, name ):
-		"""
-			\remarks	[abstract] set the layer name for this layer
-			\sa			setGroupName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
 	
 	def setLayerGroup( self, layerGroup ):
 		"""
@@ -902,21 +788,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return False
 		
-	def setLayerId( self, layerId ):
-		"""
-			\remarks	[abstract] set the unique layer id for this layer instance
-			\sa			layerId
-			\param		layerId		<int>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
 	def setAdvancedAltMaterialStateAt( self, index, altMaterialState ):
 		"""
 			\remarks	[abstract] set a mapping for the advanced alternate material status of a given alternate material
@@ -932,16 +803,6 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			raise NotImplementedError
 		
 		return False
-	
-	def setProperty( self, key, value ):
-		"""
-			\remarks	set the property for this layer defined by the inputed key to the inputed value
-			\sa			hasProperty, property, _nativeProperty, _setNativeProperty
-			\param		key			<str>
-			\param		value		<variant>
-			\return		<bool> success
-		"""
-		return self._setNativeProperty( str(key), self._scene._toNativeValue( value ) )
 	
 	def setWireColor( self, color ):
 		"""
@@ -973,7 +834,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\return		
 		"""
 		if ( xml ):
-			return scene.findLayer( layerName = xml.attribute( 'name' ), layerId = int(xml.attribute( 'id',0 )) )
+			return scene.findLayer( name = xml.attribute( 'name' ), uniqueId = int(xml.attribute( 'id',0 )) )
 		return None
 		
 # register the symbol

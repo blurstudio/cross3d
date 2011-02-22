@@ -8,12 +8,9 @@
 #	\date		09/08/10
 #
 
-class AbstractScenePropSet:
-	def __init__( self, scene, nativePropSet ):
-		# define parameters
-		self._scene 		= scene
-		self._nativePointer = nativePropSet
-	
+from abstractscenewrapper import AbstractSceneWrapper
+
+class AbstractScenePropSet( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -53,30 +50,6 @@ class AbstractScenePropSet:
 		
 		return False
 	
-	def propSetName( self ):
-		"""
-			\remarks	[abstract] return the name for this property set
-			\return		<str> name
-		"""
-		from bludev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-	
-	def propSetId( self ):
-		"""
-			\remarks	[abstract] return the unique id for this property set
-			\return		<int> id
-		"""
-		from bludev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return 0
-		
 	def isActive( self ):
 		"""
 			\remarks	return whether or not any property is used in this set
@@ -103,13 +76,6 @@ class AbstractScenePropSet:
 		"""
 		return str(propname) in self.activeProperties()
 	
-	def nativePointer( self ):
-		"""
-			\remarks	return the native wrapper for this instance
-			\return		<variant>
-		"""
-		return self._nativePointer
-	
 	def propertyNames( self ):
 		"""
 			\remarks	[abstract] return a list of the property names for this property set
@@ -120,45 +86,6 @@ class AbstractScenePropSet:
 			raise NotImplementedError
 		return []
 	
-	def recordXml( self, xml ):
-		"""
-			\remarks	record this property set to xml data
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		<bool> success
-		"""
-		if ( not xml ):
-			return False
-		
-		xml.setAttribute( 'name', self.propSetName() )
-		xml.setAttribute( 'id',		self.propSetId() )
-		return True
-	
-	def setPropSetName( self, propSetName ):
-		"""
-			\remarks	[abstract] set the name for this property set
-			\param		propSetName	<str>
-			\return		<bool> success
-		"""
-		from bludev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
-	def setPropSetId( self, propSetId ):
-		"""
-			\remarks	[abstract] set the unique id for this property set
-			\param		propSetId	<int>
-			\return		<bool> success
-		"""
-		from bludev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-		
 	def setValue( self, propname, value ):
 		"""
 			\remarks	[abstract] set the value of the property
@@ -203,7 +130,7 @@ class AbstractScenePropSet:
 		"""
 		if ( not xml ):
 			return None
-		return scene.findPropSet( propSetName = xml.attribute( 'name' ), propSetId = int(xml.attribute( 'id', 0 )) )
+		return scene.findPropSet( name = xml.attribute( 'name' ), uniqueId = int(xml.attribute( 'id', 0 )) )
 
 # register the class to the system
 from blur3d import api

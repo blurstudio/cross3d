@@ -220,11 +220,11 @@ class StudiomaxScene( AbstractScene ):
 			
 		return False
 		
-	def _cachedNativeMap( self, cacheType, mapId, default = None ):
+	def _cachedNativeMap( self, cacheType, uniqueId, default = None ):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMap method to return the cached map for the inputed map id
 			\param		cacheType		<blur3d.constants.MapCacheType>
-			\param		mapId			<str>
+			\param		uniqueId			<str>
 			\param		default			<variant>	value to return if the id was not found
 			\return		<Py3dsMax.mxs.TextureMap> nativeMap
 		"""			
@@ -238,7 +238,7 @@ class StudiomaxScene( AbstractScene ):
 			uid = str(unique_id(nativeMap))
 			unm = str(nativeMap.name)
 			
-			if ( mapId == uid or mapId == unm ):
+			if ( uniqueId == uid or uniqueId == unm ):
 				return nativeMap
 		return None
 		
@@ -436,53 +436,53 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.saveNodes( objects, filename )
 	
-	def _findNativeObject( self, objectName = '', objectId = 0 ):
+	def _findNativeObject( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeObject to look up an object based on the inputed name
 			\sa			findNativeObject
-			\param		objectName	<str>
+			\param		name	<str>
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
-		objectName 	= str(objectName)
+		name 	= str(name)
 		output 		= None
-		if ( objectName ):
-			output = mxs.getNogyName( str(objectName) )
+		if ( name ):
+			output = mxs.getNogyName( str(name) )
 		
-		if ( not output and objectId ):
-			output = mxs.refByUniqueId( objectId )
+		if ( not output and uniqueId ):
+			output = mxs.refByUniqueId( uniqueId )
 		
 		return output
 		
-	def _findNativeLayer( self, layerName = '', layerId = 0 ):
+	def _findNativeLayer( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeLayer to look up a layer based on the inputed name
 			\sa			findNativeLayer
-			\param		layerName	<str>
+			\param		name	<str>
 			\return		<Py3dsMax.mxs.Layer> nativeLayer || None
 		"""
-		if ( layerName == 'World Layer' ):
-			layerName = '0'
+		if ( name == 'World Layer' ):
+			name = '0'
 		
 		output = None
-		if ( layerName ):
-			output = mxs.layerManager.getLayerFromName( str(layerName) )
+		if ( name ):
+			output = mxs.layerManager.getLayerFromName( str(name) )
 		
-		if ( not output and layerId ):
-			output = mxs.layerManager.refByUniqueId( layerId )
+		if ( not output and uniqueId ):
+			output = mxs.layerManager.refByUniqueId( uniqueId )
 			
 		return output
 		
-	def _findNativeLayerGroup( self, groupName = '', groupId = 0 ):
+	def _findNativeLayerGroup( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeLayerGroup to look up a layer group based on the inputed name
 			\sa			findNativeLayer
-			\param		layerName	<str>
+			\param		name	<str>
 			\return		<str> nativeLayerGroup || None
 		"""
 		names 		= list(self.metaData().value('layerGroupNames'))
-		groupName 	= str(groupName)
-		if ( groupName in names ):
-			return groupName
+		name 	= str(name)
+		if ( name in names ):
+			return name
 		return None
 	
 	def _findNativeMaterial( self, materialName = '', materialId = 0 ):
@@ -505,21 +505,21 @@ class StudiomaxScene( AbstractScene ):
 				
 		return None
 		
-	def _findNativeMap( self, mapName = '', mapId = 0 ):
+	def _findNativeMap( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	implements the AbstractScene._findNativeMap to look up an map based on the inputed name
 			\sa			findNativeMap
-			\param		mapName	<str>
+			\param		name	<str>
 			\return		<Py3dsMax.mxs.Map> nativeMap || None
 		"""
-		mapName 	= str(mapName)
+		name 	= str(name)
 		
-		if ( not (mapName or mapId) ):
+		if ( not (name or uniqueId) ):
 			return None
 		
 		uniqueid = mxs.blurUtil.uniqueId
 		for nmap in self._collectNativeMaps():
-			if ( nmap.name == mapName or uniqueid(nmap) == mapId ):
+			if ( nmap.name == name or uniqueid(nmap) == uniqueId ):
 				return nmap
 				
 		return None
