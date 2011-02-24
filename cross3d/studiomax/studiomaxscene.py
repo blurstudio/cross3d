@@ -1078,7 +1078,7 @@ class StudiomaxScene( AbstractScene ):
 				else:
 					processMaterial = nativeMaterial
 				
-				overrideMaterial 	= matlib.createMaterialOverride( baseMaterial, processMaterial, options = options )
+				overrideMaterial 	= matlib.createMaterialOverride( baseMaterial, processMaterial, options = options, advancedState = advancedState )
 				processed[uid] 		= overrideMaterial
 				
 			obj.material = overrideMaterial

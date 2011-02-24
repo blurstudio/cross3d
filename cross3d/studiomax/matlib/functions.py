@@ -235,13 +235,14 @@ def buildMaterialFrom( material, opacityMap = None, displacementMap = None, bump
 	
 	return material
 
-def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
+def createMaterialOverride( baseMaterial, overrideMaterial, options = None, advancedState = None ):
 	"""
 		\remarks	generate a proper override material based on the inputed base material by preserving aspects of the
 					base material based on the supplied options, while joining the main shader aspects of the override material
 		\param		baseMaterial		<Py3dsMax.mxs.Material>
 		\param		overrideMaterial	<Py3dsMax.mxs.Material>
 		\param		options				<blur3d.constants.MaterialOverrideOptions>
+		\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 	"""
 	from blur3d.constants import MaterialOverrideOptions
 	
@@ -250,7 +251,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 		options = MaterialOverrideOptions.All
 	
 	# make sure we have at least some overriding options or a base material to work from
-	if ( not options ):
+	if ( not (options or advancedState) ):
 		return overrideMaterial
 	
 	# make sure we have an overrideMaterial to work from
@@ -267,7 +268,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 	
 	# process XRef materials
 	if ( is_kindof( baseMaterial, mxs.XRef_Material ) ):
-		return createMaterialOverride( (baseMaterial.getSourceMaterial(True)), overrideMaterial, options )
+		return createMaterialOverride( (baseMaterial.getSourceMaterial(True)), overrideMaterial, options, advancedState )
 	
 	# process Multi/Sub Materials
 	elif ( is_kindof( baseMaterial, multi_material ) ):
@@ -287,7 +288,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 			if ( class_of( subMaterial ) == mxs.Mental_Ray and not subMaterial.surface ):
 				outputMaterial[i] = subMaterial
 			else:
-				outputMaterial[i] = createMaterialOverride( subMaterial, replaceMaterial, options = options )
+				outputMaterial[i] = createMaterialOverride( subMaterial, replaceMaterial, options = options, advancedState = advancedState )
 		
 		return outputMaterial
 	
@@ -298,7 +299,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 	# so even rendering with Vray will not behave correctly.  below is code to handle this situation:
 	elif ( class_of( overrideMaterial ) in (mxs.StandardMaterial,mxs.MatteShadow,mxs.Blur_Matte_mtl) ):
 		if ( class_of( baseMaterial ) in (mxs.VrayBlendMtl,mxs.VrayOverrideMtl,mxs.VrayMtlWrapper) ):
-			return createMaterialOverride( get_submtl( baseMaterial, 1 ), overrideMaterial, options = options )
+			return createMaterialOverride( get_submtl( baseMaterial, 1 ), overrideMaterial, options = options, advancedState = advancedState )
 	
 	# process any non-multi/sub multi-materials
 	elif ( get_numsubmtls( baseMaterial ) ):
@@ -316,7 +317,7 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 				if ( class_of( subMaterial ) == mxs.Mental_Ray and not subMaterial.surface ):
 					set_submtl( outputMaterial, i+1, subMaterial )
 				else:
-					set_submtl( outputMaterial, i+1, createMaterialOverride( subMaterial, replaceMaterial, options = options ) )
+					set_submtl( outputMaterial, i+1, createMaterialOverride( subMaterial, replaceMaterial, options = options, advancedState = advancedState ) )
 		
 		return outputMaterial
 	
@@ -332,6 +333,20 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None ):
 	else:
 		displMap 	= None
 		bumpMap		= None
+	
+	# check to see if we should use an advanced state
+	baseMaterialId = mxs.blurUtil.uniqueId(baseMaterial)
+	if ( advancedState and baseMaterialId in advancedState ):
+		overrideSceneMaterial, ignoreOverride = advancedState[baseMaterialId]
+	
+		# ignore this material from the advanced state
+		if ( ignoreOverride ):
+			return baseMaterial
+		
+		# pull the maxscript value from the wrapper instance
+		elif ( overrideSceneMaterial ):
+			overrideMaterial = overrideSceneMaterial.nativePointer()
+		
 			
 	# return the new material
 	return buildMaterialFrom( overrideMaterial, opacityMap = opacityMap, displacementMap = displMap, bumpMap = bumpMap )
