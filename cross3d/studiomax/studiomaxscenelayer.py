@@ -1019,7 +1019,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\param		index	<int>
 			\return		<bool> changed
 		"""
-		self.metaData().setValue( 'groupOrder', index )
+		self.metaData().setValue( 'groupOrder', index + 1 )
 		return True
 	
 	def setFrozen( self, state ):
