@@ -13,36 +13,6 @@ from blur3d.api.abstract.abstractscenemap 		import AbstractSceneMap
 
 class StudiomaxSceneMap( AbstractSceneMap ):
 	#------------------------------------------------------------------------------------------------------------------------
-	# 												protected methods
-	#------------------------------------------------------------------------------------------------------------------------
-	def _nativeProperty( self, key, default = None ):
-		"""
-			\remarks	implements AbstractSceneMap._nativeProperty to return the value of the property defined by the inputed key
-			\sa			hasProperty, setProperty, _nativeProperty, AbstractScene._fromNativeValue
-			\param		key			<str>
-			\param		default		<variant>	(auto-converted from the application's native value)
-			\return		<variant>
-		"""
-		try:
-			return self._nativePointer.property( str(key) )
-		except:
-			return default
-		
-	def _setNativeProperty( self, key, nativeValue ):
-		"""
-			\remarks	implements AbstractSceneMap._setNativeProperty to set the value of the property defined by the inputed key
-			\sa			hasProperty, property, setProperty, AbstractScene._toNativeValue
-			\param		key		<str>
-			\param		value	<variant>	(pre-converted to the application's native value)
-			\retrun		<bool> success
-		"""
-		try:
-			self._nativePointer.setProperty( str( key ), nativeValue )
-			return True
-		except:
-			return False
-	
-	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	def edit( self ):
@@ -54,15 +24,6 @@ class StudiomaxSceneMap( AbstractSceneMap ):
 		medit.PutMtlToMtlEditor( self._nativePointer, medit.GetActiveMtlSlot() )
 		mxs.matEditor.open()
 		return True
-	
-	def hasProperty( self, key ):
-		"""
-			\remarks	implements AbstractSceneMap.hasProperty to check to see if the inputed property name exists for this map
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		return mxs.isProperty( self._nativePointer, str(key) ) or mxs.hasProperty( self._nativePointer, str(key) )
 	
 	def name( self ):
 		"""

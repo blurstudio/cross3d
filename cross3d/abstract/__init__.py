@@ -14,6 +14,7 @@ def init():
 		\remarks	initializes the original abstract classes, registering them to the api module when necessary
 	"""
 	import abstractscene
+	import abstractscenewrapper
 	import abstractsceneobject
 	import abstractsceneobjectgroup
 	import abstractscenelayer
@@ -23,3 +24,6 @@ def init():
 	import abstractsceneatmospheric
 	import abstractscenerenderer
 	import abstractscenecamera
+	import abstractsceneanimationcontroller
+	import abstractsceneanimationkey
+	import abstractscenecache

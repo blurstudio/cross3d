@@ -9,9 +9,9 @@
 #
 
 from blurdev import debug
-from abstractscenewrapper import AbstractSceneWrapper
+from blur3d.api import SceneWrapper
 
-class AbstractSceneMaterial( AbstractSceneWrapper ):
+class AbstractSceneMaterial( SceneWrapper ):
 	iconCache = {}
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods

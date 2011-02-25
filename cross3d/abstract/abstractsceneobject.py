@@ -9,12 +9,12 @@
 #	\date		03/15/10
 #
 
-from abstractscenewrapper import AbstractSceneWrapper
+from blur3d.api import SceneWrapper
 
-class AbstractSceneObject( AbstractSceneWrapper ):
+class AbstractSceneObject( SceneWrapper ):
 	iconCache = {}
 	def __init__( self, scene, nativeObject ):
-		AbstractSceneWrapper.__init__( self, scene, nativeObject )
+		SceneWrapper.__init__( self, scene, nativeObject )
 		
 		self._objectType	= self._typeOfNativeObject( nativeObject )
 	
@@ -37,6 +37,20 @@ class AbstractSceneObject( AbstractSceneWrapper ):
 			raise NotImplementedError
 		
 		return None
+	
+	def _nativeCaches( self, cacheType = 0 ):
+		"""
+			\remarks	[abstract] return a list of the native caches that are applied to this object
+			\param		cacheType	<blur3d.constants.CacheType>	fitler by the inputed cache type
+			\return		<list> [ <variant> nativeCache, .. ]
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return []
 		
 	def _nativeChildren( self ):
 		"""
@@ -209,6 +223,27 @@ class AbstractSceneObject( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	def addCacheFromFile( self, cacheFile ):
+		"""
+			\remarks	adds a new cache based on the inputed filename
+			\param		cacheFile	<str>
+			\return		<blur3d.api.SceneCache> || None
+		"""
+		nativeCache = self._addNativeCacheFromFile( cacheFile )
+		if ( nativeCache ):
+			from blur3d.api import SceneCache
+			return SceneCache( self._scene, nativeCache )
+		return None
+		
+	def caches( self, cacheType = 0 ):
+		"""
+			\remarks	return a list of the caches that are applied to this object
+			\param		cacheType	<blur3d.constants.CacheType>	filter by the inputed cache type
+			\return		<list> [ <blur3d.api.SceneCache> , .. ]
+		"""
+		from blur3d.api import SceneCache
+		return [ SceneCache( self._scene, nativeCache ) for nativeCache in self._nativeCaches( cacheType ) ]
+	
 	def deslect( self ):
 		"""
 			\remarks	deselects the object in the scene
@@ -230,7 +265,7 @@ class AbstractSceneObject( AbstractSceneWrapper ):
 			raise NotImplementedError
 		
 		return ''
-		
+	
 	def childAt( self, index ):
 		"""
 			\remarks	returns the child at a particular index for this object
@@ -282,7 +317,7 @@ class AbstractSceneObject( AbstractSceneWrapper ):
 			from blur3d.api import SceneObject
 			return SceneObject( self._scene, nativeChild )
 		return None
-
+	
 	def freeze( self ):
 		"""
 			\remarks	freezes/locks this item
@@ -545,7 +580,8 @@ class AbstractSceneObject( AbstractSceneWrapper ):
 			\param		color	<QColor>
 			\return		<bool> success
 		"""
-		return self._setNativeWireColor( self._scene._toNativeValue( color ) )
+		from PyQt4.QtGui import QColor
+		return self._setNativeWireColor( self._scene._toNativeValue( QColor(color) ) )
 	
 	def unfreeze( self ):
 		"""

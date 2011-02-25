@@ -8,11 +8,11 @@
 #	\date		09/08/10
 #
 
-from abstractscenewrapper import AbstractSceneWrapper
+from blur3d.api import SceneWrapper
 
-class AbstractSceneObjectGroup( AbstractSceneWrapper ):
+class AbstractSceneObjectGroup( SceneWrapper ):
 	def __init__( self, scene, nativeGroup ):
-		AbstractSceneWrapper.__init__( self, scene, nativeGroup )
+		SceneWrapper.__init__( self, scene, nativeGroup )
 		
 		# define custom properties
 		self._materialOverride		= None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group

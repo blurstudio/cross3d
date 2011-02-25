@@ -8,9 +8,9 @@
 #	\date		09/08/10
 #
 
-from abstractscenewrapper import AbstractSceneWrapper
+from blur3d.api import SceneWrapper
 
-class AbstractSceneAtmospheric( AbstractSceneWrapper ):
+class AbstractSceneAtmospheric( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------

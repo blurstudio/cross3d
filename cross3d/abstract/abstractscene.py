@@ -955,6 +955,19 @@ class AbstractScene( QObject ):
 		doc = XMLDocument()
 		self.recordLayerState( doc )
 		return doc.toxml()
+	
+	def currentElement( self ):
+		"""
+			\remarks	return the trax element that is currently loaded based on the filename of this scene
+			\return		<trax.api.data.Element> || None
+		"""
+		try:
+			import trax
+		except:
+			print 'The trax asset tracking system is not installed'
+			return None
+		
+		return trax.api.findElementByPath( self.currentFileName() )
 		
 	def currentFileName( self ):
 		"""

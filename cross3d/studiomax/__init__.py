@@ -18,7 +18,8 @@ def init():
 	from Py3dsMax import mxs
 	
 	# load the maxscript classes
-	import studiomaxscene	
+	import studiomaxscene
+	import studiomaxscenewrapper
 	import studiomaxsceneobject	
 	import studiomaxscenelayer	
 	import studiomaxscenelayergroup	
@@ -28,3 +29,6 @@ def init():
 	import studiomaxsceneatmospheric
 	import studiomaxscenerenderer
 	import studiomaxscenecamera
+	import studiomaxsceneanimationcontroller
+	import studiomaxsceneanimationkey
+	import studiomaxscenecache

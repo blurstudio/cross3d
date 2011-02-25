@@ -364,18 +364,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				
 		return None
 	
-	def _nativeProperty( self, key, default = None ):
-		"""
-			\remarks	implements the AbstractSceneLayer._nativeObjects method to return the native value for this layer's property defined by the key
-			\param		key			<str>
-			\param		default		<variant>	value to return if not found
-			\return		<variant> nativeValue
-		"""
-		nativeValue = self._nativePointer.property(str(key))
-		if ( nativeValue == None ):
-			return default
-		return nativeValue
-	
 	def _setNativeAltMaterialAt( self, index, nativeMaterial ):
 		"""
 			\remarks	implements the AbstractSceneLayer._setNativeAltMaterialAt method to set the material in the alternate materials list at the inputed index to the given material
@@ -520,16 +508,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		
 		return True
 	
-	def _setNativeProperty( self, key, nativeValue ):
-		"""
-			\remarks	implements the AbstractSceneLayer._nativeObjects method to return the native value for this layer's property defined by the key
-			\param		key				<str>
-			\param		nativeValue		<variant>
-			\return		<bool> success
-		"""
-		self._nativePointer.setProperty( str(key), nativeValue )
-		return True
-		
 	def _setNativeWireColor( self, nativeColor ):
 		"""
 			\remarks	implements the AbstractSceneLayer._setNativeWireColor method to set the wirecolor for this layer instance
@@ -645,15 +623,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<bool> found
 		"""
 		return (index+1) in list(self.metaData().value('altMtlIndexes') )
-	
-	def hasProperty( self, key ):
-		"""
-			\remarks	implements the AbstractSceneLayer.hasProperty method to return whether or not a given property exists for this layer
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		return mxs.isProperty( self._nativePointer, str(key) ) or mxs.hasProperty( self._nativePointer, str(key) )
 	
 	def isActive( self ):
 		"""

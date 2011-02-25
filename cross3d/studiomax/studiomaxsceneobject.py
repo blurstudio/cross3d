@@ -42,6 +42,49 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		
 		return None
 	
+	def _nativeController( self, name ):
+		"""
+			\remarks	implements the AbstractSceneObject._findNativeController method to find the controller at the	
+						inputed name for this object
+			\param		name		<str>
+			\return		<Py3dsMax.mxs.Controller> || None
+		"""
+		# return basic controllers
+		if ( name == 'transform' ):
+			return self._nativePointer.controller
+		
+		return AbstractSceneObject._nativeController( self, name )
+		
+	def _nativeCaches( self, cacheType = 0 ):
+		"""
+			\remarks	implements the AbstractSceneObject._nativeCaches method to return a list of the native caches that are applied to this object
+			\param		cacheType	<blur3d.constants.CacheType>	fitler by the inputed cache type
+			\return		<list> [ <variant> nativeCache, .. ]
+		"""
+		output = []
+		
+		from blur3d.constants import CacheType
+		
+		# store maxscript methods used
+		classof 	= mxs.classof
+		
+		# collect point cache modifiers
+		if ( not cacheType or cacheType & CacheType.Point_Cache ):
+			cls 	= mxs.Point_Cache
+			for modifier in self._nativePointer.modifiers:
+				if ( classof(modifier) == cls ):
+					output.append(modifier)
+		
+		# collect transform cache controllers
+		if ( not cacheType or cacheType & CacheType.Transform_Cache ):
+			cls 		= mxs.Transform_Cache
+			controller	= self._nativePointer.controller
+			while ( classof( controller ) == cls ):
+				output.append( controller )
+				controller = controller.basecontroller
+		
+		return output
+	
 	def _nativeChildren( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
@@ -92,6 +135,31 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<QColor>
 		"""
 		return self._nativePointer.wireColor
+	
+	def _setNativeController( self, name, nativeController ):
+		"""
+			\remarks	implements the AbstractSceneObject._setNativeController method to set the controller type at the inputed name to the given controller
+			\param		name				<str>
+			\param		nativeController	<Py3dMax.mxs.Controller> || None
+			\return		<bool> success
+		"""
+		# set a point cache controller
+		if ( name.startswith( 'modifiers[#Point_Cache]' ) ):
+			from blur3d.constants import CacheType
+			success = False
+			# set controllers within the cache system
+			for cache in self.caches( CacheType.Point_Cache ):
+				if ( cache._setNativeController( name.replace( 'modifiers[#Point_Cache].', '' ), nativeController ) ):
+					success = True
+			
+			return success
+		
+		# set a transform controller
+		elif ( name == 'transform' ):
+			self._nativePointer.controller = nativeController
+			return True
+		
+		return AbstractSceneObject._setNativeController( self, name, nativeController )
 		
 	def _setNativeLayer( self, nativeLayer ):
 		"""
@@ -200,16 +268,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.name.split( '.' )[-1]
 	
-	def hasProperty( self, key ):
-		"""
-			\remarks	implements the AbstractSceneObject.hasProperty method to return whether or not the inputed key is a property of this object
-			\sa			property, setProperty
-			\param		key		<str>
-			\return		<bool> found
-		"""
-		key = str(key)
-		return mxs.isProperty( self._nativePointer, key ) or mxs.hasProperty( self._nativePointer, key )
-	
 	def isFrozen( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.isFrozen to return whether or not this object is frozen(locked)
@@ -241,19 +299,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return str(self._nativePointer.name)
-		
-	def property( self, key, default = None ):
-		"""
-			\remarks	implements the AbstractSceneObject.property to return the value for the property of this object, or the default value if not found
-			\sa			hasProperty, setProperty
-			\param		key			<str>
-			\param		default		<variant>	default return value if not found
-			\return		<variant>
-		"""
-		result = self._scene._fromNativeValue( mxs.getProperty( self._nativePointer, str(key) ) )
-		if ( result == None ):
-			return default
-		return result
 		
 	def setDisplayName( self, name ):
 		"""
@@ -297,17 +342,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		self._nativePointer.name = str(name)
 		return True
 		
-	def setProperty( self, key, value ):
-		"""
-			\remarks	implements the AbstractSceneObject.setProperty to set the inputed object's property key to the given value
-			\sa			hasProperty, property
-			\param		key		<str>
-			\param		value	<variant>
-			\return		<bool> success
-		"""
-		mxs.setProperty( self._nativePointer, str(key), self._scene._toNativeValue(value) )
-		return True
-	
 	def setSelected( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setSelected to selects/deselects this object

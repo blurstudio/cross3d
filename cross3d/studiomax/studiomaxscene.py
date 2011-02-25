@@ -10,6 +10,7 @@
 
 from blurdev import debug
 from Py3dsMax 								import mxs
+	
 from blur3d.api.abstract.abstractscene 	import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
