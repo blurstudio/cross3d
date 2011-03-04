@@ -111,6 +111,13 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		data.setValue( 'layerGroupNames', names )
 		data.setValue( 'layerGroupStates', states )
 		
+		# update all the layers past this index
+		for layer in self._scene.layers():
+			ldata 	= layer.metaData()
+			gi 		= ldata.value('groupIndex') - 1
+			if ( index < gi ):
+				ldata.setValue( 'groupIndex', gi )
+		
 		return True
 	
 	def setName( self, name ):
