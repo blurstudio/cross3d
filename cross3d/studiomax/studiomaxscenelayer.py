@@ -170,6 +170,22 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# initialize the data properly
 		self._altMtlIndex		= self.metaData().value( 'currentAltMtlIndex', 0 ) - 1
 		self._altPropIndex		= self.metaData().value( 'currentAltPropIndex', 0 ) - 1
+	
+	def __syncNativeObjects( self, nativeObjects ):
+		# match the layer's override state to the objects
+		mtl = self._nativeMaterialOverride()
+		if ( mtl ):
+			self._scene._setNativeMaterialOverride( nativeObjects, mtl, options = self.materialOverrideFlags(), advancedState = self.materialOverrideAdvancedState() )
+		else:
+			self._scene._clearNativeMaterialOverride( nativeObjects )
+		
+		propSet = self._nativePropSetOverride()
+		if ( propSet ):
+			self._scene._setNativePropSetOverride( nativeObjects, propSet )
+		else:
+			self._scene._clearNativePropSetOverride( nativeObjects )
+
+		return True
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -209,9 +225,17 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
+		# add the nodes to this layer
 		addnode = self._nativePointer.addNode
+		hidden = self._nativePointer.isHidden
+		frozen = self._nativePointer.isfrozen
+		
 		for obj in nativeObjects:
 			addnode(obj)
+			obj.ishidden = hidden
+			obj.isfrozen = frozen
+		
+		self.__syncNativeObjects(nativeObjects)
 		return True
 	
 	def _clearNativeObjects( self ):

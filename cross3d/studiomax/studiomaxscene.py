@@ -348,9 +348,8 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		lay = mxs.layerManager.newLayerFromName( str(name) )
 		if ( lay ):
-			addnode = lay.addNode
-			for obj in nativeObjects:
-				addnode( obj )
+			from blur3d.api import SceneLayer
+			SceneLayer(self,lay)._addNativeObjects(nativeObjects)
 		return lay
 		
 	def _createNativeLayerGroup( self, name, nativeLayers = [] ):

@@ -15,9 +15,10 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		SceneWrapper.__init__( self, scene, nativeGroup )
 		
 		# define custom properties
-		self._materialOverride		= None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group
-		self._materialOverrideFlags	= 0				# blur3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
-		self._propSetOverride		= None			# blur3d.api.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
+		self._materialOverride				= None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group
+		self._materialOverrideFlags			= 0				# blur3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
+		self._materialOverrideAdvancedState = {}			# <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+		self._propSetOverride				= None			# blur3d.api.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -147,6 +148,13 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		"""
 		if ( options == -1 ):
 			options = self.materialOverrideFlags()
+		else:
+			self.setMaterialOverrideFlags(options)
+		
+		if ( advancedState == None ):
+			advancedState = self.materialOverrideAdvancedState()
+		else:
+			self.setMaterialOverrideAdvancedState( advancedState )
 			
 		return self._scene._setNativeMaterialOverride( self._nativeObjects(), nativeMaterial, options = options, advancedState = advancedState )
 	
@@ -341,6 +349,13 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 			return SceneMaterial( self.scene(), nativeMaterial )
 		return None
 	
+	def materialOverrideAdvancedState( self ):
+		"""
+			\remarks	return the current advanced material override state that the object group is in
+			\return		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+		"""
+		return self._materialOverrideAdvancedState
+	
 	def materialOverrideFlags( self ):
 		"""
 			\remarks	return the duplication flags for the override material
@@ -439,6 +454,14 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		"""
 		self._materialOverrideFlags = flags
 		return True
+	
+	def setMaterialOverrideAdvancedState( self, advancedState ):
+		"""
+			\remarks	set an advanced state for this object group to be in
+			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+			\return		<bool> success
+		"""
+		self._materialOverrideAdvancedState = advancedState
 	
 	def setAtmospherics( self, atmospherics ):
 		"""
