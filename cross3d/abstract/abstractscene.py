@@ -197,6 +197,19 @@ class AbstractScene( QObject ):
 		
 		return None
 	
+	def _currentNativeCamera( self ):
+		"""
+			\remarks	[abstract]	return the current active camera in the viewport for the scene
+			\return		<variant> nativeCamera
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return None
+	
 	def _currentNativeRenderer( self ):
 		"""
 			\remarks	[abstract]	return the current native renderer for this scene instance
@@ -616,6 +629,20 @@ class AbstractScene( QObject ):
 		
 		return False
 	
+	def _setCurrentNativeCamera( self, nativeCamera ):
+		"""
+			\remarks	[abstract] set the current viewport camera in the scene to the inputed camera
+			\param		<variant> nativeCamera
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return False
+	
 	def _setCurrentNativeRenderer( self, nativeRenderer ):
 		"""
 			\remarks	[abstract] set the current renderer to the inputed native renderer
@@ -769,6 +796,19 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
+	
+	def animationRange( self ):
+		"""
+			\remarks	[abstract] return the start and end frames for the animation range for the scene
+			\return		<tuple> ( <int> start, <int> end )
+		"""
+		from blurdev import debug
+				
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return (0,0)
 	
 	def atmospherics( self ):
 		"""
@@ -946,15 +986,16 @@ class AbstractScene( QObject ):
 			return SceneObject( self, nativeModel )
 		return None
 	
-	def currentLayerState( self ):
+	def currentCamera( self ):
 		"""
-			\remarks	records the current layer state to xml and returns the string
-			\return		<str> layerState
+			\remarks	return a SceneCamera instance containing the currently active camera in the scene
+			\return		<blur3d.api.SceneCamera> || None
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
-		self.recordLayerState( doc )
-		return doc.toxml()
+		nativeCamera = self._currentNativeCamera()
+		if ( nativeCamera ):
+			from blur3d.api import SceneCamera
+			return SceneCamera( self, nativeCamera)
+		return None
 	
 	def currentElement( self ):
 		"""
@@ -980,6 +1021,16 @@ class AbstractScene( QObject ):
 		
 		return ''
 	
+	def currentLayerState( self ):
+		"""
+			\remarks	records the current layer state to xml and returns the string
+			\return		<str> layerState
+		"""
+		from blurdev.XML import XMLDocument
+		doc = XMLDocument()
+		self.recordLayerState( doc )
+		return doc.toxml()
+	
 	def currentRenderer( self ):
 		"""
 			\remarks	return the current renderer assigned to this scene
@@ -997,6 +1048,19 @@ class AbstractScene( QObject ):
 			\return		<variant>
 		"""
 		return self._fromNativeValue( self._nativeCustomProperty( key, default ) )
+	
+	def defaultSubmitArgs( self ):
+		"""
+			\remarks	[abstract] return a collection of arguments and values for the current scene state for a render submission job using Blur's renderfarm submission interface
+			\return		<dict> { <str> key: <variant> value }
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return {}
 	
 	def emitLayerStateChanged( self ):
 		"""
@@ -1426,6 +1490,21 @@ class AbstractScene( QObject ):
 		"""
 		return self._renameNativeObjects( [ object.nativePointer() for object in objects ], names, display = display )
 	
+	def renderSize( self ):
+		"""
+			\remarks	[abstract] return the render output size for the scene
+			\return		<QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		
+		from blurdev import debug
+				
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return QSize()
+	
 	def reset( self ):
 		"""
 			\remarks	[abstract]	resets this scene for all the data and in the application
@@ -1487,6 +1566,20 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneObject
 		return [ SceneObject( self, obj ) for obj in self._nativeSelection() ]
+	
+	def setAnimationRange( self, animationRange ):
+		"""
+			\remarks	[abstract] return the start and end frames for the animation range for the scene
+			\param		animationRange 	<tuple> ( <int> start, <int> end )
+			\return		<bool> success
+		"""
+		from blurdev import debug
+				
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return False
 	
 	def setEnvironmentMap( self, sceneMap ):
 		"""
@@ -1570,6 +1663,18 @@ class AbstractScene( QObject ):
 		"""
 		return self._setCachedNativeMaterials( cacheType, [ material.nativePointer() for material in materials ] )
 	
+	def setCurrentCamera( self, camera ):
+		"""
+			\remarks	return a SceneCamera instance containing the currently active camera in the scene
+			\param		camera	<blur3d.api.SceneCamera> || None
+			\return		<bool> success
+		"""
+		nativeCamera = None
+		if ( camera ):
+			nativeCamera = camera.nativePointer()
+		
+		return self._setCurrentNativeCamera( nativeCamera )
+	
 	def setCurrentLayerState( self, layerState ):
 		"""
 			\remarks	restore the layer state from the inputed xml string
@@ -1652,6 +1757,20 @@ class AbstractScene( QObject ):
 			nativeMaterial = material.nativePointer()
 			
 		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options, advancedState = advancedState )
+	
+	def setRenderSize( self, size ):
+		"""
+			\remarks	[abstract] set the render output size for the scene
+			\param		size	<QSize>
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return False
 	
 	def setSelection( self, objects ):
 		"""

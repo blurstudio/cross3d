@@ -420,6 +420,13 @@ class StudiomaxScene( AbstractScene ):
 					
 		return None
 	
+	def _currentNativeCamera( self ):
+		"""
+			\remarks	implements AbstractScene._currentNativeCamera method to return the current native camera that is in the viewport for the scene
+			\return		<Py3dsMax.mxs.Camera> || None
+		"""
+		return mxs.viewport.getCamera()
+	
 	def _currentNativeRenderer( self ):
 		"""
 			\remarks	implements AbstractScene._currentNativeRenderer method to return the current native renderer for this scene instance
@@ -1257,6 +1264,14 @@ class StudiomaxScene( AbstractScene ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	def animationRange( self ):
+		"""
+			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
+			\return		<tuple> (<int> startFrame,<int> endFrame>)
+		"""
+		r = mxs.animationRange
+		return ( int(r.start), int(r.end) )
+			
 	def checkForSave( self ):
 		"""
 			\remarks	implements AbstractScene.checkForSave method to prompt the user to save and continue, returning false on a user cancel
@@ -1309,6 +1324,51 @@ class StudiomaxScene( AbstractScene ):
 			\return		<str>
 		"""
 		return mxs.maxFilePath + mxs.maxFileName
+	
+	def defaultSubmitArgs( self ):
+		"""
+			\remarks	implements AbstractScene.defaultSubmitArgs method to return a collection of information for the blur rendering submission system
+			\return		<dict> { <str> key: <variant> value, .. }
+		"""
+		a = {}
+		
+		import os.path
+		
+		a['flag_w'] 		= mxs.renderWidth
+		a['flag_h'] 		= mxs.renderHeight
+		a['frameStart']		= int(mxs.animationRange.start)
+		a['frameEnd']		= int(mxs.animationRange.end)
+		a['outputPath']		= os.path.normpath( mxs.rendOutputFilename )
+		a['fileOriginal']	= os.path.normpath( mxs.maxFilePath + mxs.maxFileName )
+		a['flag_xv']		= int(mxs.rendColorCheck)				# default: off
+		a['flag_x2']		= int(mxs.rendForce2Side)				# default: off
+		a['flag_xa']		= int(not mxs.rendAtmosphere)			# default: on
+		a['flag_xe']		= int(not mxs.renderEffects)			# default: on
+		a['flag_xk']		= int(mxs.rendSuperBlack)				# default: off
+		a['flag_xd']		= int(not mxs.renderDisplacements)		# default: on
+		a['flag_xh']		= int(mxs.rendHidden)					# default: off
+		a['flag_xf']		= int(mxs.rendFieldRender)				# default: off
+		a['flag_xp']		= int(mxs.rendDither256)				# default: off
+		a['flag_xc']		= int(mxs.rendDitherTrue)				# default: off
+		
+		rtype = mxs.rendTimeType
+		if ( rtype == 1 ):
+			a['frameList'] = int(mxs.slidertime.frame)
+		elif ( rtype == 2 ):
+			a['frameList'] = '%s-%s' % (int(mxs.animationRange.start),int(mxs.animationRange.end))
+		elif ( rtype == 3 ):
+			a['frameList'] = '%s-%s' % (int(mxs.rendStart.frame),int(mxs.rendEnd.frame))
+		elif ( rtype == 4 ):
+			a['frameList'] = mxs.rendPickupFrames
+		
+		# record the camera options
+		camera = mxs.viewport.getCamera()
+		if ( camera ):
+			a['camera'] = camera.name
+		else:
+			a['camera'] = 'undefined'
+		
+		return a
 	
 	def holdCurrentState( self ):
 		"""
@@ -1383,6 +1443,14 @@ class StudiomaxScene( AbstractScene ):
 		
 		return self._fromNativeValue( value )
 	
+	def renderSize( self ):
+		"""
+			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders
+			\return		<QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		return QSize( mxs.renderWidth, mxs.renderHeight )
+	
 	def reset( self ):
 		"""
 			\remarks	implements AbstractScene.reset to reset this scene for all the data and in the application
@@ -1419,6 +1487,25 @@ class StudiomaxScene( AbstractScene ):
 			mxs.saveMaxFile( str(filename) )
 			return True
 		return False
+	
+	def setAnimationRange( self, animationRange ):
+		"""
+			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
+			\param		animationRange	<tuple> ( <int> start, <int> end )
+			\return		<bool> success
+		"""
+		start, end 			= animationRange
+		mxs.animationRange 	= mxs.interval( start, end )
+		return True
+	
+	def setRenderSize( self, size ):
+		"""
+			\remarks	implements AbstractScene.setRenderSize method to set the current output width and height for renders for this scene
+			\param		size	<QSize>
+			\return		<bool> success
+		"""
+		mxs.renderWidth 	= size.width()
+		mxs.renderHeight	= size.height()
 	
 	def setLayerGroups( self, layerGroups ):
 		"""
