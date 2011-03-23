@@ -453,7 +453,7 @@ class StudiomaxScene( AbstractScene ):
 		name 	= str(name)
 		output 		= None
 		if ( name ):
-			output = mxs.getNogyName( str(name) )
+			output = mxs.getNodeByName( str(name) )
 		
 		if ( not output and uniqueId ):
 			output = mxs.refByUniqueId( uniqueId )
@@ -1271,7 +1271,7 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		r = mxs.animationRange
 		return ( int(r.start), int(r.end) )
-			
+	
 	def checkForSave( self ):
 		"""
 			\remarks	implements AbstractScene.checkForSave method to prompt the user to save and continue, returning false on a user cancel
@@ -1325,51 +1325,6 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.maxFilePath + mxs.maxFileName
 	
-	def defaultSubmitArgs( self ):
-		"""
-			\remarks	implements AbstractScene.defaultSubmitArgs method to return a collection of information for the blur rendering submission system
-			\return		<dict> { <str> key: <variant> value, .. }
-		"""
-		a = {}
-		
-		import os.path
-		
-		a['flag_w'] 		= mxs.renderWidth
-		a['flag_h'] 		= mxs.renderHeight
-		a['frameStart']		= int(mxs.animationRange.start)
-		a['frameEnd']		= int(mxs.animationRange.end)
-		a['outputPath']		= os.path.normpath( mxs.rendOutputFilename )
-		a['fileOriginal']	= os.path.normpath( mxs.maxFilePath + mxs.maxFileName )
-		a['flag_xv']		= int(mxs.rendColorCheck)				# default: off
-		a['flag_x2']		= int(mxs.rendForce2Side)				# default: off
-		a['flag_xa']		= int(not mxs.rendAtmosphere)			# default: on
-		a['flag_xe']		= int(not mxs.renderEffects)			# default: on
-		a['flag_xk']		= int(mxs.rendSuperBlack)				# default: off
-		a['flag_xd']		= int(not mxs.renderDisplacements)		# default: on
-		a['flag_xh']		= int(mxs.rendHidden)					# default: off
-		a['flag_xf']		= int(mxs.rendFieldRender)				# default: off
-		a['flag_xp']		= int(mxs.rendDither256)				# default: off
-		a['flag_xc']		= int(mxs.rendDitherTrue)				# default: off
-		
-		rtype = mxs.rendTimeType
-		if ( rtype == 1 ):
-			a['frameList'] = int(mxs.slidertime.frame)
-		elif ( rtype == 2 ):
-			a['frameList'] = '%s-%s' % (int(mxs.animationRange.start),int(mxs.animationRange.end))
-		elif ( rtype == 3 ):
-			a['frameList'] = '%s-%s' % (int(mxs.rendStart.frame),int(mxs.rendEnd.frame))
-		elif ( rtype == 4 ):
-			a['frameList'] = mxs.rendPickupFrames
-		
-		# record the camera options
-		camera = mxs.viewport.getCamera()
-		if ( camera ):
-			a['camera'] = camera.name
-		else:
-			a['camera'] = 'undefined'
-		
-		return a
-	
 	def holdCurrentState( self ):
 		"""
 			\remarks	implements AbstractScene.holdCurrentState to protect the current scene as it is to allow for manipulation and provide a restore point
@@ -1390,6 +1345,13 @@ class StudiomaxScene( AbstractScene ):
 			\return		<list> [ <str>, .. ]
 		"""
 		return [ 'Max files (*.max)' ]
+	
+	def isSlaveMode( self ):
+		"""
+			\remarks	[abstract] return whether or not the application is currently being run as a slave
+			\return		<bool> state
+		"""
+		return mxs.getQuietMode()
 	
 	def loadFile( self, filename = '' ):
 		"""

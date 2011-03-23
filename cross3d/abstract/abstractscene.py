@@ -31,6 +31,14 @@ class AbstractScene( QObject ):
 	layerGroupCreated			= pyqtSignal('str')
 	layerGroupRemoved			= pyqtSignal('str')
 	
+	# generic signals
+	progressUpdated				= pyqtSignal('str',int,'str')		# section, % complete (0-100), message
+	progressErrored				= pyqtSignal('str','str')			# section, error message
+	
+	# submit signals
+	submitSuccess				= pyqtSignal()
+	submitError					= pyqtSignal('str')
+	
 	# create the scene instance
 	_instance = None
 	
@@ -986,6 +994,15 @@ class AbstractScene( QObject ):
 			return SceneObject( self, nativeModel )
 		return None
 	
+	def createSubmitter( self, submitType ):
+		"""
+			\remarks	creates a new SceneSubmitter instance initialized for the inputed submission type
+			\param		submitType	<blur3d.constants.SubmitType.
+			\return		<blur3d.api.SceneSubmitter>
+		"""
+		from blur3d.api import SceneSubmitter
+		return SceneSubmitter( self, submitType )
+	
 	def currentCamera( self ):
 		"""
 			\remarks	return a SceneCamera instance containing the currently active camera in the scene
@@ -1000,6 +1017,7 @@ class AbstractScene( QObject ):
 	def currentElement( self ):
 		"""
 			\remarks	return the trax element that is currently loaded based on the filename of this scene
+			\warning	this method requires Blur's trax asset tracking system to be installed to work
 			\return		<trax.api.data.Element> || None
 		"""
 		try:
@@ -1049,25 +1067,60 @@ class AbstractScene( QObject ):
 		"""
 		return self._fromNativeValue( self._nativeCustomProperty( key, default ) )
 	
-	def defaultSubmitArgs( self ):
-		"""
-			\remarks	[abstract] return a collection of arguments and values for the current scene state for a render submission job using Blur's renderfarm submission interface
-			\return		<dict> { <str> key: <variant> value }
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
-		return {}
-	
 	def emitLayerStateChanged( self ):
 		"""
 			\remarks	emits the layerStateChanged signal provided signals are not blocked
 		"""
 		if ( not self.signalsBlocked() ):
 			self.layerStateChanged.emit()
+	
+	def emitProgressUpdated( self, section, percent = 100, message = '' ):
+		"""
+			\remarks	emits the progress updated signal provided signals are not blocked
+			\param		section		<str>	progress section
+			\param		percent		<int>	(0-100)
+			\param		message		<str>	message to display
+		"""
+		if ( not self.signalsBlocked() ):
+			self.progressUpdated.emit( section, percent, message )
+		
+	def emitProgressErrored( self, section, error ):
+		"""
+			\remarks	emits the progress errored signal to update the error information
+			\param		section		<str>		progress section
+			\param		error		<str>		error information
+		"""
+		if ( not self.signalsBlocked() ):
+			self.progressErrored.emit( section, error )
+	
+	def emitSubmitError( self, error, progressSection = 'Submitting Job' ):
+		"""
+			\remarks	emits the submit success signal if the signals are not blocked and cleans the submit process
+			\param		error				<str>	resulting error feedback
+			\param		progressSection		<str>	the name of the progress section to be updated using emitProgressUpdated
+		"""
+		from PyQt4.QtCore import Qt
+		from PyQt4.QtGui import QApplication
+		
+		QApplication.instance().restoreOverrideCursor()
+		
+		if ( not self.signalsBlocked() ):
+			self.progressErrored.emit( progressSection, error )
+			self.submitError.emit(error)
+	
+	def emitSubmitSuccess( self, progressSection = 'Submitting Job' ):
+		"""
+			\remarks	emits the submit success signal if the signals are not blocked and cleans the submit process
+			\param		progressSection		<str>	the name of the progress section to be updated using emitProgressUpdated
+		"""
+		from PyQt4.QtCore import Qt
+		from PyQt4.QtGui import QApplication
+		
+		QApplication.instance().restoreOverrideCursor()
+		
+		if ( not self.signalsBlocked() ):
+			self.emitProgressUpdated(progressSection)
+			self.submitSuccess.emit()
 	
 	def environmentMap( self ):
 		"""
@@ -1273,6 +1326,19 @@ class AbstractScene( QObject ):
 			\return		<bool> overridden
 		"""
 		return self._nativeEnvironmentMapOverride() != None
+	
+	def isSlaveMode( self ):
+		"""
+			\remarks	[abstract] return whether or not the application is currently being run as a slave
+			\return		<bool> state
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return False
 	
 	def isolateObjects( self, objects, state ):
 		"""
@@ -1490,6 +1556,19 @@ class AbstractScene( QObject ):
 		"""
 		return self._renameNativeObjects( [ object.nativePointer() for object in objects ], names, display = display )
 	
+	def renderOutputPath( self ):
+		"""
+			\remarks	[abstract] return the render output file path for the scene
+			\return		<str>
+		"""
+		from blurdev import debug
+				
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return ''
+		
 	def renderSize( self ):
 		"""
 			\remarks	[abstract] return the render output size for the scene
@@ -1758,6 +1837,20 @@ class AbstractScene( QObject ):
 			
 		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options, advancedState = advancedState )
 	
+	def setRenderOutputPath( self, outputPath ):
+		"""
+			\remarks	[abstract] set the render output path for the scene
+			\param		outputPath	<str>
+			\return		<bool> success
+		"""
+		from blurdev import debug
+		
+		# when debugging, raise an error
+		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
+			raise NotImplementedError
+
+		return False
+	
 	def setRenderSize( self, size ):
 		"""
 			\remarks	[abstract] set the render output size for the scene
@@ -1810,6 +1903,14 @@ class AbstractScene( QObject ):
 			\return		<str>
 		"""
 		return ''
+	
+	def stats( self ):
+		"""
+			\remarks	return an instance of blur3d.api.SceneStats to be able to collect information on this scene
+			\return		<blur3d.api.SceneStats>
+		"""
+		from blur3d.api import SceneStats
+		return SceneStats(self)
 	
 	def toggleVisibleState( self, objects = None, options = None ):
 		"""

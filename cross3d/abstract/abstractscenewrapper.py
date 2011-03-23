@@ -20,7 +20,7 @@ class AbstractSceneWrapper:
 			return other._nativePointer == self._nativePointer
 		return False
 		
-	def __init__( self, scene, nativePointer ):
+	def __init__( self, scene, nativePointer = None ):
 		"""
 			\remarks	initialize the abstract scene controller
 		"""
@@ -295,6 +295,9 @@ class AbstractSceneWrapper:
 		
 		return 0
 	
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												static/class methods
+	#------------------------------------------------------------------------------------------------------------------------
 	@classmethod
 	def fromXml( cls, scene, xml ):
 		"""

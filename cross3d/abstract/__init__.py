@@ -27,3 +27,5 @@ def init():
 	import abstractsceneanimationcontroller
 	import abstractsceneanimationkey
 	import abstractscenecache
+	import abstractscenesubmitter
+	import abstractscenestats

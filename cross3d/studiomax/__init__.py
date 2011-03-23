@@ -32,3 +32,4 @@ def init():
 	import studiomaxsceneanimationcontroller
 	import studiomaxsceneanimationkey
 	import studiomaxscenecache
+	import studiomaxscenesubmitter
