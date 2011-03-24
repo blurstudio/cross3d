@@ -76,12 +76,12 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		
 		return True
 	
-	def _prepareRemoteRenderSubmit( self ):
+	def _prepareRemoteSubmit( self ):
 		"""
 			\remarks	[virtual] provide any processing that needs to occur for a remote render submission
 			\return		<bool> success
 		"""
-		AbstractSceneSubmitter._prepareRemoteRenderSubmit( self )
+		AbstractSceneSubmitter._prepareRemoteSubmit( self )
 		
 		import os
 		jobMaxFile 	= os.path.normpath('c:/temp/maxhold.mx')
@@ -89,7 +89,8 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		
 		# create max hold file
 		success = mxs.saveMaxFile( jobMaxFile, clearNeedSaveFlag = False, useNewFile = False, quiet = True )
-		self._additionalFiles.append( jobMaxFile )
+		if ( not jobMaxFile in self._additionalFiles ):
+			self._additionalFiles.append( jobMaxFile )
 		
 		# create job stat file
 		if ( os.path.exists(jobStatFile) ):

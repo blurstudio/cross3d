@@ -11,7 +11,7 @@
 from blur3d.api import SceneWrapper
 
 RENDER_PROGRESS_SECTIONS 	= [ 'Validating Scene', 'Pre-Processing Scene', 'Post-Processing Scene' ]
-REMOTE_PROGRESS_SECTIONS	= [ 'Validating Scene', 'Packaging Files' ]
+SCRIPT_PROGRESS_SECTIONS	= [ 'Preparing Script', 'Archiving Files' ]
 SUBMIT_PROGRESS_SECTIONS	= [ 'Preparing to Submit', 'Submitted to Farm', 'Waiting for Response' ]
 
 class AbstractSceneSubmitter( SceneWrapper ):
@@ -191,7 +191,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		"""
 		return True
 	
-	def _prepareScriptSubmit( self ):
+	def _prepareRemoteSubmit( self ):
 		"""
 			\remarks	[virtual] provide any processing that needs to occur for a remote render submission
 			\return		<bool> success
@@ -282,36 +282,55 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		from blur3d.constants import SubmitFlags, SubmitType
 		
 		scene = self.scene()
-		
-		temparchivefile = 'c:/temp/archive.zip'
 		tempscriptfile	= 'c:/temp/script.py'
 		
 		# make sure this instance has a remote render script defined
 		if ( not self.RemoteRenderScript ):
-			scene.emitProgressErrored( REMOTE_PROGRESS_SECTIONS[0], 'There is no remote render script defined.' )
+			scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'There is no remote render script defined.' )
 			return False
 		
 		# remove the old archive
 		import os
 		try:
-			if ( os.path.exists(temparchivefile) ):
-				os.remove(temparchivefile)
 			if ( os.path.exists(tempscriptfile) ):
 				os.remove(tempscriptfile)
 		except:
-			scene.emitProgressErrored( REMOTE_PROGRESS_SECTIONS[0], 'Could not remove the temporary archive/script files.' )
+			scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'Could not remove the temporary render script files.' )
 			return False
 		
 		# create the remote submission information
 		submitter = self.scene().createSubmitter(SubmitType.Script)
-		submitter.setCustomArg( 'script', self.RemoteRenderScript )
-		submitter.setAdditionalFiles( self.renderElements() )
+		
+		# save the script to a custom location
+		f = open( tempscriptfile, 'w' )
+		f.write( self.RemoteRenderScript )
+		f.close()
+		
+		# create the script with the remote render script
+		submitter.setCustomArg( 'script', tempscriptfile )
 		
 		# collect the additional files for the script submission
 		filenames = []
 		for filename in self.renderElements():
 			filenames += [ filename ] + glob.glob( os.path.splitext(filename)[0] + '*.*' )
+			
 		submitter.setAdditionalFiles( filenames )
+		
+		if ( not submitter._prepareRemoteSubmit() ):
+			return False
+		
+		# calculate the number of frames for the submission script as the number of render elements that need to be loaded
+		num_elements = len(self.renderElements())
+		if ( num_elements > 1 ):
+			submitter.setFrameList( '1-%i' % num_elements )
+			
+			# if we are deleting hidden geometry, force the packet size to 1
+			if ( self.hasSubmitFlag( SubmitFlags.DeleteHiddenGeometry ) ):
+				submitter.setPacketSize( 1 )
+			
+			# otherwise, set the packet size as the length of the elements
+			else:
+				submitter.setPacketSize( num_elements )
 		
 		submitter.submit()
 		
@@ -321,51 +340,38 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\sa			submit
 			\return		<bool> success
 		"""
+		import os.path
+		
+		script = self.customArg( 'script' )
+		if ( not script ):
+			return False
+		
 		scene = self.scene()
 		
-		# prepare the scene for remote submission
-		if ( not self._preparScriptSubmit() ):
-			scene.emitProgressErrored( REMOTE_PROGRESS_SECTIONS[0], 'Could not prepare the scene for remote submission' )
-			return False
-		
-		scene.emitProgressUpdated( REMOTE_PROGRESS_SECTIONS[0], 100 )
-		
-		# calculate the number of frames for the submission script as the number of render elements that need to be loaded
-		num_elements = len(self.renderElements())
-		if ( num_elements > 1 ):
-			submitter.setFrameList( '1-%i' % num_elements )
-			
-			# if we are deleting hidden geometry, force the packet size to 1
-			if ( self.hasSubmitFlag( SubmitFlags.DeleteHiddenGeometry ) ):
-				self.setPacketSize( 1 )
-			
-			# otherwise, set the packet size as the length of the elements
-			else:
-				self.setPacketSize( num_elements )
-			
-		# otherwise, submit the scene as is
-		else:
-			submitter.setFrameList( '1' )
-			submitter.setPacketSize( 1 )
-		
-		# create the submission script
-		f = open(tempscriptfile,'w')
-		f.write( self.RemoteRenderScript )
-		f.close()
-		
 		# create the submission package
-		from blurdev import zipper
-		print 'zipping', ([tempscriptfile] + submitter._additionalFiles)
-		if ( not zipper.packageFiles( [ tempscriptfile ] + self._additionalFiles, temparchivefile ) ):
-			scene.emitProgressErrored( REMOTE_PROGRESS_SECTIONS[1], 'Could not package the files together' )
-			return False
+		if ( self._additionalFiles ):
+			temparchivefile = 'c:/temp/archive.zip'
+			try:
+				if ( os.path.exists(temparchivefile) ):
+					os.remove(temparchivefile)
+			except:
+				scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'Could not remove the temporary archive location.' )
+				return False
+			
+			scene.emitProgressUpdated( SCRIPT_PROGRESS_SECTIONS[1], 100 )
+				
+			from blurdev import zipper
+			print 'zipping', ([script] + self._additionalFiles)
+			if ( not zipper.packageFiles( [script] + self._additionalFiles, temparchivefile ) ):
+				scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[1], 'Could not package the files together' )
+				return False
+			
+			self.setFileName( temparchivefile )
 		
-		scene.emitProgressUpdated( REMOTE_PROGRESS_SECTIONS[1], 100 )
+		scene.emitProgressUpdated( SCRIPT_PROGRESS_SECTIONS[1], 100 )
 		
-		# submit the remote submitter
-		submitter.setFileName( temparchivefile )
-		return submitter._submit()
-		
+		# submit the script job
+		return self._submit()
 		
 	def _uncache( self ):
 		"""
@@ -815,6 +821,13 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\return		<list> [ <str>, .. ]
 		"""
 		return self._serviceNames
+	
+	def setAdditionalFiles( self, filenames ):
+		"""
+			\remarks	set the list of additional filenames that will be used when packaging this job for submission
+			\param		filenames	<list> [ <str> filename, .. ]
+		"""
+		self._additionalFiles = filenames
 			
 	def setAutoPacketSize( self, state = True ):
 		"""
@@ -1137,9 +1150,13 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		# include the render submission settings
 		if ( self.submitType() == SubmitType.Render ):
 			if ( self.hasSubmitFlag( SubmitFlags.RemoteSubmit ) ):
-				sections += REMOTE_PROGRESS_SECTIONS
+				sections += SCRIPT_PROGRESS_SECTIONS
 			else:
 				sections += RENDER_PROGRESS_SECTIONS
+		
+		# include the script progress sections
+		elif ( self.submitType() == SubmitType.Script ):
+			sectiosn += SCRIPT_PROGRESS_SECTIONS
 		
 		sections += SUBMIT_PROGRESS_SECTIONS
 		
