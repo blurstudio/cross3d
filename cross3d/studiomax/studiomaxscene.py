@@ -1503,12 +1503,13 @@ class StudiomaxScene( AbstractScene ):
 									version of the software being run.
 			\return		<str>
 		"""
-		# show the bit amount
-		output = '%s_x32'
-		if ( mxs.is64bitApplication() ):
-			output = '%s_x64'
-			
-		return output % str( mxs.maxversion()[0] )
+		mversion 	= mxs.maxVersion()[0]/1000
+		sixtyfour	= ''
+		if ( mversion > 10 ):
+			mversion = 2009 + (mversion-11)		# shifted to years at version 11
+		if ( mxs.is64BitApplication() ):
+			sixtyfour = '_64'
+		return 'MAX%i%s' % (mversion,sixtyfour)
 	
 # register the symbol
 from blur3d import api

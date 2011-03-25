@@ -42,19 +42,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		
 		return None
 	
-	def _nativeController( self, name ):
-		"""
-			\remarks	implements the AbstractSceneObject._findNativeController method to find the controller at the	
-						inputed name for this object
-			\param		name		<str>
-			\return		<Py3dsMax.mxs.Controller> || None
-		"""
-		# return basic controllers
-		if ( name == 'transform' ):
-			return self._nativePointer.controller
-		
-		return AbstractSceneObject._nativeController( self, name )
-		
 	def _nativeCaches( self, cacheType = 0 ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeCaches method to return a list of the native caches that are applied to this object
@@ -153,11 +140,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 					success = True
 			
 			return success
-		
-		# set a transform controller
-		elif ( name == 'transform' ):
-			self._nativePointer.controller = nativeController
-			return True
 		
 		return AbstractSceneObject._setNativeController( self, name, nativeController )
 		

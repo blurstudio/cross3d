@@ -24,10 +24,31 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		return mxs.copy(self._nativePointer)
 	
 	def _nativeController( self, name ):
-		# return the controller for a property on this object
-		if ( name in self.propertyNames() ):
-			return mxs.getPropertyController( self._nativePointer, name )
-		return None
+		if ( not name ):
+			return ''
+			
+		# strip out controller references
+		name 	= name.replace( '.controller', '' )
+		parent 	= self._nativePointer
+		
+		# look up the parent
+		splt			= name.split('.')
+		controller	 	= None
+		parent			= self._nativePointer
+		
+		# start with the transform controller if necessary
+		if ( splt[0] == 'transform' ):
+			parent = parent.controller
+			controller = parent
+			splt = splt[1:]
+		
+		for section in splt:
+			controller = mxs.getPropertyController( parent, section )
+			if ( not controller ):
+				return None
+			parent = controller
+		
+		return controller
 	
 	def _nativeProperty( self, key, default = None ):
 		"""
@@ -51,17 +72,30 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		return True
 	
 	def _setNativeController( self, name, nativeController ):
-		# check for the property controller
+		# strip out controller references
 		name = name.replace( '.controller', '' )
 		
-		# set the name
-		splt = name.split( '.' )
-		propname = splt[-1]
-		if ( propname in self.propertyNames() ):
-			mxs.setPropertyController( self._nativePointer, propname, nativeController )
-			return True
+		# look up the parent
+		splt 		= name.split( '.' )
+		parent 		= self._nativePointer
 		
-		return False
+		# start with the transform controller if necessary
+		if ( splt[0] == 'transform' ):
+			parent = parent.controller
+			splt = splt[1:]
+		
+		for section in splt[:-1]:
+			parent = mxs.getPropertyController( parent, section )
+			if ( not parent ):
+				return False
+		
+		# set the property
+		propname 	= splt[-1]
+		try:
+			mxs.setPropertyController( parent, propname, nativeController )
+			return True
+		except:
+			return False
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
