@@ -8,14 +8,17 @@
 #	\date		03/18/11
 #
 
+from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
-
-RENDER_PROGRESS_SECTIONS 	= [ 'Validating Scene', 'Pre-Processing Scene', 'Post-Processing Scene' ]
-SCRIPT_PROGRESS_SECTIONS	= [ 'Preparing Script', 'Archiving Files' ]
-SUBMIT_PROGRESS_SECTIONS	= [ 'Preparing to Submit', 'Submitted to Farm', 'Waiting for Response' ]
 
 class AbstractSceneSubmitter( SceneWrapper ):
 	__cache = []
+	
+	# define progress sections
+	RENDER_PROGRESS_SECTIONS 	= [ 'Validating Scene', 'Pre-Processing Scene', 'Post-Processing Scene' ]
+	SCRIPT_PROGRESS_SECTIONS	= [ 'Preparing Script', 'Archiving Files' ]
+	SUBMIT_PROGRESS_SECTIONS	= [ 'Preparing to Submit', 'Submitted to Farm', 'Waiting for Response' ]
+
 	
 	# define submission scripts
 	RemoteRenderScript = ''				# needs to be redefined in a subclass
@@ -123,7 +126,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		output['user']					= self._username
 		output['host']					= self._hostname
 		output['projectName']			= self._projectName
-		output['hosts']					= ','.join( self._hostNames )
+		output['hostList']				= ','.join( self._hostNames )
 		output['services']				= ','.join( self._serviceNames )
 		output['priority']				= self._priority
 		output['frameList']				= self._frameList
@@ -183,28 +186,15 @@ class AbstractSceneSubmitter( SceneWrapper ):
 				# uncache the submitter when the submission completes
 				self._nativePointer.submitSuccess.connect(	self._uncache )
 				self._nativePointer.submitError.connect(	self._uncache )
-		
+	
+	@abstractmethod
 	def _prepareRenderSubmit( self ):
 		"""
-			\remarks	[virtual] provide any processing that needs to occur for a render submission, by default, this method does nothing
+			\remarks	provide any processing that needs to occur for a render submission, by default, this method does nothing
 			\return		<bool> success
 		"""
 		return True
 	
-	def _prepareRemoteSubmit( self ):
-		"""
-			\remarks	[virtual] provide any processing that needs to occur for a remote render submission
-			\return		<bool> success
-		"""
-		# collect the render elements and all associated files with the render elements
-		import glob, os.path
-		
-		# create the xml definition file for this submitter
-		self.saveXml( 'c:/temp/submitter.xml' )
-		self._additionalFiles.append( 'c:/temp/submitter.xml' )
-		
-		return True
-		
 	def _submit( self ):
 		"""
 			\remarks	private method for actually performing the submission and caching
@@ -222,16 +212,21 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		self._nativePointer.submitError.connect(	scene.emitSubmitError )
 		
 		# collect all of the arguments that will be supplied for submission
-		scene.emitProgressUpdated( SUBMIT_PROGRESS_SECTIONS[0], 100 )
+		scene.emitProgressUpdated( self.SUBMIT_PROGRESS_SECTIONS[0], 100 )
 		self._nativePointer.applyArgs( self._buildArgs() )
-		scene.emitProgressUpdated( SUBMIT_PROGRESS_SECTIONS[1], 100 )
+		scene.emitProgressUpdated( self.SUBMIT_PROGRESS_SECTIONS[1], 100 )
 		self._nativePointer.submit()
 		
 		from blurdev import debug
+		if ( debug.debugLevel() ):
+			self.saveXml( 'c:/temp/submission_settings.xml' )
+		
 		if ( debug.isDebugLevel( debug.DebugLevel.Mid ) ):
 			self._nativePointer.waitForFinished()
 		else:
 			self._cache()
+		
+		return True
 			
 	def _submitRender( self ):
 		"""
@@ -245,22 +240,22 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		
 		# record render submission information
 		if ( not self._prepareRenderSubmit() ):
-			scene.emitProgressErrored( RENDER_PROGRESS_SECTIONS[0], 'The submission data was not able to be saved properly.' )
+			scene.emitProgressErrored( self.RENDER_PROGRESS_SECTIONS[0], 'The submission data was not able to be saved properly.' )
 			return False
 		
 		# make sure we have a valid output path specified
 		outputpath = self.customArg('outputPath')
 		if ( not outputpath ):
-			scene.emitProgressErrored( RENDER_PROGRESS_SECTIONS[0], 'There is no output path specified for this Render submission' )
+			scene.emitProgressErrored( self.RENDER_PROGRESS_SECTIONS[0], 'There is no output path specified for this Render submission' )
 			return False
 		
-		scene.emitProgressUpdated( RENDER_PROGRESS_SECTIONS[0], 100 )
+		scene.emitProgressUpdated( self.RENDER_PROGRESS_SECTIONS[0], 100 )
 		
 		# delete old frames if necessary
 		if ( self.hasSubmitFlag( SubmitFlags.DeleteOldFrames ) ):
 			self.deleteOldFrames( outputpath )
 		
-		scene.emitProgressUpdated( RENDER_PROGRESS_SECTIONS[1], 100 )
+		scene.emitProgressUpdated( self.RENDER_PROGRESS_SECTIONS[1], 100 )
 		
 		# submit the job
 		self._submit()
@@ -269,7 +264,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		if ( self.hasSubmitFlag( SubmitFlags.WriteInfoFile ) ):
 			self.writeInfoFile( outputpath )
 		
-		scene.emitProgressUpdated( RENDER_PROGRESS_SECTIONS[2], 100 )
+		scene.emitProgressUpdated( self.RENDER_PROGRESS_SECTIONS[2], 100 )
 				
 		return True
 	
@@ -282,42 +277,27 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		from blur3d.constants import SubmitFlags, SubmitType
 		
 		scene = self.scene()
-		tempscriptfile	= 'c:/temp/script.py'
 		
 		# make sure this instance has a remote render script defined
 		if ( not self.RemoteRenderScript ):
-			scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'There is no remote render script defined.' )
-			return False
-		
-		# remove the old archive
-		import os
-		try:
-			if ( os.path.exists(tempscriptfile) ):
-				os.remove(tempscriptfile)
-		except:
-			scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'Could not remove the temporary render script files.' )
+			scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[0], 'There is no remote render script defined.' )
 			return False
 		
 		# create the remote submission information
 		submitter = self.scene().createSubmitter(SubmitType.Script)
-		
-		# save the script to a custom location
-		f = open( tempscriptfile, 'w' )
-		f.write( self.RemoteRenderScript )
-		f.close()
-		
-		# create the script with the remote render script
-		submitter.setCustomArg( 'script', tempscriptfile )
+		submitter.setCustomArg( 'code', self.RemoteRenderScript )
 		
 		# collect the additional files for the script submission
 		filenames = []
 		for filename in self.renderElements():
 			filenames += [ filename ] + glob.glob( os.path.splitext(filename)[0] + '*.*' )
-			
-		submitter.setAdditionalFiles( filenames )
 		
-		if ( not submitter._prepareRemoteSubmit() ):
-			return False
+		# create the xml definition file for this submitter
+		submitterfile = 'c:/temp/submitter.xml'
+		self.saveXml( submitterfile )
+		filenames.append( submitterfile )
+		
+		submitter.setAdditionalFiles( filenames )
 		
 		# calculate the number of frames for the submission script as the number of render elements that need to be loaded
 		num_elements = len(self.renderElements())
@@ -332,7 +312,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			else:
 				submitter.setPacketSize( num_elements )
 		
-		submitter.submit()
+		return submitter.submit()
 		
 	def _submitScript( self ):
 		"""
@@ -340,35 +320,36 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\sa			submit
 			\return		<bool> success
 		"""
-		import os.path
-		
-		script = self.customArg( 'script' )
-		if ( not script ):
-			return False
-		
+		import os
 		scene = self.scene()
+		scriptFile = self.fileName()
+		
+		# use the script file for submission
+		if ( not os.path.exists( scriptFile ) ):
+			scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[0], 'The script file (%s) does not exist for submission' % scriptFile )
+			return False
 		
 		# create the submission package
 		if ( self._additionalFiles ):
 			temparchivefile = 'c:/temp/archive.zip'
+			
 			try:
 				if ( os.path.exists(temparchivefile) ):
 					os.remove(temparchivefile)
 			except:
-				scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[0], 'Could not remove the temporary archive location.' )
+				scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[0], 'Could not remove the temporary archive location.' )
 				return False
 			
-			scene.emitProgressUpdated( SCRIPT_PROGRESS_SECTIONS[1], 100 )
+			scene.emitProgressUpdated( self.SCRIPT_PROGRESS_SECTIONS[1], 100 )
 				
 			from blurdev import zipper
-			print 'zipping', ([script] + self._additionalFiles)
-			if ( not zipper.packageFiles( [script] + self._additionalFiles, temparchivefile ) ):
-				scene.emitProgressErrored( SCRIPT_PROGRESS_SECTIONS[1], 'Could not package the files together' )
+			if ( not zipper.packageFiles( [scriptFile] + self._additionalFiles, temparchivefile ) ):
+				scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[1], 'Could not package the files together' )
 				return False
-			
-			self.setFileName( temparchivefile )
+			else:
+				self.setFileName( temparchivefile )
 		
-		scene.emitProgressUpdated( SCRIPT_PROGRESS_SECTIONS[1], 100 )
+		scene.emitProgressUpdated( self.SCRIPT_PROGRESS_SECTIONS[1], 100 )
 		
 		# submit the script job
 		return self._submit()
@@ -386,8 +367,6 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			# disconnect from the scene
 			nativeSubmitter.submitError.disconnect( 	scene.emitSubmitError )
 			nativeSubmitter.submitSuccess.disconnect( 	scene.emitSubmitSuccess )
-			nativeSubmitter.submitSuccess.disconnect(	self.submitSucceeded )
-			nativeSubmitter.submitError.disconnect(		self.submitErrored )
 			
 			# clear the submitter from Qt's memory
 			nativeSubmitter.setParent(None)
@@ -443,8 +422,8 @@ class AbstractSceneSubmitter( SceneWrapper ):
 						
 						SubmitType.Script Args:
 							
-							requiresUi				runPythonScript			run64Bit
-							script					silent
+							code					requiresUi				runPythonScript			
+							run64Bit				script					silent
 		"""
 		return self._customArgs
 	
@@ -476,9 +455,10 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		"""
 		return {}
 	
+	@abstractmethod
 	def defaultJobType( self ):
 		"""
-			\remarks	[virtual] return the default job type for this submitter instance based on the abstract submitType inputed.
+			\remarks	return the default job type for this submitter instance based on the abstract submitType inputed.
 			\param		submitType		<blur3d.constants.SubmitType>
 			\return		<str>
 		"""
@@ -736,7 +716,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		xml.setProperty( 'hostname',				self._hostname )
 		xml.setProperty( 'frameList',				self._frameList )
 		xml.setProperty( 'packetType',				self._packetType )
-		xml.setProperty( 'hostnames',				';'.join(self._hostNames) )
+		xml.setProperty( 'hostList',				';'.join(self._hostNames) )
 		xml.setProperty( 'services',				';'.join(self._serviceNames) )
 		xml.setProperty( 'renderElements',			';'.join(self._renderElements) )
 		xml.setProperty( 'cameras',					';'.join(self._cameras) )
@@ -782,6 +762,10 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			self.setCustomArg( 'silent',			True )
 			self.setCustomArg( 'script',			'' )
 			self.setFrameList( '1' )
+			self.setPriority( 10 )
+			
+			# temp for testing - # EKH 03/25/11
+			self.setHostNames( ['sentinel039'] )
 	
 	def saveXml( self, filename ):
 		"""
@@ -844,19 +828,14 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		"""
 		self._cameras = cameras
 	
+	@abstractmethod
 	def setCurrentRenderElement( self, renderElement ):
 		"""
-			\remarks	[abstract] set the current render element in the scene to the inputed element
+			\remarks	set the current render element in the scene to the inputed element
 			\warning	this is considered legacy support - # EKH 03/21/11
 			\param		renderElement	<str> filename
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
 	def setCustomArg( self, key, value ):
@@ -894,7 +873,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\remarks	set the filename that will be used when submitting to the farm
 			\param		filename	<str>
 		"""
-		self._filename = filename
+		self._fileName = filename
 	
 	def setFrameList( self, frameList ):
 		"""
@@ -1009,7 +988,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\remarks	set the priority for the job to have when it is submitted
 			\param		priority	<int>
 		"""
-		return self._priority
+		self._priority = priority
 	
 	def setPrioritizeOuterFrames( self, state = True ):
 		"""
@@ -1066,7 +1045,7 @@ class AbstractSceneSubmitter( SceneWrapper ):
 			\sa			services, serviceNames, setServices
 			\param		servicenames	<list> [ <str> , .. ]
 		"""
-		self._serviceNames = [ str(servicename) for servicename in services ]
+		self._serviceNames = [ str(servicename) for servicename in servicenames ]
 	
 	def setSubmitFlag( self, flag, state = True ):
 		"""
@@ -1101,17 +1080,6 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		jobtype = self.defaultJobType()
 		
 		self.setJobType( jobtype )
-	
-		# try to use trax to determine default services
-		try:
-			import trax.api
-		except:
-			self.setServices( [] )
-			return
-		
-		service = trax.api.data.JobType.recordByName(jobtype).service()
-		if ( service.isRecord() ):
-			self.setServices( [ service ] )
 	
 	def setUseFrameNth( self, state = True ):
 		"""
@@ -1150,15 +1118,15 @@ class AbstractSceneSubmitter( SceneWrapper ):
 		# include the render submission settings
 		if ( self.submitType() == SubmitType.Render ):
 			if ( self.hasSubmitFlag( SubmitFlags.RemoteSubmit ) ):
-				sections += SCRIPT_PROGRESS_SECTIONS
+				sections += self.SCRIPT_PROGRESS_SECTIONS
 			else:
-				sections += RENDER_PROGRESS_SECTIONS
+				sections += self.RENDER_PROGRESS_SECTIONS
 		
 		# include the script progress sections
 		elif ( self.submitType() == SubmitType.Script ):
-			sectiosn += SCRIPT_PROGRESS_SECTIONS
+			sectiosn += self.SCRIPT_PROGRESS_SECTIONS
 		
-		sections += SUBMIT_PROGRESS_SECTIONS
+		sections += self.SUBMIT_PROGRESS_SECTIONS
 		
 		# add the sections
 		for section in sections:

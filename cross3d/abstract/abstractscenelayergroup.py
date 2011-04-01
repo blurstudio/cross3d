@@ -10,67 +10,48 @@
 #	\date		09/08/10
 #
 
+from blur3d 	import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneLayerGroup( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _addNativeLayers( self, nativeLayers ):
 		"""
-			\remarks	[abstract]	add the native layers to the layer group
+			\remarks	add the native layers to the layer group
 			\sa			addLayers, addSelection
 			\param		nativeLayers	<list> [ <variant> nativeLayer, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _clearNativeLayers( self ):
 		"""
-			\remarks	[abstract] clear the native layers from this layer
+			\remarks	clear the native layers from this layer
 			\sa			clearLayers
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _nativeLayers( self ):
 		"""
-			\remarks	[abstract] return a list of the native layers that are currently on this layer group
+			\remarks	return a list of the native layers that are currently on this layer group
 			\sa			layers
 			\return		<list> [ <variant> nativeLayers, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeObjects( self ):
 		"""
-			\remarks	[abstract] return a list of all the native objects that are encompassed on this layer group
+			\remarks	return a list of all the native objects that are encompassed on this layer group
 			\sa			objects
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -101,17 +82,12 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 		"""
 		return self.setFrozen(True)
 	
+	@abstractmethod
 	def groupOrder( self ):
 		"""
-			\remarks	[abstract] return the order for this layer group
+			\remarks	return the order for this layer group
 			\return		<int> order
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return -1
 	
 	def hide( self ):
@@ -130,17 +106,12 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 		"""
 		return len( self._nativeLayers() ) == 0
 	
+	@abstractmethod
 	def isOpen( self ):
 		"""
-			\remarks	[abstract] return whether or not the layer group is open
+			\remarks	return whether or not the layer group is open
 			\return		<bool> open
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def layers( self ):
@@ -159,21 +130,16 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 		from blur3d.api import SceneObject
 		return [ SceneObject( self._scene, obj ) for obj in self._nativeObjects() ]
 	
+	@abstractmethod
 	def remove( self, removeLayers = False, removeObjects = False ):
 		"""
-			\remarks	[abstract] remove the layer from the scene (layers included when desired)
+			\remarks	remove the layer from the scene (layers included when desired)
 			\param		removeLayers	<bool>	when true, the layers in the layer group should be removed from the scene, otherwise
 												only the layer group should be removed
 			\param		removeObjects	<bool>	if removeLayers is true, when removeObjects is true, the objects on the layers in the 
 												layer group should be removed from the scene
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def scene( self ):
@@ -202,19 +168,14 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 			layer.setFrozen( state )
 		return True
 	
+	@abstractmethod
 	def setGroupOrder( self, groupOrder ):
 		"""
-			\remarks	[abstract] set the order number for this group instance
+			\remarks	set the order number for this group instance
 			\sa			groupOrder
 			\param		groupOrder	<int>
 			\return		<bool> changed
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setHidden( self, state ):
@@ -228,18 +189,13 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 			layer.setHidden( state )
 		return True
 		
+	@abstractmethod
 	def setOpen( self, state ):
 		"""
-			\remarks	[abstract] set whether or not the layer group is open
+			\remarks	set whether or not the layer group is open
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setSelected( self, state ):

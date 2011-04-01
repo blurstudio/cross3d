@@ -8,6 +8,7 @@
 #	\date		09/08/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractScenePropSet( SceneWrapper ):
@@ -24,30 +25,22 @@ class AbstractScenePropSet( SceneWrapper ):
 			self.activateProperty( propname, state )
 		return True
 	
+	@abstractmethod
 	def activateProperty( self, propname, state ):
 		"""
-			\remarks	[abstract] set the inputed propname as active or not
+			\remarks	set the inputed propname as active or not
 			\param		propname	<str>
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def activeProperties( self ):
 		"""
-			\remarks	[abstract] return a list of the active property names for this prop set
+			\remarks	return a list of the active property names for this prop set
 			\return		<list> [ <str> propname, .. ]
 		"""
-		from bludev import debug
-		
-		if ( not debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def isActive( self ):
@@ -57,15 +50,13 @@ class AbstractScenePropSet( SceneWrapper ):
 		"""
 		return len(self.activeProperties()) != 0
 	
+	@abstractmethod
 	def isCustomProperty( self, propname ):
 		"""
-			\remarks	[abstract] return whether or not the inputed property name is a custom property or a standard property
+			\remarks	return whether or not the inputed property name is a custom property or a standard property
 			\param		propname	<str>
 			\return		<bool> custom
 		"""
-		from blurdev import debug
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
 		return False
 	
 	def isActiveProperty( self, propname ):
@@ -76,48 +67,40 @@ class AbstractScenePropSet( SceneWrapper ):
 		"""
 		return str(propname) in self.activeProperties()
 	
+	@abstractmethod
 	def propertyNames( self ):
 		"""
-			\remarks	[abstract] return a list of the property names for this property set
+			\remarks	return a list of the property names for this property set
 			\return		<list> [ <str> propname, .. ]
 		"""
-		from blurdev import debug
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
 		return []
 	
+	@abstractmethod
 	def setValue( self, propname, value ):
 		"""
-			\remarks	[abstract] set the value of the property
+			\remarks	set the value of the property
 			\param		propname	<str>
 			\param		value		<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
 		return False
 	
+	@abstractmethod
 	def toolTip( self ):
 		"""
-			\remarks	[abstract] return the tool tip for this property set based on the usage and value strings
+			\remarks	return the tool tip for this property set based on the usage and value strings
 			\return		<str>
 		"""
-		from blurdev import debug
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
 		return ''
 	
+	@abstractmethod
 	def value( self, propname, default = None ):
 		"""
-			\remarks	[abstract] return the value for the inputed propname, returining the default value if not found
+			\remarks	return the value for the inputed propname, returining the default value if not found
 			\param		propname	<str>
 			\param		default		<variant>
 			\return		<variant>
 		"""
-		from blurdev import debug
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
 		return default
 	
 	@staticmethod

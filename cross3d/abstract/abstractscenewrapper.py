@@ -9,6 +9,8 @@
 #	\date		03/15/10
 #
 
+from blur3d import abstractmethod
+
 class AbstractSceneWrapper:
 	def __eq__( self, other ):
 		"""
@@ -30,91 +32,61 @@ class AbstractSceneWrapper:
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _nativeControllers( self ):
 		"""
-			\remarks	[abstract] collect a list of the native controllers that are currently applied to this cache instance
+			\remarks	collect a list of the native controllers that are currently applied to this cache instance
 			\return		<list> [ <variant> nativeController, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return []
 	
+	@abstractmethod
 	def _nativeController( self, name ):
 		"""
-			\remarks	[abstract] find a controller for this object based on the inputed name
+			\remarks	find a controller for this object based on the inputed name
 			\param		name		<str>
 			\return		<variant> nativeController || None
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return None
 	
+	@abstractmethod
 	def _nativeCopy( self ):
 		"""
-			\remarks	[abstract] return a native copy of the instance in the scene
+			\remarks	return a native copy of the instance in the scene
 			\return		<variant> nativePointer || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return None
-		
+	
+	@abstractmethod
 	def _nativeProperty( self, key, default = None ):
 		"""
-			\remarks	[abstract] return the value of the property defined by the inputed key
+			\remarks	return the value of the property defined by the inputed key
 			\sa			hasProperty, setProperty, _nativeProperty, AbstractScene._fromNativeValue
 			\param		key			<str>
 			\param		default		<variant>	(auto-converted from the application's native value)
 			\return		<variant>
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return default
 	
+	@abstractmethod
 	def _setNativeController( self, name, nativeController ):
 		"""
-			\remarks	[abstract] find a controller for this object based on the inputed name
+			\remarks	find a controller for this object based on the inputed name
 			\param		name		<str>
 			\param		<variant> nativeController || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
-		
+	
+	@abstractmethod
 	def _setNativeProperty( self, key, nativeValue ):
 		"""
-			\remarks	[abstract] set the value of the property defined by the inputed key
+			\remarks	set the value of the property defined by the inputed key
 			\sa			hasProperty, property, setProperty, AbstractScene._toNativeValue
 			\param		key		<str>
 			\param		value	<variant>	(pre-converted to the application's native value)
 			\retrun		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	#------------------------------------------------------------------------------------------------------------------------
@@ -149,34 +121,32 @@ class AbstractSceneWrapper:
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController( self._scene, nativeController )
 		return None
+	
+	def displayName( self ):
+		"""
+			\remarks	returns the display name for this wrapper instance, if not reimplemented, then it will just return
+						the name of the object
+			\return		<str>
+		"""
+		return self.name()
 
+	@abstractmethod
 	def hasProperty( self, key ):
 		"""
-			\remarks	[abstract] check to see if the inputed property name exists for this controller
+			\remarks	check to see if the inputed property name exists for this controller
 			\sa			property, setProperty
 			\param		key		<str>
 			\return		<bool> found
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def name( self ):
 		"""
-			\remarks	[abstract] return the name of this controller instance
+			\remarks	return the name of this controller instance
 			\sa			setControllerName
 			\return		<str> name
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return ''
 	
 	def nativePointer( self ):
@@ -196,17 +166,12 @@ class AbstractSceneWrapper:
 		"""
 		return self._scene._fromNativeValue( self._nativeProperty( key, default ) )
 	
+	@abstractmethod
 	def propertyNames( self ):
 		"""
-			\remarks	[abstract] return a list of the property names linked to this instance
+			\remarks	return a list of the property names linked to this instance
 			\return		<list> [ <str> propname, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
 	def recordXml( self, xml ):
@@ -240,35 +205,34 @@ class AbstractSceneWrapper:
 		if ( controller ):
 			nativeController = controller.nativePointer()
 		return self._setNativeController( name, nativeController )
-		
+	
+	def setDisplayName( self, name ):
+		"""
+			\remarks	set the display name for this wrapper instance to the inputed name - if not reimplemented, then it will
+						set the object's actual name to the inputed name
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		return self.setName( name )
+	
+	@abstractmethod
 	def setName( self, name ):
 		"""
-			\remarks	[abstract] set the name of this wrapper instance
+			\remarks	set the name of this wrapper instance
 			\sa			name
 			\param		name	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def setUniqueId( self, uniqueId ):
 		"""
-			\remarks	[abstract] set the unique id for this wrapper instance
+			\remarks	set the unique id for this wrapper instance
 			\sa			uniqueId
 			\param		uniqueId <int>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	def setProperty( self, key, value ):
@@ -281,18 +245,13 @@ class AbstractSceneWrapper:
 		"""
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
 	
+	@abstractmethod
 	def uniqueId( self ):
 		"""
-			\remarks	[abstract] return the unique id for this controller instance
+			\remarks	return the unique id for this controller instance
 			\sa			setControllerId
 			\return		<int> id
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return 0
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -301,16 +260,10 @@ class AbstractSceneWrapper:
 	@classmethod
 	def fromXml( cls, scene, xml ):
 		"""
-			\remarks	[abstract] create a new wrapper instance from the inputed xml data
+			\remarks	create a new wrapper instance from the inputed xml data
 			\param		xml		<blurdev.XML.XMLElement>
 			\return		
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return 0
 	
 # register the symbol

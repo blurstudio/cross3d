@@ -8,68 +8,48 @@
 #	\date		03/15/10
 #
 
+from blur3d 	import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneAnimationController( SceneWrapper ):
 	#--------------------------------------------------------------------------------
 	#								private methods
 	#--------------------------------------------------------------------------------
+	@abstractmethod
 	def _createNativeKeyAt( self, time ):
 		"""
-			\remarks	[abstract] creates a new key at the inputed time
+			\remarks	creates a new key at the inputed time
 			\param		time		<float>
 			\return		<variant> nativeKey || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeKeys( self ):
 		"""
-			\remarks	[abstract] return a list of the keys that are defined for this controller
+			\remarks	return a list of the keys that are defined for this controller
 			\return		<list> [ <variant> nativeKey, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _setNativeKeyAt( self, time, nativeKey ):
 		"""
-			\remarks	[abstract] set the key at the inputed time to the given native key
+			\remarks	set the key at the inputed time to the given native key
 			\param		time		<float>
 			\param		nativeKey	<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	@classmethod
 	def _createNewNative( cls, scene, controllerType ):
 		"""
-			\remarks	[abstract] create a new native controller in the scene of the inputed controller type
+			\remarks	create a new native controller in the scene of the inputed controller type
 			\param		scene				<blur3d.api.Scene>
 			\param		controllerType		<blur3d.constants.ControllerType>
 			\return		<blur3d.api.SceneAnimationController> || None
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return None
 		
 	#--------------------------------------------------------------------------------
@@ -87,17 +67,12 @@ class AbstractSceneAnimationController( SceneWrapper ):
 			return SceneAnimationKey( self._scene, nativeKey )
 		return None
 	
+	@abstractmethod
 	def controllerType( self ):
 		"""
-			\remarks	[abstract] return the type of controller that this controller is
+			\remarks	return the type of controller that this controller is
 			\return		<blur3d.constants.ControllerType>
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return 0
 		
 	def isKeyedAt( self, time ):

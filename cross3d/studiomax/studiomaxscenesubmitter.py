@@ -24,15 +24,16 @@ def runScript( frame ):
 	
 	# load a particular render element before processing
 	relements = submitter.renderElements()
-	if ( 0 < frame and frame <= len(reelements) ):
-		submitter.setCurrentRenderElement( '%s/%s' % (relpath,os.path.basename(relements[frame-1]) ) # frames are 1 based
+	if ( 0 < frame and frame <= len(relements) ):
+		submitter.setCurrentRenderElement( '%s/%s' % (relpath,os.path.basename(relements[frame-1])) ) # frames are 1 based
 	
 	# turn off the remote submission & render element flags since now we are processing those locally here
+	from blur3d.constants import SubmitFlags
 	submitter.setSubmitFlag( SubmitFlags.RemoteSubmit, False )
 	submitter.setRenderElements( [] )
 	
 	# run the submission
-	return submitter.submit()
+	submitter.submit()
 """
 
 class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
@@ -76,16 +77,12 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		
 		return True
 	
-	def _prepareRemoteSubmit( self ):
-		"""
-			\remarks	[virtual] provide any processing that needs to occur for a remote render submission
-			\return		<bool> success
-		"""
-		AbstractSceneSubmitter._prepareRemoteSubmit( self )
-		
+	def _submitScript( self ):
+		# for now, scripts MUST be run as an archive containing at least a maxhold.mx and script.py file
 		import os
-		jobMaxFile 	= os.path.normpath('c:/temp/maxhold.mx')
-		jobStatFile = os.path.normpath('c:/temp/maxhold.txt')
+		jobMaxFile 		= os.path.normpath('c:/temp/maxhold.mx')
+		jobStatFile 	= os.path.normpath('c:/temp/maxhold.txt')
+		tempScriptFile	= os.path.normpath('c:/temp/script.py')
 		
 		# create max hold file
 		success = mxs.saveMaxFile( jobMaxFile, clearNeedSaveFlag = False, useNewFile = False, quiet = True )
@@ -96,7 +93,34 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		if ( os.path.exists(jobStatFile) ):
 			os.remove(jobStatFile)
 		
-		return True
+		# create the scene
+		scene = self.scene()
+		
+		# store the script information as a file
+		scriptFile = self.customArg( 'script' )
+		if ( not scriptFile ):
+			script = self.customArg( 'code' )
+			if ( script ):
+				scriptFile = tempScriptFile
+				f = open(scriptFile,'w')
+				f.write(script)
+				f.close()
+			else:
+				scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[0], 'No script was defined to run' )
+				return False
+			
+		# make sure we have the script file in the proper spot
+		elif ( os.path.normcase( scriptFile ) != os.path.normcase( tempScriptFile ) ):
+			import shutil
+			try:
+				shutil.copyfile( scriptFile, tempScriptFile )
+			except:
+				scene.emitProgressErrored( self.SCRIPT_PROGRESS_SECTIONS[0], 'Could not copy file %s to %s' % (scriptFile,tempScriptFile) )
+			
+		self.setFileName( scriptFile )
+		
+		return AbstractSceneSubmitter._submitScript( self )
+		
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -120,7 +144,7 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		elif ( submitType == SubmitType.Script ):
 			return 'MaxScript'
 		
-		return AbstractSceneSubmitter.defaultJobType( self, submitType )
+		return ''
 	
 	def customArgMapping( self ):
 		"""
@@ -164,6 +188,29 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		from blur3d.constants import SubmitType
 		
 		submitType = self.submitType()
+		
+		try:
+			from trax.api.data import JobType, Service
+		except:
+			JobType = None
+		
+		# load the default service options
+		if ( JobType ):
+			record 		= JobType.recordByName( self.jobType() )
+			service 	= record.service()
+			services 	= []
+			
+			# load the service option
+			if ( service.isRecord() ):
+				services.append(service)
+			
+			# load the default version for script submissions
+			if ( self.submitType() == SubmitType.Script ):
+				service = Service.recordByName( self.scene().softwareId() )
+				if ( service.isRecord() and not service in services ):
+					services.append(service)
+			
+			self.setServices(services)
 		
 		# initialize the render arguments
 		if ( submitType == SubmitType.Render ):

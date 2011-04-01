@@ -8,24 +8,20 @@
 #	\date		09/08/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneAtmospheric( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _nativeLayer( self ):
 		"""
-			\remarks	[abstract] return the layer that this atmospheric is a part of
+			\remarks	return the layer that this atmospheric is a part of
 			\sa			layer
 			\return		<variant> nativeLayer || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -46,19 +42,14 @@ class AbstractSceneAtmospheric( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return self.setEnabled( True )
-		
+	
+	@abstractmethod
 	def isEnabled( self ):
 		"""
-			\remarks	[abstract] return whether or not this atmospheric is currently enabled in the scene
+			\remarks	return whether or not this atmospheric is currently enabled in the scene
 			\sa			disable, enable, setEnabled
 			\return		<bool> enabled
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def layer( self ):
@@ -79,19 +70,14 @@ class AbstractSceneAtmospheric( SceneWrapper ):
 		"""
 		return self._scene
 	
+	@abstractmethod
 	def setEnabled( self, state ):
 		"""
-			\remarks	[abstract] set whether or not this atmospheric is currently enabled in the scene
+			\remarks	set whether or not this atmospheric is currently enabled in the scene
 			\sa			disable, enable, isEnabled
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	@classmethod

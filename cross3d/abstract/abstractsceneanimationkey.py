@@ -8,54 +8,40 @@
 #	\date		03/15/10
 #
 
+from blur3d 	import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneAnimationKey( SceneWrapper ):
 	#--------------------------------------------------------------------------------
 	#								private methods
 	#--------------------------------------------------------------------------------
+	@abstractmethod
 	def _nativeValue( self ):
 		"""
-			\remarks	[abstract] return the value 
+			\remarks	return the value 
 			\return		<variant> value
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return 0
 	
+	@abstractmethod
 	def _setNativeValue( self, nativeValue ):
 		"""
-			\remarks	[abstract] set the native value of this key to the inputed value
+			\remarks	set the native value of this key to the inputed value
 			\param		nativeValue		<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	#--------------------------------------------------------------------------------
 	#								public methods
 	#--------------------------------------------------------------------------------
+	@abstractmethod
 	def setTime( self, time ):
 		"""
-			\remarks	[abstract] set the value of this key to the inputed value
+			\remarks	set the value of this key to the inputed value
 			\param		time	<float>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setValue( self, value ):
@@ -66,17 +52,12 @@ class AbstractSceneAnimationKey( SceneWrapper ):
 		"""
 		return self._setNativeValue( self._scene._toNativeValue( value ) )
 		
+	@abstractmethod
 	def time( self ):
 		"""
-			\remarks	[abstract] return the time frame of this key
+			\remarks	return the time frame of this key
 			\return		<float> value
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return 0.0
 		
 	def value( self ):

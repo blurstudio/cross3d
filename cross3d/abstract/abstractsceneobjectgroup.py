@@ -8,6 +8,7 @@
 #	\date		09/08/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneObjectGroup( SceneWrapper ):
@@ -23,34 +24,24 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _addNativeAtmospherics( self, nativeAtmospherics ):
 		"""
-			\remarks	[abstract] add the native atmospherics to the object group
+			\remarks	add the native atmospherics to the object group
 			\sa			addAtmospherics
 			\param		nativeAtmospherics	<list> [ <variant> nativeAtmospheric, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _addNativeObjects( self, nativeObjects ):
 		"""
-			\remarks	[abstract]	add the native objects to the object group
+			\remarks	add the native objects to the object group
 			\sa			addObjects, addSelection
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def _clearNativeMaterialOverride( self ):
@@ -69,72 +60,47 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		"""
 		return self._scene._clearNativePropSetOverride( self._nativeObjects() )
 	
+	@abstractmethod
 	def _nativeAtmospherics( self ):
 		"""
-			\remarks	[abstract] return a list of the atmospherics that are associated with this object group
+			\remarks	return a list of the atmospherics that are associated with this object group
 			\sa			atmospherics
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeObjects( self ):
 		"""
-			\remarks	[abstract] return a list of the native objects that are currently on this group
+			\remarks	return a list of the native objects that are currently on this group
 			\sa			objects
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeMaterials( self ):
 		"""
-			\remarks	[abstract] return a list of all the native materials that are contained within this object group
+			\remarks	return a list of all the native materials that are contained within this object group
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeMaterialOverride( self ):
 		"""
-			\remarks	[abstract] return the current override material for this object group
+			\remarks	return the current override material for this object group
 			\return		<variant> nativeMaterial || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _setNativeAtmospherics( self, nativeAtmospherics ):
 		"""
-			\remarks	[abstract] set the linked atmopherics to this object group to the inputed list of atmospherics
+			\remarks	set the linked atmopherics to this object group to the inputed list of atmospherics
 			\param		nativeAtmospherics	<list> [ <variant> nativeAtmospheric, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def _setNativeMaterialOverride( self, nativeMaterial, options = -1, advancedState = None ):
@@ -272,30 +238,20 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		"""
 		return len( self._nativeObjects() ) == 0
 	
+	@abstractmethod
 	def isFrozen( self ):
 		"""
-			\remarks	[abstract] retrieve the group name for this object group instance
+			\remarks	retrieve the group name for this object group instance
 			\return		<bool> frozen
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
-		
+	
+	@abstractmethod
 	def isHidden( self ):
 		"""
-			\remarks	[abstract] retrieve the group name for this object group instance
+			\remarks	retrieve the group name for this object group instance
 			\return		<bool> hidden
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def isVisible( self ):
@@ -375,19 +331,14 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 			return ScenePropSet( self.scene(), nativePropSet )
 		return nativePropSet
 	
+	@abstractmethod
 	def remove( self, removeObjects = False ):
 		"""
-			\remarks	[abstract] remove the object group from the scene (objects included when desired)
+			\remarks	remove the object group from the scene (objects included when desired)
 			\param		removeObjects	<bool>	when true, the objects on the object group should be removed from the scene, otherwise
 												only the object group should be removed
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def select( self ):
@@ -398,19 +349,14 @@ class AbstractSceneObjectGroup( SceneWrapper ):
 		"""
 		return self.setSelected(True)
 	
+	@abstractmethod
 	def setActive( self, state ):
 		"""
-			\remarks	[abstract] mark this object group as the active scene object group
+			\remarks	mark this object group as the active scene object group
 			\sa			isActive
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setMaterialOverride( self, material, options = -1, advancedState = None ):

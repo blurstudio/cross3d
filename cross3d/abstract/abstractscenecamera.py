@@ -9,19 +9,16 @@
 #	\date		03/15/10
 #
 
-from blurdev import debug
+from blur3d		import abstractmethod
 from blur3d.api import SceneObject
 
 class AbstractSceneCamera( SceneObject ):
+	@abstractmethod
 	def cameraType( self ):
 		"""
-			\remarks	[abstract] return the camera type for this camera instance
+			\remarks	return the camera type for this camera instance
 			\return		<blur3d.constants.CameraType>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-			
 		return 0
 	
 	def isCameraType( self, cameraType ):

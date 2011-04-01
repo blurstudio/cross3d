@@ -8,6 +8,7 @@
 #	\date		09/08/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneCache( SceneWrapper ):
@@ -38,58 +39,38 @@ class AbstractSceneCache( SceneWrapper ):
 		"""
 		return self.setEnabled(True)
 	
+	@abstractmethod
 	def filename( self ):
 		"""
-			\remarks	[abstract] return the filename that this cache is pulling from
+			\remarks	return the filename that this cache is pulling from
 			\return		<str> filename
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return ''
 			
+	@abstractmethod
 	def isEnabled( self ):
 		"""
-			\remarks	[abstract] return wether or not this cache is enabled in the scene
+			\remarks	return wether or not this cache is enabled in the scene
 			\return		<bool> enabled
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 		
+	@abstractmethod
 	def setEnabled( self, state ):
 		"""
-			\remarks	[abstract] mark whether or not this cache is enabled in the scene
+			\remarks	mark whether or not this cache is enabled in the scene
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
+	@abstractmethod
 	def setFilename( self, filename ):
 		"""
-			\remarks	[abstract] set the filename for this cache data to the inputed filename
+			\remarks	set the filename for this cache data to the inputed filename
 			\param		filename	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
 # register the symbol

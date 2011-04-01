@@ -8,23 +8,19 @@
 #	\date		09/08/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneMap( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def edit( self ):
 		"""
-			\remarks	[abstract] allow the user to edit the map
+			\remarks	allow the user to edit the map
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	@staticmethod

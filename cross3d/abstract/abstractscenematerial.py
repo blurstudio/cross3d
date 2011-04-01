@@ -8,7 +8,7 @@
 #	\date		09/08/10
 #
 
-from blurdev import debug
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneMaterial( SceneWrapper ):
@@ -16,29 +16,23 @@ class AbstractSceneMaterial( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _nativeSubmaterials( self ):
 		"""
-			\remarks	[abstract] return the native sub-materials for this material instance
+			\remarks	return the native sub-materials for this material instance
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def edit( self ):
 		"""
-			\remarks	[abstract] allow the user to edit the material
+			\remarks	allow the user to edit the material
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	def icon( self ):

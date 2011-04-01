@@ -7,8 +7,8 @@
 #
 #				The AbstractScene is a QObject instance and any changes to scene data can be controlled by connecting to the signals defined here.
 #
-#				When subclassing the AbstractScene, methods tagged as [abstract] will be required to be overwritten.  Methods tagged with [virtual]
-#				are flagged such that additional operations could be required based on the needs of the method.  All [abstract] methods MUST be implemented
+#				When subclassing the AbstractScene, methods tagged as @abstractmethod will be required to be overwritten.  Methods tagged with [virtual]
+#				are flagged such that additional operations could be required based on the needs of the method.  All @abstractmethod methods MUST be implemented
 #				in a subclass.
 #
 #				The term NativeObject will be used when referring to methods and pointers referencing an application specific instance (Studiomax vs. Softimage
@@ -19,7 +19,8 @@
 #	\date		03/15/10
 #
 
-from blurdev import debug
+from blur3d				import abstractmethod
+
 from PyQt4.QtCore import QObject, pyqtSignal
 
 class AbstractScene( QObject ):
@@ -53,703 +54,531 @@ class AbstractScene( QObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _cacheNativeMap( self, cacheType, nativeMap ):
 		"""
-			\remarks	[abstract] cache the inputed map in the scene
+			\remarks	cache the inputed native map in the scene
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\param		nativeMap	<variant>
 			\return		<bool> changed
-		"""		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-			
+		"""	
 		return nativeMap
 	
+	@abstractmethod
 	def _cacheNativeMaterial( self, cacheType, nativeMaterial ):
 		"""
-			\remarks	[abstract] cache the inputed material in the scene
+			\remarks	cache the inputed native material in the scene
 			\param		cacheType	<blur3d.constants.MaterialCacheType>
 			\param		nativeMaterial	<variant>
 			\return		<bool> changed
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _cachedNativeMap( self, cacheType, uniqueId, default = None ):
 		"""
-			\remarks	[abstract] return the cached map for the inputed material id
+			\remarks	return the cached native map for the inputed material id
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\param		uniqueId		<str>
 			\param		default		<variant>	value to return if the id was not found
 			\return		<variant> nativeMap || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return default
 	
+	@abstractmethod
 	def _cachedNativeMaterial( self, cacheType, uniqueId, default = None ):
 		"""
-			\remarks	[abstract] return the cached material for the inputed material id
+			\remarks	return the cached native material for the inputed material id
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
 			\param		uniqueId		<str>
 			\param		default			<variant>	value to return if the id was not found
 			\return		<variant> nativeMaterial || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return default
 	
+	@abstractmethod
 	def _cachedNativeMaps( self, cacheType ):
 		"""
-			\remarks	[abstract] return the cached maps for the inputed cache type
+			\remarks	return the cached native maps for the inputed cache type
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\return		<list> [ <variant> nativeMap, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _cachedNativeMaterials( self, cacheType ):
 		"""
-			\remarks	[abstract] return the cached materials for the inputed cache type
+			\remarks	return the cached native materials for the inputed cache type
 			\param		cacheType		<blur3d.constants.MaterialCacheType>
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _clearNativeMaterialOverride( self, nativeObjects ):
 		"""
-			\remarks	[abstract] clear the native objects of any material overrides
+			\remarks	clear the native objects of any material overrides
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
+	@abstractmethod
 	def _clearNativePropSetOverride( self, nativeObjects ):
 		"""
-			\remarks	[abstract] clear the native objects of any property set overrides
+			\remarks	clear the native objects of any property set overrides
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
-		
+	
+	@abstractmethod
 	def _createNativeLayer( self, name, nativeObjects = [] ):
 		"""
-			\remarks	[abstract]		creates a new layer in this scene based on the inputed name with the given objects
+			\remarks	creates a new native layer in this scene based on the inputed name with the given objects
 			\param		name			<str>
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<variant> nativeLayer || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _createNativeLayerGroup( self, name, nativeLayers = [] ):
 		"""
-			\remarks	[abstract]		create a new layer group in this scene based on the inputed name with the given layers
+			\remarks	create a new native layer group in this scene based on the inputed name with the given layers
 			\param		name			<str>
 			\return		<variant> nativeLayerGroup || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
-		
+	
+	@abstractmethod
 	def _createNativeModel( self, name = 'New Model', nativeObjects = [] ):
 		"""
-			\remarks	[abstract] 		creates and returns a new 3d model with the inputed name and objects
+			\remarks	creates and returns a new native 3d model with the inputed name and objects
 			\param		name			<str>
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<variant> nativeObject || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
-		
+	
+	@abstractmethod
 	def _createNativeRenderer( self, rendererType ):
 		"""
-			\remaks		[abstract]		creates a new renderer based on the inputed renderer type for this scene
+			\remaks		creates a new native renderer based on the inputed renderer type for this scene
 			\param		rendererType	<blur3d.constants.RendererType>
 			\return		<variant> nativeRenderer || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _currentNativeCamera( self ):
 		"""
-			\remarks	[abstract]	return the current active camera in the viewport for the scene
+			\remarks	return the current active native camera in the viewport for the scene
 			\return		<variant> nativeCamera
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return None
 	
+	@abstractmethod
 	def _currentNativeRenderer( self ):
 		"""
-			\remarks	[abstract]	return the current native renderer for this scene instance
+			\remarks	return the current native renderer for this scene instance
 			\return		<variant> nativeRenderer || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _exportNativeObjects( self, nativeObjects ):
 		"""
-			\remarks	[abstract]			exports the inputed native objects to the given filename
+			\remarks	exports the inputed native objects to the given filename
 			\param		nativeObjects		<list> [ <variant> nativeObject, .. ]
 			\param		filename			<str>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _findNativeAtmospheric( self, name = '', uniqueId = 0 ):
 		"""
-			\remarks	[abstract] look up the native atmospheric from this scene instance
+			\remarks	look up the native atmospheric from this scene instance
 			\param		name	<str>
 			\return		<variant> nativeAtmospheric || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _findNativeObject( self, name = '', uniqueId = 0 ):
 		"""
-			\remarks	[abstract] looks up an object based on the inputed name
+			\remarks	looks up a native object based on the inputed name
 			\sa			findNativeObject
 			\param		name	<str>
 			\return		<variant> nativeObject || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _findNativeLayer( self, name = '', uniqueId = 0 ):
 		"""
-			\remarks	[abstract] looks up a layer based on the inputed name
+			\remarks	looks up a native layer based on the inputed name
 			\sa			findNativeLayer
 			\param		name	<str>
 			\return		<variant> nativeLayer || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _findNativeLayerGroup( self, name = '', uniqueId = 0):
 		"""
-			\remarks	[abstract] look up a layer group based on the inputed name
+			\remarks	look up a native layer group based on the inputed name
 			\sa			findNativeLayer
 			\param		name	<str>
 			\return		<variant> nativeLayerGroup || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _findNativeMaterial( self, name = '', uniqueId = 0 ):
 		"""
-			\remarks	[abstract] looks up an material based on the inputed name
+			\remarks	looks up a native material based on the inputed name
 			\sa			findNativeMaterial
 			\param		name	<str>
 			\return		<variant> nativeMaterial || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _findNativeMap( self, name = '', uniqueId = 0 ):
 		"""
-			\remarks	[abstract] looks up an map based on the inputed name
+			\remarks	looks up a native map based on the inputed name
 			\sa			findNativeMap
 			\param		name	<str>
 			\return		<variant> nativeMap || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _freezeNativeObjects( self, nativeObjects, state ):
 		"""
-			\remarks	[abstract]		freeze(lock)/unfreeze(unlock) a list of native objects
+			\remarks	freeze(lock)/unfreeze(unlock) a list of native objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def _fromNativeValue( self, nativeValue ):
 		"""
-			\remarks	[virtual] 	converts the inputed value from a native value from whatever application we're in
+			\remarks	converts the inputed value from a native value from whatever application we're in
 			\param		nativeValue		<variant>
 			\return		<variant>
 		"""
 		# by default, we assume all conversions have already occurred
 		return nativeValue
 	
+	@abstractmethod
 	def _getNativeObject( self ):
 		"""
-			\remarks	[abstract]	invokes the application's ability to let a user select a Object from the scene
+			\remarks	invokes the native application's ability to let a user select a Object from the scene
 			\return		<variant> nativeObject || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
-		
+	
+	@abstractmethod
 	def _getNativeMaterial( self ):
 		"""
-			\remarks	[abstract]	invokes the application's ability to let a user select a Material from the scene
+			\remarks	invokes the native application's ability to let a user select a Material from the scene
 			\return		<variant> nativeMaterial || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
-		
+	
+	@abstractmethod
 	def _getNativeMap( self ):
 		"""
-			\remarks	[abstract]	invokes the application's ability to let a user select a Map from the scene
+			\remarks	invokes the native application's ability to let a user select a Map from the scene
 			\return		<variant> nativeMap || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
-		
+	
+	@abstractmethod
 	def _hideNativeObjects( self, nativeObjects, state ):
 		"""
-			\remarks	[abstract]		hide/unhide a list of native objects
+			\remarks	hide/unhide a list of native objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _isolateNativeObjects( self, nativeObjects, state ):
 		"""
-			\remarks	[abstract] isolate (hide all other objects) or unisolate the inputed objects in the scene
+			\remarks	isolate (hide all other objects) or unisolate the inputed objects in the native scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		state			<bool>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _loadNativeMaterialsFromLibrary( self, filename = '' ):
 		"""
-			\remarks	[abstract] loads a bunch of materials from the inputed library location, or prompts the user to select a library when not provided
+			\remarks	loads a bunch of materials from the inputed library location, or prompts the user to select a library when not provided
 			\param		filename	<str>
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeActiveLayer( self ):
 		"""
-			\remarks	[abstract]		returns the native active layer from the scene
+			\remarks	returns the native active layer from the scene
 			\param		name			<str>
 			\return		<variant> nativeLayer || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeAtmospherics( self ):
 		"""
-			\remarks	[abstract]	return the native atmospheric instances for this scene
+			\remarks	return the native atmospheric instances for this scene
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeCameras( self ):
 		"""
-			\remarks	[abstract] return a collection of the cameras in this scene
+			\remarks	return a collection of the cameras in this scene
 			\return		<list> [ <variant> nativeCamera, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeCustomProperty( self, key, default = None ):
 		"""
-			\remarks	[abstract] return the native property for the inputed key
+			\remarks	return the native property for the inputed key
 			\param		key			<str>
 			\param		default		<variant>
 			\return		<variant>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return default
-		
+	
+	@abstractmethod
 	def _nativeEnvironmentMap( self ):
 		"""
-			\remarks	[abstract] return the current scene environment map
+			\remarks	return the current scene environment map
 			\return		<variant> nativeMap || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeEnvironmentMapOverride( self ):
 		"""
-			\remarks	[abstract] return the current scene environment map override
+			\remarks	return the current scene environment map override
 			\return		<variant> nativeMap || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeRefresh( self ):
 		"""
-			\remarks	[abstrct]	refreshes the contents of the current scene
+			\remarks	refreshes the contents of the current scene
 			\sa			setUpdatesEnabled, update
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeLayers( self ):
 		"""
-			\remarks	[abstract]		returns a list of the native layers in this scene
+			\remarks	returns a list of the native layers in this scene
 			\return		<list> [ <variant> nativeLayer, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeLayerGroups( self ):
 		"""
-			\remarks	[abstract] collect all the layer groups and their corresponding layers
+			\remarks	collect all the native layer groups and their corresponding layers
 			\sa			layerGroups
 			\return		<list> [ <variant> nativeLayerGroup, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeMaterials( self ):
 		"""
-			\remarks	[abstract] collect all the materials in this scene
+			\remarks	collect all the native materials in this scene
 			\sa			materials
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeMaps( self ):
 		"""
-			\remarks	[abstract] collect all the maps in this scene
+			\remarks	collect all the native maps in this scene
 			\sa			maps
 			\return		<list> [ <variant> nativeMap, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeObjects( self ):
 		"""
-			\remarks	[abstract] 	returns the native objects from the scene
+			\remarks	returns the native objects from the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeRootObject( self ):
 		"""
-			\remarks	[abstract] 	returns the native root object of the scen
+			\remarks	returns the native root object of the scen
 			\return		<variant> nativeObject || None
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeSelection( self ):
 		"""
-			\remarks	[abstract] 	returns the selected objects from the scene
+			\remarks	returns the selected objects from the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeWorldLayer( self ):
 		"""
-			\remarks	[abstract]		returns the native world layer from the scene
+			\remarks	returns the native world layer from the scene
 			\param		name			<str>
 			\return		<variant> nativeLayer
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _removeNativeObjects( self, nativeObjects ):
 		"""
-			\remarks	[abstract]		removes the inputed objects from the scene
+			\remarks	removes the inputed objects from the scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _renameNativeObjects( self, nativeObjects, names, display = True ):
 		"""
-			\remarks	[abstract]		removes the inputed objects from the scene
+			\remarks	removes the inputed objects from the scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		names			<list> [ <str> name, .. ]
 			\param		display		<bool> 	tags whether or not the names are display names or object names
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setCachedNativeMaps( self, cacheType, nativeMaps ):
 		"""
-			\remarks	[abstract] set the currently cached maps for the inputed cache type
+			\remarks	set the currently cached maps for the inputed cache type
 			\param		cacheType	<blur3d.constants.MapCacheType>
 			\param		nativeMaps	<list> [ <variant> nativeMap, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setCachedNativeMaterials( self, cacheType, nativeMaterials ):
 		"""
-			\remarks	[abstract] set the currently cached materials for the inputed cache type
+			\remarks	set the currently cached materials for the inputed cache type
 			\param		cacheType			<blur3d.constants.MaterialCacheType>
 			\param		nativeMaterials		<list> [ <variant> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setCurrentNativeCamera( self, nativeCamera ):
 		"""
-			\remarks	[abstract] set the current viewport camera in the scene to the inputed camera
+			\remarks	set the current viewport camera in the scene to the inputed camera
 			\param		<variant> nativeCamera
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
+	@abstractmethod
 	def _setCurrentNativeRenderer( self, nativeRenderer ):
 		"""
-			\remarks	[abstract] set the current renderer to the inputed native renderer
+			\remarks	set the current renderer to the inputed native renderer
 			\param		nativeRenderer	<variant>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeCustomProperty( self, key, value ):
 		"""
-			\remarks	[abstract] set the custom property on this scene to the inputed value
+			\remarks	set the custom property on this scene to the inputed value
 			\param		key		<str>
 			\param		value	<variant>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeMaterialOverride( self, nativeObjects, nativeMaterial, options = None, advancedState = None ):
 		"""
-			\remarks	[abstract] set the material override for the inputed objects
+			\remarks	set the material override for the inputed objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		nativeMaterial	<variant>
 			\param		options			<blur3d.constants.MaterialOverrideOptions>
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeEnvironmentMap( self, nativeMap ):
 		"""
-			\remarks	[abstract] set the current environment map in the scene
+			\remarks	set the current environment map in the scene
 			\param		nativeMap	<variant>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeEnvironmentMapOverride( self, nativeMap ):
 		"""
-			\remarks	[abstract] set the current environment map override in the scene
+			\remarks	set the current environment map override in the scene
 			\param		nativeMap	<variant>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativePropSetOverride( self, nativeObjects, nativePropSet ):
 		"""
-			\remarks	[abstract] set the overriding property set for the inputed objects to the given property set
+			\remarks	set the overriding property set for the inputed objects to the given property set
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		nativePropSet	<variant>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeSelection( self, nativeObjects ):
 		"""
-			\remarks	[abstract]		selects the inputed native objects in the scene
+			\remarks	selects the inputed native objects in the scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeUpdatesEnabled( self, state ):
 		"""
-			\remarks	[abstract]		enables/disables scene updates
+			\remarks	enables/disables scene updates
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def _toNativeValue( self, pyValue ):
@@ -767,28 +596,22 @@ class AbstractScene( QObject ):
 		# by default, we assume that any other type can be naturally processed
 		return pyValue
 	
+	@abstractmethod
 	def _toggleNativeVisibleState( self, nativeObjects = None, options = None ):
 		"""
-			\remarks	[abstract] toggle the inputed object's visibility settings based on the inputed options
+			\remarks	toggle the inputed object's visibility settings based on the inputed options
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		options			<blur3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _visibleNativeObjects( self ):
 		"""
-			\remarks	[abstract]		returns the visible objects in the scene
+			\remarks	returns the visible objects in the scene
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 		
 	#------------------------------------------------------------------------------------------------------------------------
@@ -805,17 +628,12 @@ class AbstractScene( QObject ):
 			return SceneLayer( self, lay )
 		return None
 	
+	@abstractmethod
 	def animationRange( self ):
 		"""
-			\remarks	[abstract] return the start and end frames for the animation range for the scene
+			\remarks	return the start and end frames for the animation range for the scene
 			\return		<tuple> ( <int> start, <int> end )
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return (0,0)
 	
 	def atmospherics( self ):
@@ -906,16 +724,13 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneCamera
 		return [ SceneCamera( self, nativeCamera ) for nativeCamera in self._nativeCameras() ]
 	
+	@abstractmethod
 	def checkForSave( self ):
 		"""
-			\remarks	[abstract]	checks the state of the current scene and queries the user to save if the scene is modified.  If the user cancels the operation,
-									this method will return false.  Returns true if the scene is saved, or otherwise is approved by the user to continue the next operation
+			\remarks	checks the state of the current scene and queries the user to save if the scene is modified.  If the user cancels the operation,
+						this method will return false.  Returns true if the scene is saved, or otherwise is approved by the user to continue the next operation
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def clearMaterialOverride( self, objects ):
@@ -1028,15 +843,12 @@ class AbstractScene( QObject ):
 		
 		return trax.api.findElementByPath( self.currentFileName() )
 		
+	@abstractmethod
 	def currentFileName( self ):
 		"""
-			\remarks	[abstract]	returns the current filename for the scene that is active in the application
+			\remarks	returns the current filename for the scene that is active in the application
 			\return		<str>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return ''
 	
 	def currentLayerState( self ):
@@ -1246,26 +1058,20 @@ class AbstractScene( QObject ):
 				return SceneMap( self, nativeMap )
 			return None
 		
+	@abstractmethod
 	def fileType( self ):
 		"""
-			\remarks	[abstract]	returns the main file type for this type of application
+			\remarks	returns the main file type for this type of application
 			\return		<str>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return ''
-		
+	
+	@abstractmethod
 	def fileTypes( self ):
 		"""
-			\remarks	[abstract]	returns the associated file types for this type of application
+			\remarks	returns the associated file types for this type of application
 			\return		<list> [ <str>, .. ]
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
 	def getObject( self ):
@@ -1301,15 +1107,14 @@ class AbstractScene( QObject ):
 			return SceneMap( self, nativeMap )
 		return None
 	
+	@abstractmethod
 	def holdCurrentState( self ):
 		"""
-			\remarks	[abstract]	protects the current scene as it is to allow for manipulation and provide a restore point
+			\remarks	protects the current scene as it is to allow for manipulation and provide a restore point
 			\sa			restoreHeldState
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-	
+		pass
+		
 	def hideObjects( self, objects, state ):
 		"""
 			\remarks	hides the inputed objects based on the given state
@@ -1327,17 +1132,12 @@ class AbstractScene( QObject ):
 		"""
 		return self._nativeEnvironmentMapOverride() != None
 	
+	@abstractmethod
 	def isSlaveMode( self ):
 		"""
-			\remarks	[abstract] return whether or not the application is currently being run as a slave
+			\remarks	return whether or not the application is currently being run as a slave
 			\return		<bool> state
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
 	def isolateObjects( self, objects, state ):
@@ -1368,16 +1168,13 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneLayerGroup
 		return [ SceneLayerGroup( self, nativeLayerGroup ) for nativeLayerGroup in self._nativeLayerGroups() ]
 	
+	@abstractmethod
 	def loadFile( self, filename = '' ):
 		"""
-			\remarks	[abstract]	loads the inputed filename into the application, returning true on success
+			\remarks	loads the inputed filename into the application, returning true on success
 			\param		filename	<str>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def loadMaterialsFromLibrary( self, filename = '' ):
@@ -1413,17 +1210,14 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneObject
 		return [ SceneObject( self, obj ) for obj in self._nativeObjects() ]
 	
+	@abstractmethod
 	def property( self, key, default = None ):
 		"""
-			\remarks	[abstract]	returns a global scene value
+			\remarks	returns a global scene value
 			\param		key			<str> || <QString>
 			\param		default		<variant>	default value to return if no value was found
 			\return		<variant>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return default
 	
 	def recordLayerState( self, xml ):
@@ -1443,6 +1237,7 @@ class AbstractScene( QObject ):
 			\sa			recordLayerState, SceneLayer.restoreLayerState
 			\return		<bool> success
 		"""
+		from blurdev import debug
 		watch = debug.Stopwatch( 'AbstractScene.restoreLayerState' )
 		
 		layerState = xml.findChild( 'layerState' )
@@ -1556,55 +1351,38 @@ class AbstractScene( QObject ):
 		"""
 		return self._renameNativeObjects( [ object.nativePointer() for object in objects ], names, display = display )
 	
+	@abstractmethod
 	def renderOutputPath( self ):
 		"""
-			\remarks	[abstract] return the render output file path for the scene
+			\remarks	return the render output file path for the scene
 			\return		<str>
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return ''
 		
+	@abstractmethod
 	def renderSize( self ):
 		"""
-			\remarks	[abstract] return the render output size for the scene
+			\remarks	return the render output size for the scene
 			\return		<QSize>
 		"""
 		from PyQt4.QtCore import QSize
-		
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return QSize()
 	
+	@abstractmethod
 	def reset( self ):
 		"""
-			\remarks	[abstract]	resets this scene for all the data and in the application
+			\remarks	resets this scene for all the data and in the application
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def restoreHeldState( self ):
 		"""
-			\remarks	[abstract]	restores a held state after processing code
+			\remarks	restores a held state after processing code
 			\sa			holdCurrentState
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def rootObject( self ):
@@ -1625,16 +1403,13 @@ class AbstractScene( QObject ):
 		"""
 		return self.saveFileAs( self.currentFilename() )
 		
+	@abstractmethod
 	def saveFileAs( self, filename = '' ):
 		"""
-			\remarks	[abstract]	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
+			\remarks	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
 			\param		filename 	<str>
 			\return		<bool> success
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def selection( self ):
@@ -1646,18 +1421,13 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneObject
 		return [ SceneObject( self, obj ) for obj in self._nativeSelection() ]
 	
+	@abstractmethod
 	def setAnimationRange( self, animationRange ):
 		"""
-			\remarks	[abstract] return the start and end frames for the animation range for the scene
+			\remarks	return the start and end frames for the animation range for the scene
 			\param		animationRange 	<tuple> ( <int> start, <int> end )
 			\return		<bool> success
 		"""
-		from blurdev import debug
-				
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
 	def setEnvironmentMap( self, sceneMap ):
@@ -1760,6 +1530,7 @@ class AbstractScene( QObject ):
 			\param		layerState	<str>
 			\return		<bool> success
 		"""
+		from blurdev import debug
 		# create a stopwatch
 		watch = debug.Stopwatch( 'AbstractScene.setCurrentLayerState' )
 		
@@ -1797,17 +1568,14 @@ class AbstractScene( QObject ):
 		"""
 		return self._setNativeCustomProperty( key, self._toNativeValue(value) )
 	
+	@abstractmethod
 	def setProperty( self, key, value ):
 		"""
-			\remarks	[abstract]	sets the global scene property to the inputed value
+			\remarks	sets the global scene property to the inputed value
 			\param		key			<str> || <QString>
 			\param		value		<variant>
 			\return		<bool>
 		"""
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setPropSetOverride( self, objects, propSet ):
@@ -1837,32 +1605,22 @@ class AbstractScene( QObject ):
 			
 		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options, advancedState = advancedState )
 	
+	@abstractmethod
 	def setRenderOutputPath( self, outputPath ):
 		"""
-			\remarks	[abstract] set the render output path for the scene
+			\remarks	set the render output path for the scene
 			\param		outputPath	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
+	@abstractmethod
 	def setRenderSize( self, size ):
 		"""
-			\remarks	[abstract] set the render output size for the scene
+			\remarks	set the render output size for the scene
 			\param		size	<QSize>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return False
 	
 	def setSelection( self, objects ):
@@ -1896,9 +1654,10 @@ class AbstractScene( QObject ):
 		
 		return self.updatesEnabled()
 		
+	@abstractmethod
 	def softwareId( self ):
 		"""
-			\remarks	[abstract]	returns a unique version/bits string information that will represent the exact
+			\remarks	returns a unique version/bits string information that will represent the exact
 									version of the software being run.
 			\return		<str>
 		"""

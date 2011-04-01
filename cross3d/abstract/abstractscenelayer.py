@@ -10,7 +10,8 @@
 #	\date		09/08/10
 #
 
-from abstractsceneobjectgroup import AbstractSceneObjectGroup
+from blur3d						import abstractmethod
+from abstractsceneobjectgroup 	import AbstractSceneObjectGroup
 
 class AbstractSceneLayer( AbstractSceneObjectGroup ):
 	def __init__( self, scene, nativeLayer ):
@@ -23,106 +24,71 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _nativeAltMaterials( self ):
 		"""
-			\remarks	[abstract] return a list of the alternate materials associated with this layer
+			\remarks	return a list of the alternate materials associated with this layer
 			\sa			altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials
 						setCurrentAltMaterialIndex, _setNativeAltMaterials, _setNativeAltMaterialAt
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeLayerGroup( self ):
 		"""
-			\remarks	[abstract] return the layer group that this layer belongs to
+			\remarks	return the layer group that this layer belongs to
 			\sa			layerGroup, setLayerGroup, _setNativeLayerGroup
 			\return		<variant> nativeLayerGroup || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _setNativeAltMaterialAt( self, index, nativeMaterial ):
 		"""
-			\remarks	[abstract] set the material in the alternate materials list at the inputed index to the given material
+			\remarks	set the material in the alternate materials list at the inputed index to the given material
 			\param		index			<index>
 			\param		nativeMaterial	<variant> || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeAltMaterials( self, nativeMaterials ):
 		"""
-			\remarks	[abstract] set the alternate material list for this layer
+			\remarks	set the alternate material list for this layer
 			\param		nativeMaterials	<list> [ <variant> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeLayerGroup( self, nativeLayerGroup ):
 		"""
-			\remarks	[abstract] set the layer group that this layer belongs to
+			\remarks	set the layer group that this layer belongs to
 			\sa			layerGroup, setLayerGroup, _nativeLayerGroup
 			\param		<variant> nativeLayerGroup || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeWireColor( self, nativeColor ):
 		"""
-			\remarks	[abstract] set the wirecolor for this layer instance
+			\remarks	set the wirecolor for this layer instance
 			\sa			setWireColor
 			\param		nativeColor		<variant>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _nativeWireColor( self ):
 		"""
-			\remarks	[abstract] return the wirecolor for this layer instance
+			\remarks	return the wirecolor for this layer instance
 			\sa			nativeColor
 			\return		<variant> nativeColor || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -150,19 +116,14 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		propSets.append( propSet )
 		return self.setAltPropSets( propSets )
 	
+	@abstractmethod
 	def advancedAltMaterialStateAt( self, index ):
 		"""
-			\remarks	[abstract] return a mapping for the advanced alternate material status of a given alternate material
+			\remarks	return a mapping for the advanced alternate material status of a given alternate material
 						slot
 			\param		index	<int>
 			\return		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return {}
 		
 	def altMaterialAt( self, index ):
@@ -208,17 +169,12 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 				output.append( None )
 		return output
 	
+	@abstractmethod
 	def altMaterialFlags( self ):
 		"""
-			\remarks	[abstract] return a list of material duplication flags for this layer
+			\remarks	return a list of material duplication flags for this layer
 			\return		<list> [ <blur3d.constants.MaterialDuplicateOptions>, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
 	def altMaterialFlagsAt( self, index ):
@@ -253,19 +209,14 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		"""
 		return len( self.altPropSets() )
 	
+	@abstractmethod
 	def altPropSets( self ):
 		"""
-			\remarks	[abstract]	retrive the alternate SceneObjectPropSet's for this layer
+			\remarks	retrive the alternate SceneObjectPropSet's for this layer
 			\sa			altPropSetCount, altPropAt, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
 						setCurrentAltPropSetIndex
 			\return		<list> [ <blur3d.api.SceneObjectPropSet>, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
 	def defineAltMaterialAt( self, index, material ):
@@ -342,19 +293,14 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			return (flags[index] & flag) != 0
 		return False
 	
+	@abstractmethod
 	def hasAdvancedAltMaterialStateAt( self, index ):
 		"""
-			\remarks	[abstract] return whether or not an advanced state for an alternate material has been defined for the inputed
+			\remarks	return whether or not an advanced state for an alternate material has been defined for the inputed
 						alternate material index
 			\param		index	<int>
 			\return		<bool> found
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def indexOfAltMaterial( self, material ):
@@ -381,31 +327,21 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		except:
 			return -1
 	
+	@abstractmethod
 	def isActive( self ):
 		"""
-			\remarks	[abstract] return whether or not this layer is currently active in the scene
+			\remarks	return whether or not this layer is currently active in the scene
 			\sa			setActive
 			\return		<bool> active
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def isWorldLayer( self ):
 		"""
-			\remarks	[abstract] return whether or not this layer is the root world layer of the scene
+			\remarks	return whether or not this layer is the root world layer of the scene
 			\return		<bool> is world
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def isolate( self ):
@@ -446,17 +382,13 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			return SceneLayerGroup( self._scene, nativeGroup )
 		return None
 	
+	@abstractmethod
 	def layerGroupOrder( self ):
 		"""
-			\remarks	[abstract] return the sort order for this layer within its layer group
+			\remarks	return the sort order for this layer within its layer group
 			\sa			setLayerGroupOrder
 			\return		<int> index
 		"""
-		from blurdev import debug
-		
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return -1
 	
 	def recordLayerState( self, xml ):
@@ -530,18 +462,13 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			return True
 		return False
 	
+	@abstractmethod
 	def removeAdvancedAltMaterialStateAt( self, index ):
 		"""
-			\remarks	[abstract] remove the advanced alternate material state from the layer at the alternate material index
+			\remarks	remove the advanced alternate material state from the layer at the alternate material index
 			\param		index		<int>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def removeAltPropSetAt( self, index ):
@@ -555,19 +482,14 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			return self.setAltPropSets( altPropSets[:index] + altPropSets[index+1:] )
 		return False
 	
+	@abstractmethod
 	def setActive( self, state ):
 		"""
-			\remarks	[abstract] mark this layer as the active scene layer
+			\remarks	mark this layer as the active scene layer
 			\sa			isActive
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setAltMaterialAt( self, index, material ):
@@ -630,49 +552,34 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			mflags[index] = flags
 			return self.setAltMaterialFlags( mflags )
 		return False
-				
+	
+	@abstractmethod
 	def setAltMaterialFlags( self, flags ):
 		"""
-			\remarks	[abstract] set the alternate material flags for this instance
+			\remarks	set the alternate material flags for this instance
 			\param		flags	<list> [ <blur3d.constants.MaterialDuplicateOptions>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def setAltPropSetAt( self, index, propSet ):
 		"""
-			\remarks	[abstract] set the alternate object property set at the inputed index
+			\remarks	set the alternate object property set at the inputed index
 			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSets,
 						setCurrentAltPropSetIndex
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def setAltPropSets( self, propSets ):
 		"""
-			\remarks	[abstract] set the alternate object property set list for this layer
+			\remarks	set the alternate object property set list for this layer
 			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, 
 						setCurrentAltPropSetIndex
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setCurrentAltMaterialIndex( self, index ):
@@ -774,6 +681,7 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 		
 		return self._setNativeLayerGroup( nativeGroup )
 	
+	@abstractmethod
 	def setLayerGroupOrder( self, groupOrder ):
 		"""
 			\remarks	set the layer group sort order for this layer within its layer group
@@ -781,27 +689,17 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\param		groupOrder		<int>
 			\return		<bool> changed
 		"""
-		from blurdev import debug
-		
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
+	@abstractmethod
 	def setAdvancedAltMaterialStateAt( self, index, altMaterialState ):
 		"""
-			\remarks	[abstract] set a mapping for the advanced alternate material status of a given alternate material
+			\remarks	set a mapping for the advanced alternate material status of a given alternate material
 						slot
 			\param		index	<int>
 			\param		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setWireColor( self, color ):

@@ -9,6 +9,7 @@
 #	\date		03/15/10
 #
 
+from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneObject( SceneWrapper ):
@@ -21,194 +22,129 @@ class AbstractSceneObject( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	@abstractmethod
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
-			\remarks	[abstract]	finds the child by the name and returns it
+			\remarks	finds the child by the name and returns it
 			\sa			findChild
 			\param		name		<str>
 			\param		recursive	<bool>
 			\param		parent		<variant> nativeObject	(used for recursive searches when necessary)
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeCaches( self, cacheType = 0 ):
 		"""
-			\remarks	[abstract] return a list of the native caches that are applied to this object
+			\remarks	return a list of the native caches that are applied to this object
 			\param		cacheType	<blur3d.constants.CacheType>	fitler by the inputed cache type
 			\return		<list> [ <variant> nativeCache, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-
 		return []
 		
+	@abstractmethod
 	def _nativeChildren( self ):
 		"""
-			\remarks	[abstract]	looks up the native children for this object
+			\remarks	looks up the native children for this object
 			\sa			children
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return []
 	
+	@abstractmethod
 	def _nativeLayer( self ):
 		"""
-			\remarks	[abstract]	returns the native application's layer that the object is on
+			\remarks	returns the native application's layer that the object is on
 			\sa			layer, setLayer, _setNativeLayer
 			\return		<variant> nativeLayer || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeMaterial( self ):
 		"""
-			\remarks	[abstract] returns the native material for this object
+			\remarks	returns the native material for this object
 			\sa			material, setMaterial, _setNativeMaterial
 			\return		<variant> nativeMaterial || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeModel( self ):
 		"""
-			\remarks	[abstract]	looks up the native model for this object
+			\remarks	looks up the native model for this object
 			\sa			model, setModel, _setNativeModel
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeParent( self ):
 		"""
-			\remarks	[abstract]	looks up the native parent for this object
+			\remarks	looks up the native parent for this object
 			\sa			parent, setParent, _setNativeParent
 			\return		<variant> nativeObject || None
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return None
 	
+	@abstractmethod
 	def _nativeWireColor( self ):
 		"""
-			\remarks	[abstract] return the color for the wireframe of this object in the scene
+			\remarks	return the color for the wireframe of this object in the scene
 			\sa			setWireColor
 			\return		<QColor>
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeLayer( self, nativeLayer ):
 		"""
-			\remarks	[abstract]	sets the native layer for this object
+			\remarks	sets the native layer for this object
 			\sa			layer, setLayer, _nativeLayer
 			\param		<variant> nativeLayer || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeMaterial( self, nativeMaterial ):
 		"""
-			\remarks	[abstract]	sets the native material for this object
+			\remarks	sets the native material for this object
 			\sa			material, setMaterial, _nativeMaterial
 			\param		<variant> nativeMaterial || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeModel( self, nativeModel ):
 		"""
-			\remarks	[abstract]	sets the native model for this object
+			\remarks	sets the native model for this object
 			\sa			model, setModel, _nativeModel
 			\param		<variant> nativeObject || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeParent( self, nativeParent ):
 		"""
-			\remarks	[abstract]	sets the native parent for this object
+			\remarks	sets the native parent for this object
 			\sa			parent, setParent, _nativeParent
 			\param		<variant> nativeObject || None
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def _setNativeWireColor( self, color ):
 		"""
-			\remarks	[abstract] set the wirecolor for the object to the inputed QColor
+			\remarks	set the wirecolor for the object to the inputed QColor
 			\sa			wireColor
 			\param		color	<QColor>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def _typeOfNativeObject( self, nativeObject ):
@@ -252,20 +188,6 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		return self.setSelected(False)
 		
-	def displayName( self ):
-		"""
-			\remarks	[abstract]	looks up the display name for this object and returns it
-			\sa			name, setDisplayName, setName
-			\return		<str> name
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return ''
-	
 	def childAt( self, index ):
 		"""
 			\remarks	returns the child at a particular index for this object
@@ -341,32 +263,22 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		return self.cachedIcon( self.objectType() )
 		
+	@abstractmethod
 	def isFrozen( self ):
 		"""
-			\remarks	[abstract]	returns whether or not this object is frozen(locked)
+			\remarks	returns whether or not this object is frozen(locked)
 			\sa			freeze, setFrozen, unfreeze
 			\return		<bool> frozen
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
-		
+	
+	@abstractmethod
 	def isHidden( self ):
 		"""
-			\remarks	[abstract]	returns whether or not this object is hidden
+			\remarks	returns whether or not this object is hidden
 			\sa			hide, setHidden, unhide
 			\return		<bool> hidden
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def isObjectType( self, objectType ):
@@ -377,19 +289,14 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> matches
 		"""
 		return (self._objectType & objectType) != 0
-		
+	
+	@abstractmethod
 	def isSelected( self ):
 		"""
-			\remarks	[abstract]	returns whether or not this object is selected
+			\remarks	returns whether or not this object is selected
 			\sa			deselect, select, setSelected
 			\return		<bool> selected
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 		
 	def layer( self ):
@@ -456,49 +363,24 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		return self.setSelected(True)
 	
-	def setDisplayName( self, name ):
-		"""
-			\remarks	[abstract]	sets the display name for this object
-			\sa			displayName, name, setName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
-		return False
-	
+	@abstractmethod
 	def setFrozen( self, state ):
 		"""
-			\remarks	[abstract]  freezes(locks)/unfreezes(unlocks) this object
+			\remarks	freezes(locks)/unfreezes(unlocks) this object
 			\sa			freeze, isFrozen, unfreeze
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
+	@abstractmethod
 	def setHidden( self, state ):
 		"""
-			\remarks	[abstract]  hides/unhides this object
+			\remarks	hides/unhides this object
 			\sa			hide, isHidden, unhide
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setLayer( self, layer ):
@@ -558,24 +440,19 @@ class AbstractSceneObject( SceneWrapper ):
 			nativeParent = parent.nativePointer()
 		return self._setNativeParent( nativeParent )
 			
+	@abstractmethod
 	def setSelected( self, state ):
 		"""
-			\remarks	[abstract]  selects/deselects this object
+			\remarks	selects/deselects this object
 			\sa			deselect, isSelected, select
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		
-		# when debugging, raise an error
-		if ( debug.isDebugLevel( debug.DebugLevel.High ) ):
-			raise NotImplementedError
-		
 		return False
 	
 	def setWireColor( self, color ):
 		"""
-			\remarks	[abstract]  sets the wirecolor for the object to the inputed QColor
+			\remarks	sets the wirecolor for the object to the inputed QColor
 			\sa			wireColor
 			\param		color	<QColor>
 			\return		<bool> success
