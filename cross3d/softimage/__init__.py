@@ -1,15 +1,24 @@
 ##
-#	\namespace	blur3d.api.softimage
+#	\namespace	blur3d.scenes
 #
-#	\remarks	Defines the classes that will be used for the Softimage implementation of the blur3d abstraction layer
+#	\remarks	The blur3d.scenes package creates an abstract wrapper from a 3d system
+#				to use when dealing with scenes
 #	
-#	\author		eric@blur.com
+#	\author		douglas@blur.com
 #	\author		Blur Studio
 #	\date		03/15/10
 #
 
 def init():
 	# make sure we can import softimage
-	import PySoftimage
+	from PySoftimage import xsi
 	
 	# import softimage classes
+	import softimagescene
+	import softimagescenewrapper
+	import softimagesceneobjectmetadata # not in abstract
+	import softimagesceneobject
+	import softimagescenemodel
+	import softimagescenecamera
+	import softimagesceneviewport # not in abstract
+	import softimagescenerenderpass

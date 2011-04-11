@@ -54,6 +54,7 @@ class AbstractScene( QObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	@abstractmethod
 	def _cacheNativeMap( self, cacheType, nativeMap ):
 		"""
@@ -265,6 +266,7 @@ class AbstractScene( QObject ):
 		"""
 		return False
 	
+	@abstractmethod
 	def _fromNativeValue( self, nativeValue ):
 		"""
 			\remarks	converts the inputed value from a native value from whatever application we're in
@@ -344,6 +346,21 @@ class AbstractScene( QObject ):
 		"""
 		return []
 	
+	@abstractmethod
+	def _nativeModels( self ): # new douglas
+		"""
+			\remarks	return a collection of the models in this scene
+			\return		<list> [ <variant> nativeModel, .. ]
+		"""
+		return []
+		
+	def _importNativeModel( self, path, name = '' ): # new douglas
+		"""
+			\remarks	import and return a model in the scene
+			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
+		"""
+		return None
+		
 	@abstractmethod
 	def _nativeCameras( self ):
 		"""
@@ -571,6 +588,15 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return False
+		
+	@abstractmethod
+	def _addToNativeSelection( self, nativeObjects ): # new douglas
+		"""
+			\remarks	add the inputed native objects to the selection in the scene
+			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
+			\return		<bool> success
+		"""
+		return False
 	
 	@abstractmethod
 	def _setNativeUpdatesEnabled( self, state ):
@@ -613,10 +639,36 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		return []
+
+	@abstractmethod
+	def _nativeRenderPasses( self ): # new douglas
+		return []
+
+	@abstractmethod
+	def _findNativeRenderPass( self, displayName = '' ): # new douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class.
+		return None
+
+	@abstractmethod
+	def _currentNativeRenderPass( self ): # new douglas
+		return None
+
+	@abstractmethod
+	def _setCurrentNativeRenderPass( self, nativeRenderPass ): #new douglas
+		xsi.SetCurrentPass( nativeRenderPass )
+		return False
 		
+	@abstractmethod
+	def _removeNativeRenderPasses( self , nativeRenderPasses ): # new douglas
+		return False
+		
+	@abstractmethod
+	def _createNativeRenderPass( self, displayName ): # new douglas
+		return None
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	def activeLayer( self ):
 		"""
 			\remarks	returns the currently active layer of the scene
@@ -715,6 +767,24 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
 	
+	def models( self ):
+		"""
+			\remarks	return a list of all the models objects in this scene
+			\sa			_nativeModels
+			\return		<list> [ <blur3d.api.SceneModel>, .. ]
+		"""
+		from blur3d.api import SceneModel
+		return [ SceneModel( self, nativeModel ) for nativeModel in self._nativeModels() ]
+		
+	def importModel( self, path, name = '' ): # new douglas
+		"""
+			\remarks	import and return a model in the scene
+			\sa			_importNativeModel
+			\return		<blur3d.api.SceneModel>
+		"""
+		from blur3d.api import SceneModel
+		return SceneModel( self, self._importNativeModel( path, name ) )
+		
 	def cameras( self ):
 		"""
 			\remarks	return a list of all the camera objects in this scene
@@ -1630,6 +1700,14 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return self._setNativeSelection( [ obj.nativePointer() for obj in objects ] )
+		
+	def addToSelection( self, objects ): # new douglas
+		"""
+			\remarks	add the inputed objects to the selection in the scene
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\return		<bool> success
+		"""
+		return self._addToNativeSelection( [ obj.nativePointer() for obj in objects ] )
 	
 	def setUpdatesEnabled( self, state ):
 		"""
@@ -1744,7 +1822,35 @@ class AbstractScene( QObject ):
 	@staticmethod
 	def clearInstance():
 		AbstractScene._instance = None
-	
+		
+	def renderPasses( self ): # new douglas
+		from blur3d.api import SceneRenderPass
+		return [ SceneRenderPass( self, nativeRenderPass ) for nativeRenderPass in self._nativeRenderPasses() ]
+
+	def findRenderPass( self, displayName = '' ): # new douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class.
+		from blur3d.api import SceneRenderPass
+		return SceneRenderPass( self, self._findNativeRenderPass( displayName ) )
+
+	def currentRenderPass( self ): # new douglas
+		from blur3d.api import SceneRenderPass
+		return SceneRenderPass( self, self._currentNativeRenderPass() )
+
+	def setCurrentRenderPass( self, renderPass ): # new douglas
+		return self._setCurrentNativeRenderPass( renderPass.nativePointer() )
+		
+	def removeRenderPasses( self, renderPasses ): # new douglas
+		return self._removeNativeRenderPasses( [ renderPass.nativePointer() for renderPass in renderPasses ] )
+
+	def createRenderPass( self, displayName ): # new douglas
+		from blur3d.api import SceneRenderPass
+		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
+
+	def softwareVersion( self ): # new douglas
+		print ""
+		
+	def softwareName( self ): # new douglas
+		print ""
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Scene', AbstractScene, ifNotFound = True )
