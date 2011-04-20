@@ -97,17 +97,28 @@ class SoftimageScene( AbstractScene ):
 		root = self._nativeRootObject()
 		return root.FindChildren( '', '', '', True )
 	
-	def _findNativeObject( self, name="", uniqueId=0 ):
+	def _findNativeObject( self, name='', uniqueId=0 ):
 		"""
-			\remarks	implements AbstractScene.getObject method to to let a user select a Material from the scene
+			\remarks	implements AbstractScene._findNativeObject method to looks up a native object based on the inputed name
 			\param		name <string>
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
 		return xsi.Dictionary.GetObject( name, False )
+
+	def _findNativeCamera( self, name = '', uniqueId = 0 ):
+		"""
+			\remarks	implements AbstractScene._findNativeObject method to looks up a native camera based on the inputed name
+			\param		name <string>
+			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
+		"""
+		obj = xsi.Dictionary.GetObject( name, False )
+		if 'camera' in obj.Type.lower():
+			return obj
+		return None
 		
 	def _nativeCameras( self ):
 		"""
-			\remarks	implements the AbstractScene._nativeCameras method to return the native root of the scene
+			\remarks	implements the AbstractScene._nativeCameras method to return the native cameras of the scene
 			\return		<PySoftimage.xsi.X3DObject> nativeObject
 		"""
 		cameras = []
@@ -198,7 +209,7 @@ class SoftimageScene( AbstractScene ):
 		playControl.Parameters( "GlobalOut" ).Value = animationRange[1]
 		return True
 		
-	def setSilentMode( self, switch ): # not in abstract
+	def setSilentMode( self, switch ):
 		"""
 			\remarks	implements AbstractScene.setAutoInspect method to set the Auto Inspect state
 			\param		switch	<bool>
@@ -210,11 +221,11 @@ class SoftimageScene( AbstractScene ):
 			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
 		return True
 		
-	def getAvailableLetterIteration( self, mask ): # not in abstract
+	def getAvailableIteration( self, mask ): # not in abstract
 		import string
-		for letter in string.uppercase:
-			if not self._findNativeObject( mask % { "letterIteration" : letter } ):
-				return letter
+		for iteration in string.uppercase:
+			if not self._findNativeObject( mask % { "iteration" : iteration } ):
+				return iteration
 		return None
 		
 	def isAvalaibleName( self, name ): # not in abstract
@@ -264,6 +275,10 @@ class SoftimageScene( AbstractScene ):
 		
 	def softwareName( self ):
 		return "Softimage"
+		
+	def undo( self ):
+		xsi.Undo( '' )
+		return True
 
 # register the symbol
 from blur3d import api

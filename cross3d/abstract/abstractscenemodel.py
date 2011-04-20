@@ -20,18 +20,12 @@ class AbstractSceneModel( SceneObject ): # new douglas
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def _nativeCamera( self ):
-		return None
+	pass
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-
-	def camera( self ):
-		from blur3d.api import SceneCamera
-		from blur3d.api import Scene
-		return SceneCamera( Scene(), self._nativeCamera() )
-		
+			
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneModel', AbstractSceneModel, ifNotFound = True )

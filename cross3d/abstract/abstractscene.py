@@ -215,6 +215,16 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeObject || None
 		"""
 		return None
+		
+	@abstractmethod
+	def _findNativeCamera( self, name = '', uniqueId = 0 ): # new douglas
+		"""
+			\remarks	looks up a native camera based on the inputed name
+			\sa			findNativeCamera
+			\param		name	<str>
+			\return		<variant> nativeCamera || None
+		"""
+		return None
 	
 	@abstractmethod
 	def _findNativeLayer( self, name = '', uniqueId = 0 ):
@@ -1089,6 +1099,19 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneObject
 			return SceneObject( self, nativeObject )
 		return None
+		
+	def findCamera( self, name = '', uniqueId = 0 ): # new douglas
+		"""
+			\remarks	looks up an individual camera by its name
+			\sa			_findNativeCamera
+			\param		name	<str>
+			\return		<blur3d.api.SceneCamera> || None
+		"""
+		nativeCamera = self._findNativeCamera( name, uniqueId )
+		if ( nativeCamera ):
+			from blur3d.api import SceneCamera
+			return SceneCamera( self, nativeCamera )
+		return None
 	
 	def findMaterial( self, name = '', uniqueId = 0 ):
 		"""
@@ -1829,7 +1852,10 @@ class AbstractScene( QObject ):
 
 	def findRenderPass( self, displayName = '' ): # new douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class.
 		from blur3d.api import SceneRenderPass
-		return SceneRenderPass( self, self._findNativeRenderPass( displayName ) )
+		nativeRenderPass = self._findNativeRenderPass( displayName )
+		if nativeRenderPass:
+			return SceneRenderPass( self, nativeRenderPass  )
+		return None
 
 	def currentRenderPass( self ): # new douglas
 		from blur3d.api import SceneRenderPass
@@ -1846,10 +1872,16 @@ class AbstractScene( QObject ):
 		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
 
 	def softwareVersion( self ): # new douglas
-		print ""
+		return ""
 		
 	def softwareName( self ): # new douglas
-		print ""
+		return ""
+		
+	def undo( self ): # new douglas
+		return False
+		
+	def setSilentMode( self, switch ):
+		return False
 
 # register the symbol
 from blur3d import api

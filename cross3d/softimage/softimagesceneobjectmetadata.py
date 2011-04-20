@@ -15,9 +15,9 @@ from PySoftimage import xsi
 
 class SoftimageSceneObjectMetadata( object ): #not in abstract
 	def __init__( self, object ):
-		self.parent = object
+		self.obj = object
 		self.attributes = {}
-		self.property = object._nativePointer.Properties( "Metadata" )
+		self.property = self.obj._nativePointer.Properties( "Metadata" )
 		if self.property:
 			self.attributes = eval( self.property.Value )
 
@@ -36,13 +36,13 @@ class SoftimageSceneObjectMetadata( object ): #not in abstract
 
 	def setAttribute( self, attribute, value ):
 		if not self.property:
-			self.property = self.parent._nativePointer.AddProperty( "UserDataBlob", False, "Metadata" )
+			self.property = self.obj._nativePointer.AddProperty( "UserDataBlob", False, "Metadata" )
 		self.attributes[ attribute ] = value
 		self.property.Value = str( self.attributes )
 		
 	def setAttributes( self, **attributes ):
 		if not self.property:
-			self.property = self.obj.AddProperty( "UserDataBlob", False, "Metadata" )
+			self.property = self.obj._nativePointer.AddProperty( "UserDataBlob", False, "Metadata" )
 		for attribute in attributes.keys():
 			self.attributes[ attribute ] = attributes[ attribute ]
 		self.property.Value = str( self.attributes )

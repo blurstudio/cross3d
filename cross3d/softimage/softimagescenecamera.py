@@ -37,9 +37,9 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	
 	def offsetRange( self, offset ): #not in abstract
 		range = self.range()
-		range[0] = range[0] + offset
-		range[1] = range[1] + offset
-		self.setRange( range )
+		start = range[0] + offset
+		end = range[1] + offset
+		self.setRange( ( start, end ) )
 		return True
 		
 # register the symbol

@@ -15,13 +15,6 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 #------------------------------------------------------------------------------------------------------------------------
 
 class SoftimageSceneModel( AbstractSceneModel ):
-
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												protected methods
-	#------------------------------------------------------------------------------------------------------------------------
-
-	def _nativeCamera( self ): # I don't really like that but for now will do
-		return self._findNativeChild( 'Camera' )
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -31,39 +24,39 @@ class SoftimageSceneModel( AbstractSceneModel ):
 		metadata = self.metadata()
 		return metadata.attribute( 'assetType' )
 		
-	def department( self ): # not in abstract. I would call that "stage" but I am matching trax.
+	def department( self ): # not in abstract
 		metadata = self.metadata()
 		return metadata.attribute( 'department' )
 
 	def displayNameTokens( self ): # not in abstract
+		print self.displayName()
 		import re
-		regex = re.compile(r'^(?P<assetName>[A-Za-z0-9]+)?(_(?P<letterIteration>[A-Z]))$')
-		if regex:
-			match = regex.match( self.displayName() )
-			if match:
-				return match.groupdict()
+		regex = re.compile(r'^((?P<denomination>[CEVP](-Ly)?)_)?(?P<assetName>[A-Za-z0-9]+)(_)?(?P<iteration>[A-Z]|[0-9]+)?$')
+		match = regex.match( self.displayName() )
+		if match:
+			return match.groupdict()
 		return None
 
 	def displayNameMask( self ): # not in abstract
-		return '%(assetName)s_%(letterIteration)s'
+		return '%(assetName)s_%(iteration)s'
 		
 	def assetName( self ): # not in abstract
 		return self.displayNameTokens()[ 'assetName' ]
 	
-	def letterIteration( self ): # not in abstract
-		return self.displayNameTokens()[ 'letterIteration' ]
+	def iteration( self ): # not in abstract
+		return self.displayNameTokens()[ 'iteration' ]
 
-	def setLetterIteration( self, letterIteration ): # not in abstract
+	def setIteration( self, iteration ): # not in abstract
 		tokens = self.displayNameTokens()
 		if tokens:
-			if tokens[ 'letterIteration' ]: # not in abstract
+			if tokens[ 'iteration' ]: # not in abstract
 				from blur3d.api import Scene
 				scene = Scene() 
 				if scene.isLetterIterationAvailable( letterIteration, tokens[ 'assetName' ] ):
-					tokens[ 'letterIteration' ] = letterIteration
+					tokens[ 'iteration' ] = letterIteration
 					self.setDisplayName( self.displayNameMask % tokens )
 					return True
-		return True
+		return False
 		
 # register the symbol
 from blur3d import api

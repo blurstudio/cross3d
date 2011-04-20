@@ -50,9 +50,6 @@ class SoftimageSceneViewport( object ): # not in abstract. has to be reviewed an
 		xsi.SetValue( "ViewportCapture.End",range[1] , None )
 		xsi.SetValue( "ViewportCapture.Filename", fileName )
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
-		print self.name
-		print letterToNumber[ self.name ]
-		print fileName
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
 # register the symbol
