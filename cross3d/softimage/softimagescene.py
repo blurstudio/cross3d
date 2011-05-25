@@ -146,6 +146,10 @@ class SoftimageScene( AbstractScene ):
 		
 	def _createNativeRenderPass( self, displayName ): 
 		return xsi.CreatePass("", displayName )( "Value" )
+		
+	def _exportNativeModel( self, nativeModel, path ): # not in abstract
+		xsi.ExportModel( nativeModel, path, "", "" )
+		return True
 			
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -239,7 +243,7 @@ class SoftimageScene( AbstractScene ):
 		xsi.SISequence( "", "siAllAnimParams", value, "", 1, 100, 1, "siFCurvesAnimationSources" )
 		for model in self.models():
 			if model.assetType() == "camera":
-				camera = model.camera()
+				camera = self.findCamera( model.name() + '.View' )
 				if camera:
 					camera.offsetRange( value )
 		self.setSilentMode( False )
@@ -279,6 +283,10 @@ class SoftimageScene( AbstractScene ):
 	def undo( self ):
 		xsi.Undo( '' )
 		return True
+		
+	def exportModel( self, model, path ): # not in abstract
+		nativeModel = model.nativePointer()
+		return self._exportNativeModel( nativeModel, path )
 
 # register the symbol
 from blur3d import api

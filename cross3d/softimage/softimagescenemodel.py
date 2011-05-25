@@ -29,9 +29,8 @@ class SoftimageSceneModel( AbstractSceneModel ):
 		return metadata.attribute( 'department' )
 
 	def displayNameTokens( self ): # not in abstract
-		print self.displayName()
 		import re
-		regex = re.compile(r'^((?P<denomination>[CEVP](-Ly)?)_)?(?P<assetName>[A-Za-z0-9]+)(_)?(?P<iteration>[A-Z]|[0-9]+)?$')
+		regex = re.compile(r'^((?P<denomination>[CEVP](-Ly)?)_)?(?P<assetName>[A-Za-z0-9]+)(_|\-)?(?P<iteration>[A-Z]|[0-9]+)?$')
 		match = regex.match( self.displayName() )
 		if match:
 			return match.groupdict()

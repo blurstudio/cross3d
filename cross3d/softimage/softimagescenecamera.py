@@ -20,28 +20,36 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def range( self ): #not in abstract
+	def range( self ): # not in abstract
 		metadata = self.metadata()
-		return metadata.attribute( "range" )
+		return metadata.attribute( 'range' )
 
-	def lens( self ): #not in abstract
-		return self.nativePointer().Parameters( "projplanedist" ).Value
+	def lens( self ): # not in abstract
+		return self.nativePointer().Parameters( 'projplanedist' ).Value
 		
-	def setLens( self, value ): #not in abstract
-		self.nativePointer().Parameters( "projplanedist" ).Value = value
+	def setLens( self, value ): # not in abstract
+		self.nativePointer().Parameters( 'projplanedist' ).Value = value
 		
-	def setRange( self, range ): #not in abstract
+	def setRange( self, range ): # not in abstract
 		metadata = self.metadata()
-		metadata.setAttribute( "range", range )
+		metadata.setAttribute( 'range', range )
 		return True
 	
-	def offsetRange( self, offset ): #not in abstract
+	def offsetRange( self, offset ): # not in abstract
 		range = self.range()
 		start = range[0] + offset
 		end = range[1] + offset
 		self.setRange( ( start, end ) )
 		return True
 		
+	def showCurrentFrame( self, switch ): # not in abstract
+		xsi.SetValue( self.name() + '.camvis.currenttime', switch )
+		return True
+		
+	def showCustomParameters( self, switch ): # not in abstract
+		xsi.SetValue( self.name() + '.camvis.custominfo', switch )
+		return True
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneCamera', SoftimageSceneCamera )
