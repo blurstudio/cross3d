@@ -8,6 +8,20 @@
 #	\author		Blur Studio
 #	\date		05/26/11
 #
+#|# get object
+#|import blur3d
+#|scene = blur3d.api.Scene()
+#|selection = scene.selection()
+#|object = selection[0]
+#|# set blurTags
+#|tags = object.blurTags()
+#|tags.update(type='Character', entity='Dalton', usage='Shaded', location='Right', 
+#|render='Rndr', cache='tmc', variation = 3)
+#|tags['subdivision'] = 4
+#|# set custom properties
+#|prop = object.userProps()
+#|prop['tagA'] = '36'
+#|prop['customProp'] = 'My custom property'
 
 from PyQt4.QtCore import QString
 
