@@ -9,8 +9,6 @@
 #	\date		05/23/11
 #
 
-from PyQt4.QtCore import QString
-
 class BlurTags(dict):
 	def __init__(self, object):
 		dict.__init__(self)

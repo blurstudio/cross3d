@@ -10,7 +10,8 @@
 #
 
 from blur3d import abstractmethod
-#from blur3d.api	import UserProps, BlurTags
+from blur3d.api	import UserProps
+from blur3d.api.abstract.blurtags import BlurTags
 
 class AbstractSceneWrapper:
 	def __eq__( self, other ):
@@ -93,12 +94,12 @@ class AbstractSceneWrapper:
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-#	def blurTags(self):
-#		"""
-#			\remarks	Uses CustomProperteries to store a dictionary containing all blur tags
-#			\return		<blur3d.api.BlurTags>
-#		"""
-#		return BlurTags(self)
+	def blurTags(self):
+		"""
+			\remarks	Uses CustomProperteries to store a dictionary containing all blur tags
+			\return		<blur3d.api.BlurTags>
+		"""
+		return BlurTags(self)
 	
 	def copy( self ):
 		"""
@@ -253,14 +254,14 @@ class AbstractSceneWrapper:
 		"""
 		return False
 	
-#	def setUserProps(self, newDict):
-#		"""
-#			\remarks	ovewrites the current custom properties with the provided dict
-#			\param		newDict		<dict>
-#		"""
-#		props = UserProps(self._nativePointer)
-#		props.clear()
-#		props.update(newDict)
+	def setUserProps(self, newDict):
+		"""
+			\remarks	ovewrites the current custom properties with the provided dict
+			\param		newDict		<dict>
+		"""
+		props = UserProps(self._nativePointer)
+		props.clear()
+		props.update(newDict)
 	
 	@abstractmethod
 	def uniqueId( self ):
@@ -271,12 +272,12 @@ class AbstractSceneWrapper:
 		"""
 		return 0
 	
-#	def userProps(self):
-#		"""
-#			\remarks	returns the UserProps object associated with this element
-#			\return		<blur3d.api.UserProps>
-#		"""
-#		return UserProps(self._nativePointer)
+	def userProps(self):
+		"""
+			\remarks	returns the UserProps object associated with this element
+			\return		<blur3d.api.UserProps>
+		"""
+		return UserProps(self._nativePointer)
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static/class methods

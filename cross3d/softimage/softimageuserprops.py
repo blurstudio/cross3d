@@ -11,7 +11,7 @@
 
 #from PySoftimage import xsi
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps
-from blur3d.api import Scene
+from blur3d import api
 from blurdev.enum import enum
 
 class SoftimageUserProps(AbstractUserProps):
@@ -25,7 +25,7 @@ class SoftimageUserProps(AbstractUserProps):
 		prop = self._nativePointer.Properties(key)
 		if not prop:
 			raise KeyError('%s is not a property' % key)
-		scene = Scene()
+		scene = api.Scene()
 		obj = scene.findObject(prop.FullName)
 		scene.removeObjects([obj])
 	
@@ -77,5 +77,4 @@ class SoftimageUserProps(AbstractUserProps):
 		return props
 
 # register the symbol
-from blur3d import api
 api.registerSymbol( 'UserProps', SoftimageUserProps )
