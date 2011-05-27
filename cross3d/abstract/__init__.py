@@ -13,8 +13,8 @@ def init():
 	"""
 		\remarks	initializes the original abstract classes, registering them to the api module when necessary
 	"""
-	import abstractuserprops
-	import blurtags
+	#import abstractuserprops
+	#import blurtags
 	import abstractscene
 	import abstractscenewrapper
 	import abstractsceneobject

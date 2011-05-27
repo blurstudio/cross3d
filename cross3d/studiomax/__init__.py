@@ -18,7 +18,7 @@ def init():
 	from Py3dsMax import mxs
 	
 	# load the maxscript classes
-	import studiomaxuserprops
+	#import studiomaxuserprops
 	import studiomaxscene
 	import studiomaxscenewrapper
 	import studiomaxsceneobject	

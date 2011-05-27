@@ -14,8 +14,8 @@ def init():
 	from PySoftimage import xsi
 	
 	# import softimage classes
+	#import softimageuserprops
 	import softimagescene
-	import softimageuserprops
 	import softimagescenewrapper
 	import softimagesceneobjectmetadata # not in abstract
 	import softimagesceneobject
