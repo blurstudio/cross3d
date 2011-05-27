@@ -18,8 +18,7 @@ class BlurTags(dict):
 		return key in self.lookupProps()
 	
 	def __getitem__(self, key):
-		key = key
-		return self.lookupProps().__getitem__(self, key)
+		return self.lookupProps().__getitem__(key)
 	
 	def __setitem__(self, key, value):
 		props = self.lookupProps()
