@@ -15,6 +15,7 @@ def init():
 	
 	# import softimage classes
 	import softimagescene
+	import softimageuserprops
 	import softimagescenewrapper
 	import softimagesceneobjectmetadata # not in abstract
 	import softimagesceneobject

@@ -10,6 +10,7 @@
 #
 
 from blur3d import abstractmethod
+from blur3d.api	import UserProps, BlurTags
 
 class AbstractSceneWrapper:
 	def __eq__( self, other ):
@@ -92,6 +93,13 @@ class AbstractSceneWrapper:
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	def blurTags(self):
+		"""
+			\remarks	Uses CustomProperteries to store a dictionary containing all blur tags
+			\return		<blur3d.api.BlurTags>
+		"""
+		return BlurTags(self)
+	
 	def copy( self ):
 		"""
 			\remarks	create a copy of this wrapper in the scene
@@ -225,16 +233,6 @@ class AbstractSceneWrapper:
 		"""
 		return False
 	
-	@abstractmethod
-	def setUniqueId( self, uniqueId ):
-		"""
-			\remarks	set the unique id for this wrapper instance
-			\sa			uniqueId
-			\param		uniqueId <int>
-			\return		<bool> success
-		"""
-		return False
-		
 	def setProperty( self, key, value ):
 		"""
 			\remarks	set the value of the property defined by the inputed key
@@ -246,6 +244,25 @@ class AbstractSceneWrapper:
 		return self._setNativeProperty( key, self._scene._toNativeValue( value ) )
 	
 	@abstractmethod
+	def setUniqueId( self, uniqueId ):
+		"""
+			\remarks	set the unique id for this wrapper instance
+			\sa			uniqueId
+			\param		uniqueId <int>
+			\return		<bool> success
+		"""
+		return False
+	
+	def setUserProps(self, newDict):
+		"""
+			\remarks	ovewrites the current custom properties with the provided dict
+			\param		newDict		<dict>
+		"""
+		props = UserProps(self._nativePointer)
+		props.clear()
+		props.update(newDict)
+	
+	@abstractmethod
 	def uniqueId( self ):
 		"""
 			\remarks	return the unique id for this controller instance
@@ -253,6 +270,13 @@ class AbstractSceneWrapper:
 			\return		<int> id
 		"""
 		return 0
+	
+	def userProps(self):
+		"""
+			\remarks	returns the UserProps object associated with this element
+			\return		<blur3d.api.UserProps>
+		"""
+		return UserProps(self._nativePointer)
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static/class methods
