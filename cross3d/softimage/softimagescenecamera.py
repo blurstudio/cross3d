@@ -49,6 +49,13 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	def showCustomParameters( self, switch ): # not in abstract
 		xsi.SetValue( self.name() + '.camvis.custominfo', switch )
 		return True
+		
+	def setHeadlight( self, switch ): # not in abstract
+		xsi.SetValue( self.name() + '.camdisp.headlight', switch )
+		return True
+		
+	def hasHeadlight( self ): # not in abstract
+		return xsi.GetValue( self.name() + '.camdisp.headlight' )
 
 # register the symbol
 from blur3d import api
