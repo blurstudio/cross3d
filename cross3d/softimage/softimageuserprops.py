@@ -21,7 +21,6 @@ class SoftimageUserProps(AbstractUserProps):
 		self._nativePointer = nativePointer
 	
 	def __delitem__(self, key):
-		key = self.typeCheck(key)
 		prop = self._nativePointer.Properties(key)
 		if not prop:
 			raise KeyError('%s is not a property' % key)
@@ -30,12 +29,9 @@ class SoftimageUserProps(AbstractUserProps):
 		scene.removeObjects([obj])
 	
 	def __getitem__(self, key):
-		key = self.typeCheck(key)
 		return self._nativePointer.Properties(key).Value
 	
 	def __setitem__(self, key, value):
-		key = self.typeCheck(key)
-		value = self.typeCheck(value)
 		prop = self._nativePointer.Properties(key)
 		if not prop:
 			prop = self._nativePointer.AddProperty( 'UserDataBlob', False, key)
@@ -49,7 +45,6 @@ class SoftimageUserProps(AbstractUserProps):
 			del self[item]
 
 	def pop(self, key, default = None):
-		key = self.typeCheck(key)
 		if not key in self.lookupProps():
 			if default:
 				return default
