@@ -23,8 +23,6 @@
 #|prop['tagA'] = '36'
 #|prop['customProp'] = 'My custom property'
 
-from PyQt4.QtCore import QString
-
 class AbstractUserProps(dict):
 	def __init__(self, nativePointer):
 		dict.__init__(self)
@@ -34,12 +32,9 @@ class AbstractUserProps(dict):
 		return key in self.lookupProps()
 	
 	def __getitem__(self, key):
-		key = self.typeCheck(key)
 		return dict.__getitem__(self, key)
 	
 	def __setitem__(self, key, value):
-		key = self.typeCheck(key)
-		value = self.typeCheck(value)
 		dict.__setitem__(self, key, value)
 	
 	def __str__(self):
@@ -105,6 +100,8 @@ class AbstractUserProps(dict):
 			\remarks	replaces any unstorable characters in key with their html codes
 			\return		<str>
 		"""
+		if not isinstance(string, (str, unicode)):
+			string = unicode(string)
 		return string.replace(' ', '&#32;').replace('\n', '&#10;').replace('\r', '&#13;')
 	
 	@staticmethod
@@ -113,22 +110,9 @@ class AbstractUserProps(dict):
 			\remarks	replaces any unstorable characters in value with their html codes
 			\return		<str>
 		"""
-		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')
-	
-	@staticmethod
-	def typeCheck(string):
-		"""
-			\remarks	Returns the string. Raises a TypeError if the input is not a string or unicode. If the input is a QString it converts it to unicode.
-			\return		<str>
-		"""
 		if not isinstance(string, (str, unicode)):
-			if isinstance(string, QString):
-				return unicode(string)
-			else:
-				# raise type error
-				raise TypeError(('UserProps requires a <str> or <unicode> you provided <%s>' % string.__class__.__name__))
-		return string
-				
+			string = unicode(string)
+		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')		
 	
 	@staticmethod
 	def unescapeKey(string):
@@ -136,6 +120,8 @@ class AbstractUserProps(dict):
 			\remarks	replaces any html codes with their associated unstorable characters
 			\return		<str>
 		"""
+		if not isinstance(string, (str, unicode)):
+			string = unicode(string)
 		return string.replace('&#32;', ' ').replace('&#10;', '\n').replace('&#13;', '\r')
 	
 	@staticmethod
@@ -144,6 +130,8 @@ class AbstractUserProps(dict):
 			\remarks	replaces any html codes with their associated unstorable characters
 			\return		<str>
 		"""
+		if not isinstance(string, (str, unicode)):
+			string = unicode(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 
 

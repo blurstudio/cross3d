@@ -11,6 +11,7 @@
 
 from Py3dsMax import mxs
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps
+import re
 
 class StudiomaxUserProps(AbstractUserProps):
 	def __init__(self, nativePointer):
@@ -22,7 +23,7 @@ class StudiomaxUserProps(AbstractUserProps):
 			\remarks	There is no build in way to remove keys from userProp's so we create a copy of our userProps dictionary
 						clear userProps on the object, remove the item we want to remove and restore the remaining data to the object.
 		"""
-		key = self.typeCheck(key)
+		#key = self.typeCheck(key)
 		data = self.lookupProps()
 		if key in data:
 			self.clear()
@@ -30,12 +31,9 @@ class StudiomaxUserProps(AbstractUserProps):
 			self.update(data)
 	
 	def __getitem__(self, key):
-		key = self.typeCheck(key)
-		return self.unescapeValue(mxs.getUserProp(self._nativePointer, self.escapeKey(key)))
+		return self.lookupProps()[key]
 	
 	def __setitem__(self, key, value):
-		key = self.typeCheck(key)
-		value = self.typeCheck(value)
 		mxs.setUserProp(self._nativePointer, self.escapeKey(key), self.escapeValue(value))
 
 	def clear(self):
@@ -45,7 +43,7 @@ class StudiomaxUserProps(AbstractUserProps):
 		mxs.setUserPropBuffer(self._nativePointer, '')
 	
 	def pop(self, key, default = None):
-		key = self.typeCheck(key)
+		#key = self.typeCheck(key)
 		if not key in self.lookupProps():
 			if default:
 				return default
@@ -76,6 +74,79 @@ class StudiomaxUserProps(AbstractUserProps):
 						continue
 			props[self.unescapeKey(split[0])] = self.unescapeValue(split[1])
 		return props
+
+	@staticmethod
+	def escapeValue(string):
+		"""
+			\remarks	replaces any unstorable characters in value with their html codes
+			\return		<str>
+		"""
+		if isinstance(string, (float, list)):
+			return string
+		if not isinstance(string, (str, unicode, float)):
+			string = unicode(string)
+		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')
+	
+	@staticmethod
+	def unescapeValue(string):
+		"""
+			\remarks	replaces any html codes with their associated unstorable characters
+			\return		<str>
+		"""
+		string = unicode(string)
+		string, type = StudiomaxUserProps._decodeString(string)
+		if type == float:
+			return float(string)
+		elif type == int:
+			return int(string)
+		elif type == list:
+			return eval(string)
+		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+	
+	@staticmethod
+	def _decodeString(string):
+		if string.endswith('d0'):
+			val = string.rstrip('d0')
+			try:
+				float(val)
+				return val, float
+			except:
+				pass
+		if re.search('#\(.+\)', string):
+			data = []
+			s = string
+			open, close = StudiomaxUserProps._posCounter(s)
+			while (open != -1 or close != -1):
+				#if open and close < len(string):
+				s = s[:open-2]+'['+s[open:close]+']'+s[close+1:]
+				open, close = StudiomaxUserProps._posCounter(s)
+			return s, list
+		try:
+			int(string)
+			return string, int
+		except:
+			pass
+		return string, None
+	
+	@staticmethod
+	def _posCounter(string, opening = '#(', closing = ')'):
+		openBr = 0
+		openPos = 0
+		found = False
+		for pos in range(0, len(string)):
+			if string[pos-2:pos] == opening:
+				openBr += 1
+				if not found:
+					openPos = pos
+					found = True
+			elif string[pos] == closing:
+				openBr -= 1
+			if found and not openBr:
+				break
+		else:
+			return -1,-1
+		return openPos, pos
+			
 
 # register the symbol
 from blur3d import api
