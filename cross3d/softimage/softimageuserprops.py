@@ -12,7 +12,8 @@
 #from PySoftimage import xsi
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps
 from blur3d import api
-from blurdev.enum import enum
+import re
+#from blurdev.enum import enum
 
 class SoftimageUserProps(AbstractUserProps):
 	#dataTypes = enum('ClusterProperty', 'CustomProperty', 'Property', 'UserDataBlob', 'UserDataMap')
@@ -29,10 +30,13 @@ class SoftimageUserProps(AbstractUserProps):
 		scene.removeObjects([obj])
 	
 	def __getitem__(self, key):
-		return self._nativePointer.Properties(key).Value
+		return self.unescapeValue(self._nativePointer.Properties(key).Value)
+		#return self.lookupProps()[key]
 	
 	def __setitem__(self, key, value):
 		prop = self._nativePointer.Properties(key)
+		if isinstance(value, (list, dict)):
+			value = unicode(value)
 		if not prop:
 			prop = self._nativePointer.AddProperty( 'UserDataBlob', False, key)
 		prop.Value = value
@@ -68,8 +72,55 @@ class SoftimageUserProps(AbstractUserProps):
 			if prop.Type in ("UserDataBlob"):
 				key = prop.Name
 				value = prop.Value
-				props[key] = value
+				props[key] = self.unescapeValue(value)
 		return props
+	
+	@staticmethod
+	def escapeValue(string):
+		"""
+			\remarks	replaces any unstorable characters in value with their html codes
+			\return		<str>
+		"""
+		if not isinstance(string, (str, unicode)):
+			string = unicode(string)
+		#return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')		
+		return string
+	
+	@staticmethod
+	def unescapeValue(string):
+		"""
+			\remarks	replaces any html codes with their associated unstorable characters
+			\return		<str>
+		"""
+		string = unicode(string)
+		string, type = SoftimageUserProps._decodeString(string)
+		if type == float:
+			return float(string)
+		elif type == int:
+			return int(string)
+		elif type in (list, dict):
+			return eval(string)
+		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+	
+	@staticmethod
+	def _decodeString(string):
+		if re.search('\[.+\]', string):
+			return string, list
+		if re.search('{.+}', string):
+			return string, dict
+			return string, dict
+		if string.find('.') != -1:
+			try:
+				float(string)
+				return string, float
+			except:
+				pass
+		try:
+			int(string)
+			return string, int
+		except:
+			pass
+		return string, None
 
 # register the symbol
 api.registerSymbol( 'UserProps', SoftimageUserProps )

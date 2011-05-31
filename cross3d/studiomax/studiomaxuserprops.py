@@ -99,7 +99,7 @@ class StudiomaxUserProps(AbstractUserProps):
 			return float(string)
 		elif type == int:
 			return int(string)
-		elif type == list:
+		elif type in (list, dict):
 			return eval(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
@@ -112,6 +112,8 @@ class StudiomaxUserProps(AbstractUserProps):
 				return val, float
 			except:
 				pass
+		if re.search('\{.+\}', string):
+			return string, dict
 		if re.search('#\(.+\)', string):
 			data = []
 			s = string

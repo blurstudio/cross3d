@@ -66,7 +66,7 @@ class BlurTags(dict):
 		"""
 		props = self._object.userProps()
 		if 'BlurTags' in props:
-			return eval(props['BlurTags'])
+			return props['BlurTags']
 		return {}
 	
 	def pop(self, key, default = None):
