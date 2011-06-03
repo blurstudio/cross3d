@@ -238,14 +238,39 @@ class SoftimageScene( AbstractScene ):
 		else:
 			return True
 			
-	def offsetAnimation( self, value ): # not in abstract
+	def retime( self, offset, scale = 1, activeRange = None, pivot = None ): # not in abstract
+		if activeRange:
+			if not pivot:
+				pivot = activeRange[0]
+		else:
+			activeRange = ( -9999, 9999 )
+			if not pivot:
+				pivot = 1
 		self.setSilentMode( True )
-		xsi.SISequence( "", "siAllAnimParams", value, "", 1, 100, 1, "siFCurvesAnimationSources" )
+		xsi.SISequence( "", "siAllAnimParams", offset, scale, activeRange[0], activeRange[1], activeRange[0], "siFCurvesAnimationSources" )
+		smallerOuterRangeOffset = int( ( activeRange[0] - pivot ) * scale + pivot ) - activeRange[0]
+		biggerOuterRangeOffset = int( ( activeRange[1] - pivot ) * scale + pivot ) - activeRange[1]
+		# retiming blur camera ranges
 		for model in self.models():
 			if model.assetType() == "camera":
 				camera = self.findCamera( model.name() + '.View' )
 				if camera:
-					camera.offsetRange( value )
+					if camera.range():
+						retimedRange = []
+						for frame in camera.range():
+							if frame in range( activeRange[0], activeRange[1] + 1 ):
+								frame = int( ( ( frame - pivot ) * scale ) + pivot ) + offset
+							else:
+								if frame > activeRange[1]:
+									frame = frame + biggerOuterRangeOffset
+									if offset > 0:
+										frame = frame + offset
+								else:
+									frame = frame + smallerOuterRangeOffset
+									if offset < 0:
+										frame = frame + offset
+							retimedRange.append( frame ) 
+						camera.setRange( retimedRange )
 		self.setSilentMode( False )
 		return True	
 		

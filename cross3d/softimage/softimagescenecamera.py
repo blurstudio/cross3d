@@ -34,13 +34,6 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		metadata = self.metadata()
 		metadata.setAttribute( 'range', range )
 		return True
-	
-	def offsetRange( self, offset ): # not in abstract
-		range = self.range()
-		start = range[0] + offset
-		end = range[1] + offset
-		self.setRange( ( start, end ) )
-		return True
 		
 	def showCurrentFrame( self, switch ): # not in abstract
 		xsi.SetValue( self.name() + '.camvis.currenttime', switch )
