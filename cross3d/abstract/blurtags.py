@@ -17,6 +17,11 @@ class BlurTags(dict):
 	def __contains__(self, key):
 		return key in self.lookupProps()
 	
+	def __delitem__(self, key):
+		props = self.lookupProps()
+		del props[key]
+		self._object.userProps()['BlurTags'] = str(props)
+	
 	def __getitem__(self, key):
 		return self.lookupProps().__getitem__(key)
 	
@@ -70,13 +75,32 @@ class BlurTags(dict):
 		return {}
 	
 	def pop(self, key, default = None):
-		return self.lookupProps().pop(key, default)
+		if not key in self.lookupProps():
+			if default:
+				return default
+			raise KeyError(self.unescapeKey(key))
+		out = self[key]
+		del self[key]
+		return out
 	
 	def popitem(self):
-		return self.lookupProps().popitem()
+		data = self.lookupProps()
+		if not data:
+			raise KeyError('popitem(): dictionary is empty')
+		item = data.popitem()
+		del self[item[0]]
+		return item
 	
 	def setdefault(self, key, default = None):
 		return self.lookupProps().setdefault(key, default)
+	
+	def toString(self, prefix = '', seperator = ':', postfix = ' '):
+		out = ''
+		for key, value in self.lookupProps().items():
+			line = prefix + key + seperator + unicode(value) + postfix
+			out += line
+		return out
+		
 	
 	def update(self, *args, **kwargs):
 		for k, v in dict(*args, **kwargs).iteritems():
