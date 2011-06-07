@@ -35,11 +35,12 @@ class SoftimageUserProps(AbstractUserProps):
 	
 	def __setitem__(self, key, value):
 		prop = self._nativePointer.Properties(key)
-		if isinstance(value, (list, dict)):
+		if isinstance(value, (list, dict, tuple)):
 			value = unicode(value)
 		if not prop:
 			prop = self._nativePointer.AddProperty( 'UserDataBlob', False, key)
 		prop.Value = value
+		#self.emitChange()
 
 	def clear(self):
 		"""
@@ -98,7 +99,7 @@ class SoftimageUserProps(AbstractUserProps):
 			return float(string)
 		elif type == int:
 			return int(string)
-		elif type in (list, dict):
+		elif type in (list, dict, tuple):
 			return eval(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
@@ -108,7 +109,8 @@ class SoftimageUserProps(AbstractUserProps):
 			return string, list
 		if re.search('{.+}', string):
 			return string, dict
-			return string, dict
+		if re.search('\(.+\)', string):
+			return string, tuple
 		if string.find('.') != -1:
 			try:
 				float(string)

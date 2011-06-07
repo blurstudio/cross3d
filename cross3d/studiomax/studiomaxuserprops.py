@@ -34,7 +34,10 @@ class StudiomaxUserProps(AbstractUserProps):
 		return self.lookupProps()[key]
 	
 	def __setitem__(self, key, value):
+		if isinstance(value, float):
+			value = '%f' % value
 		mxs.setUserProp(self._nativePointer, self.escapeKey(key), self.escapeValue(value))
+		#self.emitChange()
 
 	def clear(self):
 		"""
@@ -99,13 +102,13 @@ class StudiomaxUserProps(AbstractUserProps):
 			return float(string)
 		elif type == int:
 			return int(string)
-		elif type in (list, dict):
+		elif type in (list, dict, tuple):
 			return eval(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
 	@staticmethod
 	def _decodeString(string):
-		if string.endswith('d0'):
+		if string.endswith('d0') or string.find('.'):
 			val = string.rstrip('d0')
 			try:
 				float(val)
@@ -123,6 +126,8 @@ class StudiomaxUserProps(AbstractUserProps):
 				s = s[:open-2]+'['+s[open:close]+']'+s[close+1:]
 				open, close = StudiomaxUserProps._posCounter(s)
 			return s, list
+		if re.search('\(.+\)', string):
+			return string, tuple
 		try:
 			int(string)
 			return string, int
