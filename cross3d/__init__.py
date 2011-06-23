@@ -10,10 +10,11 @@
 #	\date		03/15/10
 #
 
+import blurdev
 # If you need to test why a package is failing to import set this to true
-_useDebug = False
+_useDebug = blurdev.debug.debugLevel() == blurdev.debug.DebugLevel.High
 # specify the module you wish to check. This way it will not report the fail to load softimage if you are in max, as this is a expected failure
-_modName = ''
+_modName = blurdev.core.objectName()
 
 # initialize the
 def init():
