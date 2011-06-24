@@ -20,8 +20,11 @@
 #|tags['subdivision'] = 4
 #|# set custom properties
 #|prop = object.userProps()
-#|prop['tagA'] = '36'
+#|prop['tagA'] = 36
 #|prop['customProp'] = 'My custom property'
+
+import blur3d
+dispatchObject = blur3d.api.dispatch.dispatchObject
 
 class AbstractUserProps(dict):
 	def __init__(self, nativePointer):
@@ -36,6 +39,7 @@ class AbstractUserProps(dict):
 	
 	def __setitem__(self, key, value):
 		dict.__setitem__(self, key, value)
+		self.emitChange()
 	
 	def __str__(self):
 		return str(self.lookupProps())
@@ -48,6 +52,12 @@ class AbstractUserProps(dict):
 	
 	def copy(self):
 		return self.lookupProps().copy()
+	
+	def emitChange(self, key):
+		if key == 'BlurTags':
+			dispatchObject('blurTagChanged', self._nativePointer)
+		else:
+			dispatchObject('customPropChanged', self._nativePointer)
 	
 	def keys(self):
 		return self.lookupProps().keys()

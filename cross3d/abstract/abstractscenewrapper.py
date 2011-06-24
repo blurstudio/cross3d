@@ -13,7 +13,7 @@ from blur3d import abstractmethod
 from blur3d.api	import UserProps
 from blur3d.api.abstract.blurtags import BlurTags
 
-class AbstractSceneWrapper:
+class AbstractSceneWrapper(object):
 	def __eq__( self, other ):
 		"""
 			\remarks	compares this instance to another object
@@ -28,6 +28,7 @@ class AbstractSceneWrapper:
 		"""
 			\remarks	initialize the abstract scene controller
 		"""
+		super(AbstractSceneWrapper, self).__init__()
 		self._scene				= scene
 		self._nativePointer		= nativePointer
 	

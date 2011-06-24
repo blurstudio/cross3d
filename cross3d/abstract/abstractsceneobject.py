@@ -11,6 +11,7 @@
 
 from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
+from blur3d.constants import ObjectType
 
 class AbstractSceneObject( SceneWrapper ):
 	iconCache = {}
@@ -153,7 +154,6 @@ class AbstractSceneObject( SceneWrapper ):
 			\param		<variant> nativeObject || None
 			\return		<bool> success
 		"""
-		from blur3d.constants import ObjectType
 		return ObjectType.Generic
 	
 	#------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +429,6 @@ class AbstractSceneObject( SceneWrapper ):
 			\param		parent	<blur3d.api.SceneObject> || None
 			\return		<bool> success
 		"""
-		from blur3d.api import ObjectType
 		
 		# set the model in particular
 		if ( parent and parent.isObjectType( ObjectType.Model ) ):
@@ -497,7 +496,6 @@ class AbstractSceneObject( SceneWrapper ):
 			return icon
 		
 		# create an icon cache
-		from blur3d.constants 	import ObjectType
 		
 		# create a light icon
 		if ( objectType & ObjectType.Light ):

@@ -15,6 +15,7 @@ def init():
 	"""
 	import abstractuserprops
 	import blurtags
+	import abstractapplication
 	import abstractscene
 	import abstractscenewrapper
 	import abstractsceneobject

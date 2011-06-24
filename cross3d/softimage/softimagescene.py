@@ -115,7 +115,30 @@ class SoftimageScene( AbstractScene ):
 		if 'camera' in obj.Type.lower():
 			return obj
 		return None
-		
+
+	def _freezeNativeObjects( self, nativeObjects, state ):
+		"""
+			\remarks	implements the AbstractScene._freezeNativeObjects method to freeze(lock)/unfreeze(unlock) the inputed objects
+			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+			\param		state			<bool>
+			\return		<bool> success
+		"""
+		for object in nativeObjects:
+			object.Properties('Visibility').Parameters('selectability').SetValue(not state)
+		return True
+	
+	def _hideNativeObjects( self, nativeObjects, state ):
+		"""
+			\remarks	implements the AbstractScene._hideNativeObjects method to hide/unhide the inputed objects
+			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+			\param		state			<bool>
+			\return		<bool> success
+		"""
+		for object in nativeObjects:
+			object.Properties('Visibility').Parameters('viewvis').SetValue(not state)
+			object.Properties('Visibility').Parameters('rendvis').SetValue(not state)
+		return True
+	
 	def _nativeCameras( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeCameras method to return the native cameras of the scene

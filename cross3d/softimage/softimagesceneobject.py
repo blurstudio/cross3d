@@ -23,9 +23,27 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		return self.nativePointer().FindChild( name )
 
-	def _nativeChildren():
-		return self.nativePointer.Children
-		
+	def _nativeChildren(self):
+		return self._nativePointer.Children
+	
+	def _nativeParent( self ):
+		"""
+			\remarks	implements the AbstractSceneObject._nativeParent method to look up the native parent for this object
+			\sa			parent, setParent, _setNativeParent
+			\return		<Py3dsMax.mxs.Object> nativeObject || None
+		"""
+		return self._nativePointer.Parent
+	
+	def _setNativeParent( self, nativeParent ):
+		"""
+			\remarks	implements the AbstractSceneObject._setNativeParent method to set the native parent for this object
+			\sa			parent, setParent, _nativeParent
+			\param		<Py3dsMax.mxs.Object> nativeObject || None
+			\return		<bool> success
+		"""
+		xsi.Application.ParentObj(self._nativePointer, nativeParent)
+		return True
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -36,18 +54,27 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	def displayName( self ):
 		return self._nativePointer.Name
 		
-	def setDisplayName( name ):
-		"""
-			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
-			\sa			displayName, name, setName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		self.nativePointer().Name = name
+	# MH 06/13/11 moved functionality to correct place SoftimageSceneWrapper.setName. This method was missing self, so probubly didn't work
+#	def setDisplayName( name ):
+#		"""
+#			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
+#			\sa			displayName, name, setName
+#			\param		name	<str>
+#			\return		<bool> success
+#		"""
+#		self.nativePointer().Name = name
 		
 	def metadata( self ): #not in abstract
 		from softimagesceneobjectmetadata import SoftimageSceneObjectMetadata
 		return SoftimageSceneObjectMetadata( self )
+	
+	def uniqueId( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.uniqueId to look up the unique name for this object and returns it
+			\sa			displayName, setDisplayName, setName
+			\return		<str> name
+		"""
+		return self._nativePointer.ObjectID
 
 # register the symbol
 from blur3d import api

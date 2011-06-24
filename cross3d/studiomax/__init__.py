@@ -19,6 +19,7 @@ def init():
 	
 	# load the maxscript classes
 	import studiomaxuserprops
+	import studiomaxapplication
 	import studiomaxscene
 	import studiomaxscenewrapper
 	import studiomaxsceneobject	

@@ -37,7 +37,7 @@ class StudiomaxUserProps(AbstractUserProps):
 		if isinstance(value, float):
 			value = '%f' % value
 		mxs.setUserProp(self._nativePointer, self.escapeKey(key), self.escapeValue(value))
-		#self.emitChange()
+		self.emitChange(key)
 
 	def clear(self):
 		"""

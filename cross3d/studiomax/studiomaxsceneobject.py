@@ -290,7 +290,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		splt 		= self._nativePointer.name.split( '.' )
-		splt[-1] 	= name
+		splt[-1] 	= unicode(name)
 		self._nativePointer.name = '.'.join( splt )
 		return True
 		

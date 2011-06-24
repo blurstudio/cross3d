@@ -40,7 +40,7 @@ class SoftimageUserProps(AbstractUserProps):
 		if not prop:
 			prop = self._nativePointer.AddProperty( 'UserDataBlob', False, key)
 		prop.Value = value
-		#self.emitChange()
+		self.emitChange(key)
 
 	def clear(self):
 		"""

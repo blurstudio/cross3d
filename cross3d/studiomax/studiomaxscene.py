@@ -9,7 +9,7 @@
 #
 
 from blurdev import debug
-from Py3dsMax 								import mxs
+from Py3dsMax import mxs
 	
 from blur3d.api.abstract.abstractscene 	import AbstractScene
 
@@ -129,7 +129,6 @@ class SceneMetaData( MXSCustAttribDef ):
 SceneMetaData.register()
 
 #------------------------------------------------------------------------------------------------------------------------
-
 class StudiomaxScene( AbstractScene ):
 	def __init__( self ):
 		AbstractScene.__init__( self )
@@ -137,6 +136,7 @@ class StudiomaxScene( AbstractScene ):
 		# create custom properties
 		self._metaData 			= None
 		self._mapCache			= None
+		self._connectDefined = False
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -542,6 +542,9 @@ class StudiomaxScene( AbstractScene ):
 			mxs.freeze( nativeObjects )
 		else:
 			mxs.unfreeze( nativeObjects )
+		# this does not seem to update the viewports so call scene update
+		self.update()
+		return True
 	
 	def _hideNativeObjects( self, nativeObjects, state ):
 		"""
@@ -554,6 +557,9 @@ class StudiomaxScene( AbstractScene ):
 			mxs.hide( nativeObjects )
 		else:
 			mxs.unhide( nativeObjects )
+		# this does not seem to update the viewports so call scene update
+		self.update()
+		return True
 	
 	def _fromNativeValue( self, nativeValue ):
 		"""
@@ -579,7 +585,9 @@ class StudiomaxScene( AbstractScene ):
 			return str(nativeValue)
 		
 		# return the standard value
-		return AbstractScene._fromNativeValue( self, nativeValue )
+		# by default, we assume all conversions have already occurred
+		return nativeValue
+#		return AbstractScene._fromNativeValue( self, nativeValue )
 	
 	def _getNativeObject( self ):
 		"""
@@ -1170,7 +1178,6 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		from blur3d.api.studiomax 	import cachelib
 		from blur3d.constants 		import VisibilityToggleOptions
-		from Py3dsMax 				import mxs
 		from blur3d.api.studiomax 	import cachelib
 		
 		# toggle all the visibility options by default

@@ -16,6 +16,9 @@ _useDebug = blurdev.debug.debugLevel() == blurdev.debug.DebugLevel.High
 # specify the module you wish to check. This way it will not report the fail to load softimage if you are in max, as this is a expected failure
 _modName = blurdev.core.objectName()
 
+from classes import Dispatch
+dispatch = Dispatch()
+
 # initialize the
 def init():
 	# import any overrides to the abstract symbols
@@ -32,7 +35,7 @@ def init():
 			else:
 				try:
 					__import__( pckg )
-				except:
+				except ImportError:
 					continue
 			
 			mod = sys.modules[pckg]
@@ -48,6 +51,8 @@ def init():
 	# import the abstract api for default implementations of api
 	import abstract
 	abstract.init()
+	global application
+	application = Application()
 
 def registerSymbol( name, value, ifNotFound = False ):
 	# initialize a value in the dictionary
@@ -56,4 +61,3 @@ def registerSymbol( name, value, ifNotFound = False ):
 		return
 		
 	blur3d.api.__dict__[ name ] = value
-	
