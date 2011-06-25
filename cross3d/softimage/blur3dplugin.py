@@ -93,22 +93,22 @@ def XsiApplication_sceneNewFinished_OnEvent( ctxt ):
 def XsiApplication_sceneOpenRequested_OnEvent( ctxt ):
 	_signalsEnabled = False
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneOpenRequested')
+	dispatchSignal('sceneOpenRequested', ctxt.GetAttribute('FileName'))
 	
 def XsiApplication_sceneOpenFinished_OnEvent( ctxt ):
 	_signalsEnabled = True
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneOpenFinished')
+	dispatchSignal('sceneOpenFinished', ctxt.GetAttribute('FileName'))
 	
 def XsiApplication_sceneSaveRequested_OnEvent( ctxt ):
 	_signalsEnabled = False
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneSaveRequested')
+	dispatchSignal('sceneSaveRequested', ctxt.GetAttribute('FileName'))
 	
 def XsiApplication_sceneSaveFinished_OnEvent( ctxt ):
 	_signalsEnabled = True
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneSaveFinished')
+	dispatchSignal('sceneSaveFinished', ctxt.GetAttribute('FileName'))
 	
 def XsiApplication_sceneSaveAsRequested_OnEvent( ctxt ):
 	_signalsEnabled = False

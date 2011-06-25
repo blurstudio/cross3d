@@ -26,8 +26,8 @@ class Dispatch(QObject):
 	sceneMergeFinished		= pyqtSignal()
 	sceneNewRequested		= pyqtSignal()
 	sceneNewFinished		= pyqtSignal()
-	sceneOpenRequested		= pyqtSignal(str)
-	sceneOpenFinished		= pyqtSignal(str)
+	sceneOpenRequested		= pyqtSignal(str)		# <str> The Filename
+	sceneOpenFinished		= pyqtSignal(str)		# <str> The Filename
 	scenePreReset			= pyqtSignal()
 	sceneReset				= pyqtSignal()
 	sceneSaveRequested		= pyqtSignal(str)		# <str> The Filename
