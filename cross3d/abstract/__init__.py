@@ -29,6 +29,7 @@ def init():
 	import abstractscenemodel # new douglas
 	import abstractscenecamera
 	import abstractscenerenderpass # new douglas
+	import abstractsceneviewport # new douglas
 	import abstractsceneanimationcontroller
 	import abstractsceneanimationkey
 	import abstractscenecache

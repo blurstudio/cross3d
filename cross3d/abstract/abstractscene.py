@@ -357,16 +357,23 @@ class AbstractScene( QObject ):
 		return []
 	
 	@abstractmethod
-	def _nativeModels( self ): # new douglas
+	def _nativeModels( self ):
 		"""
-			\remarks	return a collection of the models in this scene
+			\remarks	return a collection of the models in this scene. added by douglas
 			\return		<list> [ <variant> nativeModel, .. ]
 		"""
 		return []
 		
-	def _importNativeModel( self, path, name = '' ): # new douglas
+	def _exportNativeModel( self, nativeModel, path ):
 		"""
-			\remarks	import and return a model in the scene
+			\remarks	exports a specified model to a specific path. added by douglas
+			\return		<bool> success
+		"""
+		return False
+		
+	def _importNativeModel( self, path, name = '' ):
+		"""
+			\remarks	import and return a model in the scene. added by douglas
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
 		return None
@@ -600,9 +607,9 @@ class AbstractScene( QObject ):
 		return False
 		
 	@abstractmethod
-	def _addToNativeSelection( self, nativeObjects ): # new douglas
+	def _addToNativeSelection( self, nativeObjects ):
 		"""
-			\remarks	add the inputed native objects to the selection in the scene
+			\remarks	add the inputed native objects to the selection in the scene. added by douglas
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
 		"""
@@ -651,28 +658,56 @@ class AbstractScene( QObject ):
 		return []
 
 	@abstractmethod
-	def _nativeRenderPasses( self ): # new douglas
+	def _nativeRenderPasses( self ):
+		"""
+			\remarks	returns the render passes in the scene. added by douglas
+			\return		<list> [ <variant> nativeObject, .. ]
+		"""
 		return []
 
 	@abstractmethod
-	def _findNativeRenderPass( self, displayName = '' ): # new douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class.
+	def _findNativeRenderPass( self, displayName = '' ):
+		"""
+			\remarks	returns a render pass by it's name. added by douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class
+			\param		<str> displayName
+			\return		<variant> nativeObject
+		"""
 		return None
 
 	@abstractmethod
-	def _currentNativeRenderPass( self ): # new douglas
+	def _currentNativeRenderPass( self ):
+		"""
+			\remarks	returns the currently active render pass in the scene. added by douglas
+			\return		<variant> nativeObject
+		"""
 		return None
 
 	@abstractmethod
-	def _setCurrentNativeRenderPass( self, nativeRenderPass ): #new douglas
+	def _setCurrentNativeRenderPass( self, nativeRenderPass ):
+		"""
+			\remarks	sets the current render pass in the scene. added by douglas
+			\param		nativeRenderPass <variant>
+			\return		<bool> success
+		"""
 		xsi.SetCurrentPass( nativeRenderPass )
 		return False
 		
 	@abstractmethod
-	def _removeNativeRenderPasses( self , nativeRenderPasses ): # new douglas
+	def _removeNativeRenderPasses( self , nativeRenderPasses ):
+		"""
+			\remarks	removes a render pass in the scene. added by douglas
+			\param		nativeRenderPass <variant>
+			\return		<bool> success
+		"""
 		return False
 		
 	@abstractmethod
-	def _createNativeRenderPass( self, displayName ): # new douglas
+	def _createNativeRenderPass( self, displayName ):
+		"""
+			\remarks	creates a render pass in the scene. added by douglas
+			\param		displayName <str>
+			\return		<variant> nativeRenderPass | None
+		"""
 		return None
 
 	#------------------------------------------------------------------------------------------------------------------------
@@ -786,9 +821,9 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneModel
 		return [ SceneModel( self, nativeModel ) for nativeModel in self._nativeModels() ]
 		
-	def importModel( self, path, name = '' ): # new douglas
+	def importModel( self, path, name = '' ):
 		"""
-			\remarks	import and return a model in the scene
+			\remarks	import and return a model in the scene. added by douglas
 			\sa			_importNativeModel
 			\return		<blur3d.api.SceneModel>
 		"""
@@ -908,7 +943,7 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneCamera
 			return SceneCamera( self, nativeCamera)
 		return None
-	
+
 	def currentElement( self ):
 		"""
 			\remarks	return the trax element that is currently loaded based on the filename of this scene
@@ -920,7 +955,6 @@ class AbstractScene( QObject ):
 		except:
 			print 'The trax asset tracking system is not installed'
 			return None
-		
 		return trax.api.findElementByPath( self.currentFileName() )
 		
 	@abstractmethod
@@ -1834,7 +1868,185 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
-	
+
+	def renderPasses( self ):
+		"""
+			\remarks	returns render passes of the scene. added by douglas
+			\return		<list> [ <blur3d.api.SceneRenderPass>, .. ]
+		"""
+		from blur3d.api import SceneRenderPass
+		return [ SceneRenderPass( self, nativeRenderPass ) for nativeRenderPass in self._nativeRenderPasses() ]
+
+	def findRenderPass( self, displayName = '' ):
+		"""
+			\remarks	returns a render pass based on it's name. added by douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class
+			\return		<blur3d.api.SceneRenderPass> || None
+		"""
+		from blur3d.api import SceneRenderPass
+		nativeRenderPass = self._findNativeRenderPass( displayName )
+		if nativeRenderPass:
+			return SceneRenderPass( self, nativeRenderPass  )
+		return None
+
+	def currentRenderPass( self ):
+		"""
+			\remarks	returns the active render pass. added by douglas
+			\return		<blur3d.api.SceneRenderPass> || None
+		"""
+		from blur3d.api import SceneRenderPass
+		return SceneRenderPass( self, self._currentNativeRenderPass() )
+
+	def setCurrentRenderPass( self, renderPass ):
+		"""
+			\remarks	sets the active render pass. added by douglas
+			\param		renderPass <blur3d.api.SceneRenderPass>
+			\return		<bool> success
+		"""
+		self._setCurrentNativeRenderPass( renderPass.nativePointer() )
+		return True
+		
+	def removeRenderPasses( self, renderPasses ):
+		"""
+			\remarks	deletes specified render passes. added by douglas
+			\param		renderPasses [ <blur3d.api.SceneRenderPass> ]
+			\return		<bool> success
+		"""
+		return self._removeNativeRenderPasses( [ renderPass.nativePointer() for renderPass in renderPasses ] )
+
+	def createRenderPass( self, displayName ):
+		"""
+			\remarks	creates a renderpass. added by douglas
+			\param		displayName	<str>
+			\return		<bool> success
+		"""
+		from blur3d.api import SceneRenderPass
+		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
+
+	@abstractmethod
+	def softwareVersion( self ):
+		"""
+			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
+		
+	@abstractmethod
+	def softwareName( self ):
+		"""
+			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
+		
+	@abstractmethod
+	def undo( self ):
+		"""
+			\remarks    undoes last action. added by douglas
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def retime( self, offset, scale, activeRange, pivot ):
+		"""
+			\remarks    retimes the scene. added by douglas
+			\param		offset <int> 
+			\param		scale <float>
+			\param		activeRange ( <int>, <int> )
+			\param		pivot <int>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setSilentMode( self, switch ):
+		"""
+			\remarks	sets the software to make sure that windows are not popping. added by douglas
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setTimeControlPlay( self, switch, fromStart=False ):
+		"""
+			\remarks	sets the status of the timeline playback. added by douglas
+			\param		switch <bool>
+			\param		fromStart <bool>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setTimeControlLoop( self, switch ):
+		"""
+			\remarks	sets the loop mode of the playback. added by douglas
+			\param		switch <bool>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def isTimeControlLoop( self ):
+		"""
+			\remarks	returns if loop mode is active. added by douglas
+			\return		<bool> success
+		"""
+		return False
+
+	def exportModel( self, model, path ):
+		"""
+			\remarks	exports a specified model to a specific path. added by douglas
+			\return		<bool> success
+		"""
+		nativeModel = model.nativePointer()
+		return self._exportNativeModel( nativeModel, path )
+
+	@abstractmethod
+	def animationFPS( self ):
+		"""
+			\remarks	returns the current frame per second rate. added by douglas
+			\return		<int> fps
+		"""
+		return 0
+
+	@abstractmethod
+	def currentFrame( self ):
+		"""
+			\remarks	returns the current frame. added by douglas
+			\return		<int> frame
+		"""
+		return 0
+
+	@abstractmethod
+	def setCurrentFrame( self, frame ):
+		"""
+			\remarks	sets the current frame. Addded by douglas
+			\param		frame <int>
+			\return		<bool> success
+		"""
+		return False
+
+	def viewport( self, viewportID=0 ):
+		"""
+			\remarks	returns the specified viewport. Added by douglas
+			\param		viewportName <string>
+			\return	  	<blur3d.api.SceneViewport> viewport | None
+		"""
+		from blur3d.api import SceneViewport
+		return SceneViewport( self, viewportID )
+
+	def getAvailableIteration( self, mask ):
+		"""
+			\remarks	returns the first avalaible iteration with the specified prevx. Added by douglas
+			\param		viewportName <string>
+			\return	  	<blur3d.api.SceneViewport> viewport | None
+		"""
+		import string
+		for iteration in string.uppercase:
+			if not self._findNativeObject( mask % { "iteration" : iteration } ):
+				return iteration
+		return None
+
 	@staticmethod
 	def instance():
 		if ( not AbstractScene._instance ):
@@ -1845,43 +2057,6 @@ class AbstractScene( QObject ):
 	@staticmethod
 	def clearInstance():
 		AbstractScene._instance = None
-		
-	def renderPasses( self ): # new douglas
-		from blur3d.api import SceneRenderPass
-		return [ SceneRenderPass( self, nativeRenderPass ) for nativeRenderPass in self._nativeRenderPasses() ]
-
-	def findRenderPass( self, displayName = '' ): # new douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class.
-		from blur3d.api import SceneRenderPass
-		nativeRenderPass = self._findNativeRenderPass( displayName )
-		if nativeRenderPass:
-			return SceneRenderPass( self, nativeRenderPass  )
-		return None
-
-	def currentRenderPass( self ): # new douglas
-		from blur3d.api import SceneRenderPass
-		return SceneRenderPass( self, self._currentNativeRenderPass() )
-
-	def setCurrentRenderPass( self, renderPass ): # new douglas
-		return self._setCurrentNativeRenderPass( renderPass.nativePointer() )
-		
-	def removeRenderPasses( self, renderPasses ): # new douglas
-		return self._removeNativeRenderPasses( [ renderPass.nativePointer() for renderPass in renderPasses ] )
-
-	def createRenderPass( self, displayName ): # new douglas
-		from blur3d.api import SceneRenderPass
-		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
-
-	def softwareVersion( self ): # new douglas
-		return ""
-		
-	def softwareName( self ): # new douglas
-		return ""
-		
-	def undo( self ): # new douglas
-		return False
-		
-	def setSilentMode( self, switch ):
-		return False
 
 # register the symbol
 from blur3d import api

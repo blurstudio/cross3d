@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.softimagesceneviewport
+#	\namespace	blur3d.api.softimage.softimagesceneviewport
 #
 #	\remarks	The SoftimageSceneViewport class provides the implementation of the AbstractSceneViewport class as it applies
 #				to Softimage scenes
@@ -10,13 +10,26 @@
 #
 
 from PySoftimage import xsi
+from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
 
-class SoftimageSceneViewport( object ): # not in abstract. has to be reviewed anyway
-	def __init__( self, name ):
-		self.name = name
+class SoftimageSceneViewport( AbstractSceneViewport ):
+	viewportNames = { 1:'A', 2:'B', 3:'C', 4:'D' }
+	def __init__( self, scene, viewportID=0 ):
+		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
+		if viewportID in self.viewportNames:
+			self.name = self.viewportNames[ viewportID ]
+		else:
+			self.name = self.viewportManager.GetAttributeValue( 'focusedviewport' )
 
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												protected methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
+	def _nativeCamera( self ):
+		return xsi.Dictionary.GetObject( self.cameraName() )
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -24,16 +37,13 @@ class SoftimageSceneViewport( object ): # not in abstract. has to be reviewed an
 	def name( self ):
 		return self.name
 
-	def cameraName( self ): # not in abstract. Anyway it's a pain, we will have to speak about it
-		viewportManager = xsi.Desktop.ActiveLayout.Views( "vm" )
-		focusedViewportLetter = viewportManager.GetAttributeValue( "focusedviewport" )
-		return viewportManager.getAttributeValue( "activecamera:" + self.name )
+	def cameraName( self ):
+		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )	
 		
-	def setCamera( self, cameraName ): # not in abstract. Anyway it's a pain, we will have to speak about it.
-		viewportManager = xsi.Desktop.ActiveLayout.Views( "vm" )
-		focusedViewportLetter = viewportManager.GetAttributeValue( "focusedviewport" )
-		viewportManager.SetAttributeValue( "activecamera:" + focusedViewportLetter, cameraName )
-	
+	def setCamera( self, cameraName ):
+		self.viewportManager.SetAttributeValue( 'activecamera:' + self.name, cameraName )
+		return True
+
 	def playblast( self, fileName, range=None ):
 		if not range:
 			range = self.scene.animationRange()
@@ -51,6 +61,16 @@ class SoftimageSceneViewport( object ): # not in abstract. has to be reviewed an
 		xsi.SetValue( "ViewportCapture.Filename", fileName )
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
+		return True
+		
+	def setHeadlight( self, switch ):
+		camera = self.camera()
+		xsi.SetValue( camera.name() + '.camdisp.headlight', switch )
+		return True
+		
+	def hasHeadlight( self ):
+		camera = self.camera()
+		return xsi.GetValue( camera.name() + '.camdisp.headlight' )
 		
 # register the symbol
 from blur3d import api

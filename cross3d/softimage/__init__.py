@@ -22,5 +22,5 @@ def init():
 	import softimagesceneobject
 	import softimagescenemodel
 	import softimagescenecamera
-	import softimagesceneviewport # not in abstract
 	import softimagescenerenderpass
+	import softimagesceneviewport

@@ -29,6 +29,30 @@ class AbstractSceneCamera( SceneObject ):
 			\return		<blur3d.constants.CameraType>
 		"""
 		return (self.cameraType() & cameraType) > 0
+		
+	def range( self ):
+		return ( 0, 0 )
+
+	def lens( self ):
+		return 0.0
+		
+	def setLens( self, value ):
+		return False
+		
+	def setRange( self, range ):
+		return False
+		
+	def showCurrentFrame( self, switch ):
+		return False
+		
+	def showCustomParameters( self, switch ):
+		return False
+		
+	def setHeadlight( self, switch ):
+		return False
+		
+	def hasHeadlight( self ):
+		return False
 	
 # register the symbol
 from blur3d import api

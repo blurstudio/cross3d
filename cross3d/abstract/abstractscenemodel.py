@@ -14,13 +14,69 @@ from blur3d.api import SceneObject
 
 #------------------------------------------------------------------------------------------------------------------------
 
-class AbstractSceneModel( SceneObject ): # new douglas
+class AbstractSceneModel( SceneObject ):
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	pass
+	def displayNameTokens( self ):
+		"""
+			\remarks	returns the parsed model name as a dictionary. added by douglas.
+			\return		<dict> nameTokens
+		"""	
+		import re
+		regex = re.compile(r'^((?P<denomination>[CEVP](-Ly)?)_)?(?P<assetName>[A-Za-z0-9]+)(_|\-)?(?P<iteration>[A-Z]|[0-9]+)?$')
+		match = regex.match( self.displayName() )
+		if match:
+			return match.groupdict()
+		return {}
+
+	def displayNameMask( self ):
+		"""
+			\remarks	returns the mask that allows to assemble a model name. added by douglas.
+			\return		<str> nameMask
+		"""	
+		return '%(assetName)s_%(iteration)s'
+	
+	def displayNameTokenValue( self, token ):
+		"""
+			\remarks	returns a specified name token. added by douglas.
+			\return		<str> tokenValue
+		"""	
+		if token in self.displayNameTokens():
+			return self.displayNameTokens()[ token ]
+		return None
+
+	def assetName( self ):
+		"""
+			\remarks	returns the asset name. added by douglas.
+			\return		<str> assetName
+		"""	
+		return self.displayNameTokenValue( 'assetName' )
+	
+	def iteration( self ):
+		"""
+			\remarks	returns the model iteration. added by douglas.
+			\return		<str> assetName
+		"""	
+		return self.displayNameTokenValue( 'iteration' )
+
+	def setIteration( self, iteration ):
+		"""
+			\remarks	sets the model iteration. added by douglas.
+			\return		iteration <str>
+			\return		<bool> success
+		"""	
+		tokens = self.displayNameTokens()
+		if tokens[ 'iteration' ]:
+			from blur3d.api import Scene
+			scene = Scene() 
+			if scene.isLetterIterationAvailable( letterIteration, tokens[ 'assetName' ] ):
+				tokens[ 'iteration' ] = letterIteration
+				self.setDisplayName( self.displayNameMask % tokens )
+				return True
+		return False
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods

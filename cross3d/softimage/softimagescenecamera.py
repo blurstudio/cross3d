@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.softimagescenecamera
+#	\namespace	blur3d.api.softimage.softimagescenecamera
 #
 #	\remarks	The SotimageSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
 #				to Softimage scenes
@@ -20,34 +20,34 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def range( self ): # not in abstract
+	def range( self ):
 		metadata = self.metadata()
 		return metadata.attribute( 'range' )
 
-	def lens( self ): # not in abstract
+	def lens( self ):
 		return self.nativePointer().Parameters( 'projplanedist' ).Value
 		
-	def setLens( self, value ): # not in abstract
+	def setLens( self, value ):
 		self.nativePointer().Parameters( 'projplanedist' ).Value = value
 		
-	def setRange( self, range ): # not in abstract
+	def setRange( self, range ):
 		metadata = self.metadata()
 		metadata.setAttribute( 'range', range )
 		return True
 		
-	def showCurrentFrame( self, switch ): # not in abstract
+	def showCurrentFrame( self, switch ):
 		xsi.SetValue( self.name() + '.camvis.currenttime', switch )
 		return True
 		
-	def showCustomParameters( self, switch ): # not in abstract
+	def showCustomParameters( self, switch ):
 		xsi.SetValue( self.name() + '.camvis.custominfo', switch )
 		return True
 		
-	def setHeadlight( self, switch ): # not in abstract
+	def setHeadlight( self, switch ):
 		xsi.SetValue( self.name() + '.camdisp.headlight', switch )
 		return True
 		
-	def hasHeadlight( self ): # not in abstract
+	def hasHeadlight( self ):
 		return xsi.GetValue( self.name() + '.camdisp.headlight' )
 
 # register the symbol

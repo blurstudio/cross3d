@@ -22,7 +22,8 @@ def init():
 	import studiomaxapplication
 	import studiomaxscene
 	import studiomaxscenewrapper
-	import studiomaxsceneobject	
+	import studiomaxsceneobject
+	import studiomaxscenemodel	
 	import studiomaxscenelayer	
 	import studiomaxscenelayergroup	
 	import studiomaxscenematerial	

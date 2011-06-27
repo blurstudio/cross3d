@@ -1,7 +1,7 @@
 ##
 #	\namespace	blur3d.api.softimage.abstractscenerenderpass
 #
-#	\remarks	The AbstractSceneRenderPass class will define all the operations for Softimage render passes interaction.  
+#	\remarks	The AbstractSceneRenderPass class will define all the operations for render passes interaction.  
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio

@@ -170,7 +170,7 @@ class SoftimageScene( AbstractScene ):
 	def _createNativeRenderPass( self, displayName ): 
 		return xsi.CreatePass("", displayName )( "Value" )
 		
-	def _exportNativeModel( self, nativeModel, path ): # not in abstract
+	def _exportNativeModel( self, nativeModel, path ):
 		xsi.ExportModel( nativeModel, path, "", "" )
 		return True
 			
@@ -186,7 +186,7 @@ class SoftimageScene( AbstractScene ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return [ int( playControl.Parameters( "In" ).Value ), int( playControl.Parameters( "Out" ).Value ) ]
 
-	def animationFPS( self ): # not in abstract
+	def animationFPS( self ):
 		"""
 			\remarks	implements AbstractScene.animationFPS method to return the current frame per second rate.
 			\return		<int> endFrame>
@@ -200,14 +200,14 @@ class SoftimageScene( AbstractScene ):
 		"""
 		return xsi.ActiveProject.ActiveScene.FileName.Value
 	
-	def currentFrame( self ): # not in abstract
+	def currentFrame( self ):
 		"""
 			\remarks	implements AbstractScene.currentFrame method to return the current frame
 			\return		<int>
 		"""
 		return int( xsi.ActiveProject.Properties( "Play Control" ).Current.Value )
 
-	def setCurrentFrame( self, frame ): # not in abstract
+	def setCurrentFrame( self, frame ):
 		"""
 			\remarks	implements AbstractScene.setCurrentFrame method to set the current frame
 			\return		<bool> success
@@ -223,7 +223,7 @@ class SoftimageScene( AbstractScene ):
 		xsi.DeselectAll()
 		return True
 		
-	def setAnimationRange( self, animationRange ): # I think we need to add a switch for global local at every level
+	def setAnimationRange( self, animationRange ):
 		"""
 			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
 			\param		animationRange	<tuple> ( <int> start, <int> end )
@@ -248,20 +248,13 @@ class SoftimageScene( AbstractScene ):
 			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
 		return True
 		
-	def getAvailableIteration( self, mask ): # not in abstract
-		import string
-		for iteration in string.uppercase:
-			if not self._findNativeObject( mask % { "iteration" : iteration } ):
-				return iteration
-		return None
-		
 	def isAvalaibleName( self, name ): # not in abstract
 		if self._findNativeObject( name ):
 			return False
 		else:
 			return True
 			
-	def retime( self, offset, scale = 1, activeRange = None, pivot = None ): # not in abstract
+	def retime( self, offset, scale = 1, activeRange = None, pivot = None ):
 		if activeRange:
 			if not pivot:
 				pivot = activeRange[0]
@@ -297,7 +290,7 @@ class SoftimageScene( AbstractScene ):
 		self.setSilentMode( False )
 		return True	
 		
-	def setTimeControlPlay( self, switch, fromStart=False ): # not in abstract
+	def setTimeControlPlay( self, switch, fromStart=False ):
 		if switch:
 			if fromStart:
 			    xsi.PlayRealTimeFromStart()
@@ -307,20 +300,14 @@ class SoftimageScene( AbstractScene ):
 			xsi.PlaybackStop()
 		return True
 			
-	def setTimeControlLoop( self, switch ): # not in abstract
+	def setTimeControlLoop( self, switch ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		playControl.Parameters( "Loop" ).Value = switch
 		return True
 		
-	def isTimeControlLoop( self ): # not in abstract
+	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return playControl.Parameters( "Loop" ).Value
-		
-	def currentViewport( self ): # not in abstract
-		viewportManager = xsi.Desktop.ActiveLayout.Views( "vm" )
-		viewportName = viewportManager.GetAttributeValue( "focusedviewport" )
-		from blur3d.api import SceneViewport
-		return SceneViewport( viewportName )
 
 	def softwareVersion( self ):
 		print xsi.version()
@@ -331,10 +318,6 @@ class SoftimageScene( AbstractScene ):
 	def undo( self ):
 		xsi.Undo( '' )
 		return True
-		
-	def exportModel( self, model, path ): # not in abstract
-		nativeModel = model.nativePointer()
-		return self._exportNativeModel( nativeModel, path )
 
 # register the symbol
 from blur3d import api
