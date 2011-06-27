@@ -18,5 +18,5 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 
 # register the symbol
 from blur3d import api
-api.registerSymbol( 'SceneModel', SoftimageSceneModel )
+api.registerSymbol( 'SceneModel', StudiomaxSceneModel )
 
