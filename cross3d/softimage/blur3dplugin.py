@@ -113,12 +113,12 @@ def XsiApplication_sceneSaveFinished_OnEvent( ctxt ):
 def XsiApplication_sceneSaveAsRequested_OnEvent( ctxt ):
 	_signalsEnabled = False
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneSaveRequested')
+	dispatchSignal('sceneSaveRequested', ctxt.GetAttribute('FileName'))
 	
 def XsiApplication_sceneSaveAsFinished_OnEvent( ctxt ):
 	_signalsEnabled = True
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
-	dispatchSignal('sceneSaveFinished')
+	dispatchSignal('sceneSaveFinished', ctxt.GetAttribute('FileName'))
 	
 #def XsiApplication_selectionChanged_OnEvent( ctxt ):
 #	# Send different signals based on this
