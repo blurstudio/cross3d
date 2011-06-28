@@ -17,6 +17,7 @@
 
 from blur3d.api.abstract.abstractapplication import AbstractApplication
 from Py3dsMax import mxs
+from blurdev import debug
 dispatch = None
 
 # initialize callback scripts
@@ -29,12 +30,59 @@ if ( blur3d != undefined ) then (
 )
 """
 
+#class ConnectionDef:
+#	def __init__(self, signal, callback, arguments = '', function = ''):
+#		self.signal = signal
+#		self.callback = callback
+#		self.arguments = arguments
+#		self.function = function
+#
+#	@staticmethod
+#	def asDict(signal, callback, arguments = '', function = ''):
+#		return {signal:ConnectionDef(signal, callback, arguments = '', function = '')}
+
 class StudiomaxApplication(AbstractApplication):
+	# create a mapping of callbacks to be used when connecting signals
+#	_connectionMap = {}
+#	_connectionMap.update(ConnectionDef.asDict('sceneNewRequested', 'systemPreNew'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneNewFinished', 'systemPostNew'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneOpenRequested', 'filePreOpen', '""'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneOpenFinished', 'filePostOpen', '""'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeRequested', 'filePreMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeRequested', 'objectXrefPreMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeRequested', 'sceneXrefPreMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeFinished', 'filePostMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeFinished', 'objectXrefPostMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneMergeFinished', 'sceneXrefPostMerge'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneSaveRequested', 'filePreSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneSaveFinished', 'filePostSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
+#	_connectionMap.update(ConnectionDef.asDict('scenePreReset', 'systemPreReset'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneReset', 'systemPostReset'))
+#	_connectionMap.update(ConnectionDef.asDict('layerCreated', 'layerCreated'))
+#	_connectionMap.update(ConnectionDef.asDict('layerDeleted', 'layerDeleted'))
+#	_connectionMap.update(ConnectionDef.asDict('startupFinished', 'postSystemStartup'))
+#	_connectionMap.update(ConnectionDef.asDict('shutdownStarted', 'preSystemShutdown'))
+#	_connectionMap.update(ConnectionDef.asDict('sceneImportFinished', 'postImport'))
+#	_connectionMap.update(ConnectionDef.asDict('selectionChanged', 'selectionSetChanged'))
+#	_connectionMap.update(ConnectionDef.asDict('objectFreeze', 'nodeFreeze', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectUnfreeze', 'nodeUnfreeze', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectHide', 'nodeHide', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectUnHide', 'nodeUnHide', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectRenamed', 'nodeNameSet', '(if (ms_args != undefined) then (#(ms_args[1], ms_args[2], ms_args[3])) else #("", "", ""))', 'dispatchRename'))
+#	_connectionMap.update(ConnectionDef.asDict('objectCreated', 'nodeCreated', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectCloned', 'nodeCloned', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectAdded', 'sceneNodeAdded', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectPreDelete', 'nodePreDelete', 'ms_args', 'preDelete'))
+#	_connectionMap.update(ConnectionDef.asDict('objectPostDelete', 'nodePostDelete', function = 'postDelete'))
+#	_connectionMap.update(ConnectionDef.asDict('objectParented', 'nodeLinked', 'ms_args', 'dispatchObject'))
+#	_connectionMap.update(ConnectionDef.asDict('objectUnparented', 'nodeUnlinked', 'ms_args', 'dispatchObject'))
+	
 	def connect(self):
 		"""
 			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
 						and emit a signal.
-						connect should only be called after blur3d has been initalized.
+						connect is called when the first <blur3d.api.Dispatch> signal is connected.
+			\return		<bool>	The Connection was successfull
 		"""
 		global dispatch
 		import blur3d.api
@@ -72,7 +120,14 @@ class StudiomaxApplication(AbstractApplication):
 		self.connectStudiomaxSignal('nodePostDelete', 'objectPostDelete', function = 'postDelete')
 		self.connectStudiomaxSignal('nodeLinked', 'objectParented', 'ms_args', function = 'dispatchObject')
 		self.connectStudiomaxSignal('nodeUnlinked', 'objectUnparented', 'ms_args', function = 'dispatchObject')
-		
+		return True
+	
+#	def connectCallback(self, signal):
+#		if signal in self._connectionMap:
+#			self.connectStudiomaxSignal(self._connectionMap[signal].callback, signal)
+#		else:
+#			debug.debugMsg('Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
+	
 	def connectStudiomaxSignal(self, maxSignal, blurdevSignal, args = '', function = 'dispatch' ):
 		# store the maxscript methods needed
 		_n = mxs.pyhelper.namify
@@ -81,7 +136,7 @@ class StudiomaxApplication(AbstractApplication):
 	def disconnect(self):
 		"""
 			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
-						Most likely on reload
+						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
 		"""
 		blurdevid 	= mxs.pyhelper.namify('blur3dcallbacks')
 		mxs.callbacks.removeScripts(id = blurdevid)

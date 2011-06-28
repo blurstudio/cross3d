@@ -15,6 +15,7 @@
 #	\date		06/07/11
 #
 
+from blur3d import abstractmethod
 from PyQt4.QtCore import QObject
 dispatch = None
 
@@ -29,11 +30,13 @@ class AbstractApplication(QObject):
 #			cls._instance = super(AbstractApplication, cls).__new__(cls, *args, **kwargs)
 #		return cls._instance
 
+	@abstractmethod
 	def connect(self):
 		"""
 			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
 						and emit a signal.
-						connect should only be called after blur3d has been initalized.
+						connect is called when the first <blur3d.api.Dispatch> signal is connected.
+			\return		<bool>	the connection was successful
 		"""
 		# create a signal linking between 2 signals
 		import blur3d.api
@@ -54,11 +57,13 @@ class AbstractApplication(QObject):
 		dispatch.linkSignals( 'objectCreated', 'newObject' )
 		dispatch.linkSignals( 'objectCloned', 'newObject' )
 		dispatch.linkSignals( 'objectAdded', 'newObject' )
+		return True
 	
+	@abstractmethod
 	def disconnect(self):
 		"""
 			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
-						Most likely on reload
+						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
 		"""
 		return
 	

@@ -63,7 +63,23 @@ class SoftimageSceneObject( AbstractSceneObject ):
 #			\return		<bool> success
 #		"""
 #		self.nativePointer().Name = name
-		
+	
+	def isFrozen( self ):
+		"""
+			\remarks	returns whether or not this object is frozen(locked)
+			\sa			freeze, setFrozen, unfreeze
+			\return		<bool> frozen
+		"""
+		return not self._nativePointer.Properties('Visibility').Parameters('selectability').Value
+	
+	def isHidden( self ):
+		"""
+			\remarks	returns whether or not this object is hidden
+			\sa			hide, setHidden, unhide
+			\return		<bool> hidden
+		"""
+		return not self._nativePointer.Properties('Visibility').Parameters('viewvis').Value and not self._nativePointer.Properties('Visibility').Parameters('rendvis').Value
+
 	def metadata( self ): #not in abstract
 		from softimagesceneobjectmetadata import SoftimageSceneObjectMetadata
 		return SoftimageSceneObjectMetadata( self )

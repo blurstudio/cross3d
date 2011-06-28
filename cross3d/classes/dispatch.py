@@ -78,6 +78,9 @@ class Dispatch(QObject):
 	
 	_instance = None
 	
+	_isConnected = False
+	_connections = {}
+	
 	def __init__(self):
 		QObject.__init__(self)
 	
@@ -91,8 +94,6 @@ class Dispatch(QObject):
 			import blurdev
 			cls._instance._linkedSignals = {}
 			cls._process = None
-			# Listen for changes to the blurdev environment, ie switching between beta, gold, or local
-			blurdev.core.aboutToClearPaths.connect(cls._instance.disconnectSignals)
 			import blur3d
 		return cls._instance
 	
@@ -107,8 +108,7 @@ class Dispatch(QObject):
 			pass
 		import blurdev
 		blurdev.core.aboutToClearPaths.disconnect(self.disconnectSignals)
-#		self._instance = None
-#		self._process = None
+		self._isConnected = False
 	
 	def connect(self, signal, function):
 		"""
@@ -117,8 +117,19 @@ class Dispatch(QObject):
 			\param		signal	<str>	The name of the signal you wish to connect to
 			\param		function	<function>	a pointer to the function needed to run
 		"""
+		# only connect the callbacks if a application actually requests them
+		if not self._isConnected:
+			self._isConnected = blur3d.api.Application().connect()
+			# Listen for changes to the blurdev environment, ie switching between beta, gold, or local
+			blurdev.core.aboutToClearPaths.connect(self.disconnectSignals)
+		# connect the signal
 		if ( hasattr(self,signal) and type(getattr(self,signal)).__name__ == 'pyqtBoundSignal' ):
 			getattr(self,signal).connect(function)
+			# keep track of what signals are connected to dispatch
+			if signal in self._connections:
+				self._connections[signal].append(function)
+			else:
+				self._connections[signal] = [function]
 	
 	def disconnect(self, signal, function):
 		"""
@@ -129,6 +140,22 @@ class Dispatch(QObject):
 		"""
 		if ( hasattr(self,signal) and type(getattr(self,signal)).__name__ == 'pyqtBoundSignal' ):
 			getattr(self,signal).disconnect(function)
+			# remove the signal from the connections list
+			if signal in self._connections:
+				if function in self._connections[signal]:
+					self._connections[signal].remove(function)
+					# if the signal is empty remove it
+					if not len(self._connections[signal]):
+						self._connections.pop(signal)
+				else:
+					debug.debugMsg('The function %s for signal %s has been disconnected, but was not recorded as connected' % (str(function), signal), debug.DebugLevel.Mid)
+			else:
+				debug.debugMsg('The signal %s has been disconnected, but was not recorded as connected.' % signal, debug.DebugLevel.Mid)
+		# disconnect signals if nothing is connected
+		if self._isConnected and not self._connections:
+			print "Trying to disconnect signals"
+			self.disconnectSignals()
+				
 	
 	def dispatch( self, signal, *args ):
 		"""

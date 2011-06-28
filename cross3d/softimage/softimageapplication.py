@@ -26,41 +26,23 @@ class SoftimageApplication(AbstractApplication):
 		"""
 			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
 						and emit a signal.
-						connect should only be called after blur3d has been initalized.
+						connect is called when the first <blur3d.api.Dispatch> signal is connected.
+			\return		<bool>	was the connection successfull
 		"""
 		global dispatch
 		import blur3d.api
 		dispatch = blur3d.api.dispatch
-		super(SoftimageApplication, self).connect()
-		xsi.LoadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py'))
+		if super(SoftimageApplication, self).connect():
+			if xsi.LoadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py')):
+				return True
+		return False
 	
 	def disconnect(self):
+		"""
+			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
+						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
+		"""
 		xsi.UnloadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py'))
-	
-#	def connect(self):
-#		global Dispatch, DispatchProcess
-#		from blur3d.api.classes import Dispatch
-#		from blur3d.api.classes.dispatchprocess import DispatchProcess
-#		Dispatch().setProcess(DispatchProcess())
-#	
-#	def disconnect(self):
-#		thread = Dispatch.process()
-#		thread.quit()
-#		thread.wait()
-	
-#	def valueChanged(self, objectAttr, fullname, previousValue):
-#		"""
-#			\remarks	Responsible for decoding xsi's generic valueChanged callback for object changes into blur3d.api.Dispatch's callbacks
-#		"""
-#		import blur3d.api
-#		object = objectAttr.parent
-#		if fullname.endswith('.Name'):
-#			print "The Name has changed, Old: %s, New: %s" % (previousValue, object())
-#			blur3d.api.dispatch.dispatchRename(previousValue, object(), object)
-#		elif fullname.endswith('.visibility.viewvis') or fullname.endswith('.visibility.rendvis'):
-#			print 'View visibility changed'
-#		elif fullname.endswith('.visibility.selectability'):
-#			print 'The object was frozen/unfrozen'
 	
 	def preDeleteObject(self, *args):
 		"""
