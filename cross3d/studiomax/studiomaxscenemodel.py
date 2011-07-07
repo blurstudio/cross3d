@@ -15,7 +15,7 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 class StudiomaxSceneModel( AbstractSceneModel ):
 	pass
-
+		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneModel', StudiomaxSceneModel )

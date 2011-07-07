@@ -13,6 +13,7 @@ from Py3dsMax import mxs
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
 class StudiomaxSceneCamera( AbstractSceneCamera ):
+	
 	def cameraType( self ):
 		"""
 			\remarks	implements the AbstractSceneCamera.cameraType method to determine what type of camera this instance is
@@ -26,8 +27,17 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 		
 		elif ( cls == mxs.VRayPhysicalCamera ):
 			return CameraType.VRayPhysical
-		
 		return 0
+		
+	def lens( self ):
+		return mxs.cameraFOV.FOVtoMM( self.nativePointer().fov )
+		
+	def hasEffect( self ):
+		return self.nativePointer().mpassEnabled
+		
+	def renderEffect( self ):
+		mxs.maxOps.displayActiveCameraViewWithMultiPassEffect()
+		return True
 
 # register the symbol
 from blur3d import api

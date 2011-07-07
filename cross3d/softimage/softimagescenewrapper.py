@@ -36,7 +36,7 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 		xsi.SetValue( '%s.%s' % (self._nativePointer.name, key), nativeValue )
 		return True
 
-	def setName( self, name ):
+	def setDisplayName( self, name ):
 		"""
 			\remarks	set the name of this wrapper instance
 			\sa			name
@@ -46,6 +46,12 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 		# NOTE: passing a PyQt4.QtCore.QString object will crash Softimage
 		self.nativePointer().Name = unicode(name)
 		return True
+
+	def name( self ):
+		return self._nativePointer.FullName
+	
+	def displayName( self ):
+		return self._nativePointer.Name
 
 # register the symbol
 from blur3d import api

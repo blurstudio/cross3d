@@ -13,6 +13,7 @@ from blur3d		import abstractmethod
 from blur3d.api import SceneObject
 
 class AbstractSceneCamera( SceneObject ):
+
 	@abstractmethod
 	def cameraType( self ):
 		"""
@@ -20,7 +21,7 @@ class AbstractSceneCamera( SceneObject ):
 			\return		<blur3d.constants.CameraType>
 		"""
 		return 0
-	
+
 	def isCameraType( self, cameraType ):
 		"""
 			\remarks	return whether or not this camera is a kind of the inputed camera type
@@ -29,29 +30,46 @@ class AbstractSceneCamera( SceneObject ):
 			\return		<blur3d.constants.CameraType>
 		"""
 		return (self.cameraType() & cameraType) > 0
-		
-	def range( self ):
-		return ( 0, 0 )
 
+	@abstractmethod
 	def lens( self ):
 		return 0.0
-		
+
+	@abstractmethod
 	def setLens( self, value ):
 		return False
-		
-	def setRange( self, range ):
-		return False
-		
+	
+	@abstractmethod	
 	def showCurrentFrame( self, switch ):
 		return False
-		
+
+	@abstractmethod
 	def showCustomParameters( self, switch ):
 		return False
-		
+
+	@abstractmethod
 	def setHeadlight( self, switch ):
 		return False
-		
+
+	@abstractmethod
 	def hasHeadlight( self ):
+		return False
+		
+	@abstractmethod
+	def hasEffect( self ):
+		return False
+
+	@abstractmethod
+	def renderEffect( self ):
+		return False
+
+	@abstractmethod
+	def cache( self, path ):
+		"""
+			\remarks	caches the camera using .xsi format. Does not belon in api. Added by douglas
+			\param		path <str>
+			\return		<bool> success
+		"""
 		return False
 	
 # register the symbol

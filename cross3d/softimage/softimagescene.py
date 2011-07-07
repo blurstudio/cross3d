@@ -247,12 +247,6 @@ class SoftimageScene( AbstractScene ):
 		else:
 			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
 		return True
-		
-	def isAvalaibleName( self, name ): # not in abstract
-		if self._findNativeObject( name ):
-			return False
-		else:
-			return True
 			
 	def retime( self, offset, scale = 1, activeRange = None, pivot = None ):
 		if activeRange:

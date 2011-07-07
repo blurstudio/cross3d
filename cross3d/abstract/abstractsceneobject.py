@@ -23,6 +23,7 @@ class AbstractSceneObject( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	@abstractmethod
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
@@ -155,6 +156,13 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return ObjectType.Generic
+		
+	def _nativeModel( self ):
+		"""
+			\remarks	returns the native model this object belongs to.
+			\return		<variant> model
+		"""
+		return None
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -448,7 +456,8 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return False
-	
+
+	@abstractmethod
 	def setWireColor( self, color ):
 		"""
 			\remarks	sets the wirecolor for the object to the inputed QColor
@@ -458,7 +467,8 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		from PyQt4.QtGui import QColor
 		return self._setNativeWireColor( self._scene._toNativeValue( QColor(color) ) )
-	
+
+	@abstractmethod
 	def unfreeze( self ):
 		"""
 			\remarks	unfreezes (unlocks) the object in the scene
@@ -466,7 +476,8 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return self.setFrozen( False )
-	
+
+	@abstractmethod
 	def unhide( self ):
 		"""
 			\remarks	unhides the object in the scene
@@ -474,7 +485,8 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return self.setHidden( False )
-	
+
+	@abstractmethod
 	def wireColor( self ):
 		"""
 			\remarks	returns the color for the wireframe of this object in the scene
@@ -482,7 +494,35 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<QColor>
 		"""
 		return self._scene._fromNativeValue( self._nativeWireColor() )
-	
+
+	@abstractmethod
+	def deleteProperty( self, propertyName ):
+		"""
+			\remarks	delete the specified property. added by douglas.
+			\param		propertyName <str>
+			\return		<bool> success
+		"""
+		return False
+		
+	def model( self ):
+		"""
+			\remarks	returns the model this object belongs to.
+			\return		<blur3d.api.SceneModel> || None
+		"""
+		from blur3d.api import Scene, SceneModel
+		nativeModel = self._nativeModel()
+		if nativeModel:
+			return SceneModel( Scene(), nativeModel )
+		return None
+		
+	def deleteProperty( self, propertyName ):
+		"""
+			\remarks	deletes the property of an object. added by douglas
+			\param		propertyName <str>
+			\return		<bool> success
+		"""
+		return False
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------

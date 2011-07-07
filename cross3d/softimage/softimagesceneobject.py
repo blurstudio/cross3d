@@ -21,9 +21,18 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	
 	def _findNativeChild( self, name, recursive = False, parent = None ):
+		"""
+			\remarks	implements the AbstractSceneObject._findNativeChildren method to look up a specific native children for this object
+			\return		<PySotimage.xsi.Object> nativeObject
+		"""
 		return self.nativePointer().FindChild( name )
 
 	def _nativeChildren(self):
+		"""
+			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
+			\sa			children
+			\return		<list> [ <PySotimage.xsi.Object> nativeObject, .. ]
+		"""
 		return self._nativePointer.Children
 	
 	def _nativeParent( self ):
@@ -43,46 +52,38 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		"""
 		xsi.Application.ParentObj(self._nativePointer, nativeParent)
 		return True
+		
+	def _nativeModel( self ):
+		"""
+			\remarks	implements the AbstractSceneObject._nativeModel method to look up the native model for this object
+			\sa			children
+			\return		<list> [ <PySotimage.xsi.Model> nativeObject, .. ]
+		"""
+		obj = self.nativePointer()
+		ignoreSceneRoot = True
+		if str( obj.Type ) == "#model":
+			if ignoreSceneRoot is True and obj.Name == "Scene_Root": 
+				model = None
+			else:
+				model = obj
+		else:
+			if ignoreSceneRoot is True and obj.Model.Name == "Scene_Root":
+				model = None
+			else:
+				model = obj.Model
+		return model
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def name( self ):
-		return self._nativePointer.FullName
-	
-	def displayName( self ):
-		return self._nativePointer.Name
-		
-	# MH 06/13/11 moved functionality to correct place SoftimageSceneWrapper.setName. This method was missing self, so probubly didn't work
-#	def setDisplayName( name ):
-#		"""
-#			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
-#			\sa			displayName, name, setName
-#			\param		name	<str>
-#			\return		<bool> success
-#		"""
-#		self.nativePointer().Name = name
-	
-	def isFrozen( self ):
+	def deleteProperty( self, propertyName ):
 		"""
-			\remarks	returns whether or not this object is frozen(locked)
-			\sa			freeze, setFrozen, unfreeze
-			\return		<bool> frozen
+			\remarks	implements the AbstractSceneObject.deleteProperty that deletes a property of this object.
+			\return		<bool> success
 		"""
-		return not self._nativePointer.Properties('Visibility').Parameters('selectability').Value
-	
-	def isHidden( self ):
-		"""
-			\remarks	returns whether or not this object is hidden
-			\sa			hide, setHidden, unhide
-			\return		<bool> hidden
-		"""
-		return not self._nativePointer.Properties('Visibility').Parameters('viewvis').Value and not self._nativePointer.Properties('Visibility').Parameters('rendvis').Value
-
-	def metadata( self ): #not in abstract
-		from softimagesceneobjectmetadata import SoftimageSceneObjectMetadata
-		return SoftimageSceneObjectMetadata( self )
+		xsi.DeleteObj( '.'.join( [ self.name(), propertyName ] ) )
+		return True
 	
 	def uniqueId( self ):
 		"""
@@ -91,6 +92,10 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return self._nativePointer.ObjectID
+		
+	def metadata( self ): # temp to be deleted soon. added by douglas
+		from softimagesceneobjectmetadata import SoftimageSceneObjectMetadata
+		return SoftimageSceneObjectMetadata( self )
 
 # register the symbol
 from blur3d import api

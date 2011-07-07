@@ -12,9 +12,11 @@ from blur3d		import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractScenePropSet( SceneWrapper ):
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	def activateProperties( self, state ):
 		"""
 			\remarks	set the usage state for all properties to true

@@ -689,7 +689,6 @@ class AbstractScene( QObject ):
 			\param		nativeRenderPass <variant>
 			\return		<bool> success
 		"""
-		xsi.SetCurrentPass( nativeRenderPass )
 		return False
 		
 	@abstractmethod
@@ -2035,18 +2034,35 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneViewport
 		return SceneViewport( self, viewportID )
 
-	def getAvailableIteration( self, mask ):
+	def getAvailableIteration( self, mask, letter=True, padding=3,  ):
 		"""
-			\remarks	returns the first avalaible iteration with the specified prevx. Added by douglas
+			\remarks	returns the first avalaible iteration using the specified mask. Added by douglas
 			\param		viewportName <string>
 			\return	  	<blur3d.api.SceneViewport> viewport | None
 		"""
-		import string
-		for iteration in string.uppercase:
+		if letter:
+			import string
+			bank = string.uppercase
+		else:
+			bank = range( 1, 1000 )
+		for iteration in bank:
+			if iteration.isdigit():
+				paddingCode = '%0' + str( padding ) + 'd'
+				iteration = paffingCode % iteration
 			if not self._findNativeObject( mask % { "iteration" : iteration } ):
 				return iteration
 		return None
+		
+	def isAvalaibleName( self, name ):
+		if self._findNativeObject( name ):
+			return False
+		else:
+			return True
 
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												static methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
 	@staticmethod
 	def instance():
 		if ( not AbstractScene._instance ):

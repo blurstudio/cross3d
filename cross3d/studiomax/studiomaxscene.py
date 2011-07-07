@@ -129,6 +129,7 @@ class SceneMetaData( MXSCustAttribDef ):
 SceneMetaData.register()
 
 #------------------------------------------------------------------------------------------------------------------------
+
 class StudiomaxScene( AbstractScene ):
 	def __init__( self ):
 		AbstractScene.__init__( self )
@@ -141,6 +142,7 @@ class StudiomaxScene( AbstractScene ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	def _cacheNativeMaterial( self, cacheType, nativeMaterial ):
 		"""
 			\remarks	implements the AbstractScene._cacheNativeMaterial method to cache the inputed material in the scene
@@ -1267,6 +1269,67 @@ class StudiomaxScene( AbstractScene ):
 #				cachelib.toggleCaches( obj, state )
 					
 		return True
+
+	def _findNativeCamera( self, name = '', uniqueId = 0 ):
+		"""
+			\remarks	returns the native cameras in the scene. added by douglas
+			\return		<variant> nativeCamera
+		"""
+		camera = mxs.getNodeByName( name )
+		if ( mxs.isKindOf( camera, mxs.Camera )):
+			return camera
+		return None
+		
+	def _addToNativeSelection( self, selection ):
+		"""
+			\remarks	implements the AbstractScene._addToNativeSelection to select the inputed native objects in the scene. added by douglas
+			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+			\return		<bool> success
+		"""
+		mxs.selectMore( selection )
+
+	def _importNativeModel( self, path, name = '' ):
+		"""
+			\remarks	implements the AbstractScene._importNativeModel to import and return a native model from an external file. added by douglas.
+			\return		[ <Py3dsMax.mxs.Object> ] models
+		"""
+		
+		modelsRoot = self.findObject( 'Models' )
+		
+		import os
+		modelName = os.path.split( path )[1].split( '.' )[0]
+		objectNames = mxs.getMaxFileObjectNames( path )
+		toMerge = []
+		
+		if 'Models' in objectNames:
+			if not modelsRoot:
+				toMerge.append( 'Models' )
+				
+			if modelName in objectNames:
+				toMerge.append( modelName )
+				for objectName in objectNames:
+					if ( modelName + '.' ) in objectName:
+						toMerge.append( objectName )
+				mxs.mergeMAXFile( path, toMerge )
+			model = self._findNativeObject( modelName )
+			if name:
+				for objectName in toMerge:
+					obj = self._findNativeObject( objectName )
+					newName = obj.name.replace( modelName, name )
+					obj.name = newName
+			return model
+		else:
+			return None
+
+	def _nativeModels( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeModels to return native models in the scene. added by douglas.
+			\return		[ <Py3dsMax.mxs.Object> ] models
+		"""
+		modelsRoot = self.findObject( 'Models' )
+		if modelsRoot:
+			models = modelsRoot._nativeChildren()
+		return models
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -1517,7 +1580,46 @@ class StudiomaxScene( AbstractScene ):
 		if ( mxs.is64BitApplication() ):
 			sixtyfour = '_64'
 		return 'MAX%i%s' % (mversion,sixtyfour)
-	
+		
+	def setTimeControlPlay( self, switch, fromStart=False ):
+		if switch:
+			if fromStart:
+				mxs.sliderTime = mxs.animationRange.start
+				mxs.playAnimation()
+			else:
+				mxs.playAnimation()
+		else:
+			mxs.stopAnimation()
+		return True
+		
+	def setTimeControlLoop( self, switch ):
+		mxs.timeConfiguration.playbackLoop =  switch
+		return True
+		
+	def isTimeControlLoop( self ):
+		return mxs.timeConfiguration.playbackLoop
+		
+	def animationFPS( self ):
+		return mxs.frameRate
+		
+	def currentFrame( self ):
+		return int( mxs.currentTime )
+		
+	def setCurrentFrame( self, frame ):
+		mxs.sliderTime = frame
+		return True
+		
+	def clearSelection( self ):
+		mxs.clearSelection()
+		return True
+		
+	def undo( self ):
+		mxs.execute( 'max undo' )
+		return True
+		
+	def softwareName( self ):
+		return "studiomax"
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Scene', StudiomaxScene )

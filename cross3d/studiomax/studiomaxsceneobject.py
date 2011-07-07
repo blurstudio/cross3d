@@ -16,6 +16,10 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	AppDataAltMtlIndex		= 1108
 	AppDataAltPropIndex 	= 1110
 	
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												protected methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChild method to find 
@@ -238,6 +242,21 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			return ObjectType.Camera
 			
 		return AbstractSceneObject._typeOfNativeObject( self, nativeObject )
+		
+	def _nativeModel( self ):
+		"""
+			\remarks	implements the AbstractSceneObject._nativeModel method to look up the native model for this object
+			\sa			children
+			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
+		"""
+		name = self.name()
+		split = name.split( '.' )
+		if len( split ) > 1:
+			modelName = split[0]
+			from blur3d.api import Scene
+			scene = Scene()
+			return scene._findNativeObject( modelName )
+		return None
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods

@@ -14,19 +14,8 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 #------------------------------------------------------------------------------------------------------------------------
 
 class SoftimageSceneModel( AbstractSceneModel ):
-		
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												public methods
-	#------------------------------------------------------------------------------------------------------------------------
-
-	def assetType( self ):
-		metadata = self.metadata()
-		return metadata.attribute( 'assetType' )
-		
-	def department( self ):
-		metadata = self.metadata()
-		return metadata.attribute( 'department' )
-		
+	pass
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneModel', SoftimageSceneModel )

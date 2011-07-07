@@ -15,8 +15,11 @@ from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 #------------------------------------------------------------------------------------------------------------------------
 
 class SoftimageSceneViewport( AbstractSceneViewport ):
+	
 	viewportNames = { 1:'A', 2:'B', 3:'C', 4:'D' }
-	def __init__( self, scene, viewportID=0 ):
+	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
+	
+	def __init__( self, scene, viewportID=0 ): 
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
 			self.name = self.viewportNames[ viewportID ]
@@ -26,27 +29,42 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+		
 	def _nativeCamera( self ):
-		return xsi.Dictionary.GetObject( self.cameraName() )
-	
+		cameraName = self.cameraName()
+		if cameraName == 'Render Pass':
+			from blur3d.api import Scene
+			scene = Scene()
+			renderPass = self.scene.currentRenderPass()
+			cameraName = renderPass.camera().name()
+		return xsi.Dictionary.GetObject( cameraName )
+
+	def _setNativeCamera( self, nativeCamera ):
+		if type( nativeCamera ) == str or type( nativeCamera ) == unicode:
+			cameraName = nativeCamera
+		else:
+			cameraName = nativeCamera.FullName
+		if nativeCamera:
+			self.viewportManager.SetAttributeValue( 'activecamera:' + self.name, cameraName ) 
+			return True
+		else:
+			return False
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
-	def name( self ):
-		return self.name
 
 	def cameraName( self ):
-		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )	
-		
-	def setCamera( self, cameraName ):
-		self.viewportManager.SetAttributeValue( 'activecamera:' + self.name, cameraName )
-		return True
+		cameraName = self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
+		if cameraName in self.sceneCameras:
+			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
+		return cameraName
 
-	def playblast( self, fileName, range=None ):
-		if not range:
-			range = self.scene.animationRange()
+	def playblast( self, fileName, rang=None ):
+		from blur3d.api import Scene
+		scene = Scene()
+		if not rang:
+			rang = scene.animationRange()
 		width = xsi.GetValue( "Passes.RenderOptions.ImageWidth" )
 		height = xsi.GetValue( "Passes.RenderOptions.ImageHeight" )
 		xsi.SetValue( "ViewportCapture.ImageWidth", width, None )
@@ -56,8 +74,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		xsi.SetValue( "ViewportCapture.CaptureAudio", None )
 		xsi.SetValue( "ViewportCapture.UserPixelRatio", True )
 		xsi.SetValue( "ViewportCapture.FormatType", 4 )
-		xsi.SetValue( "ViewportCapture.Start", range[0], None )
-		xsi.SetValue( "ViewportCapture.End",range[1] , None )
+		xsi.SetValue( "ViewportCapture.Start", rang[0], None )
+		xsi.SetValue( "ViewportCapture.End",rang[1] , None )
 		xsi.SetValue( "ViewportCapture.Filename", fileName )
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
