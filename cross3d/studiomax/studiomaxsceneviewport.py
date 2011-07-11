@@ -119,7 +119,6 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		cropsDif = [ viewSize[0] - crops[0], viewSize[1] - crops[1] ]
 		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
 		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
-		imageInMemory = 0
 
 		for frame in range( ran[0], ran[1] + 1 ):
 			scene.setCurrentFrame( frame )
@@ -129,13 +128,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
-			imageInMemory = imageInMemory + 1
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
 			mxs.save( croppedImage )
-			
-			if imageInMemory > 50:
-				mxs.gc()
+			mxs.gc()
 			
 		# restoring viewport settings
 		mxs.displaySafeFrames = initialSafeFrame
@@ -149,9 +145,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.spacewarps =	initialSpaceWarpsVisibility 
 		mxs.hideByCategory.particles = initialParticleSystemsVisibility
 		mxs.hideByCategory.bones = initialBoneObjectsVisibility
-		if initialViewNumber > 1:
+		if initialViewNumber == 1:
 			mxs.execute( 'max tool maximize' )
-			mxs.completeRedraw()
 		mxs.execute( 'max tool maximize' )
 		self.name = mxs.viewport.activeViewport
 		mxs.viewport.setGridVisibility( self.name, initialGridVisibility )
