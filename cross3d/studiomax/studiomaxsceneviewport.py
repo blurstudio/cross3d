@@ -95,7 +95,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.particles = False
 		mxs.hideByCategory.bones = True
 		scene.clearSelection()
-		mxs.displaySafeFrames = False
+		mxs.displaySafeFrames = True
 		mxs.viewport.setGridVisibility( self.name, False )
 		if initialViewNumber > 1:
 			mxs.execute( 'max tool maximize' )
@@ -113,11 +113,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		
 		position = [ ( viewSize[0] - playblastSize[0] ) / 2, ( viewSize[1] - playblastSize[1] ) / 2 ]
 		mxs.gw.setPos( position[0], position[1], playblastSize[0], playblastSize[1] )
-		mxs.completeRedraw()
 	
 		viewSize = [ mxs.getViewSize().x, mxs.getViewSize().y ]
 		crops = [ ( viewSize[0] - outputSize[0] ) / 2, ( viewSize[1] - outputSize[1] ) / 2 ]
 		cropsDif = [ viewSize[0] - crops[0], viewSize[1] - crops[1] ]
+		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
+		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
+		imageInMemory = 0
 
 		for frame in range( ran[0], ran[1] + 1 ):
 			scene.setCurrentFrame( frame )
@@ -127,19 +129,16 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
-			animeImage = mxs.bitmap( viewSize[0], viewSize[1] )
-			croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
+			imageInMemory = imageInMemory + 1
 			croppedImage.filename = imagePath
-			mxs.copy( image, animeImage )
-			box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
-			mxs.pasteBitmap( animeImage, croppedImage, box, mxs.point2( 0, 0 ) )
-			mxs.save( croppedImage ) 
-			mxs.close( animeImage )
-			mxs.close( croppedImage )
-
+			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
+			mxs.save( croppedImage )
+			
+			if imageInMemory > 50:
+				mxs.gc()
+			
 		# restoring viewport settings
 		mxs.displaySafeFrames = initialSafeFrame
-		mxs.viewport.setGridVisibility( self.name, initialGridVisibility )
 		scene.setSelection( initialSelection )
 		scene.setCurrentFrame( initialFrame )
 		mxs.hideByCategory.geometry = initialGeometryVisibility
@@ -152,13 +151,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.bones = initialBoneObjectsVisibility
 		if initialViewNumber > 1:
 			mxs.execute( 'max tool maximize' )
-		else:
-			mxs.execute( 'max tool maximize' )
 			mxs.completeRedraw()
-			mxs.execute( 'max tool maximize' )
-		mxs.completeRedraw()
+		mxs.execute( 'max tool maximize' )
+		self.name = mxs.viewport.activeViewport
+		mxs.viewport.setGridVisibility( self.name, initialGridVisibility )
 		mxs.gc()
-
 		return True
 		
 # register the symbol
