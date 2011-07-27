@@ -37,12 +37,20 @@ class SoftimageApplication(AbstractApplication):
 				return True
 		return False
 	
+	def connectCallback(self, signal):
+		""" Override to prevent a warning in high debug. If a plugin can be designed to handle dynamicly connecting and disconnecting callbacks this is not useable """
+		return
+	
 	def disconnect(self):
 		"""
 			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
 						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
 		"""
 		xsi.UnloadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py'))
+	
+	def disconnectCallback(self, signal):
+		""" Override to prevent a warning in high debug. If a plugin can be designed to handle dynamicly connecting and disconnecting callbacks this is not useable """
+		return
 	
 	def preDeleteObject(self, *args):
 		"""

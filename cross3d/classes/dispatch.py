@@ -130,6 +130,8 @@ class Dispatch(QObject):
 				self._connections[signal].append(function)
 			else:
 				self._connections[signal] = [function]
+				# create the application callback. this way callbacks that are not being used do not need to be processed
+				blur3d.api.application.connectCallback(signal)
 	
 	def disconnect(self, signal, function):
 		"""
@@ -147,6 +149,8 @@ class Dispatch(QObject):
 					# if the signal is empty remove it
 					if not len(self._connections[signal]):
 						self._connections.pop(signal)
+						# remove the application callback. this way callbacks that are not being used do not need to be processed
+						blur3d.api.application.disconnectCallback(signal)
 				else:
 					debug.debugMsg('The function %s for signal %s has been disconnected, but was not recorded as connected' % (str(function), signal), debug.DebugLevel.Mid)
 			else:

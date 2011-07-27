@@ -30,11 +30,9 @@ class AbstractApplication(QObject):
 #			cls._instance = super(AbstractApplication, cls).__new__(cls, *args, **kwargs)
 #		return cls._instance
 
-	@abstractmethod
 	def connect(self):
 		"""
-			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
-						and emit a signal.
+			\remarks	responsible for seting up the application to connect to signals using <blur3d.api.dispatch.connectCallback>
 						connect is called when the first <blur3d.api.Dispatch> signal is connected.
 			\return		<bool>	the connection was successful
 		"""
@@ -60,10 +58,25 @@ class AbstractApplication(QObject):
 		return True
 	
 	@abstractmethod
+	def connectCallback(self, signal):
+		"""
+			\remarks	Connects a single callback. This allows blur3d to only have to respond to callbacks that tools actually
+						need, instead of all callbacks.
+						Called the first time a signal is connected to this callback.
+		"""
+		return
+	
 	def disconnect(self):
 		"""
-			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
+			\remarks	responsible for disabling all changes made in <blur3d.api.application.connect>.
 						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
+		"""
+		return
+	
+	@abstractmethod
+	def disconnectCallback(self, signal):
+		"""
+			\remarks	Disconnect a single callback when it is no longer used. Called when the last signal for this callback is disconnected.
 		"""
 		return
 	
