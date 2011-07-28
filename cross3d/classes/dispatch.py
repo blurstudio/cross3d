@@ -74,12 +74,17 @@ class Dispatch(QObject):
 	startupFinished			= pyqtSignal()
 	shutdownStarted			= pyqtSignal()
 	
+	# viewport signals
+	viewportRedrawn			= pyqtSignal()
+	
 	eventCalled = pyqtSignal(list)
 	
 	_instance = None
 	
 	_isConnected = False
 	_connections = {}
+	# these signals should never actualy be connected, The supplied function will instead be called directly. This is for when exicution order is critical.
+	_functionSignals = (viewportRedrawn,)
 	
 	def __init__(self):
 		QObject.__init__(self)
@@ -124,7 +129,8 @@ class Dispatch(QObject):
 			blurdev.core.aboutToClearPaths.connect(self.disconnectSignals)
 		# connect the signal
 		if ( hasattr(self,signal) and type(getattr(self,signal)).__name__ == 'pyqtBoundSignal' ):
-			getattr(self,signal).connect(function)
+			if not signal in self._functionSignals:
+				getattr(self,signal).connect(function)
 			# keep track of what signals are connected to dispatch
 			if signal in self._connections:
 				self._connections[signal].append(function)
@@ -141,7 +147,8 @@ class Dispatch(QObject):
 			\param		function	<function>	a pointer to the function needed to run
 		"""
 		if ( hasattr(self,signal) and type(getattr(self,signal)).__name__ == 'pyqtBoundSignal' ):
-			getattr(self,signal).disconnect(function)
+			if not signal in self._functionSignals:
+				getattr(self,signal).disconnect(function)
 			# remove the signal from the connections list
 			if signal in self._connections:
 				if function in self._connections[signal]:
@@ -160,7 +167,6 @@ class Dispatch(QObject):
 			print "Trying to disconnect signals"
 			self.disconnectSignals()
 				
-	
 	def dispatch( self, signal, *args ):
 		"""
 			\remarks	dispatches a string based signal through the system from an application
@@ -183,6 +189,16 @@ class Dispatch(QObject):
 		if ( signal in self._linkedSignals ):
 			for trigger in self._linkedSignals[signal]:
 				self.dispatch( trigger )
+	
+	def dispatchFunction(self, signal):
+		"""
+			\remarks	directly calls the function, this is used when the delay from a callback is not acceptable, for example when a viewport is rendering, it needs to draw in a specific order. The function should not expect any arguments.
+			\param		signal	<str>	The name of th signal that is being called
+		"""
+		if signal in self._connections:
+			for fn in self._connections[signal]:
+				# call the function
+				fn()
 	
 	def dispatchObject( self, signal, *args ):
 		"""
@@ -208,6 +224,11 @@ class Dispatch(QObject):
 				self.dispatch( trigger )
 	
 	def dispatchRename(self, signal, *args):
+		"""
+			\remarks	dispatches a string based signal through the system from an application specificly for renaming
+			\param		signal	<str>
+			\param		*args	<tuple> additional arguments
+		"""
 		if args:
 			if len(args) == 3:
 				oldName = args[0]
