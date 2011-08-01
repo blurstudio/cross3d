@@ -10,16 +10,22 @@
 #
 
 from Py3dsMax import mxs
+from blur3d.api import dispatch
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
 
 class StudiomaxSceneViewport( AbstractSceneViewport ):
 
-	def __init__( self, scene, viewportID=0 ):			
+	def __init__( self, scene, viewportID=0 ):		
+		super( AbstractSceneViewport, self ).__init__( viewportID )
+		
 		if ( viewportID - 1 ) in range( mxs.viewport.numViews ):
 			mxs.viewport.activeViewport = viewportID
-		self.name = mxs.viewport.activeViewport
+
+		self._name = mxs.viewport.activeViewport	
+		self._slateIsActive = False
+		self._slateText = ''
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -46,9 +52,38 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 	def cameraName( self ):
 		return self._nativeCamera().name
+	
+	def size( self ):
+		return [ mxs.getViewSize().x, mxs.getViewSize().y ]
 		
-	def playblast( self, path, ran=None ):
+	def safeFrameIsActive( self ):
+		return mxs.displaySafeFrames
 		
+	def setSafeFrameIsActive( self, active ):
+		mxs.displaySafeFrames = active
+		return True
+
+	def safeFrameSize( self ):
+		from blur3d.api import Scene
+		scene = Scene()
+		outputSize = [ scene.renderSize().width(), scene.renderSize().height() ]
+		viewSize = self.size()
+		
+		ratios = [ float( outputSize[0] ) / viewSize[0] , float( outputSize[1] ) / viewSize[1] ]
+		
+		if ratios[0] > ratios[1]:
+			# cropping height
+			outputImageRation = float( outputSize[1] ) / outputSize[0]
+			width = viewSize[0]
+			height = int( width * outputImageRation )
+		else:
+			# cropping width
+			outputImageRation = float( outputSize[0] ) / outputSize[1]
+			height = viewSize[1]
+			width = int( height * outputImageRation )
+		return [ width, height ]
+
+	def generatePlayblast( self, path, ran=None ):
 		# collecting what we need
 		import os
 		from blur3d.api import Scene
@@ -74,7 +109,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		initialSpaceWarpsVisibility = mxs.hideByCategory.spacewarps
 		initialParticleSystemsVisibility = mxs.hideByCategory.particles
 		initialBoneObjectsVisibility = mxs.hideByCategory.bones
-		initialGridVisibility = mxs.viewport.getGridVisibility( self.name )
+		initialGridVisibility = mxs.viewport.getGridVisibility( self._name )
 		initialFrame = scene.currentFrame()
 		initialSelection = scene.selection()
 		initialSafeFrame = mxs.displaySafeFrames
@@ -82,7 +117,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 		# getting the camera
 		camera = self.camera()
-		if camera.hasEffect():
+		if camera.hasMultiPassEffects():
 			effects = True
 			
 		# setting the viewport
@@ -96,14 +131,14 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.bones = True
 		scene.clearSelection()
 		mxs.displaySafeFrames = True
-		mxs.viewport.setGridVisibility( self.name, False )
+		mxs.viewport.setGridVisibility( self._name, False )
 		if initialViewNumber > 1:
 			mxs.execute( 'max tool maximize' )
 			mxs.completeRedraw()
 			
 		# getting the viewport size information
 		outputSize = [ scene.renderSize().width(), scene.renderSize().height() ]
-		viewSize = [ mxs.getViewSize().x, mxs.getViewSize().y ]
+		viewSize = self.size()
 		ratios = [ outputSize[0] / viewSize[0] , outputSize[1] / viewSize[1] ]
 		if ratios[0] > ratios[1]:
 			ratio = ratios[0]
@@ -124,14 +159,16 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			scene.setCurrentFrame( frame )
 			
 			if effects:
-				camera.renderEffect()
+				camera.renderMultiPassEffects()
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
+			if self.slateIsActive():
+				self.slateDraw()
 			mxs.save( croppedImage )
-			mxs.gc()
+			# mxs.gc()
 			
 		# restoring viewport settings
 		mxs.displaySafeFrames = initialSafeFrame
@@ -148,11 +185,63 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		if initialViewNumber == 1:
 			mxs.execute( 'max tool maximize' )
 		mxs.execute( 'max tool maximize' )
-		self.name = mxs.viewport.activeViewport
-		mxs.viewport.setGridVisibility( self.name, initialGridVisibility )
-		mxs.gc()
+		self._name = mxs.viewport.activeViewport
+		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
+		# mxs.gc()
 		return True
 		
+	def slateDraw( self ):
+		# importing stuff
+		import re
+		from blur3d.api import Scene
+		scene = Scene()
+		
+		# processing the text
+		text = self._slateText
+		matches = re.findall( r'(\[)([F|f][R|r][A|a][M|m][E|e])( +)?(#[0-9]+)?( +)?(\])', text )
+		for match in matches:
+			padding = match[3]
+			if padding:
+				padding = int( padding.strip( '#' ) )
+			else:
+				padding = 1
+			text = text.replace( ''.join( match ), str( scene.currentFrame() ).zfill( padding ) )
+		
+		# rendering the slate
+		viewSize = self.size()
+		textSize = mxs.GetTextExtent( text )
+		textWidth = int( textSize.x )
+		if self.safeFrameIsActive():
+			safeFrameSize = self.safeFrameSize()
+			posY = int( ( viewSize[1] - safeFrameSize[1] ) / 2 )
+		else:
+			posY = 0
+		
+		# I am not very happy with the posX calculation as the textWidth does not seem to be very reliable.
+		textPos = mxs.point3( viewSize[0] - textWidth - 3, posY, 0 )
+		mxs.gw.htext( textPos, text )
+		box = mxs.box2( 0,0,viewSize[0],viewSize[1] )
+		mxs.gw.enlargeUpdateRect( box )
+		mxs.gw.updatescreen() 
+
+	def slateIsActive( self ):
+		return self._slateIsActive
+	
+	def setSlateIsActive( self, active ):
+		if active:
+			if not self._slateIsActive:
+				dispatch.connect( 'viewportRedrawn', self.slateDraw )
+				mxs.completeRedraw() 
+			self._slateIsActive = True
+			return True
+		dispatch.disconnect( 'viewportRedrawn', self.slateDraw )
+		mxs.forceCompleteRedraw()
+		return True
+
+	def setSlateText( self, text ):
+		self._slateText = text
+		return True
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneViewport', StudiomaxSceneViewport )

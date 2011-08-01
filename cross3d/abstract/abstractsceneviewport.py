@@ -1,7 +1,7 @@
 ##
 #	\namespace	blur3d.api.studiomax.abstractsceneviewport
 #
-#	\remarks	The AbstractSceneRenderPass class will define all the operations for viewport interaction.  
+#	\remarks	The AbstractSceneRenderPass class will define all the operations for viewport interaction  
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio
@@ -15,7 +15,9 @@ from blur3d.api import SceneWrapper
 class AbstractSceneViewport( SceneWrapper ):
 	def __init__( self, scene, viewportID=0 ):
 		self.name = ''
-
+		self._slateIsActive = False
+		self._slateText = ''
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -49,14 +51,7 @@ class AbstractSceneViewport( SceneWrapper ):
 		if camera:
 			return SceneCamera( self, camera )
 		return None
-
-	def cameraName( self ):
-		"""
-			\remarks	return the viewport's camera name. added by douglas
-			\return		<variant> camera | None
-		"""
-		return ''
-
+		
 	def setCamera( self, camera ):
 		"""
 			\remarks	sets the camera of the current viewport. added by douglas
@@ -69,7 +64,14 @@ class AbstractSceneViewport( SceneWrapper ):
 			cam = camera.nativePointer()
 		return self._setNativeCamera( cam )
 
-	def playblast( self, fileName, ran=None ):
+	def cameraName( self ):
+		"""
+			\remarks	return the viewport's camera name. added by douglas
+			\return		<variant> camera | None
+		"""
+		return ''
+
+	def generatePlayblast( self, fileName, ran=None ):
 		"""
 			\remarks	generates a playblast in the specific path. added by douglas
 			\param		filename where the playblast is save
@@ -78,21 +80,62 @@ class AbstractSceneViewport( SceneWrapper ):
 		"""
 		return False
 	
-	def setHeadlight( self, switch ):
+	def setHeadlightIsActive( self, active ):
 		"""
 			\remarks	sets the headlight of the camera of the viewport. added by douglas
-			\param		switch <bool>
+			\param		active <bool>
 			\return		<bool> success
 		"""
 		return False
 		
-	def hasHeadlight( self ):
+	def headlightIsActive( self ):
 		"""
 			\remarks	returns if the status of the headlight. added by douglas
-			\return		<bool> status
+			\return		<bool> active
 		"""
 		return False
 		
+	def size( self ):
+		"""
+			\remarks	returns the viewport size. added by douglas
+			\return		( <int>, <int> ) size
+		"""
+		return ( 0, 0 )
+		
+	def safeFrameSize( self ):
+		"""
+			\remarks	returns the size of the safe frame. added by douglas
+			\return		( <int>, <int> ) size
+		"""
+		return ( 0, 0 )
+		
+	def safeFrameIsActive( self ):
+		"""
+			\remarks	returns the active of the safe frame. added by douglas
+			\return		<bool> active
+		"""
+		return False
+		
+	def setSafeFrameIsActive( self, active ):
+		"""
+			\remarks	sets the active of the safe frame. added by douglas
+			\param		<bool> active
+			\return		<bool> success
+		"""
+		return False
+		
+	def slateIsActive( self ):
+		return False
+	
+	def setSlateIsActive( self, active ):
+		return False
+		
+	def setSlateText( self, text='' ):
+		return False
+		
+	def slateDraw( self ):
+		return False
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneViewport', AbstractSceneViewport )

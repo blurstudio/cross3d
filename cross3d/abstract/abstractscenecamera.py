@@ -40,33 +40,37 @@ class AbstractSceneCamera( SceneObject ):
 		return False
 	
 	@abstractmethod	
-	def showCurrentFrame( self, switch ):
+	def setShowsFrame( self, switch ):
+		return False
+		
+	@abstractmethod	
+	def showsFrame( self ):
 		return False
 
 	@abstractmethod
-	def showCustomParameters( self, switch ):
+	def setShowsCustomParameters( self, switch ):
 		return False
 
 	@abstractmethod
-	def setHeadlight( self, switch ):
+	def setHeadlightIsActive( self, switch ):
 		return False
 
 	@abstractmethod
-	def hasHeadlight( self ):
+	def headlightIsActive( self ):
 		return False
 		
 	@abstractmethod
-	def hasEffect( self ):
+	def hasMultiPassEffects( self ):
 		return False
 
 	@abstractmethod
-	def renderEffect( self ):
+	def renderMultiPassEffects( self ):
 		return False
 
-	@abstractmethod
-	def cache( self, path ):
+	@abstractmethod	
+	def generateDotXSI( self, path, range=None ):
 		"""
-			\remarks	caches the camera using .xsi format. Does not belon in api. Added by douglas
+			\remarks	this is a temporary place for that method as it will belong to blur3d.pipeline. Added by douglas
 			\param		path <str>
 			\return		<bool> success
 		"""

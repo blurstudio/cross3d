@@ -708,6 +708,15 @@ class AbstractScene( QObject ):
 			\return		<variant> nativeRenderPass | None
 		"""
 		return None
+		
+	@abstractmethod
+	def _removeNativeModel( self, models ):
+		"""
+			\remarks	deletes provided native models. Addded by douglas
+			\param		models [ <SceneModel>, ... ]
+			\return		<bool> success
+		"""
+		return False
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -912,7 +921,7 @@ class AbstractScene( QObject ):
 			return SceneLayerGroup( self, nativeGroup )
 		return None
 		
-	def createModel( self, name = 'New Model', objects = [] ):
+	def createModel( self, name = 'Model', objects = [] ):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
@@ -1992,14 +2001,6 @@ class AbstractScene( QObject ):
 		"""
 		return False
 
-	def exportModel( self, model, path ):
-		"""
-			\remarks	exports a specified model to a specific path. added by douglas
-			\return		<bool> success
-		"""
-		nativeModel = model.nativePointer()
-		return self._exportNativeModel( nativeModel, path )
-
 	@abstractmethod
 	def animationFPS( self ):
 		"""
@@ -2024,6 +2025,22 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return False
+
+	def removeModel( self, models ):
+		"""
+			\remarks	deletes provided models. Addded by douglas
+			\param		models [ <SceneModel>, ... ]
+			\return		<bool> success
+		"""
+		return self._removeNativeModel( [ model.nativePointer() for model in models ] )
+
+	def exportModel( self, model, path ):
+		"""
+			\remarks	exports a specified model to a specific path. added by douglas
+			\return		<bool> success
+		"""
+		nativeModel = model.nativePointer()
+		return self._exportNativeModel( nativeModel, path )
 
 	def viewport( self, viewportID=0 ):
 		"""

@@ -370,7 +370,7 @@ class StudiomaxScene( AbstractScene ):
 			return name
 		return ''
 		
-	def _createNativeModel( self, name = 'New Model', nativeObjects = [] ):
+	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
 		"""
 			\remarks	implements the AbstractScene._createNativeModel method to return a new Studiomax model
 			\param		name			<str>
@@ -378,10 +378,16 @@ class StudiomaxScene( AbstractScene ):
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
 		output = mxs.Point( name = name )
+		modelsRoot = self._findNativeObject( 'Models' )
+		if not modelsRoot:
+			modelsRoot = mxs.Point( name = 'Models' )
+		output.parent = modelsRoot
 		if ( nativeObjects ):
-			output.parent = nativeObjects[0].parent
 			for nativeObject in nativeObjects:
 				nativeObject.parent = output
+				nativeObject.name = '.'.join( [ name, nativeObject.name ] )
+		nativeObjects.append( output )
+		self._createNativeLayer( name, nativeObjects )
 		return output
 	
 	def _createNativeRenderer( self, rendererType ):
@@ -1300,23 +1306,24 @@ class StudiomaxScene( AbstractScene ):
 		modelName = os.path.split( path )[1].split( '.' )[0]
 		objectNames = mxs.getMaxFileObjectNames( path )
 		toMerge = []
-		
 		if 'Models' in objectNames:
 			if not modelsRoot:
 				toMerge.append( 'Models' )
-				
+			
 			if modelName in objectNames:
 				toMerge.append( modelName )
 				for objectName in objectNames:
 					if ( modelName + '.' ) in objectName:
 						toMerge.append( objectName )
-				mxs.mergeMAXFile( path, toMerge )
+				mxs.mergeMAXFile( path, toMerge, mxs.pyhelper.namify( 'neverReparent' ) )
 			model = self._findNativeObject( modelName )
+			modelsRoot = self._findNativeObject( 'Models' )
 			if name:
 				for objectName in toMerge:
 					obj = self._findNativeObject( objectName )
 					newName = obj.name.replace( modelName, name )
 					obj.name = newName
+			model.parent = modelsRoot
 			return model
 		else:
 			return None
@@ -1329,7 +1336,26 @@ class StudiomaxScene( AbstractScene ):
 		modelsRoot = self.findObject( 'Models' )
 		if modelsRoot:
 			models = modelsRoot._nativeChildren()
-		return models
+			return models
+		return []
+		
+	def _removeNativeModel( self, models ):
+		"""
+			\remarks	implements the AbstractScene._removeNativeModel to remove a native model in the scene. Addded by douglas
+			\param		models [ <PySoftimage.xsi.Model>, ... ]
+			\return		<bool> success
+		"""
+		import fnmatch
+		toRemove = []
+		objects = self._nativeObjects()
+		for model in models:
+			toRemove.append( model )
+			name = model.name
+			for obj in objects:
+				if fnmatch.fnmatch( obj.name, '.'.join( [ name, '*' ] ) ):
+					toRemove.append( obj )
+		self._removeNativeObjects( toRemove )
+		return True
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
