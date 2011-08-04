@@ -25,26 +25,26 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		
 	def setLens( self, value ):
 		self.nativePointer().Parameters( 'projplanedist' ).Value = value
+
+	def showsFrame( self ):
+		return xsi.GetValue( self.name() + '.camvis.currenttime' )
 		
-	def showCurrentFrame( self, switch ):
+	def setShowsFrame( self, switch ):
 		xsi.SetValue( self.name() + '.camvis.currenttime', switch )
 		return True
 		
-	def showCustomParameters( self, switch ):
+	def setShowsCustomParameters( self, switch ):
 		xsi.SetValue( self.name() + '.camvis.custominfo', switch )
 		return True
 		
-	def setHeadlight( self, switch ):
+	def setHeadLightIsActive( self, switch ):
 		xsi.SetValue( self.name() + '.camdisp.headlight', switch )
 		return True
 		
-	def hasHeadlight( self ):
+	def headlightIsActive( self ):
 		return xsi.GetValue( self.name() + '.camdisp.headlight' )
 		
-	def cache( self, path ):
-		# although I am currently using the blur legacy library. Bad!
-		# this method does not really belong in api but there is no alternative yet. Bad!
-		
+	def generateDotXSI( self, path, range=None ):
 		import os
 		import blurXSI 
 		import blurCamera
@@ -53,12 +53,6 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		sampleType = 'regular'
 		sampleRate = 1
 		handles = 5
-		userProps = self.userProps()
-		if 'Range' in userProps:
-			range = userProps[ 'Range' ]
-		else:
-			raise Exception( self.name(), 'has no Range UserProp.' )
-			return None
 		nativeCamera = self.nativePointer()
 		start = str( range[0] )
 		end = str( range[1] )	
@@ -76,11 +70,11 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		blurCamera.AddBlurPropertyToCamera( nativeCamera, False );
 		xsi.SetValue( nativeCamera.FullName + ".blurShotProperties.StartFrame", range[0], "")
 		xsi.SetValue( nativeCamera.FullName + ".blurShotProperties.EndFrame", range[1], "")
-		xsi.SetValue( nativeCamera.FullName + ".blurShotProperties.ShotNumber", float( iteration ), "")
+		xsi.SetValue( nativeCamera.FullName + ".blurShotProperties.ShotNumber", shotNumber, "")
 		self.setDisplayName( blurName )
 
-		# cache
-		blurXSI.fileWrite (	path, outputType , shotNumber , range[0], range[1], sampleType, sampleRate, (range[0] - handles), (range[1] + handles), [nativeCamera] )
+		# write the file
+		blurXSI.fileWrite( path, outputType , shotNumber , range[0], range[1], sampleType, sampleRate, (range[0] - handles), (range[1] + handles), [nativeCamera] )
 		
 		# restore camera
 		self.setDisplayName( initialName )

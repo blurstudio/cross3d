@@ -51,7 +51,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def cameraName( self ):
-		return self._nativeCamera().name
+		nativeCamera = self._nativeCamera()
+		if nativeCamera:
+			return nativeCamera.name
+		return None
 	
 	def size( self ):
 		return [ mxs.getViewSize().x, mxs.getViewSize().y ]
@@ -160,17 +163,17 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			
 			if effects:
 				camera.renderMultiPassEffects()
+			self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
-			if self.slateIsActive():
-				self.slateDraw()
 			mxs.save( croppedImage )
 			# mxs.gc()
 			
 		# restoring viewport settings
+		self.slateClear()	
 		mxs.displaySafeFrames = initialSafeFrame
 		scene.setSelection( initialSelection )
 		scene.setCurrentFrame( initialFrame )
@@ -235,9 +238,15 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			self._slateIsActive = True
 			return True
 		dispatch.disconnect( 'viewportRedrawn', self.slateDraw )
-		mxs.forceCompleteRedraw()
+		self.slateClear()
 		return True
 
+	def slateText( self ):
+		return self._slateText
+		
+	def slateClear( self ):
+		mxs.forceCompleteRedraw()
+		
 	def setSlateText( self, text ):
 		self._slateText = text
 		return True

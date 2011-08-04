@@ -32,6 +32,15 @@ class SoftimageScene( AbstractScene ):
 		"""
 		return xsi.ImportModel( path, '', '', '', name )( 'Value' )
 		
+	def _removeNativeModel( self, models ):
+		"""
+			\remarks	implements the AbstractScene._removeNativeModel to remove a native model in the scene. Addded by douglas
+			\param		models [ <PySoftimage.xsi.Model>, ... ]
+			\return		<bool> success
+		"""
+		self._removeNativeObjects( models )
+		return True
+		
 	def _nativeSelection( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeSelection to return the native selected objects of the scene
