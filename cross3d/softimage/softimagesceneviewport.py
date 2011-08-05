@@ -91,18 +91,30 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		return xsi.GetValue( camera.FullName + '.camdisp.headlight' )
 		
 	def slateIsActive( self ):
-		camera = self._nativeCamera()
-		return xsi.GetValue( camera.FullName + '.camvis.camerainfo' )
+		import blur3d.api
+		application = blur3d.api.application
+		version = application.version()
+		if version > 9:
+			camera = self._nativeCamera()
+			return xsi.GetValue( camera.FullName + '.camvis.camerainfo' )
 	
 	def setSlateIsActive( self, state ):
-		camera = self._nativeCamera()
-		xsi.SetValue( camera.FullName + '.camvis.camerainfo', state )
-		return True
+		import blur3d.api
+		application = blur3d.api.application
+		version = application.version()
+		if version > 9:
+			camera = self._nativeCamera()
+			xsi.SetValue( camera.FullName + '.camvis.camerainfo', state )
+			return True
 
 	def setSlateText( self, text='' ):
-		camera = self._nativeCamera()
-		xsi.SetValue( camera.FullName + '.camvis.camerainfotext', text )
-		return True
+		import blur3d.api
+		application = blur3d.api.application
+		version = application.version()
+		if version > 9:
+			camera = self._nativeCamera()
+			xsi.SetValue( camera.FullName + '.camvis.camerainfotext', text )
+			return True
 		
 # register the symbol
 from blur3d import api

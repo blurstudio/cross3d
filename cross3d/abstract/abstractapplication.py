@@ -92,6 +92,13 @@ class AbstractApplication(QObject):
 		"""
 		
 		dispatch.objectPostDelete.emit()
+	
+	@abstractmethod
+	def version( self ):
+		"""
+			\remarks	Returns the version major of the sotware.
+		"""
+		return 0
 
 # register the symbol
 from blur3d import api

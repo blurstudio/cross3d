@@ -58,6 +58,13 @@ class SoftimageApplication(AbstractApplication):
 		"""
 		if args:
 			dispatch.objectDeleted.emit(args[0])
+			
+	def version( self ):
+		"""
+			\remarks	Returns the version major of XSI.
+		"""
+		version = xsi.Version()
+		return int( version.split( '.' )[0] )
 	
 # register the symbol
 from blur3d import api

@@ -78,13 +78,20 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			# cropping height
 			outputImageRation = float( outputSize[1] ) / outputSize[0]
 			width = viewSize[0]
-			height = int( width * outputImageRation )
+			height = round( width * outputImageRation )
 		else:
 			# cropping width
 			outputImageRation = float( outputSize[0] ) / outputSize[1]
 			height = viewSize[1]
-			width = int( height * outputImageRation )
+			width = round( height * outputImageRation )
 		return [ width, height ]
+		
+	def safeFrameMargins( self ):
+		viewSize = self.size()
+		safeFrameSize = self.safeFrameSize()
+		horizontal = round( ( viewSize[0] - safeFrameSize[0] ) / 2 )
+		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
+		return [ horizontal, vertical ]
 
 	def generatePlayblast( self, path, ran=None ):
 		# collecting what we need
@@ -163,7 +170,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			
 			if effects:
 				camera.renderMultiPassEffects()
-			self.slateDraw()	
+				self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
@@ -211,18 +218,23 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			text = text.replace( ''.join( match ), str( scene.currentFrame() ).zfill( padding ) )
 		
 		# rendering the slate
+		text = text + ' |'
 		viewSize = self.size()
 		textSize = mxs.GetTextExtent( text )
 		textWidth = int( textSize.x )
 		if self.safeFrameIsActive():
 			safeFrameSize = self.safeFrameSize()
-			posY = int( ( viewSize[1] - safeFrameSize[1] ) / 2 )
+			safeFrameMargins = self.safeFrameMargins()
+			hMargin = safeFrameMargins[0]
+			vMargin = safeFrameMargins[1]
 		else:
-			posY = 0
+			hMargin = 0
+			vMargin = 0
 		
 		# I am not very happy with the posX calculation as the textWidth does not seem to be very reliable.
-		textPos = mxs.point3( viewSize[0] - textWidth - 3, posY, 0 )
-		mxs.gw.htext( textPos, text )
+		textPos = mxs.point3( viewSize[0] - textWidth - hMargin + 3, vMargin, 0 )
+		colorWhite = mxs.color( 255,255,255 )
+		mxs.gw.htext( textPos, text, color=colorWhite )
 		box = mxs.box2( 0,0,viewSize[0],viewSize[1] )
 		mxs.gw.enlargeUpdateRect( box )
 		mxs.gw.updatescreen() 
@@ -230,16 +242,19 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 	def slateIsActive( self ):
 		return self._slateIsActive
 	
-	def setSlateIsActive( self, active ):
-		if active:
+	def setSlateIsActive( self, isActive ):
+		if isActive:
 			if not self._slateIsActive:
 				dispatch.connect( 'viewportRedrawn', self.slateDraw )
 				mxs.completeRedraw() 
 			self._slateIsActive = True
 			return True
-		dispatch.disconnect( 'viewportRedrawn', self.slateDraw )
-		self.slateClear()
-		return True
+		if self._slateIsActive:
+			dispatch.disconnect( 'viewportRedrawn', self.slateDraw )
+			self.slateClear()
+			self._slateIsActive = False
+			return True
+		return False
 
 	def slateText( self ):
 		return self._slateText
