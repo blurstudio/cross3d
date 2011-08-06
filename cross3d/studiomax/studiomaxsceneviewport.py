@@ -197,7 +197,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.execute( 'max tool maximize' )
 		self._name = mxs.viewport.activeViewport
 		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
-		# mxs.gc()
+		mxs.gc()
 		return True
 		
 	def slateDraw( self ):
