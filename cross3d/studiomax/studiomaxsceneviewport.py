@@ -177,6 +177,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
 			mxs.save( croppedImage )
+			mxs.close( croppedImage )
+			mxs.close( image )
 			mxs.gc()
 			
 		# restoring viewport settings
@@ -218,7 +220,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			text = text.replace( ''.join( match ), str( scene.currentFrame() ).zfill( padding ) )
 		
 		# rendering the slate
-		text = text + '  '
+		text = text + ' '
 		viewSize = self.size()
 		textSize = mxs.GetTextExtent( text )
 		textWidth = int( textSize.x )
