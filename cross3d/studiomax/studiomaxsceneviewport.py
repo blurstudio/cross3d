@@ -164,8 +164,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		cropsDif = [ viewSize[0] - crops[0], viewSize[1] - crops[1] ]
 		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
 		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
+		count = 0
 
 		for frame in range( ran[0], ran[1] + 1 ):
+			count = count + 1
 			scene.setCurrentFrame( frame )
 			
 			if effects:
@@ -177,7 +179,9 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
 			mxs.save( croppedImage )
-			# mxs.gc()
+			if count == 50:
+				mxs.gc()
+				count = 0
 			
 		# restoring viewport settings
 		self.slateClear()	
@@ -218,7 +222,6 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			text = text.replace( ''.join( match ), str( scene.currentFrame() ).zfill( padding ) )
 		
 		# rendering the slate
-		text = text + ' |'
 		viewSize = self.size()
 		textSize = mxs.GetTextExtent( text )
 		textWidth = int( textSize.x )
@@ -232,7 +235,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			vMargin = 0
 		
 		# I am not very happy with the posX calculation as the textWidth does not seem to be very reliable.
-		textPos = mxs.point3( viewSize[0] - textWidth - hMargin + 3, vMargin, 0 )
+		textPos = mxs.point3( viewSize[0] - textWidth - hMargin + 5, vMargin, 0 )
 		colorWhite = mxs.color( 255,255,255 )
 		mxs.gw.htext( textPos, text, color=colorWhite )
 		box = mxs.box2( 0,0,viewSize[0],viewSize[1] )
