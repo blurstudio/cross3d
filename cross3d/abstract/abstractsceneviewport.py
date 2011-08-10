@@ -8,12 +8,15 @@
 #	\date		04/11/10
 #
 
-from blur3d.api import SceneWrapper
+from PyQt4.QtCore import QObject
 
 #------------------------------------------------------------------------------------------------------------------------
 
-class AbstractSceneViewport( SceneWrapper ):
+class AbstractSceneViewport( QObject ):
 	def __init__( self, scene, viewportID=0 ):
+		super( AbstractSceneViewport, self ).__init__()
+		
+		self._scene = scene
 		self.name = ''
 		self._slateIsActive = False
 		self._slateText = ''

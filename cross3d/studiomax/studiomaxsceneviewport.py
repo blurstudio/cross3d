@@ -18,7 +18,7 @@ from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 	def __init__( self, scene, viewportID=0 ):		
-		super( AbstractSceneViewport, self ).__init__( viewportID )
+		super( StudiomaxSceneViewport, self ).__init__( scene, viewportID )
 		
 		if ( viewportID - 1 ) in range( mxs.viewport.numViews ):
 			mxs.viewport.activeViewport = viewportID
@@ -164,8 +164,12 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		cropsDif = [ viewSize[0] - crops[0], viewSize[1] - crops[1] ]
 		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
 		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
+		completed = True 
 
 		for frame in range( ran[0], ran[1] + 1 ):
+			if mxs.keyboard.escPressed:
+				completed = False
+				break
 			scene.setCurrentFrame( frame )
 			
 			if effects:
@@ -198,7 +202,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		self._name = mxs.viewport.activeViewport
 		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
 		mxs.gc()
-		return True
+		return completed
 		
 	def slateDraw( self ):
 		# importing stuff
