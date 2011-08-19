@@ -97,6 +97,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		if version > 9:
 			camera = self._nativeCamera()
 			return xsi.GetValue( camera.FullName + '.camvis.camerainfo' )
+		return False
 	
 	def setSlateIsActive( self, state ):
 		import blur3d.api
