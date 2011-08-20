@@ -96,9 +96,18 @@ class AbstractApplication(QObject):
 	@abstractmethod
 	def version( self ):
 		"""
-			\remarks	Returns the version major of the sotware.
+			\remarks	Returns the version major of the software.
+			\return		<int> version
 		"""
 		return 0
+		
+	@abstractmethod
+	def name( self ):
+		"""
+			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
 
 # register the symbol
 from blur3d import api

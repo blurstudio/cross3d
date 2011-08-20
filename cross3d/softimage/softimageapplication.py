@@ -65,6 +65,9 @@ class SoftimageApplication(AbstractApplication):
 		"""
 		version = xsi.Version()
 		return int( version.split( '.' )[0] )
+		
+	def name( self ):
+		return "Softimage"
 	
 # register the symbol
 from blur3d import api

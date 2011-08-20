@@ -311,12 +311,6 @@ class SoftimageScene( AbstractScene ):
 	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return playControl.Parameters( "Loop" ).Value
-
-	def softwareVersion( self ):
-		print xsi.version()
-		
-	def softwareName( self ):
-		return "Softimage"
 		
 	def undo( self ):
 		xsi.Undo( '' )

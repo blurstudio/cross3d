@@ -1642,9 +1642,6 @@ class StudiomaxScene( AbstractScene ):
 	def undo( self ):
 		mxs.execute( 'max undo' )
 		return True
-		
-	def softwareName( self ):
-		return "studiomax"
 
 # register the symbol
 from blur3d import api

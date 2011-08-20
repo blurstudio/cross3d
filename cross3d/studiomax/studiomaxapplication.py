@@ -171,7 +171,12 @@ class StudiomaxApplication(AbstractApplication):
 		"""
 		if self._objectToBeDeleted:
 			dispatch.objectDeleted.emit(self._objectToBeDeleted)
-
+			
+	def name( self ):
+		return "StudioMax"
+		
+	def version( self ):
+		return mxs.maxVersion()[0]
 	
 # register the symbol
 from blur3d import api
