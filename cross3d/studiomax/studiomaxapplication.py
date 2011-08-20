@@ -176,7 +176,7 @@ class StudiomaxApplication(AbstractApplication):
 		return "StudioMax"
 		
 	def version( self ):
-		return mxs.maxVersion()[0]
+		return int( mxs.maxVersion()[0] / 1000 )
 	
 # register the symbol
 from blur3d import api
