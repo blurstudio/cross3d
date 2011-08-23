@@ -720,7 +720,7 @@ class AbstractScene( QObject ):
 	#--------------------------------------------------------
 	#			XMesh
 	#--------------------------------------------------------
-	def cacheXmesh(path, objList, start, end, worldFlag = True, stack = 3):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
 		"""
 			\remarks	deletes provided models. Addded by douglas
 			\param		models [ <SceneModel>, ... ]
