@@ -182,7 +182,20 @@ class SoftimageScene( AbstractScene ):
 	def _exportNativeModel( self, nativeModel, path ):
 		xsi.ExportModel( nativeModel, path, "", "" )
 		return True
-			
+	
+	#--------------------------------------------------------
+	#			XMesh
+	#--------------------------------------------------------
+	def cacheXmesh(path, objList, start, end, worldFlag = True, stack = 3):
+		"""
+			\remarks	runXmesh cache function
+			\param		models [ <SceneModel>, ... ]
+			\return		<bool> success
+		"""
+		mesh = xsi.Export_XMesh(objList, stack, start, end, path, worldFlag)
+		return mesh
+	
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -311,6 +324,12 @@ class SoftimageScene( AbstractScene ):
 	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return playControl.Parameters( "Loop" ).Value
+
+	def softwareVersion( self ):
+		print xsi.version()
+		
+	def softwareName( self ):
+		return "Softimage"
 		
 	def undo( self ):
 		xsi.Undo( '' )
