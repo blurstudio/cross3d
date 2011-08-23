@@ -186,16 +186,16 @@ class SoftimageScene( AbstractScene ):
 	#--------------------------------------------------------
 	#			XMesh
 	#--------------------------------------------------------
-	def cacheXmesh(path, objList, start, end, worldFlag = True, stack = 3):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
 		"""
 			\remarks	runXmesh cache function
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
-		mesh = xsi.Export_XMesh(objList, stack, start, end, path, worldFlag)
+		mesh = xsi.Export_XMesh(objList, stack, start, end, path, worldLock)
 		return mesh
-	
-	
+
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
