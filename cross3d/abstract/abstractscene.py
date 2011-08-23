@@ -717,7 +717,16 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return False
-
+	#--------------------------------------------------------
+	#			XMesh
+	#--------------------------------------------------------
+	def cacheXmesh(path, objList, start, end, worldFlag = True, stack = 3):
+		"""
+			\remarks	deletes provided models. Addded by douglas
+			\param		models [ <SceneModel>, ... ]
+			\return		<bool> success
+		"""
+		return True
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -1929,6 +1938,22 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneRenderPass
 		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
+
+	@abstractmethod
+	def softwareVersion( self ):
+		"""
+			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
+		
+	@abstractmethod
+	def softwareName( self ):
+		"""
+			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
 		
 	@abstractmethod
 	def undo( self ):
@@ -2082,3 +2107,5 @@ api.registerSymbol( 'Scene', AbstractScene, ifNotFound = True )
 # connect the clear instance method to when a scene is invalidated
 import blurdev
 blurdev.core.sceneInvalidated.connect( AbstractScene.clearInstance )
+	
+		
