@@ -1449,7 +1449,7 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.getQuietMode()
 	
-	def loadFile( self, filename = '', , confirm = True ):
+	def loadFile( self, filename = '', confirm = True ):
 		"""
 			\remarks	implements AbstractScene.loadFile to load the inputed filename into the application, returning true on success
 			\param		filename	<str>
@@ -1461,7 +1461,7 @@ class StudiomaxScene( AbstractScene ):
 		
 		if ( filename ):
 			mxs.loadMaxFile( str( filename ), quiet=confirm)
- )
+ 
 			return True
 		return False
 	
