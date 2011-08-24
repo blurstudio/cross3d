@@ -198,7 +198,7 @@ class AbstractScene( QObject ):
 		return False
 	
 	@abstractmethod
-	def _findNativeAtmospheric( self, name = '', uniqueId = 0 ):
+	def _NativeAtmospheric( self, name = '', uniqueId = 0 ):
 		"""
 			\remarks	look up the native atmospheric from this scene instance
 			\param		name	<str>
@@ -1313,7 +1313,7 @@ class AbstractScene( QObject ):
 		return [ SceneLayerGroup( self, nativeLayerGroup ) for nativeLayerGroup in self._nativeLayerGroups() ]
 	
 	@abstractmethod
-	def loadFile( self, filename = '' ):
+	def loadFile( self, filename = '', confirm = True ):
 		"""
 			\remarks	loads the inputed filename into the application, returning true on success
 			\param		filename	<str>
@@ -1951,6 +1951,14 @@ class AbstractScene( QObject ):
 	def softwareName( self ):
 		"""
 			\remarks	returns the name of the software. added by douglas
+			\return		<str> unique name
+		"""
+		return ''
+	
+	@abstractmethod
+	def softwareNameAndVersion( self ):
+		"""
+			\remarks	returns the name and version format needed for Assburner added by John Kosnik
 			\return		<str> unique name
 		"""
 		return ''

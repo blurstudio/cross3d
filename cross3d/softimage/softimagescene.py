@@ -186,6 +186,8 @@ class SoftimageScene( AbstractScene ):
 	#--------------------------------------------------------
 	#			XMesh
 	#--------------------------------------------------------
+	
+		
 	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
 		"""
 			\remarks	runXmesh cache function
@@ -193,13 +195,21 @@ class SoftimageScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		mesh = xsi.Export_XMesh(objList, stack, start, end, path, worldLock)
-		return mesh
+		return True
 
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+	def loadFile( self, filename = '' , confirm = True):
+		"""
+			\remarks	loads the inputed filename into the application, returning true on success
+			\param		filename	<str>
+			\return		<bool> success
+		"""
+		xsi.OpenScene( filename, confirm)
+		return False
+		
 	def animationRange( self ):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
@@ -330,6 +340,25 @@ class SoftimageScene( AbstractScene ):
 		
 	def softwareName( self ):
 		return "Softimage"
+	
+	def softwareNameAndVersion( self ):
+		"""
+			\remarks	returns the name and version format needed for Assburner added by John Kosnik
+			\return		<str> unique name
+		"""
+		version =xsi.version()
+		versionDic = {
+		"10.1.46.0" : "XSI2012",
+		"8.0.249.0" : "XSI2010",
+		'default' : "XSI2012"}
+		
+		if versionDic.has_key(version):
+			jobType = versionDic[str(version)]
+		else:
+			jobType = versionDic['default']
+		
+		return jobType
+		
 		
 	def undo( self ):
 		xsi.Undo( '' )

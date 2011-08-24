@@ -148,7 +148,15 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return False
-	
+	def setName( self, name ):
+		"""
+			\remarks	implements the AbstractSceneObject.setName to set the full name for this object
+			\sa			displayName, name, setDisplayName
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		self._nativePointer.name = str(name)
+		return True
 	def _typeOfNativeObject( self, nativeObject ):
 		"""
 			\remarks	[virtual]	returns the ObjectType of the nativeObject applied

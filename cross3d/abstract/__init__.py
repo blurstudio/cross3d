@@ -34,4 +34,3 @@ def init():
 	import abstractsceneanimationkey
 	import abstractscenecache
 	import abstractscenesubmitter
-	import abstractscenestats
