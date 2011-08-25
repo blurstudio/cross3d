@@ -1356,7 +1356,29 @@ class StudiomaxScene( AbstractScene ):
 					toRemove.append( obj )
 		self._removeNativeObjects( toRemove )
 		return True
+	#--------------------------------------------------------
+	#			XMesh
+	#--------------------------------------------------------
+	
 		
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
+		"""
+			\remarks	runXmesh cache function
+			\param		models [ <SceneModel>, ... ]
+			\return		<bool> success
+		"""
+		saver = mxs.MeshSaverUtils
+		saver.SetSequenceName(path) 
+
+		for i in range(start,end):
+			mxs.sliderTime = i
+			saver.SetSceneRenderBegin()
+
+				
+			saver.SaveMeshesToSequence( objList, True, True, True)
+			saver.SetSceneRenderEnd()
+				
+		return True	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
