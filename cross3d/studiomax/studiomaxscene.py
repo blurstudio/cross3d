@@ -1369,7 +1369,7 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		saver = mxs.MeshSaverUtils
 		saver.SetSequenceName(path) 
-
+		end = end + 1
 		for i in range(start,end):
 			mxs.sliderTime = i
 			saver.SetSceneRenderBegin()
@@ -1647,7 +1647,8 @@ class StudiomaxScene( AbstractScene ):
 			jobType = jobTypeDic['default']
 
 		return jobType
-	
+	def softwareName( self ):
+		return "3dsMax"
 	def setTimeControlPlay( self, switch, fromStart=False ):
 		if switch:
 			if fromStart:
