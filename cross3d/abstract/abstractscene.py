@@ -29,16 +29,16 @@ class AbstractScene( QObject ):
 	layerCreated				= pyqtSignal('PyQt_PyObject')
 	layerRenamed				= pyqtSignal('PyQt_PyObject')
 	layerRemoved 				= pyqtSignal('PyQt_PyObject')
-	layerGroupCreated			= pyqtSignal('str')
-	layerGroupRemoved			= pyqtSignal('str')
+	layerGroupCreated			= pyqtSignal(str)
+	layerGroupRemoved			= pyqtSignal(str)
 	
 	# generic signals
-	progressUpdated				= pyqtSignal('str',int,'str')		# section, % complete (0-100), message
-	progressErrored				= pyqtSignal('str','str')			# section, error message
+	progressUpdated				= pyqtSignal(str,int,str)		# section, % complete (0-100), message
+	progressErrored				= pyqtSignal(str,str)			# section, error message
 	
 	# submit signals
 	submitSuccess				= pyqtSignal()
-	submitError					= pyqtSignal('str')
+	submitError					= pyqtSignal(str)
 	
 	# create the scene instance
 	_instance = None
