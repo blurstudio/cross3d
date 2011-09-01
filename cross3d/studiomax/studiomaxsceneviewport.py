@@ -165,8 +165,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
 		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
 		completed = True 
-
+		count = 0
+		
 		for frame in range( ran[0], ran[1] + 1 ):
+			count = count + 1
 			if mxs.keyboard.escPressed:
 				completed = False
 				break
@@ -181,7 +183,9 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			croppedImage.filename = imagePath
 			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
 			mxs.save( croppedImage )
-			# mxs.gc()
+			if count == 100:
+				mxs.gc()
+				count = 0
 			
 		# restoring viewport settings
 		self.slateClear()	
