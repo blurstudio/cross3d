@@ -1361,12 +1361,18 @@ class StudiomaxScene( AbstractScene ):
 	#--------------------------------------------------------
 	
 		
-	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
 		"""
 			\remarks	runXmesh cache function
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
+		ignoreEmpty = True
+		#local ignoreTopology = true
+		#local useObjectSpace = true
+		#local saveVelocity = true
+		
+		
 		saver = mxs.MeshSaverUtils
 		saver.SetSequenceName(path) 
 		end = end + 1
@@ -1374,9 +1380,12 @@ class StudiomaxScene( AbstractScene ):
 			mxs.sliderTime = i
 			saver.SetSceneRenderBegin()
 
-				
-			saver.SaveMeshesToSequence( objList, True, True, True)
-			saver.SetSceneRenderEnd()
+			if len(objList) > 1:	
+				saver.SaveMeshesToSequence( objList, True, True, True)
+				saver.SetSceneRenderEnd()
+			else:
+				saver.SaveMeshToSequence( objList[0], ignoreEmpty, ignoreTopology, worldLock, saveVelocity)
+				saver.SetSceneRenderEnd()
 				
 		return True	
 	#------------------------------------------------------------------------------------------------------------------------
