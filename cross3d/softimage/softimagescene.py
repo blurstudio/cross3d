@@ -188,7 +188,7 @@ class SoftimageScene( AbstractScene ):
 	#--------------------------------------------------------
 	
 		
-	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
 		"""
 			\remarks	runXmesh cache function
 			\param		models [ <SceneModel>, ... ]
