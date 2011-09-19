@@ -98,6 +98,7 @@ class Dispatch(QObject):
 			global blur3d, blurdev
 			import blurdev
 			cls._instance._linkedSignals = {}
+			cls._instance._linkedTriggers = []
 			cls._process = None
 			import blur3d
 		return cls._instance
@@ -136,8 +137,14 @@ class Dispatch(QObject):
 				self._connections[signal].append(function)
 			else:
 				self._connections[signal] = [function]
-				# create the application callback. this way callbacks that are not being used do not need to be processed
-				blur3d.api.application.connectCallback(signal)
+				if signal in self._linkedTriggers:
+					for key in self._linkedSignals:
+						if signal in self._linkedSignals[key]:
+							# Note: if at some point we need two linked signals to share a signal, this may need to be revised to only connect once.
+							blur3d.api.application.connectCallback(key)
+				else:
+					# create the application callback. this way callbacks that are not being used do not need to be processed
+					blur3d.api.application.connectCallback(signal)
 	
 	def disconnect(self, signal, function):
 		"""
@@ -156,8 +163,14 @@ class Dispatch(QObject):
 					# if the signal is empty remove it
 					if not len(self._connections[signal]):
 						self._connections.pop(signal)
-						# remove the application callback. this way callbacks that are not being used do not need to be processed
-						blur3d.api.application.disconnectCallback(signal)
+						if signal in self._linkedTriggers:
+							for key in self._linkedSignals:
+								if signal in self._linkedSignals[key]:
+									# Note: if at some point we need two linked signals to share a signal, this may need to be revised to only disconnect once the last signal is disconnected.
+									blur3d.api.application.connectCallback(key)
+						else:
+							# remove the application callback. this way callbacks that are not being used do not need to be processed
+							blur3d.api.application.disconnectCallback(signal)
 				else:
 					debug.debugMsg('The function %s for signal %s has been disconnected, but was not recorded as connected' % (str(function), signal), debug.DebugLevel.Mid)
 			else:
@@ -242,6 +255,14 @@ class Dispatch(QObject):
 				so = blur3d.api.SceneObject(blur3d.api.Scene.instance(), node)
 				self.objectRenamed.emit(oldName, newName, so)
 	
+	def isConnected(self, signal = ''):
+		"""
+			\remarks	Returns if a specific signal is connected(blur3d.api.application.connectCallback). If signal is not provided return if the master connection is connected(blur3d.api.application.connect)
+		"""
+		if not signal:
+			return self._isConnected
+		return signal in self._connections
+	
 	def linkSignals( self, signal, trigger ):
 		"""
 			\remarks	creates a dependency so that when the inputed signal is dispatched, the dependent trigger signal is also dispatched.  This will only work
@@ -253,6 +274,15 @@ class Dispatch(QObject):
 			self._linkedSignals[ signal ] = [trigger]
 		elif ( not trigger in self._linkedSignals[signal] ):
 			self._linkedSignals[signal].append(trigger)
+		# keep a record of triggers so they can be connected
+		if not trigger in self._linkedTriggers:
+			self._linkedTriggers.append(trigger)
+	
+	def linkedSignals(self):
+		return self._linkedSignals
+	
+	def linkedTriggers(self):
+		return self._linkedTriggers
 	
 	def preDelete(self, callback, *args):
 		blur3d.api.application.preDeleteObject(callback, *args)

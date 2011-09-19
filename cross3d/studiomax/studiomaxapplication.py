@@ -29,6 +29,14 @@ if ( blur3d != undefined ) then (
 	blur3d.api.dispatch.%(function)s "%(signal)s" %(args)s 
 )
 """
+_STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS = """
+global blur3d
+print "Calling maxscript no args %(function)s, |%(signal)s|"
+if ( blur3d == undefined ) then ( blur3d = python.import "blur3d" )
+if ( blur3d != undefined ) then ( 
+	blur3d.api.dispatch.%(function)s "%(signal)s"
+)
+"""
 _STUDIOMAX_VIEWPORT_TEMPLATE = """
 fn blurfn_%(signal)s = 
 (
@@ -49,7 +57,7 @@ class _ConnectionDef:
 		self.callbackType = callbackType
 
 	@staticmethod
-	def asDict(signal, callback, arguments = '', function = '', callbackType=ConnectionType.General):
+	def asDict(signal, callback, arguments = '', function = 'dispatch', callbackType=ConnectionType.General):
 		return {signal:_ConnectionDef(signal, callback, arguments, function, callbackType)}
 
 class StudiomaxApplication(AbstractApplication):
@@ -102,7 +110,10 @@ class StudiomaxApplication(AbstractApplication):
 			mxs.execute(signal)
 			mxs.registerRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % blurdevSignal))
 		else:
-			script = _STUDIOMAX_CALLBACK_TEMPLATE % { 'function':connDef.function, 'signal': blurdevSignal, 'args': connDef.arguments }
+			if connDef.arguments:
+				script = _STUDIOMAX_CALLBACK_TEMPLATE % { 'function':connDef.function, 'signal': blurdevSignal, 'args': connDef.arguments }
+			else:
+				script = _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS % { 'function':connDef.function, 'signal': blurdevSignal }
 			mxs.callbacks.addScript( _n(connDef.callback), script, id = _n('blur3dcallbacks') )
 	
 	def connect(self):

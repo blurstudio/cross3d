@@ -26,9 +26,9 @@ from PyQt4.QtCore import QObject, pyqtSignal
 class AbstractScene( QObject ):
 	# layer signals
 	layerStateChanged			= pyqtSignal()
-	layerCreated				= pyqtSignal('PyQt_PyObject')
-	layerRenamed				= pyqtSignal('PyQt_PyObject')
-	layerRemoved 				= pyqtSignal('PyQt_PyObject')
+	layerCreated				= pyqtSignal(object)
+	layerRenamed				= pyqtSignal(object)
+	layerRemoved 				= pyqtSignal(object)
 	layerGroupCreated			= pyqtSignal(str)
 	layerGroupRemoved			= pyqtSignal(str)
 	
