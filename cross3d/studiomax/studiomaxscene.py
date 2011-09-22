@@ -1624,40 +1624,7 @@ class StudiomaxScene( AbstractScene ):
 			\return		<bool>
 		"""
 		return setattr( mxs, str(key), self._toNativeValue( value ) )
-	
-	def softwareId( self ):
-		"""
-			\remarks	implements AbstractScene.softwareId to return a unique version/bits string information that will represent the exact
-									version of the software being run.
-			\return		<str>
-		"""
-		mversion 	= mxs.maxVersion()[0]/1000
-		sixtyfour	= ''
-		if ( mversion > 10 ):
-			mversion = 2009 + (mversion-11)		# shifted to years at version 11
-		if ( mxs.is64BitApplication() ):
-			sixtyfour = '_64'
-		return 'MAX%i%s' % (mversion,sixtyfour)
-	def softwareNameAndVersion( self ):
-		version = mxs.maxVersion()
-		jobTypeDic = {
-				'5100' : "Max5",
-				'6000':	 "Max6",
-				'7000':	 "Max7",
-				'8000':  "Max8",
-				'9000':  "Max9",
-				'10000': "Max10",
-				'11000': "Max2009",
-				'12000': "Max2010",
-				'default': "Max2010"}
-		if jobTypeDic.has_key(str(version[0])):
-			jobType = jobTypeDic[str(version[0])]
-		else:
-			jobType = jobTypeDic['default']
-
-		return jobType
-	def softwareName( self ):
-		return "3dsMax"
+		
 	def setTimeControlPlay( self, switch, fromStart=False ):
 		if switch:
 			if fromStart:
@@ -1677,7 +1644,7 @@ class StudiomaxScene( AbstractScene ):
 		return mxs.timeConfiguration.playbackLoop
 		
 	def animationFPS( self ):
-		return mxs.frameRate
+		return float( mxs.frameRate )
 		
 	def currentFrame( self ):
 		return int( mxs.currentTime )

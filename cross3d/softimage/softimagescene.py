@@ -221,9 +221,9 @@ class SoftimageScene( AbstractScene ):
 	def animationFPS( self ):
 		"""
 			\remarks	implements AbstractScene.animationFPS method to return the current frame per second rate.
-			\return		<int> endFrame>
+			\return		<float> fps
 		"""
-		return xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Rate" ).Value
+		return float( xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Rate" ).Value )
 		
 	def currentFileName( self ):
 		"""
@@ -334,31 +334,6 @@ class SoftimageScene( AbstractScene ):
 	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return playControl.Parameters( "Loop" ).Value
-
-	def softwareVersion( self ):
-		print xsi.version()
-		
-	def softwareName( self ):
-		return "Softimage"
-	
-	def softwareNameAndVersion( self ):
-		"""
-			\remarks	returns the name and version format needed for Assburner added by John Kosnik
-			\return		<str> unique name
-		"""
-		version =xsi.version()
-		versionDic = {
-		"10.1.46.0" : "XSI2012",
-		"8.0.249.0" : "XSI2010",
-		'default' : "XSI2012"}
-		
-		if versionDic.has_key(version):
-			jobType = versionDic[str(version)]
-		else:
-			jobType = versionDic['default']
-		
-		return jobType
-		
 		
 	def undo( self ):
 		xsi.Undo( '' )

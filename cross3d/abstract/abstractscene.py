@@ -1805,15 +1805,6 @@ class AbstractScene( QObject ):
 			self._updatesDisabled += 1
 		
 		return self.updatesEnabled()
-		
-	@abstractmethod
-	def softwareId( self ):
-		"""
-			\remarks	returns a unique version/bits string information that will represent the exact
-									version of the software being run.
-			\return		<str>
-		"""
-		return ''
 	
 	def stats( self ):
 		"""
@@ -1938,30 +1929,6 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneRenderPass
 		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
-
-	@abstractmethod
-	def softwareVersion( self ):
-		"""
-			\remarks	returns the name of the software. added by douglas
-			\return		<str> unique name
-		"""
-		return ''
-		
-	@abstractmethod
-	def softwareName( self ):
-		"""
-			\remarks	returns the name of the software. added by douglas
-			\return		<str> unique name
-		"""
-		return ''
-	
-	@abstractmethod
-	def softwareNameAndVersion( self ):
-		"""
-			\remarks	returns the name and version format needed for Assburner added by John Kosnik
-			\return		<str> unique name
-		"""
-		return ''
 		
 	@abstractmethod
 	def undo( self ):
@@ -2022,9 +1989,9 @@ class AbstractScene( QObject ):
 	def animationFPS( self ):
 		"""
 			\remarks	returns the current frame per second rate. added by douglas
-			\return		<int> fps
+			\return		<float> fps
 		"""
-		return 0
+		return 0.0
 
 	@abstractmethod
 	def currentFrame( self ):

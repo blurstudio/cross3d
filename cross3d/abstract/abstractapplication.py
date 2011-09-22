@@ -108,6 +108,23 @@ class AbstractApplication(QObject):
 			\return		<str> unique name
 		"""
 		return ''
+		
+	@abstractmethod
+	def id( self ):
+		"""
+			\remarks	returns a unique version/bits string information that will represent the exact
+									version of the software being run.
+			\return		<str>
+		"""
+		return ''
+		
+	@abstractmethod
+	def nameAndVersion( self ):
+		"""
+			\remarks	returns the name and version format needed for Assburner added by John Kosnik
+			\return		<str> unique name
+		"""
+		return ''
 
 # register the symbol
 from blur3d import api

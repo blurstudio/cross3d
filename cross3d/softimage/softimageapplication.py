@@ -68,6 +68,24 @@ class SoftimageApplication(AbstractApplication):
 		
 	def name( self ):
 		return "Softimage"
+		
+	def nameAndVersion( self ):
+		"""
+			\remarks	returns the name and version format needed for Assburner added by John Kosnik
+			\return		<str> unique name
+		"""
+		version =xsi.version()
+		versionDic = {
+		"10.1.46.0" : "XSI2012",
+		"8.0.249.0" : "XSI2010",
+		'default' : "XSI2012"}
+		
+		if versionDic.has_key(version):
+			jobType = versionDic[str(version)]
+		else:
+			jobType = versionDic['default']
+		
+		return jobType
 	
 # register the symbol
 from blur3d import api
