@@ -62,11 +62,6 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 
 	def generatePlayblast( self, fileName, rang=None ):
 		import os
-		splitFileName = os.path.splitext( fileName )
-		if splitFileName[1]:
-			fileName = '.'.join( splitFileName )
-		else:
-			fileName = fileName + '.'
 		from blur3d.api import Scene
 		scene = Scene()
 		if not rang:
