@@ -78,6 +78,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		xsi.SetValue( "ViewportCapture.Start", rang[0], None )
 		xsi.SetValue( "ViewportCapture.End",rang[1] , None )
 		xsi.SetValue( "ViewportCapture.Filename", fileName )
+		xsi.SetValue( "ViewportCapture.Padding", "(fn).#(ext)" )
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		return True
