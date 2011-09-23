@@ -61,12 +61,6 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		return cameraName
 
 	def generatePlayblast( self, fileName, rang=None ):
-		from blur3d.api import Application
-		application = Application()
-		if application.version() > 9:
-			formatID = 5
-		else:
-			formatID = 4
 		import os
 		from blur3d.api import Scene
 		scene = Scene()
@@ -80,7 +74,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		xsi.SetValue( "ViewportCapture.LaunchFlipbook", False )
 		xsi.SetValue( "ViewportCapture.CaptureAudio", None )
 		xsi.SetValue( "ViewportCapture.UserPixelRatio", True )
-		xsi.SetValue( "ViewportCapture.FormatType", formatID )
+		xsi.SetValue( "ViewportCapture.FormatType", 5 )
 		xsi.SetValue( "ViewportCapture.Start", rang[0], None )
 		xsi.SetValue( "ViewportCapture.End",rang[1] , None )
 		xsi.SetValue( "ViewportCapture.Filename", fileName )
