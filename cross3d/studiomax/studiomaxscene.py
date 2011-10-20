@@ -1373,7 +1373,7 @@ class StudiomaxScene( AbstractScene ):
 		#local saveVelocity = true
 		
 		
-		saver = mxs.MeshSaverUtils
+		saver = mxs.XMeshSaverUtils
 		saver.SetSequenceName(path) 
 		end = end + 1
 		for i in range(start,end):
