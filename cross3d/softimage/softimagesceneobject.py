@@ -92,10 +92,6 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return self._nativePointer.ObjectID
-		
-	def metadata( self ): # temp to be deleted soon. added by douglas
-		from softimagesceneobjectmetadata import SoftimageSceneObjectMetadata
-		return SoftimageSceneObjectMetadata( self )
 
 # register the symbol
 from blur3d import api

@@ -759,7 +759,7 @@ class StudiomaxScene( AbstractScene ):
 				
 		return output
 		
-	def _nativeObjects( self ):
+	def _nativeObjects( self, wildcard='' ):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]

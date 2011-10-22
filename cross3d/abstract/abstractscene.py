@@ -457,7 +457,7 @@ class AbstractScene( QObject ):
 		return []
 	
 	@abstractmethod
-	def _nativeObjects( self ):
+	def _nativeObjects( self, wildcard='' ):
 		"""
 			\remarks	returns the native objects from the scene
 			\return		<list> [ <variant> nativeObject, .. ]
@@ -1346,13 +1346,13 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMap
 		return [ SceneMap( self, obj ) for obj in self._nativeMaps() ]
 	
-	def objects( self ):
+	def objects( self, wildcard='' ):
 		"""
 			\remarks	returns a list of all the objects in the scene wrapped as SceneObjects
 			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
 		from blur3d.api import SceneObject
-		return [ SceneObject( self, obj ) for obj in self._nativeObjects() ]
+		return [ SceneObject( self, obj ) for obj in self._nativeObjects( wildcard ) ]
 	
 	@abstractmethod
 	def property( self, key, default = None ):

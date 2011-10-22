@@ -98,13 +98,13 @@ class SoftimageScene( AbstractScene ):
 				models.append( obj )
 		return models
 	
-	def _nativeObjects( self ):
+	def _nativeObjects( self, wildcard='' ):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
 		root = self._nativeRootObject()
-		return root.FindChildren( '', '', '', True )
+		return root.FindChildren( wildcard, '', '', True )
 	
 	def _findNativeObject( self, name='', uniqueId=0 ):
 		"""
