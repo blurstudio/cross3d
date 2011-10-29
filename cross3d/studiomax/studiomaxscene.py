@@ -15,6 +15,7 @@ from blur3d.api.abstract.abstractscene 	import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
 from mxscustattribdef import MXSCustAttribDef
+import re
 
 #-----------------------------------------------------------------------------
 
@@ -764,6 +765,14 @@ class StudiomaxScene( AbstractScene ):
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
+		objects = mxs.objects
+		if wildcard:
+			exp = wildcard.replace('*', '.+').strip('.+')
+			output = []
+			for object in objects:
+				if re.findall(exp, object.name):
+					output.append(object)
+			return output
 		return mxs.objects
 	
 	def _nativeRefresh( self ):
