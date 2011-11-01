@@ -237,7 +237,7 @@ class SoftimageScene( AbstractScene ):
 			\remarks	implements AbstractScene.currentFrame method to return the current frame
 			\return		<int>
 		"""
-		return int( xsi.ActiveProject.Properties( "Play Control" ).Current.Value )
+		return int( xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Current" ).Value )
 
 	def setCurrentFrame( self, frame ):
 		"""
