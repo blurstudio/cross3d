@@ -1050,15 +1050,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			atmos.setEnabled( not state )
 			
 		return True
-		
-	def setName( self, name ):
-		"""
-			\remarks	implements the AbstractSceneLayer.setName method to set the layer name for this layer instance
-			\sa			name
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		return self._nativePointer.setname( str(name) )
 	
 	def setUniqueId( self, uniqueId ):
 		"""

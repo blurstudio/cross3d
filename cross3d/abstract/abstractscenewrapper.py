@@ -9,7 +9,7 @@
 #	\date		03/15/10
 #
 
-from blur3d import abstractmethod
+from blur3d import abstractmethod, pendingdeprecation
 from blur3d.api	import UserProps
 from blur3d.api.abstract.blurtags import BlurTags
 
@@ -216,20 +216,15 @@ class AbstractSceneWrapper(object):
 			nativeController = controller.nativePointer()
 		return self._setNativeController( name, nativeController )
 	
+	@pendingdeprecation
+	def setName( self, name ):
+		return self.setDisplayName( name )
+		
+	@abstractmethod
 	def setDisplayName( self, name ):
 		"""
 			\remarks	set the display name for this wrapper instance to the inputed name - if not reimplemented, then it will
 						set the object's actual name to the inputed name
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		return self.setName( name )
-	
-	@abstractmethod
-	def setName( self, name ):
-		"""
-			\remarks	set the name of this wrapper instance
-			\sa			name
 			\param		name	<str>
 			\return		<bool> success
 		"""

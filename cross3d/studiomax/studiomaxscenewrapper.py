@@ -100,6 +100,35 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
+	def displayName( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.displayName method to look up the display name for this object and returns it
+			\sa			name, setDisplayName, setName
+			\return		<str> name
+		"""
+		return self._nativePointer.name.split( '.' )[-1]
+
+	def name( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.name to look up the unique name for this object and returns it
+			\sa			displayName, setDisplayName, setName
+			\return		<str> name
+		"""
+		return str(self._nativePointer.name)
+		
+	def setDisplayName( self, name ):
+		"""
+			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
+			\sa			displayName, name, setName
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		splt 		= self._nativePointer.name.split( '.' )
+		splt[-1] 	= unicode(name)
+		self._nativePointer.name = '.'.join( splt )
+		return True
+		
 	def hasProperty( self, key ):
 		"""
 			\remarks	implements the AbstractSceneWrapper.hasProperty method to check to see if the inputed property name exists for this controller

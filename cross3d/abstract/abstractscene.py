@@ -1919,6 +1919,7 @@ class AbstractScene( QObject ):
 			\param		renderPasses [ <blur3d.api.SceneRenderPass> ]
 			\return		<bool> success
 		"""
+		print renderPasses
 		return self._removeNativeRenderPasses( [ renderPass.nativePointer() for renderPass in renderPasses ] )
 
 	def createRenderPass( self, displayName ):
@@ -2055,11 +2056,34 @@ class AbstractScene( QObject ):
 		return None
 		
 	def isAvalaibleName( self, name ):
+		"""
+			\remarks	returns weather a name is already used in a scene. Added by douglas
+			\param		name <string>
+			\return	  	<bool> answer
+		"""
 		if self._findNativeObject( name ):
 			return False
 		else:
 			return True
-
+			
+	def departmentName( self ):
+		"""
+			\remarks	returns the current department name. Added by douglas
+			\return	  	<string> departmentName | ''
+		"""
+		fileName = self.currentFileName()
+		if 'Animation' in fileName:
+			return 'Animation'
+		elif 'Camfix' in fileName:
+			return 'Camfix'
+		elif 'DOF' in fileName:
+			return 'DOF'
+		elif 'FX' in fileName:
+			return 'FX'
+		elif 'Layout' in fileName:
+			return 'Layout'
+		return ''
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------

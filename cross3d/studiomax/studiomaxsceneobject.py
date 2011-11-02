@@ -261,13 +261,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def displayName( self ):
-		"""
-			\remarks	implements the AbstractSceneObject.displayName method to look up the display name for this object and returns it
-			\sa			name, setDisplayName, setName
-			\return		<str> name
-		"""
-		return self._nativePointer.name.split( '.' )[-1]
 	
 	def isFrozen( self ):
 		"""
@@ -293,26 +286,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.isselected
 		
-	def name( self ):
-		"""
-			\remarks	implements the AbstractSceneObject.name to look up the unique name for this object and returns it
-			\sa			displayName, setDisplayName, setName
-			\return		<str> name
-		"""
-		return str(self._nativePointer.name)
-		
-	def setDisplayName( self, name ):
-		"""
-			\remarks	implements the AbstractSceneObject.setDisplayName to set the display name for this object
-			\sa			displayName, name, setName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		splt 		= self._nativePointer.name.split( '.' )
-		splt[-1] 	= unicode(name)
-		self._nativePointer.name = '.'.join( splt )
-		return True
-		
 	def setFrozen( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setFrozen to freezes(locks)/unfreezes(unlocks) this object
@@ -331,16 +304,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		self._nativePointer.ishidden = state
-		return True
-		
-	def setName( self, name ):
-		"""
-			\remarks	implements the AbstractSceneObject.setName to set the full name for this object
-			\sa			displayName, name, setDisplayName
-			\param		name	<str>
-			\return		<bool> success
-		"""
-		self._nativePointer.name = str(name)
 		return True
 		
 	def setSelected( self, state ):
