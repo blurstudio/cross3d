@@ -2036,7 +2036,7 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneViewport
 		return SceneViewport( self, viewportID )
 
-	def getAvailableIteration( self, mask, letter=True, padding=3,  ):
+	def getAvailableIteration( self, mask, letter=False, padding=3,  ):
 		"""
 			\remarks	returns the first avalaible iteration using the specified mask. Added by douglas
 			\param		viewportName <string>
@@ -2051,7 +2051,7 @@ class AbstractScene( QObject ):
 			if iteration.isdigit():
 				paddingCode = '%0' + str( padding ) + 'd'
 				iteration = paffingCode % iteration
-			if not self._findNativeObject( mask % { "iteration" : iteration } ):
+			if not self.objects( mask % { "iteration" : iteration } ):
 				return iteration
 		return None
 		
