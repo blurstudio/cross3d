@@ -127,8 +127,9 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 		# getting the camera
 		camera = self.camera()
-		if camera.hasMultiPassEffects():
-			effects = True
+		if camera:
+			if camera.hasMultiPassEffects():
+				effects = True
 			
 		# setting the viewport
 		mxs.hideByCategory.geometry = False
@@ -175,7 +176,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			scene.setCurrentFrame( frame )
 			
 			if effects:
-				camera.renderMultiPassEffects()
+				if camera:
+					camera.renderMultiPassEffects()
 				self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )

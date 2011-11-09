@@ -53,6 +53,7 @@ class AbstractSceneViewport( QObject ):
 		camera = self._nativeCamera()
 		if camera:
 			return SceneCamera( self, camera )
+		from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 		return None
 		
 	def setCamera( self, camera ):

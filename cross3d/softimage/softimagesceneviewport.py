@@ -37,7 +37,10 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			scene = Scene()
 			renderPass = self.scene.currentRenderPass()
 			cameraName = renderPass.camera().name()
-		return xsi.Dictionary.GetObject( cameraName )
+		if cameraName:
+			return xsi.Dictionary.GetObject( cameraName )
+		else:
+			return None
 
 	def _setNativeCamera( self, nativeCamera ):
 		if type( nativeCamera ) == str or type( nativeCamera ) == unicode:

@@ -100,6 +100,7 @@ class SoftimageUserProps(AbstractUserProps):
 		elif type == int:
 			return int(string)
 		elif type in (list, dict, tuple):
+			print string
 			return eval(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
