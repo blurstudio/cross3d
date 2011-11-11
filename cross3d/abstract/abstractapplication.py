@@ -108,6 +108,10 @@ class AbstractApplication(QObject):
 			\return		<str> unique name
 		"""
 		return ''
+
+	@abstractmethod
+	def refresh( self ):
+		return False
 		
 	@abstractmethod
 	def id( self ):

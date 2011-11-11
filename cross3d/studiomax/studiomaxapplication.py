@@ -188,6 +188,10 @@ class StudiomaxApplication(AbstractApplication):
 		
 	def version( self ):
 		return int( mxs.maxVersion()[0] / 1000 )
+	
+	def refresh( self ):
+		mxs.completeRedraw()
+		return True
 		
 	def nameAndVersion( self ):
 		version = mxs.maxVersion()

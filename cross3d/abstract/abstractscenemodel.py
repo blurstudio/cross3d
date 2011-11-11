@@ -61,13 +61,14 @@ class AbstractSceneModel( SceneObject ):
 			\return		<str> | <float> iteration
 		"""	
 		iteration = self.displayNameTokenValue( 'iteration' )
-		iterationReplaced = iteration.replace( '-', '.' )
-		try:
-			iteration = float( iterationReplaced )
-			if int( str( iteration ).split( '.' )[1] ) == 0:
-				iteration = int( iteration )
-		except:
-			pass
+		if iteration:
+			iterationReplaced = iteration.replace( '-', '.' )
+			try:
+				iteration = float( iterationReplaced )
+				if int( str( iteration ).split( '.' )[1] ) == 0:
+					iteration = int( iteration )
+			except:
+				pass
 		return iteration
 
 	def setIteration( self, iteration, padding=3 ):
