@@ -43,6 +43,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			camera = nativeCamera
 		if nativeCamera:
 			mxs.viewport.setCamera( camera )
+			self.refresh()
 			return True
 		return False
 		
@@ -266,6 +267,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			return True
 		return False
 
+	def refresh( self ):
+		mxs.redrawViews()
+		return True
+		
 	def slateText( self ):
 		return self._slateText
 		

@@ -127,6 +127,9 @@ class AbstractSceneViewport( QObject ):
 			\return		<bool> success
 		"""
 		return False
+
+	def refresh( self ):
+		return False
 		
 	def slateIsActive( self ):
 		return False
