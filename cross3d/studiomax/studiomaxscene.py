@@ -770,7 +770,7 @@ class StudiomaxScene( AbstractScene ):
 			exp = wildcard.replace('*', '.+').strip('.+')
 			output = []
 			for object in objects:
-				if re.findall(exp, object.name):
+				if re.findall(exp, object.name, flags=re.I):
 					output.append(object)
 			return output
 		return mxs.objects
