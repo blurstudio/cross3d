@@ -75,7 +75,7 @@ class AbstractSceneViewport( QObject ):
 		"""
 		return ''
 
-	def generatePlayblast( self, fileName, ran=None ):
+	def generatePlayblast( self, fileName, ran=None, **options ):
 		"""
 			\remarks	generates a playblast in the specific path. added by douglas
 			\param		filename where the playblast is save

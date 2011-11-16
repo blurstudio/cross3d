@@ -94,7 +94,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, ran=None ):
+	def generatePlayblast( self, path, ran=None, **options ):
+		'''
+			/option <bool> effects
+		'''
+
 		# collecting what we need
 		import os
 		from blur3d.api import Scene
@@ -105,7 +109,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		fileSplit = file.split( '.' )
 		fileName = '.'.join( fileSplit[:-1] )
 		fileExtension = 'jpg'
-		effects = False
+		effects = options.get( 'effects', True )
 		
 		# checking inputs
 		if not ran:
@@ -128,9 +132,6 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 		# getting the camera
 		camera = self.camera()
-		if camera:
-			if camera.hasMultiPassEffects():
-				effects = True
 			
 		# setting the viewport
 		mxs.hideByCategory.geometry = False
@@ -176,7 +177,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 				break
 			scene.setCurrentFrame( frame )
 			
-			if effects:
+			if camera.hasMultiPassEffects() and effects:
 				if camera:
 					camera.renderMultiPassEffects()
 				self.slateDraw()	

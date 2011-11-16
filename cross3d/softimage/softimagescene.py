@@ -160,26 +160,76 @@ class SoftimageScene( AbstractScene ):
 		return cameras
 		
 	def _nativeRenderPasses( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeRenderPasses that returns the native render passes in the scene
+			\return		nativeRenderPasses [ <PySoftimage.xsi.Pass>, <...> ]
+		"""	
 		return xsi.ActiveProject.ActiveScene.Passes
 		
 	def _findNativeRenderPass( self, displayName= '' ):
+		"""
+			\remarks	implements the AbstractScene._findNativeRenderPass that find render passes in the scene based on their display name
+			\Param		displayName <string>
+			\return		nativeRenderPasses [ <PySoftimage.xsi.Pass>, <...> ]
+		"""	
 		return self._findNativeObject( "Passes." + displayName )
 		
 	def _currentNativeRenderPass( self ):
+		"""
+			\remarks	implements the AbstractScene._currentNativeRenderPass that returns the active render pass in the scene	
+			\return		<PySoftimage.xsi.Pass> nativeRenderPass
+		"""	
 		return xsi.ActiveProject.ActiveScene.ActivePass
 		
 	def _setCurrentNativeRenderPass( self, nativeSceneRenderPass ):
+		"""
+			\remarks	implements the AbstractScene._setCurrentNativeRenderPass method to set the current render pass in the scene			\param		displayName			<str>
+			\return		<PySoftimage.xsi.Pass> nativeRenderPass
+		"""	
 		xsi.SetCurrentPass( nativeSceneRenderPass )
 		return True
 		
-	def _removeNativeRenderPasses( self , nativeRenderPasses ): 
+	def _removeNativeRenderPasses( self , nativeRenderPasses ):
+		"""
+			\remarks	implements the AbstractScene._createNativeRenderPass method to create a new Softimage render pass
+			\param		displayName			<str>
+			\return		<PySoftimage.xsi.Pass> nativeRenderPass
+		"""	
 		self._removeNativeObjects( nativeRenderPasses )
 		return True
 		
-	def _createNativeRenderPass( self, displayName ): 
+	def _createNativeRenderPass( self, displayName ):
+		"""
+			\remarks	implements the AbstractScene._createNativeRenderPass method to create a new Softimage render pass
+			\param		displayName			<str>
+			\return		<PySoftimage.xsi.Pass> nativeRenderPass
+		"""
 		return xsi.CreatePass("", displayName )( "Value" )
 		
+	def _createNativeModel( self, name = 'Model', nativeObjects = [] )
+		"""
+			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage model
+			\param		name			<str>
+			\return		<PySoftimage.xsi.Model> nativeModel
+		"""
+		root = self._nativeRootObject()
+		return root.addModel( nativeObjects, name )
+		
+	def _createNativeCamera( self, name = 'Camera' )
+		"""
+			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage camera
+			\param		name			<str>
+			\return		<PySoftimage.xsi.Camera> nativeCamera
+		"""
+		root = self._nativeRootObject()
+		return root.addCamera( 'Camera', name )
+		
 	def _exportNativeModel( self, nativeModel, path ):
+		"""
+			\remarks	implements the AbstractScene._exportNativeModel method to export a Softimage model
+			\param		nativeModel <PySoftimage.xsi.Model>
+			\param		path <string>
+		"""
 		xsi.ExportModel( nativeModel, path, "", "" )
 		return True
 	

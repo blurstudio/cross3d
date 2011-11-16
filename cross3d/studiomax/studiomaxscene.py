@@ -373,7 +373,7 @@ class StudiomaxScene( AbstractScene ):
 		
 	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
 		"""
-			\remarks	implements the AbstractScene._createNativeModel method to return a new Studiomax model
+			\remarks	implements the AbstractScene._createNativeModel method to return a new Studiomax Model
 			\param		name			<str>
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
@@ -390,7 +390,17 @@ class StudiomaxScene( AbstractScene ):
 		nativeObjects.append( output )
 		self._createNativeLayer( name, nativeObjects )
 		return output
-	
+		
+	def _createNativeCamera( self, name = 'Camera' ):
+		"""
+			\remarks	implements the AbstractScene._createNativeCamera method to return a new Studiomax Camera
+			\param		name			<str>
+			\return		<Py3dsMax.mxs.Object> nativeObject || None
+		"""
+		nativeCamera = mxs.FreeCamera()
+		nativeCamera.name = name
+		return nativeCamera
+
 	def _createNativeRenderer( self, rendererType ):
 		"""
 			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed rendererType for this scene

@@ -163,6 +163,16 @@ class AbstractScene( QObject ):
 		return None
 	
 	@abstractmethod
+	def _createNativeCamera( self, name = 'Camera' ):
+		"""
+			\remarks	creates and returns a new native 3d camera with the inputed name and objects
+			\param		name			<str>
+			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
+			\return		<variant> nativeObject || None
+		"""
+		return None
+	
+	@abstractmethod
 	def _createNativeRenderer( self, rendererType ):
 		"""
 			\remaks		creates a new native renderer based on the inputed renderer type for this scene
@@ -939,6 +949,17 @@ class AbstractScene( QObject ):
 		if ( nativeModel ):
 			from blur3d.api import SceneObject
 			return SceneObject( self, nativeModel )
+		return None
+		
+	def createCamera( self, name = 'Camera' ):
+		"""
+			\remarks	creates a new camera with the inputed name and returns it
+			\return		<blur3d.api.SceneObject> || None
+		"""
+		nativeCamera = self._createNativeCamera( name )
+		if ( nativeCamera ):
+			from blur3d.api import SceneCamera
+			return SceneCamera( self, nativeCamera )
 		return None
 	
 	def createSubmitter( self, submitType ):
@@ -2035,25 +2056,6 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneViewport
 		return SceneViewport( self, viewportID )
-
-	def getAvailableIteration( self, mask, letter=False, padding=3,  ):
-		"""
-			\remarks	returns the first avalaible iteration using the specified mask. Added by douglas
-			\param		viewportName <string>
-			\return	  	<blur3d.api.SceneViewport> viewport | None
-		"""
-		if letter:
-			import string
-			bank = string.uppercase
-		else:
-			bank = range( 1, 1000 )
-		for iteration in bank:
-			if iteration.isdigit():
-				paddingCode = '%0' + str( padding ) + 'd'
-				iteration = paffingCode % iteration
-			if not self.objects( mask % { "iteration" : iteration } ):
-				return iteration
-		return None
 		
 	def isAvalaibleName( self, name ):
 		"""

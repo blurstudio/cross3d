@@ -63,7 +63,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, rang=None ):
+	def generatePlayblast( self, fileName, rang=None, **options ):
 		import os
 		from blur3d.api import Scene
 		scene = Scene()
