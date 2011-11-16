@@ -19,7 +19,19 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+	def classOf(self):
+		"""
+			\remarks	implements the AbstractSceneObject._findNativeChild method as a convinance function to return class 
+			information as  string
+						
+			
+			\param		parent		<Py3dsMax.mxs.Object> nativeObject	(used for recursive searches when necessary)
+			\return		<Py3dsMax.mxs.Object> nativeObject || None
+		"""
+		classof 	= mxs.classof
+		classN = str(classof (self._nativePointer))
+		
+		return classN
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChild method to find 
