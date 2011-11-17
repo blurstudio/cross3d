@@ -206,16 +206,16 @@ class SoftimageScene( AbstractScene ):
 		"""
 		return xsi.CreatePass("", displayName )( "Value" )
 		
-	def _createNativeModel( self, name = 'Model', nativeObjects = [] )
+	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
 		"""
-			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage model
+			\remarks	implements the AbstractScene._createNativeModel method to return a new Softimage model
 			\param		name			<str>
 			\return		<PySoftimage.xsi.Model> nativeModel
 		"""
 		root = self._nativeRootObject()
 		return root.addModel( nativeObjects, name )
 		
-	def _createNativeCamera( self, name = 'Camera' )
+	def _createNativeCamera( self, name = 'Camera', type = 'Standard' ):
 		"""
 			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage camera
 			\param		name			<str>
@@ -325,8 +325,10 @@ class SoftimageScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		if switch:
+			xsi.SetValue("preferences.scripting.cmdlog", False, "")
 			xsi.SetValue( "preferences.Interaction.autoinspect", False, "" )
 		else:
+			xsi.SetValue("preferences.scripting.cmdlog", True, "")
 			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
 		return True
 			

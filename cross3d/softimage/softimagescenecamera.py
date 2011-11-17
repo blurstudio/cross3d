@@ -21,7 +21,9 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def lens( self ):
-		return self.nativePointer().Parameters( 'projplanedist' ).Value
+		#print self._nativePointer.FullName
+		#return self._nativePointer.Parameters( 'projplanedist' ).Value
+		return xsi.GetValue( self.name() + '.camera.projplanedist' )
 		
 	def setLens( self, value ):
 		self.nativePointer().Parameters( 'projplanedist' ).Value = value

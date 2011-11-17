@@ -86,6 +86,10 @@ class SoftimageApplication(AbstractApplication):
 			jobType = versionDic['default']
 		
 		return jobType
+		
+	def refresh( self ):
+		xsi.Refresh()
+		return True
 	
 # register the symbol
 from blur3d import api

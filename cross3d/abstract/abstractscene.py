@@ -163,12 +163,12 @@ class AbstractScene( QObject ):
 		return None
 	
 	@abstractmethod
-	def _createNativeCamera( self, name = 'Camera' ):
+	def _createNativeCamera( self, name = 'Camera', type = 'Standard' ):
 		"""
 			\remarks	creates and returns a new native 3d camera with the inputed name and objects
 			\param		name			<str>
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
-			\return		<variant> nativeObject || None
+			\return		<variant> nativeCamera || None
 		"""
 		return None
 	
@@ -951,12 +951,12 @@ class AbstractScene( QObject ):
 			return SceneObject( self, nativeModel )
 		return None
 		
-	def createCamera( self, name = 'Camera' ):
+	def createCamera( self, name = 'Camera', type = 'Standard' ):
 		"""
 			\remarks	creates a new camera with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
 		"""
-		nativeCamera = self._createNativeCamera( name )
+		nativeCamera = self._createNativeCamera( name, type )
 		if ( nativeCamera ):
 			from blur3d.api import SceneCamera
 			return SceneCamera( self, nativeCamera )
