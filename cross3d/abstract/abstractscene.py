@@ -2067,24 +2067,14 @@ class AbstractScene( QObject ):
 			return False
 		else:
 			return True
-			
-	def departmentName( self ):
+		
+	def application( self ):
 		"""
-			\remarks	returns the current department name. Added by douglas
-			\return	  	<string> departmentName | ''
+			\remarks	returns the application class. added by douglas
+			\return	  	<blur3d.api.Application> application
 		"""
-		fileName = self.currentFileName()
-		if 'Animation' in fileName:
-			return 'Animation'
-		elif 'Camfix' in fileName:
-			return 'Camfix'
-		elif 'DOF' in fileName:
-			return 'DOF'
-		elif 'FX' in fileName:
-			return 'FX'
-		elif 'Layout' in fileName:
-			return 'Layout'
-		return ''
+		from blur3d.api import Application
+		return Application()
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
