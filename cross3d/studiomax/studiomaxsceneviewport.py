@@ -126,13 +126,17 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		initialBoneObjectsVisibility = mxs.hideByCategory.bones
 		initialGridVisibility = mxs.viewport.getGridVisibility( self._name )
 		initialFrame = scene.currentFrame()
+		initialRange = scene.animationRange()
 		initialSelection = scene.selection()
 		initialSafeFrame = mxs.displaySafeFrames
 		initialViewNumber = mxs.viewport.numViews
 
 		# getting the camera
 		camera = self.camera()
-			
+		
+		# setting the scene
+		scene.setAnimationRange( ran )
+		
 		# setting the viewport
 		mxs.hideByCategory.geometry = False
 		mxs.hideByCategory.shapes = True
@@ -190,7 +194,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			if count == 100:
 				mxs.gc()
 				count = 0
-			
+		
+		# restoring the scene
+		scene.setAnimationRange( initialRange )
+		
 		# restoring viewport settings
 		self.slateClear()	
 		mxs.displaySafeFrames = initialSafeFrame

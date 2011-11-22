@@ -483,9 +483,10 @@ class AbstractScene( QObject ):
 		return []
 	
 	@abstractmethod
-	def _nativeSelection( self ):
+	def _nativeSelection( self, type='' ):
 		"""
 			\remarks	returns the selected objects from the scene
+			\param		type <string> 
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		return []
@@ -1577,10 +1578,11 @@ class AbstractScene( QObject ):
 		"""
 		return False
 	
-	def selection( self ):
+	def selection( self, type='' ):
 		"""
 			\remarks	returns the currently selected objects from the scene
 			\sa			_nativeSelection
+			\param		type <string> 
 			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
 		from blur3d.api import SceneObject
