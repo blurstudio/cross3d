@@ -9,12 +9,14 @@
 #	\date		04/05/10
 #
 
-from blur3d		import abstractmethod
+from blur3d import abstractmethod
 from blur3d.api import SceneObject
+from blur3d.constants import ObjectType
 
 #------------------------------------------------------------------------------------------------------------------------
 
 class AbstractSceneModel( SceneObject ):
+	_objectType = ObjectType.Model
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods

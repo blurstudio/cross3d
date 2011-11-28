@@ -15,15 +15,35 @@ from blur3d.constants import ObjectType
 
 class AbstractSceneObject( SceneWrapper ):
 	iconCache = {}
+	_objectType = ObjectType.Generic
+	_subClasses = {}
+	
 	def __init__( self, scene, nativeObject ):
 		SceneWrapper.__init__( self, scene, nativeObject )
 		
 		self._objectType	= self._typeOfNativeObject( nativeObject )
-	
+
+	def __new__( cls, scene, nativeObject ):
+		"""
+			\remarks	acts as a factory to return the right type of scene object
+			\return		<variant> SceneObject
+		"""
+		#print SceneWrapper.__subclasses__()
+		if not cls._subClasses:
+			for c in cls._subclasses( cls ):
+				if not c._objectType == ObjectType.Generic:
+					cls._subClasses[ c._objectType ] = c
+		
+		nativeType = cls._typeOfNativeObject( nativeObject )
+		if nativeType in cls._subClasses:
+			c = cls._subClasses[ nativeType ]
+			return SceneWrapper.__new__( c )
+		return SceneWrapper.__new__( cls )
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-
+		
 	@abstractmethod
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
@@ -148,14 +168,6 @@ class AbstractSceneObject( SceneWrapper ):
 			\return		<bool> success
 		"""
 		return False
-		
-	def _typeOfNativeObject( self, nativeObject ):
-		"""
-			\remarks	[virtual]	returns the ObjectType of the nativeObject applied
-			\param		<variant> nativeObject || None
-			\return		<bool> success
-		"""
-		return ObjectType.Generic
 		
 	def _nativeModel( self ):
 		"""
@@ -527,7 +539,24 @@ class AbstractSceneObject( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+
+	@staticmethod
+	def _typeOfNativeObject( nativeObject ):
+		"""
+			\remarks	[virtual]	returns the ObjectType of the nativeObject applied
+			\param		<variant> nativeObject || None
+			\return		<bool> success
+		"""
+		return ObjectType.Generic
+		
+	@staticmethod
+	def _subclasses( cls, classes=[], includeClass=False ):
+		if includeClass:
+			classes.append( cls )
+		for subclass in cls.__subclasses__():
+				cls._subclasses( subclass, classes, True )
+		return classes
+		
 	@staticmethod
 	def cachedIcon( objectType ):
 		icon = AbstractSceneObject.iconCache.get( objectType )

@@ -11,9 +11,11 @@
 
 from blur3d		import abstractmethod
 from blur3d.api import SceneObject
+from blur3d.constants import ObjectType
 
 class AbstractSceneCamera( SceneObject ):
-
+	_objectType = ObjectType.Camera
+	
 	@abstractmethod
 	def cameraType( self ):
 		"""

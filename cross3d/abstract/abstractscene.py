@@ -19,9 +19,8 @@
 #	\date		03/15/10
 #
 
-from blur3d				import abstractmethod
-
-from PyQt4.QtCore import QObject, pyqtSignal
+from blur3d			import abstractmethod, pendingdeprecation
+from PyQt4.QtCore 	import QObject, pyqtSignal
 
 class AbstractScene( QObject ):
 	# layer signals
@@ -366,7 +365,7 @@ class AbstractScene( QObject ):
 		"""
 		return []
 	
-	@abstractmethod
+	@pendingdeprecation
 	def _nativeModels( self ):
 		"""
 			\remarks	return a collection of the models in this scene. added by douglas
@@ -387,8 +386,8 @@ class AbstractScene( QObject ):
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
 		return None
-		
-	@abstractmethod
+	
+	@pendingdeprecation
 	def _nativeCameras( self ):
 		"""
 			\remarks	return a collection of the cameras in this scene
@@ -467,9 +466,10 @@ class AbstractScene( QObject ):
 		return []
 	
 	@abstractmethod
-	def _nativeObjects( self, wildcard='' ):
+	def _nativeObjects( self, getsFromSelection=False, wildcard='' ):
 		"""
 			\remarks	returns the native objects from the scene
+			\param		wildcard <string>
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		return []
@@ -479,15 +479,6 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	returns the native root object of the scen
 			\return		<variant> nativeObject || None
-		"""
-		return []
-	
-	@abstractmethod
-	def _nativeSelection( self, type='' ):
-		"""
-			\remarks	returns the selected objects from the scene
-			\param		type <string> 
-			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		return []
 	
@@ -728,16 +719,15 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return False
-	#--------------------------------------------------------
-	#			XMesh
-	#--------------------------------------------------------
+
 	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
 		"""
-			\remarks	deletes provided models. Addded by douglas
+			\remarks	deletes provided models. Added by John K.
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
 		return True
+		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -840,6 +830,7 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
 	
+	@pendingdeprecation
 	def models( self ):
 		"""
 			\remarks	return a list of all the models objects in this scene
@@ -857,7 +848,8 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneModel
 		return SceneModel( self, self._importNativeModel( path, name ) )
-		
+	
+	@pendingdeprecation
 	def cameras( self ):
 		"""
 			\remarks	return a list of all the camera objects in this scene
@@ -1367,14 +1359,43 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneMap
 		return [ SceneMap( self, obj ) for obj in self._nativeMaps() ]
-	
-	def objects( self, wildcard='' ):
+
+	def _objects( self, getsFromSelection=False, wildcard='', types=[] ):
 		"""
-			\remarks	returns a list of all the objects in the scene wrapped as SceneObjects
-			\return		<list> [ <blur3d.api.SceneObject>, .. ]
+			\remarks	returns a list of all the objects in the scene wrapped as api objects
+			\param		getsFromSelection <bool>
+			\param		wildcard <string>
+			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
 		from blur3d.api import SceneObject
-		return [ SceneObject( self, obj ) for obj in self._nativeObjects( wildcard ) ]
+		objects = [ SceneObject( self, obj ) for obj in self._nativeObjects( getsFromSelection, wildcard ) ]
+		if types:
+			output = []
+			for obj in objects:
+				if obj.objectType() in types:
+					output.append( obj )
+			return output
+		else:
+			return objects			
+	
+	def selection( self, wildcard='', types=[] ):
+		"""
+			\remarks	returns the currently selected objects from the scene
+			\param		wildcard <string>
+			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\return		<list> [ <blur3d.api.Variant>, .. ]
+		"""
+		return self._objects( True, wildcard, types )
+		
+	def objects( self, wildcard='', types=[] ):
+		"""
+			\remarks	returns a list of all the objects in the scene wrapped as api objects
+			\param		wildcard <string>
+			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\return		<list> [ <blur3d.api.Variant>, .. ]
+		"""
+		return self._objects( False, wildcard, types )
 	
 	@abstractmethod
 	def property( self, key, default = None ):
@@ -1577,16 +1598,6 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return False
-	
-	def selection( self, type='' ):
-		"""
-			\remarks	returns the currently selected objects from the scene
-			\sa			_nativeSelection
-			\param		type <string> 
-			\return		<list> [ <blur3d.api.SceneObject>, .. ]
-		"""
-		from blur3d.api import SceneObject
-		return [ SceneObject( self, obj ) for obj in self._nativeSelection() ]
 	
 	@abstractmethod
 	def setAnimationRange( self, animationRange ):

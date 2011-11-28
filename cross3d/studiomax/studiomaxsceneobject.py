@@ -19,6 +19,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	def classOf(self):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChild method as a convinance function to return class 
@@ -32,6 +33,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		classN = str(classof (self._nativePointer))
 		
 		return classN
+
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChild method to find 
@@ -231,30 +233,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		self._nativePointer.wireColor = color
 		return True
 		
-	def _typeOfNativeObject( self, nativeObject ):
-		"""
-			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
-			\param		<Py3dsMax.mxs.Object> nativeObject || None
-			\return		<bool> success
-		"""
-		from blur3d.constants import ObjectType
-		
-		isKindOf 	= mxs.isKindOf
-		
-		# check to see if the object is a geometry type
-		if ( isKindOf( nativeObject, mxs.GeometryClass ) ):
-			return ObjectType.Geometry
-		
-		# check to see if the object is a light type
-		elif ( isKindOf( nativeObject, mxs.Light ) ):
-			return ObjectType.Light
-		
-		# check to see if the object is a camera type
-		elif ( isKindOf( nativeObject, mxs.Camera ) ):
-			return ObjectType.Camera
-			
-		return AbstractSceneObject._typeOfNativeObject( self, nativeObject )
-		
 	def _nativeModel( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeModel method to look up the native model for this object
@@ -335,6 +313,35 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return mxs.blurUtil.uniqueId( self._nativePointer )
+
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												static methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
+	@staticmethod
+	def _typeOfNativeObject( nativeObject ):
+		"""
+			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
+			\param		<Py3dsMax.mxs.Object> nativeObject || None
+			\return		<bool> success
+		"""
+		from blur3d.constants import ObjectType
+		
+		isKindOf 	= mxs.isKindOf
+		
+		# check to see if the object is a geometry type
+		if ( isKindOf( nativeObject, mxs.GeometryClass ) ):
+			return ObjectType.Geometry
+		
+		# check to see if the object is a light type
+		elif ( isKindOf( nativeObject, mxs.Light ) ):
+			return ObjectType.Light
+		
+		# check to see if the object is a camera type
+		elif ( isKindOf( nativeObject, mxs.Camera ) ):
+			return ObjectType.Camera
+			
+		return AbstractSceneObject._typeOfNativeObject( nativeObject )
 		
 # register the symbol
 from blur3d import api

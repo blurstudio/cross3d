@@ -92,6 +92,39 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return self._nativePointer.ObjectID
+		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												static methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
+	@staticmethod
+	def _typeOfNativeObject( nativeObject ):
+		"""
+			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
+			\param		<PySoftimage.xsi.Object> nativeObject || None
+			\return		<bool> success
+		"""
+		from blur3d.constants import ObjectType
+		
+		type 	= nativeObject.Type
+		
+		# check to see if the object is a geometry type
+		if type == 'polymsh':
+			return ObjectType.Geometry
+		
+		# check to see if the object is a light type
+		if type == 'light':
+			return ObjectType.Light
+		
+		# check to see if the object is a camera type
+		if type == 'camera':
+			return ObjectType.Camera
+			
+		# check to see if the object is a model type
+		if type == '#model':
+			return ObjectType.Model
+			
+		return AbstractSceneObject._typeOfNativeObject( nativeObject )
 
 # register the symbol
 from blur3d import api

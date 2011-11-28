@@ -8,8 +8,9 @@
 #	\date		04/01/11
 #
 
-from PySoftimage import xsi
-from blur3d.api.abstract.abstractscene import AbstractScene
+from blur3d   							import pendingdeprecation
+from PySoftimage 						import xsi
+from blur3d.api.abstract.abstractscene  import AbstractScene
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ class SoftimageScene( AbstractScene ):
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def _importNativeModel( self, path, name = '' ): # double check documentation
+	def _importNativeModel( self, path, name = '' ):
 		"""
 			\remarks	implements the AbstractScene._importNativeModel to import and return a model in the scene
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
@@ -40,13 +41,6 @@ class SoftimageScene( AbstractScene ):
 		"""
 		self._removeNativeObjects( models )
 		return True
-		
-	def _nativeSelection( self ):
-		"""
-			\remarks	implements the AbstractScene._nativeSelection to return the native selected objects of the scene
-			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
-		"""
-		return xsi.Selection
 		
 	def _setNativeSelection( self, selection ):
 		"""
@@ -86,7 +80,8 @@ class SoftimageScene( AbstractScene ):
 			names.append( branchCode + obj.FullName )
 		xsi.DeleteObj( ",".join( names ) )
 		return True
-		
+
+	@pendingdeprecation
 	def _nativeModels( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeModels method to return the native root of the scene
@@ -98,13 +93,25 @@ class SoftimageScene( AbstractScene ):
 				models.append( obj )
 		return models
 	
-	def _nativeObjects( self, wildcard='' ):
+	def _nativeObjects( self, getsFromSelection=False, wildcard='' ):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
-		root = self._nativeRootObject()
-		return root.FindChildren( wildcard, '', '', True )
+		if getsFromSelection:
+			objects = xsi.Selection
+			if wildcard:
+				import re
+				expression = wildcard.replace('*', '.+').strip('.+')
+				output = []
+				for obj in objects:
+					if re.findall( expression, obj.FullName, flags=re.I ):
+						output.append( obj )
+				return output
+		else:
+			root = self._nativeRootObject()
+			objects = root.FindChildren( wildcard, '', '', True )
+		return objects
 	
 	def _findNativeObject( self, name='', uniqueId=0 ):
 		"""
@@ -148,6 +155,7 @@ class SoftimageScene( AbstractScene ):
 			object.Properties('Visibility').Parameters('rendvis').SetValue(not state)
 		return True
 	
+	@pendingdeprecation
 	def _nativeCameras( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeCameras method to return the native cameras of the scene

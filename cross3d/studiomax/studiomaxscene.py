@@ -8,9 +8,9 @@
 #	\date		03/15/10
 #
 
-from blurdev import debug
-from Py3dsMax import mxs
-	
+from blur3d   							import pendingdeprecation
+from blurdev  							import debug
+from Py3dsMax 							import mxs
 from blur3d.api.abstract.abstractscene 	import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
@@ -670,6 +670,7 @@ class StudiomaxScene( AbstractScene ):
 		get_effect 	= mxs.getEffect
 		return [ get_atmos( i+1 ) for i in range( mxs.numAtmospherics ) ] + [ get_effect( i + 1 ) for i in range( mxs.numEffects ) ]
 	
+	@pendingdeprecation
 	def _nativeCameras( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeCameras method to return a list of the camera instances in this scene
@@ -773,21 +774,24 @@ class StudiomaxScene( AbstractScene ):
 				
 		return output
 		
-	def _nativeObjects( self, wildcard='' ):
+	def _nativeObjects( self, getsFromSelection=False, wildcard='' ):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
-		objects = mxs.objects
+		if getsFromSelection:
+			objects = mxs.selection
+		else:
+			objects = mxs.objects
 		if wildcard:
-			exp = wildcard.replace('*', '.+').strip('.+')
+			expression = wildcard.replace('*', '.+').strip('.+')
 			output = []
 			for object in objects:
-				if re.findall(exp, object.name, flags=re.I):
+				if re.findall( expression, object.name, flags=re.I ):
 					output.append(object)
 			return output
-		return mxs.objects
-	
+		return objects
+		
 	def _nativeRefresh( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeRefresh method to refreshe the contents of the current scene
@@ -805,13 +809,6 @@ class StudiomaxScene( AbstractScene ):
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
 		return mxs.rootNode
-	
-	def _nativeSelection( self ):
-		"""
-			\remarks	implements the AbstractScene._nativeSelection to return the native selected objects of the scene
-			\return		<Py3dsMax.mxs.Object> nativeObject || None
-		"""
-		return mxs.selection
 	
 	def _nativeWorldLayer( self ):
 		"""
@@ -1350,6 +1347,7 @@ class StudiomaxScene( AbstractScene ):
 		else:
 			return None
 
+	@pendingdeprecation
 	def _nativeModels( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeModels to return native models in the scene. added by douglas.
