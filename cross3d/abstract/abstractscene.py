@@ -1360,42 +1360,42 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMap
 		return [ SceneMap( self, obj ) for obj in self._nativeMaps() ]
 
-	def _objects( self, getsFromSelection=False, wildcard='', types=[] ):
+	def _objects( self, getsFromSelection=False, wildcard='', type=0 ):
 		"""
 			\remarks	returns a list of all the objects in the scene wrapped as api objects
 			\param		getsFromSelection <bool>
 			\param		wildcard <string>
-			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\param		type <blur3d.constants.ObjectType>
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
 		from blur3d.api import SceneObject
 		objects = [ SceneObject( self, obj ) for obj in self._nativeObjects( getsFromSelection, wildcard ) ]
-		if types:
+		if type:
 			output = []
 			for obj in objects:
-				if obj.objectType() in types:
+				if obj.objectType() & type:
 					output.append( obj )
 			return output
 		else:
 			return objects			
 	
-	def selection( self, wildcard='', types=[] ):
+	def selection( self, wildcard='', type=0 ):
 		"""
 			\remarks	returns the currently selected objects from the scene
 			\param		wildcard <string>
-			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\param		type <blur3d.constants.ObjectType>
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
-		return self._objects( True, wildcard, types )
+		return self._objects( True, wildcard, type )
 		
-	def objects( self, wildcard='', types=[] ):
+	def objects( self, wildcard='', type=0 ):
 		"""
 			\remarks	returns a list of all the objects in the scene wrapped as api objects
 			\param		wildcard <string>
-			\param		types [ <blur3d.constants.ObjectType>, .. ]
+			\param		type <blur3d.constants.ObjectType>
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
-		return self._objects( False, wildcard, types )
+		return self._objects( False, wildcard, type )
 	
 	@abstractmethod
 	def property( self, key, default = None ):
