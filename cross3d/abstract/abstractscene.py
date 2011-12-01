@@ -747,9 +747,10 @@ class AbstractScene( QObject ):
 	def animationRange( self ):
 		"""
 			\remarks	return the start and end frames for the animation range for the scene
-			\return		<tuple> ( <int> start, <int> end )
+			\return		<blur3d.api.FrameRange>
 		"""
-		return (0,0)
+		from blur3d.api import FrameRange
+		return FrameRange()
 	
 	def atmospherics( self ):
 		"""

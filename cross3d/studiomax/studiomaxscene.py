@@ -1411,13 +1411,15 @@ class StudiomaxScene( AbstractScene ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	def animationRange( self ):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
-			\return		<tuple> (<int> startFrame,<int> endFrame>)
+			\return		<blur3d.api.FrameRange>
 		"""
+		from blur3d.api import FrameRange
 		r = mxs.animationRange
-		return ( int(r.start), int(r.end) )
+		return FrameRange( ( int(r.start), int(r.end) ) )
 	
 	def checkForSave( self ):
 		"""

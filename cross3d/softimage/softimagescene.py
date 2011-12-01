@@ -274,10 +274,11 @@ class SoftimageScene( AbstractScene ):
 	def animationRange( self ):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
-			\return		<tuple> (<int> startFrame,<int> endFrame>)
+			\return		<blur3d.api.FrameRange>
 		"""
+		from blur3d.api import FrameRange
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
-		return [ int( playControl.Parameters( "In" ).Value ), int( playControl.Parameters( "Out" ).Value ) ]
+		return FrameRange( [ int( playControl.Parameters( "In" ).Value ), int( playControl.Parameters( "Out" ).Value ) ] )
 
 	def animationFPS( self ):
 		"""
