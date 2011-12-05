@@ -20,6 +20,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
 	
 	def __init__( self, scene, viewportID=0 ): 
+		self._scene = scene
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
 			self.name = self.viewportNames[ viewportID ]
@@ -69,19 +70,31 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		scene = Scene()
 		if not rang:
 			rang = scene.animationRange()
+		
 		width = xsi.GetValue( "Passes.RenderOptions.ImageWidth" )
 		height = xsi.GetValue( "Passes.RenderOptions.ImageHeight" )
-		xsi.SetValue( "ViewportCapture.ImageWidth", width, None )
-		xsi.SetValue( "ViewportCapture.ImageHeight", height, None )
-		xsi.SetValue( "ViewportCapture.UseNativePlayer", False )
-		xsi.SetValue( "ViewportCapture.LaunchFlipbook", False )
-		xsi.SetValue( "ViewportCapture.CaptureAudio", None )
-		xsi.SetValue( "ViewportCapture.UserPixelRatio", True )
-		xsi.SetValue( "ViewportCapture.FormatType", 5 )
-		xsi.SetValue( "ViewportCapture.Start", rang[0], None )
-		xsi.SetValue( "ViewportCapture.End",rang[1] , None )
-		xsi.SetValue( "ViewportCapture.Filename", fileName )
-		xsi.SetValue( "ViewportCapture.Padding", "(fn).#(ext)" )
+		fps = self._scene.animationFPS()
+		
+		viewportCapture = xsi.Dictionary.GetObject( 'ViewportCapture' ).NestedObjects
+		
+		viewportCapture( 'File Name' ).Value = fileName
+		viewportCapture( 'Padding' ).Value = '(fn).#(ext)'
+		viewportCapture( 'Width' ).Value = width
+		viewportCapture( 'Height' ).Value = height
+		viewportCapture( 'Scale Factor' ).Value = 1
+		viewportCapture( 'User Pixel Ratio' ).Value = True 
+		viewportCapture( 'Pixel Ratio' ).Value = 1 
+		viewportCapture( 'Frame Rate' ).Value = fps 
+		viewportCapture( 'Write Alpha' ).Value = False 
+		viewportCapture( 'Record Audio Track' ).Value = False
+		viewportCapture( 'Start Frame' ).Value = rang[0]
+		viewportCapture( 'End Frame' ).Value = rang[1]
+		viewportCapture( 'Launch Flipbook' ).Value = False
+		viewportCapture( 'Use Native Movie Player' ).Value = False 
+		viewportCapture( 'Movie' ).Value = False 
+		viewportCapture( 'OpenGL Anti-Aliasing' ).Value = 1 
+		viewportCapture( 'Remember Last Sequence' ).Value = False
+
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		return True

@@ -14,9 +14,11 @@ from blur3d 	import abstractmethod
 from blur3d.api import SceneWrapper
 
 class AbstractSceneLayerGroup( SceneWrapper ):
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	@abstractmethod
 	def _addNativeLayers( self, nativeLayers ):
 		"""
@@ -57,6 +59,7 @@ class AbstractSceneLayerGroup( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	def addLayers( self, layers ):
 		"""
 			\remarks	add the layers to this layer group

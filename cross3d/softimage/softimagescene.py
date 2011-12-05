@@ -217,6 +217,23 @@ class SoftimageScene( AbstractScene ):
 		self.setSilentMode( False )
 		return renderPass
 		
+	def viewports( self ):
+		"""
+			\remarks	implements the AbstractScene.viewports method to return the visible viewports
+			\return		[ <blur3d.api.SceneViewport>, ... ]
+		"""
+		from blur3d.api import SceneViewport
+		viewportNames = SceneViewport.viewportNames
+		viewportLetters = [ viewportNames[ key ] for key in viewportNames.keys() ]
+		viewportLetters = sorted( viewportLetters )
+		viewports = []
+		viewManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
+		for letter in viewportLetters:
+			if not viewManager.GetAttributeValue( 'layout:%s' % letter ) == 'hidden':
+				number = viewportLetters.index( letter ) + 1
+				viewports.append( SceneViewport( self, number ) )
+		return viewports
+		
 	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
 		"""
 			\remarks	implements the AbstractScene._createNativeModel method to return a new Softimage model

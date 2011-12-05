@@ -553,6 +553,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	def advancedAltMaterialStateAt( self, index ):
 		"""
 			\remarks	implements the AbstractSceneLayer.advancedAltMaterialStateAt method to return a mapping for the advanced alternate material status of a given alternate material
@@ -684,6 +685,15 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\return		<int> index
 		"""
 		return self.metaData().value( 'groupOrder' )
+		
+	def setDisplayName( self, name ):
+		"""
+			\remarks	implements the AbstractSceneLayer.setName method to set the layer display name for this layer instance
+			\sa			name
+			\param		name	<str>
+			\return		<bool> success
+		"""
+		return self._nativePointer.setname( str(name) )
 	
 	def metaData( self ):
 		if ( not self._metaData ):

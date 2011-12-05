@@ -115,7 +115,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
-		return str(self._nativePointer.name)
+		return str( self._nativePointer.name )
 		
 	def setDisplayName( self, name ):
 		"""

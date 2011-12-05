@@ -2070,6 +2070,14 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneViewport
 		return SceneViewport( self, viewportID )
+	
+	@abstractmethod
+	def viewports( self ):
+		"""
+			\remarks	returns all the visible viewports. Added by douglas
+			\return	  	[ <blur3d.api.SceneViewport>, ... ]
+		"""
+		return []
 		
 	def isAvalaibleName( self, name ):
 		"""

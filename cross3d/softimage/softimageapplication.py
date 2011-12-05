@@ -88,6 +88,7 @@ class SoftimageApplication(AbstractApplication):
 		return jobType
 		
 	def refresh( self ):
+		xsi.SceneRefresh()
 		xsi.Refresh()
 		return True
 	

@@ -21,6 +21,13 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		for layer in self.layers():
 			output += layer._nativeObjects()
 		return output
+	
+	def displayName( self ):
+		"""
+			\remarks	implements the AbstractSceneLayerGroup.name method to retrieve the unique layer display name for this layer
+			\return		<str> name
+		"""
+		return self._nativePointer
 		
 	def name( self ):
 		"""
@@ -120,9 +127,9 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		
 		return True
 	
-	def setName( self, name ):
+	def setDisplayName( self, name ):
 		"""
-			\remarks	implements the AbstractLayerGroup.setName method to set the name for this layer group
+			\remarks	implements the AbstractLayerGroup.setName method to set the display name for this layer group
 			\param		name	<str>
 			\return		<bool> changed
 		"""
