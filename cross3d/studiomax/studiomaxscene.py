@@ -1381,32 +1381,63 @@ class StudiomaxScene( AbstractScene ):
 	#--------------------------------------------------------
 	
 		
-	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True, samples = 1, makeMat = True):
 		"""
 			\remarks	runXmesh cache function
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
+		import os
 		ignoreEmpty = True
 		#local ignoreTopology = true
 		#local useObjectSpace = true
 		#local saveVelocity = true
 		
-		
+		fileExt = os.path.basename(path)
+		cacheSplit = os.path.splitext(path)
+		cacheName = cacheSplit[0]
 		saver = mxs.XMeshSaverUtils
 		saver.SetSequenceName(path) 
 		end = end + 1
-		for i in range(start,end):
-			mxs.sliderTime = i
-			saver.SetSceneRenderBegin()
+		#samples = 10
+		substep = 1.0/samples
+		
+		# I have to set the display to ticks in-order to access subframe information. This is to get around not having a proper 
+		# at time function
+		mxs.timeDisplayMode = mxs.pyhelper.namify("frameTicks")
+		print( makeMat)
+		if makeMat:
+			matUtils = mxs.XMeshSaver_MaterialUtils
+			theMaterial = matUtils.getMaterialFromNodes(objList)
 
-			if len(objList) > 1:	
-				saver.SaveMeshesToSequence( objList, True, True, True)
-				saver.SetSceneRenderEnd()
-			else:
-				saver.SaveMeshToSequence( objList[0], ignoreEmpty, ignoreTopology, worldLock, saveVelocity)
-				saver.SetSceneRenderEnd()
+			theMaterial.name = cacheName + "_MultiMaterial"
+			matDir = os.path.splitext(path)
+			theMatLibPath = matDir[0] + ".mat"
+			if theMaterial.numsubs > 1:
+
+				theMatLib = mxs.materialLibrary()
+				mxs.append(theMatLib, theMaterial)
+				mxs.saveTempMaterialLibrary( theMatLib, theMatLibPath)
+				print theMatLibPath
+		#BEGIN CACHE RECORD	
+		saver.SetSceneRenderBegin()		
+		for i in range(start,end):
+			
+			for j in range(0,samples):
+				time = float(i)+ substep * j
+				mxs.sliderTime = time
 				
+
+				if len(objList) > 1:	
+					saver.SaveMeshesToSequence( objList, True, True, True)
+					
+				else:
+					saver.SaveMeshToSequence( objList[0], ignoreEmpty, ignoreTopology, worldLock, saveVelocity)
+					#saver.SetSceneRenderEnd()
+		#END CACHE RECORD
+		saver.SetSceneRenderEnd()
+		
+		#RETURN FINISH
 		return True	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
