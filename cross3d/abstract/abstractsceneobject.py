@@ -200,14 +200,6 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		from blur3d.api import SceneCache
 		return [ SceneCache( self._scene, nativeCache ) for nativeCache in self._nativeCaches( cacheType ) ]
-	
-	def deslect( self ):
-		"""
-			\remarks	deselects the object in the scene
-			\sa			isSelected, select, setSelected
-			\return		<bool> success
-		"""
-		return self.setSelected(False)
 		
 	def childAt( self, index ):
 		"""
