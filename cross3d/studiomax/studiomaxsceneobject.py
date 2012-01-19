@@ -10,8 +10,15 @@
 #
 
 from Py3dsMax import mxs
+from blur3d.constants import ObjectType
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
+_nativeObjectTypes = { 	'light'         : ObjectType.Light,
+						'camera'        : ObjectType.Camera,
+						'Thinking'      : ObjectType.Particle,
+						'PF_Source'     : ObjectType.Particle,
+						'GeometryClass' : ObjectType.Geometry }
+							
 class StudiomaxSceneObject( AbstractSceneObject ):
 	AppDataAltMtlIndex		= 1108
 	AppDataAltPropIndex 	= 1110
@@ -325,33 +332,11 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\param		<Py3dsMax.mxs.Object> nativeObject || None
 			\return		<bool> success
 		"""
-		from blur3d.constants import ObjectType
-		
-		isKindOf 	= mxs.isKindOf
-		
-		# check to see if the object is a geometry type
-		
-		
-		# check to see if the object is a light type
-		if ( isKindOf( nativeObject, mxs.Light ) ):
-			return ObjectType.Light
-		
-		# check to see if the object is a camera type
-		elif ( isKindOf( nativeObject, mxs.Camera ) ):
-			return ObjectType.Camera
-		
-		elif ( isKindOf( nativeObject, mxs.Thinking)):
-			return ObjectType.Particle
-		
-		elif ( isKindOf( nativeObject, mxs.PF_Source)):
-			return ObjectType.Particle
-		
-		elif ( isKindOf( nativeObject, mxs.GeometryClass ) ):
-			return ObjectType.Geometry
-		
-		return AbstractSceneObject._typeOfNativeObject( nativeObject )
-		
-		
+		output = 	_nativeObjectTypes.get( str( mxs.classOf( nativeObject ) ), 
+					_nativeObjectTypes.get( str( mxs.superClassOf( nativeObject ) ),
+					AbstractSceneObject._typeOfNativeObject( nativeObject ) ) )
+		return output
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneObject', StudiomaxSceneObject )

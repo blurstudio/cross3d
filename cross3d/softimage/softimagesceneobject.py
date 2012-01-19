@@ -10,6 +10,7 @@
 #
 
 from PySoftimage import xsi
+from blur3d.constants import ObjectType
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +105,6 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\param		<PySoftimage.xsi.Object> nativeObject || None
 			\return		<bool> success
 		"""
-		from blur3d.constants import ObjectType
 		
 		type 	= nativeObject.Type
 		

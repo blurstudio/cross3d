@@ -20,8 +20,7 @@ class AbstractSceneObject( SceneWrapper ):
 	
 	def __init__( self, scene, nativeObject ):
 		SceneWrapper.__init__( self, scene, nativeObject )
-		
-		self._objectType	= self._typeOfNativeObject( nativeObject )
+		self._objectType = self._typeOfNativeObject( nativeObject )
 
 	def __new__( cls, scene, nativeObject ):
 		"""
