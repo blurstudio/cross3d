@@ -58,7 +58,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		return None
 	
 	def size( self ):
-		return [ mxs.getViewSize().x, mxs.getViewSize().y ]
+		viewSize = mxs.getViewSize()
+		return [ viewSize.x, viewSize.y ]
 		
 	def safeFrameIsActive( self ):
 		return mxs.displaySafeFrames
@@ -110,10 +111,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		fileName = '.'.join( fileSplit[:-1] )
 		fileExtension = 'jpg'
 		effects = options.get( 'effects', True )
+		initialRange = scene.animationRange()
 		
 		# checking inputs
 		if not ran:
-			ran = scene.animationRange()
+			ran = initialRange
 
 		# storing infornation
 		initialGeometryVisibility = mxs.hideByCategory.geometry
@@ -126,7 +128,6 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		initialBoneObjectsVisibility = mxs.hideByCategory.bones
 		initialGridVisibility = mxs.viewport.getGridVisibility( self._name )
 		initialFrame = scene.currentFrame()
-		initialRange = scene.animationRange()
 		initialSelection = scene.selection()
 		initialSafeFrame = mxs.displaySafeFrames
 		initialViewNumber = mxs.viewport.numViews
@@ -173,7 +174,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
 		completed = True 
 		count = 0
-		
+
 		for frame in range( ran[0], ran[1] + 1 ):
 			count = count + 1
 			if mxs.keyboard.escPressed:
@@ -181,10 +182,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 				break
 			scene.setCurrentFrame( frame )
 			
-			if camera.hasMultiPassEffects() and effects:
-				if camera:
+			if camera:
+				if camera.hasMultiPassEffects() and effects:
 					camera.renderMultiPassEffects()
-				self.slateDraw()	
+					self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
@@ -220,12 +221,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		return completed
 		
 	def slateDraw( self ):
-		# importing stuff
+		# processing the text
 		import re
 		from blur3d.api import Scene
 		scene = Scene()
-		
-		# processing the text
 		text = self._slateText
 		matches = re.findall( r'(\[)([F|f][R|r][A|a][M|m][E|e])( +)?(#[0-9]+)?( +)?(\])', text )
 		for match in matches:
@@ -235,7 +234,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			else:
 				padding = 1
 			text = text.replace( ''.join( match ), str( scene.currentFrame() ).zfill( padding ) )
-		
+
 		# rendering the slate
 		text = text + '  '
 		viewSize = self.size()
@@ -249,13 +248,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		else:
 			hMargin = 0
 			vMargin = 0
-		
-		# I am not very happy with the posX calculation as the textWidth does not seem to be very reliable.
+
 		textPos = mxs.point3( viewSize[0] - textWidth - hMargin, vMargin, 0 )
-		colorWhite = mxs.color( 255,255,255 )
-		mxs.gw.htext( textPos, text, color=colorWhite )
-		box = mxs.box2( 0,0,viewSize[0],viewSize[1] )
-		mxs.gw.enlargeUpdateRect( box )
+		color = mxs.color( 255,255,255 )
+		mxs.gw.htext( textPos, text, color=color )
+		mxs.gw.enlargeUpdateRect( mxs.pyhelper.namify( 'whole' ) )
 		mxs.gw.updatescreen() 
 
 	def slateIsActive( self ):
@@ -265,7 +262,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		if isActive:
 			if not self._slateIsActive:
 				dispatch.connect( 'viewportRedrawn', self.slateDraw )
-				mxs.completeRedraw() 
+				mxs.completeRedraw()
 			self._slateIsActive = True
 			return True
 		if self._slateIsActive:
