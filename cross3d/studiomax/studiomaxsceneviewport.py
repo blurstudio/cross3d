@@ -148,32 +148,17 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.particles = False
 		mxs.hideByCategory.bones = True
 		scene.clearSelection()
-		mxs.displaySafeFrames = True
+		mxs.displaySafeFrames = False
 		mxs.viewport.setGridVisibility( self._name, False )
 		if initialViewNumber > 1:
 			mxs.execute( 'max tool maximize' )
-			mxs.completeRedraw()
 			
 		# getting the viewport size information
-		outputSize = [ scene.renderSize().width(), scene.renderSize().height() ]
 		viewSize = self.size()
-		ratios = [ outputSize[0] / viewSize[0] , outputSize[1] / viewSize[1] ]
-		if ratios[0] > ratios[1]:
-			ratio = ratios[0]
-		else:
-			ratio = ratios[1]
-		playblastSize = [ viewSize[0] * ratio, viewSize[1] * ratio ]
-		
-		position = [ ( viewSize[0] - playblastSize[0] ) / 2, ( viewSize[1] - playblastSize[1] ) / 2 ]
-		mxs.gw.setPos( position[0], position[1], playblastSize[0], playblastSize[1] )
-	
-		viewSize = [ mxs.getViewSize().x, mxs.getViewSize().y ]
-		crops = [ ( viewSize[0] - outputSize[0] ) / 2, ( viewSize[1] - outputSize[1] ) / 2 ]
-		cropsDif = [ viewSize[0] - crops[0], viewSize[1] - crops[1] ]
-		box = mxs.box2( crops[0], crops[1], cropsDif[0], cropsDif[1] )
-		croppedImage = mxs.bitmap( outputSize[0], outputSize[1] )
 		completed = True 
 		count = 0
+		
+		mxs.pyhelper.setViewportQuadSize( scene.renderSize().width(), scene.renderSize().height() )
 
 		for frame in range( ran[0], ran[1] + 1 ):
 			count = count + 1
@@ -189,9 +174,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image = mxs.gw.getViewportDib()
-			croppedImage.filename = imagePath
-			mxs.pasteBitmap( image, croppedImage, box, mxs.point2( 0, 0 ) )
-			mxs.save( croppedImage )
+			image.filename = imagePath
+			mxs.save( image )
 			if count == 100:
 				mxs.gc()
 				count = 0
@@ -200,10 +184,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		scene.setAnimationRange( initialRange )
 		
 		# restoring viewport settings
+		self._name = mxs.viewport.activeViewport
 		self.slateClear()	
-		mxs.displaySafeFrames = initialSafeFrame
 		scene.setSelection( initialSelection )
 		scene.setCurrentFrame( initialFrame )
+		mxs.displaySafeFrames = initialSafeFrame
 		mxs.hideByCategory.geometry = initialGeometryVisibility
 		mxs.hideByCategory.shapes =	initialShapesVisibility
 		mxs.hideByCategory.lights =	initialLightsVisibility 
@@ -212,12 +197,14 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.spacewarps =	initialSpaceWarpsVisibility 
 		mxs.hideByCategory.particles = initialParticleSystemsVisibility
 		mxs.hideByCategory.bones = initialBoneObjectsVisibility
-		if initialViewNumber == 1:
-			mxs.execute( 'max tool maximize' )
-		mxs.execute( 'max tool maximize' )
-		self._name = mxs.viewport.activeViewport
 		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
+		mxs.pyhelper.setViewportQuadSize( viewSize[0], viewSize[1] )
+		
+		if initialViewNumber != 1:
+			mxs.execute( 'max tool maximize' )
+
 		mxs.gc()
+		
 		return completed
 		
 	def slateDraw( self ):
