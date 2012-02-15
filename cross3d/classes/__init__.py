@@ -9,5 +9,6 @@
 #
 
 from dispatch import Dispatch
+from clipboard import Clipboard
 from framerange import FrameRange
-#import dispatchprocess
+from filesequence import FileSequence

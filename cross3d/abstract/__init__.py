@@ -26,10 +26,10 @@ def init():
 	import abstractscenemap
 	import abstractsceneatmospheric
 	import abstractscenerenderer
-	import abstractscenemodel # new douglas
+	import abstractscenemodel
 	import abstractscenecamera
-	import abstractscenerenderpass # new douglas
-	import abstractsceneviewport # new douglas
+	import abstractscenerenderpass
+	import abstractsceneviewport
 	import abstractsceneanimationcontroller
 	import abstractsceneanimationkey
 	import abstractscenecache

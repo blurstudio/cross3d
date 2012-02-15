@@ -357,8 +357,8 @@ class SoftimageScene( AbstractScene ):
 			xsi.SetValue("preferences.scripting.cmdlog", False, "")
 			xsi.SetValue( "preferences.Interaction.autoinspect", False, "" )
 		else:
-			xsi.SetValue("preferences.scripting.cmdlog", True, "")
 			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
+			xsi.SetValue("preferences.scripting.cmdlog", True, "")
 		return True
 			
 	def retime( self, offset, scale = 1, activeRange = None, pivot = None ):

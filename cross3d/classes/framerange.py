@@ -8,14 +8,14 @@
 #   \date       11/30/11
 #
 
+#------------------------------------------------------------------------------------------------------------------------
 
 class FrameRange( list ):
-
-	'''
-		This class handles frame ranges.
-	'''	
 	
 	def __init__( self, args ):
+		"""
+			\remarks	Initialize the class.
+		"""
 		if len( args ) > 1:
 			args = args[0:2]
 		elif args:
@@ -31,9 +31,16 @@ class FrameRange( list ):
 		super( FrameRange, self ).__init__( args )
 
 	def __repr__( self ):
+		"""
+			\remarks	Affects the class representation.
+		"""
 		return 'blur3d.api.FrameRange( %s, %s )' % ( self[0], self[1] )
 		
 	def string( self, separator='-' ):
+		"""
+			\remarks	Returns the range in its string form.
+			\param		separator <string>
+		"""
 		return '%i%s%i' % ( self[0], separator, self[1] )
 		
 	def start( self ):
@@ -74,9 +81,3 @@ class FrameRange( list ):
 			
 	def merge( self, frameRange ):
 		return FrameRange( [ min( self[0], frameRange[0] ), max( self[1], frameRange[1] ) ] )
-		
-		
-		
-		
-		
-		
