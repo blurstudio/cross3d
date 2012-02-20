@@ -831,7 +831,7 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
 	
-	@pendingdeprecation
+	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Model )' )
 	def models( self ):
 		"""
 			\remarks	return a list of all the models objects in this scene
@@ -850,7 +850,7 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneModel
 		return SceneModel( self, self._importNativeModel( path, name ) )
 	
-	@pendingdeprecation('Use Scene.object(type=ObjectType.Cameras)')
+	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Camera )' )
 	def cameras( self ):
 		"""
 			\remarks	return a list of all the camera objects in this scene
