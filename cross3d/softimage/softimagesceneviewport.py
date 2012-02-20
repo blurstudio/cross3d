@@ -96,7 +96,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		viewportCapture( 'Remember Last Sequence' ).Value = False
 
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
-		return xsi.CaptureViewport( letterToNumber[ self.name ], False )
+		xsi.CaptureViewport( letterToNumber[ self.name ], False )
+		return True
 		
 	def headlightIsActive( self, state ):
 		camera = self._nativeCamera()
