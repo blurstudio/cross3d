@@ -64,12 +64,12 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, rang=None, **options ):
+	def generatePlayblast( self, fileName, frameRange=None, **options ):
 		import os
 		from blur3d.api import Scene
 		scene = Scene()
-		if not rang:
-			rang = scene.animationRange()
+		if not frameRange:
+			frameRange = scene.animationRange()
 		
 		width = xsi.GetValue( "Passes.RenderOptions.ImageWidth" )
 		height = xsi.GetValue( "Passes.RenderOptions.ImageHeight" )
@@ -87,8 +87,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		viewportCapture( 'Frame Rate' ).Value = fps 
 		viewportCapture( 'Write Alpha' ).Value = False 
 		viewportCapture( 'Record Audio Track' ).Value = False
-		viewportCapture( 'Start Frame' ).Value = rang[0]
-		viewportCapture( 'End Frame' ).Value = rang[1]
+		viewportCapture( 'Start Frame' ).Value = frameRange[0]
+		viewportCapture( 'End Frame' ).Value = frameRange[1]
 		viewportCapture( 'Launch Flipbook' ).Value = False
 		viewportCapture( 'Use Native Movie Player' ).Value = False 
 		viewportCapture( 'Movie' ).Value = False 
