@@ -330,11 +330,10 @@ class AbstractScene( QObject ):
 		return False
 	
 	@abstractmethod
-	def _isolateNativeObjects( self, nativeObjects, state ):
+	def _isolateNativeObjects( self, nativeObjects ):
 		"""
 			\remarks	isolate (hide all other objects) or unisolate the inputed objects in the native scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
-			\param		state			<bool>
 			\return		<bool> success
 		"""
 		return False
@@ -364,15 +363,8 @@ class AbstractScene( QObject ):
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
 		"""
 		return []
-	
-	@pendingdeprecation
-	def _nativeModels( self ):
-		"""
-			\remarks	return a collection of the models in this scene. added by douglas
-			\return		<list> [ <variant> nativeModel, .. ]
-		"""
-		return []
 		
+	@abstractmethod
 	def _exportNativeModel( self, nativeModel, path ):
 		"""
 			\remarks	exports a specified model to a specific path. added by douglas
@@ -380,21 +372,14 @@ class AbstractScene( QObject ):
 		"""
 		return False
 		
+	@abstractmethod
 	def _importNativeModel( self, path, name = '' ):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
 		return None
-	
-	@pendingdeprecation
-	def _nativeCameras( self ):
-		"""
-			\remarks	return a collection of the cameras in this scene
-			\return		<list> [ <variant> nativeCamera, .. ]
-		"""
-		return []
-	
+
 	@abstractmethod
 	def _nativeCustomProperty( self, key, default = None ):
 		"""
@@ -626,21 +611,6 @@ class AbstractScene( QObject ):
 		"""
 		return False
 	
-	def _toNativeValue( self, pyValue ):
-		"""
-			\remarks	[virtual] 	converts the inputed value from Qt/Python to whatever value is required for the native application
-			\param		pyValue	<variant>
-			\return		<variant>
-		"""
-		from PyQt4.QtCore import QString
-		
-		# we should not pass back QString value's to an application, as they will not expect it.  Standard python strings/unicodes will be auto-converted
-		if ( type(pyValue) == QString ):
-			return unicode(pyValue)
-		
-		# by default, we assume that any other type can be naturally processed
-		return pyValue
-	
 	@abstractmethod
 	def _toggleNativeVisibleState( self, nativeObjects = None, options = None ):
 		"""
@@ -720,18 +690,295 @@ class AbstractScene( QObject ):
 		"""
 		return False
 
+	@abstractmethod
 	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
 		"""
 			\remarks	deletes provided models. Added by John K.
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
-		return True
+		return False
 		
+	def _toNativeValue( self, pyValue ):
+		"""
+			\remarks	[virtual] 	converts the inputed value from Qt/Python to whatever value is required for the native application
+			\param		pyValue	<variant>
+			\return		<variant>
+		"""
+		from PyQt4.QtCore import QString
+		
+		# we should not pass back QString value's to an application, as they will not expect it.  Standard python strings/unicodes will be auto-converted
+		if ( type(pyValue) == QString ):
+			return unicode(pyValue)
+		
+		# by default, we assume that any other type can be naturally processed
+		return pyValue
+		
+	@pendingdeprecation
+	def _nativeModels( self ):
+		"""
+			\remarks	return a collection of the models in this scene. added by douglas
+			\return		<list> [ <variant> nativeModel, .. ]
+		"""
+		return []
+		
+	@pendingdeprecation
+	def _nativeCameras( self ):
+		"""
+			\remarks	return a collection of the cameras in this scene
+			\return		<list> [ <variant> nativeCamera, .. ]
+		"""
+		return []
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+
+	@abstractmethod
+	def undo( self ):
+		"""
+			\remarks    undoes last action
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def retime( self, offset, scale, activeRange, pivot ):
+		"""
+			\remarks    retimes the scene
+			\param		offset <int> 
+			\param		scale <float>
+			\param		activeRange ( <int>, <int> )
+			\param		pivot <int>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setSilentMode( self, switch ):
+		"""
+			\remarks	sets the software to make sure that windows are not popping. added by douglas
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setTimeControlPlay( self, switch, fromStart=False ):
+		"""
+			\remarks	sets the status of the timeline playback
+			\param		switch <bool>
+			\param		fromStart <bool>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setTimeControlLoop( self, switch ):
+		"""
+			\remarks	sets the loop mode of the playback
+			\param		switch <bool>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def isTimeControlLoop( self ):
+		"""
+			\remarks	returns if loop mode is active
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def animationFPS( self ):
+		"""
+			\remarks	returns the current frame per second rate
+			\return		<float> fps
+		"""
+		return 0.0
+
+	@abstractmethod
+	def currentFrame( self ):
+		"""
+			\remarks	returns the current frame
+			\return		<int> frame
+		"""
+		return 0
+
+	@abstractmethod
+	def setCurrentFrame( self, frame ):
+		"""
+			\remarks	sets the current frame
+			\param		frame <int>
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def viewports( self ):
+		"""
+			\remarks	returns all the visible viewports
+			\return	  	[ <blur3d.api.SceneViewport>, ... ]
+		"""
+		return []
+		
+	@abstractmethod
+	def animationRange( self ):
+		"""
+			\remarks	return the start and end frames for the animation range for the scene
+			\return		<blur3d.api.FrameRange>
+		"""
+		from blur3d.api import FrameRange
+		return FrameRange()
+		
+	@abstractmethod
+	def checkForSave( self ):
+		"""
+			\remarks	checks the state of the current scene and queries the user to save if the scene is modified.  If the user cancels the operation,
+						this method will return false.  Returns true if the scene is saved, or otherwise is approved by the user to continue the next operation
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def currentFileName( self ):
+		"""
+			\remarks	returns the current filename for the scene that is active in the application
+			\return		<str>
+		"""
+		return ''
+		
+	@abstractmethod
+	def fileType( self ):
+		"""
+			\remarks	returns the main file type for this type of application
+			\return		<str>
+		"""
+		return ''
 	
+	@abstractmethod
+	def fileTypes( self ):
+		"""
+			\remarks	returns the associated file types for this type of application
+			\return		<list> [ <str>, .. ]
+		"""
+		return []
+		
+	@abstractmethod
+	def holdCurrentState( self ):
+		"""
+			\remarks	protects the current scene as it is to allow for manipulation and provide a restore point
+			\sa			restoreHeldState
+		"""
+		pass
+		
+	@abstractmethod
+	def isSlaveMode( self ):
+		"""
+			\remarks	return whether or not the application is currently being run as a slave
+			\return		<bool> state
+		"""
+		return False
+		
+	@abstractmethod
+	def loadFile( self, filename = '', confirm = True ):
+		"""
+			\remarks	loads the inputed filename into the application, returning true on success
+			\param		filename	<str>
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def property( self, key, default = None ):
+		"""
+			\remarks	returns a global scene value
+			\param		key			<str> || <QString>
+			\param		default		<variant>	default value to return if no value was found
+			\return		<variant>
+		"""
+		return default
+
+	@abstractmethod
+	def renderOutputPath( self ):
+		"""
+			\remarks	return the render output file path for the scene
+			\return		<str>
+		"""
+		return ''
+		
+	@abstractmethod
+	def renderSize( self ):
+		"""
+			\remarks	return the render output size for the scene
+			\return		<QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		return QSize()
+	
+	@abstractmethod
+	def reset( self ):
+		"""
+			\remarks	resets this scene for all the data and in the application
+			\return		<bool> success
+		"""
+		return False
+	
+	@abstractmethod
+	def restoreHeldState( self ):
+		"""
+			\remarks	restores a held state after processing code
+			\sa			holdCurrentState
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def saveFileAs( self, filename = '' ):
+		"""
+			\remarks	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
+			\param		filename 	<str>
+			\return		<bool> success
+		"""
+		return False
+	
+	@abstractmethod
+	def setAnimationRange( self, animationRange ):
+		"""
+			\remarks	return the start and end frames for the animation range for the scene
+			\param		animationRange 	<tuple> ( <int> start, <int> end )
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def setProperty( self, key, value ):
+		"""
+			\remarks	sets the global scene property to the inputed value
+			\param		key			<str> || <QString>
+			\param		value		<variant>
+			\return		<bool>
+		"""
+		return False
+		
+	@abstractmethod
+	def setRenderOutputPath( self, outputPath ):
+		"""
+			\remarks	set the render output path for the scene
+			\param		outputPath	<str>
+			\return		<bool> success
+		"""
+		return False
+	
+	@abstractmethod
+	def setRenderSize( self, size ):
+		"""
+			\remarks	set the render output size for the scene
+			\param		size	<QSize>
+			\return		<bool> success
+		"""
+		return False
+		
 	def activeLayer( self ):
 		"""
 			\remarks	returns the currently active layer of the scene
@@ -742,15 +989,6 @@ class AbstractScene( QObject ):
 			from blur3d.api import SceneLayer
 			return SceneLayer( self, lay )
 		return None
-	
-	@abstractmethod
-	def animationRange( self ):
-		"""
-			\remarks	return the start and end frames for the animation range for the scene
-			\return		<blur3d.api.FrameRange>
-		"""
-		from blur3d.api import FrameRange
-		return FrameRange()
 	
 	def atmospherics( self ):
 		"""
@@ -830,17 +1068,7 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial( self, material ) for material in self._cachedNativeMaterials( cacheType ) if material != None ]
-	
-	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Model )' )
-	def models( self ):
-		"""
-			\remarks	return a list of all the models objects in this scene
-			\sa			_nativeModels
-			\return		<list> [ <blur3d.api.SceneModel>, .. ]
-		"""
-		from blur3d.api import SceneModel
-		return [ SceneModel( self, nativeModel ) for nativeModel in self._nativeModels() ]
-		
+
 	def importModel( self, path, name = '' ):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
@@ -849,25 +1077,6 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneModel
 		return SceneModel( self, self._importNativeModel( path, name ) )
-	
-	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Camera )' )
-	def cameras( self ):
-		"""
-			\remarks	return a list of all the camera objects in this scene
-			\sa			_nativeCameras
-			\return		<list> [ <blur3d.api.SceneCamera>, .. ]
-		"""
-		from blur3d.api import SceneCamera
-		return [ SceneCamera( self, nativeCamera ) for nativeCamera in self._nativeCameras() ]
-	
-	@abstractmethod
-	def checkForSave( self ):
-		"""
-			\remarks	checks the state of the current scene and queries the user to save if the scene is modified.  If the user cancels the operation,
-						this method will return false.  Returns true if the scene is saved, or otherwise is approved by the user to continue the next operation
-			\return		<bool> success
-		"""
-		return False
 	
 	def clearMaterialOverride( self, objects ):
 		"""
@@ -988,14 +1197,6 @@ class AbstractScene( QObject ):
 			print 'The trax asset tracking system is not installed'
 			return None
 		return trax.api.findElementByPath( self.currentFileName() )
-		
-	@abstractmethod
-	def currentFileName( self ):
-		"""
-			\remarks	returns the current filename for the scene that is active in the application
-			\return		<str>
-		"""
-		return ''
 	
 	def currentLayerState( self ):
 		"""
@@ -1216,22 +1417,6 @@ class AbstractScene( QObject ):
 				from blur3d.api import SceneMap
 				return SceneMap( self, nativeMap )
 			return None
-		
-	@abstractmethod
-	def fileType( self ):
-		"""
-			\remarks	returns the main file type for this type of application
-			\return		<str>
-		"""
-		return ''
-	
-	@abstractmethod
-	def fileTypes( self ):
-		"""
-			\remarks	returns the associated file types for this type of application
-			\return		<list> [ <str>, .. ]
-		"""
-		return []
 	
 	def getObject( self ):
 		"""
@@ -1265,14 +1450,6 @@ class AbstractScene( QObject ):
 		if ( nativeMap ):
 			return SceneMap( self, nativeMap )
 		return None
-	
-	@abstractmethod
-	def holdCurrentState( self ):
-		"""
-			\remarks	protects the current scene as it is to allow for manipulation and provide a restore point
-			\sa			restoreHeldState
-		"""
-		pass
 		
 	def hideObjects( self, objects, state ):
 		"""
@@ -1291,15 +1468,7 @@ class AbstractScene( QObject ):
 		"""
 		return self._nativeEnvironmentMapOverride() != None
 	
-	@abstractmethod
-	def isSlaveMode( self ):
-		"""
-			\remarks	return whether or not the application is currently being run as a slave
-			\return		<bool> state
-		"""
-		return False
-	
-	def isolateObjects( self, objects, state ):
+	def isolateObjects( self, objects ):
 		"""
 			\remarks	isolates (hides all other objects) or unisolates the inputed objects in the scene
 			\sa			_isolateNativeObjects
@@ -1307,7 +1476,7 @@ class AbstractScene( QObject ):
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		return self._isolateNativeObjects( [ obj.nativePointer() for obj in objects ], state )
+		return self._isolateNativeObjects( [ obj.nativePointer() for obj in objects ] )
 	
 	def layers( self ):
 		"""
@@ -1326,15 +1495,6 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import SceneLayerGroup
 		return [ SceneLayerGroup( self, nativeLayerGroup ) for nativeLayerGroup in self._nativeLayerGroups() ]
-	
-	@abstractmethod
-	def loadFile( self, filename = '', confirm = True ):
-		"""
-			\remarks	loads the inputed filename into the application, returning true on success
-			\param		filename	<str>
-			\return		<bool> success
-		"""
-		return False
 	
 	def loadMaterialsFromLibrary( self, filename = '' ):
 		"""
@@ -1397,16 +1557,6 @@ class AbstractScene( QObject ):
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
 		return self._objects( False, wildcard, type )
-	
-	@abstractmethod
-	def property( self, key, default = None ):
-		"""
-			\remarks	returns a global scene value
-			\param		key			<str> || <QString>
-			\param		default		<variant>	default value to return if no value was found
-			\return		<variant>
-		"""
-		return default
 	
 	def recordLayerState( self, xml ):
 		"""
@@ -1539,40 +1689,6 @@ class AbstractScene( QObject ):
 		"""
 		return self._renameNativeObjects( [ object.nativePointer() for object in objects ], names, display = display )
 	
-	@abstractmethod
-	def renderOutputPath( self ):
-		"""
-			\remarks	return the render output file path for the scene
-			\return		<str>
-		"""
-		return ''
-		
-	@abstractmethod
-	def renderSize( self ):
-		"""
-			\remarks	return the render output size for the scene
-			\return		<QSize>
-		"""
-		from PyQt4.QtCore import QSize
-		return QSize()
-	
-	@abstractmethod
-	def reset( self ):
-		"""
-			\remarks	resets this scene for all the data and in the application
-			\return		<bool> success
-		"""
-		return False
-	
-	@abstractmethod
-	def restoreHeldState( self ):
-		"""
-			\remarks	restores a held state after processing code
-			\sa			holdCurrentState
-			\return		<bool> success
-		"""
-		return False
-	
 	def rootObject( self ):
 		"""
 			\remarks	returns the root object of the scene
@@ -1590,24 +1706,6 @@ class AbstractScene( QObject ):
 			\return		<bool> success
 		"""
 		return self.saveFileAs( self.currentFilename() )
-		
-	@abstractmethod
-	def saveFileAs( self, filename = '' ):
-		"""
-			\remarks	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
-			\param		filename 	<str>
-			\return		<bool> success
-		"""
-		return False
-	
-	@abstractmethod
-	def setAnimationRange( self, animationRange ):
-		"""
-			\remarks	return the start and end frames for the animation range for the scene
-			\param		animationRange 	<tuple> ( <int> start, <int> end )
-			\return		<bool> success
-		"""
-		return False
 	
 	def setEnvironmentMap( self, sceneMap ):
 		"""
@@ -1747,16 +1845,6 @@ class AbstractScene( QObject ):
 		"""
 		return self._setNativeCustomProperty( key, self._toNativeValue(value) )
 	
-	@abstractmethod
-	def setProperty( self, key, value ):
-		"""
-			\remarks	sets the global scene property to the inputed value
-			\param		key			<str> || <QString>
-			\param		value		<variant>
-			\return		<bool>
-		"""
-		return False
-	
 	def setPropSetOverride( self, objects, propSet ):
 		"""
 			\remarks	set the override property set for the inputed objects to the given propset
@@ -1783,24 +1871,6 @@ class AbstractScene( QObject ):
 			nativeMaterial = material.nativePointer()
 			
 		return self._setNativeMaterialOverride( [ obj.nativePointer() for obj in objects ], nativeMaterial, options = options, advancedState = advancedState )
-	
-	@abstractmethod
-	def setRenderOutputPath( self, outputPath ):
-		"""
-			\remarks	set the render output path for the scene
-			\param		outputPath	<str>
-			\return		<bool> success
-		"""
-		return False
-	
-	@abstractmethod
-	def setRenderSize( self, size ):
-		"""
-			\remarks	set the render output size for the scene
-			\param		size	<QSize>
-			\return		<bool> success
-		"""
-		return False
 	
 	def setSelection( self, objects ):
 		"""
@@ -1914,7 +1984,7 @@ class AbstractScene( QObject ):
 
 	def renderPasses( self ):
 		"""
-			\remarks	returns render passes of the scene. added by douglas
+			\remarks	returns render passes of the scene
 			\return		<list> [ <blur3d.api.SceneRenderPass>, .. ]
 		"""
 		from blur3d.api import SceneRenderPass
@@ -1922,7 +1992,7 @@ class AbstractScene( QObject ):
 
 	def findRenderPass( self, displayName = '' ):
 		"""
-			\remarks	returns a render pass based on it's name. added by douglas. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class
+			\remarks	returns a render pass based on it's name. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class
 			\return		<blur3d.api.SceneRenderPass> || None
 		"""
 		from blur3d.api import SceneRenderPass
@@ -1933,7 +2003,7 @@ class AbstractScene( QObject ):
 
 	def currentRenderPass( self ):
 		"""
-			\remarks	returns the active render pass. added by douglas
+			\remarks	returns the active render pass
 			\return		<blur3d.api.SceneRenderPass> || None
 		"""
 		from blur3d.api import SceneRenderPass
@@ -1941,7 +2011,7 @@ class AbstractScene( QObject ):
 
 	def setCurrentRenderPass( self, renderPass ):
 		"""
-			\remarks	sets the active render pass. added by douglas
+			\remarks	sets the active render pass
 			\param		renderPass <blur3d.api.SceneRenderPass>
 			\return		<bool> success
 		"""
@@ -1950,7 +2020,7 @@ class AbstractScene( QObject ):
 		
 	def removeRenderPasses( self, renderPasses ):
 		"""
-			\remarks	deletes specified render passes. added by douglas
+			\remarks	deletes specified render passes
 			\param		renderPasses [ <blur3d.api.SceneRenderPass> ]
 			\return		<bool> success
 		"""
@@ -1959,96 +2029,16 @@ class AbstractScene( QObject ):
 
 	def createRenderPass( self, displayName ):
 		"""
-			\remarks	creates a renderpass. added by douglas
+			\remarks	creates a renderpass
 			\param		displayName	<str>
 			\return		<bool> success
 		"""
 		from blur3d.api import SceneRenderPass
 		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
-		
-	@abstractmethod
-	def undo( self ):
-		"""
-			\remarks    undoes last action. added by douglas
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def retime( self, offset, scale, activeRange, pivot ):
-		"""
-			\remarks    retimes the scene. added by douglas
-			\param		offset <int> 
-			\param		scale <float>
-			\param		activeRange ( <int>, <int> )
-			\param		pivot <int>
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def setSilentMode( self, switch ):
-		"""
-			\remarks	sets the software to make sure that windows are not popping. added by douglas
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def setTimeControlPlay( self, switch, fromStart=False ):
-		"""
-			\remarks	sets the status of the timeline playback. added by douglas
-			\param		switch <bool>
-			\param		fromStart <bool>
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def setTimeControlLoop( self, switch ):
-		"""
-			\remarks	sets the loop mode of the playback. added by douglas
-			\param		switch <bool>
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def isTimeControlLoop( self ):
-		"""
-			\remarks	returns if loop mode is active. added by douglas
-			\return		<bool> success
-		"""
-		return False
-
-	@abstractmethod
-	def animationFPS( self ):
-		"""
-			\remarks	returns the current frame per second rate. added by douglas
-			\return		<float> fps
-		"""
-		return 0.0
-
-	@abstractmethod
-	def currentFrame( self ):
-		"""
-			\remarks	returns the current frame. added by douglas
-			\return		<int> frame
-		"""
-		return 0
-
-	@abstractmethod
-	def setCurrentFrame( self, frame ):
-		"""
-			\remarks	sets the current frame. Addded by douglas
-			\param		frame <int>
-			\return		<bool> success
-		"""
-		return False
 
 	def removeModel( self, models ):
 		"""
-			\remarks	deletes provided models. Addded by douglas
+			\remarks	deletes provided models
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
@@ -2056,7 +2046,7 @@ class AbstractScene( QObject ):
 
 	def exportModel( self, model, path ):
 		"""
-			\remarks	exports a specified model to a specific path. added by douglas
+			\remarks	exports a specified model to a specific path
 			\return		<bool> success
 		"""
 		nativeModel = model.nativePointer()
@@ -2064,24 +2054,16 @@ class AbstractScene( QObject ):
 
 	def viewport( self, viewportID=0 ):
 		"""
-			\remarks	returns the specified viewport. Added by douglas
+			\remarks	returns the specified viewport
 			\param		viewportName <string>
 			\return	  	<blur3d.api.SceneViewport> viewport | None
 		"""
 		from blur3d.api import SceneViewport
 		return SceneViewport( self, viewportID )
-	
-	@abstractmethod
-	def viewports( self ):
-		"""
-			\remarks	returns all the visible viewports. Added by douglas
-			\return	  	[ <blur3d.api.SceneViewport>, ... ]
-		"""
-		return []
 		
 	def isAvalaibleName( self, name ):
 		"""
-			\remarks	returns weather a name is already used in a scene. Added by douglas
+			\remarks	returns weather a name is already used in a scene
 			\param		name <string>
 			\return	  	<bool> answer
 		"""
@@ -2092,11 +2074,31 @@ class AbstractScene( QObject ):
 		
 	def application( self ):
 		"""
-			\remarks	returns the application class. added by douglas
+			\remarks	returns the application class.
 			\return	  	<blur3d.api.Application> application
 		"""
-		from blur3d.api import Application
-		return Application()
+		from blur3d.api import application
+		return application
+		
+	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Model )' )
+	def models( self ):
+		"""
+			\remarks	return a list of all the models objects in this scene
+			\sa			_nativeModels
+			\return		<list> [ <blur3d.api.SceneModel>, .. ]
+		"""
+		from blur3d.api import SceneModel
+		return [ SceneModel( self, nativeModel ) for nativeModel in self._nativeModels() ]
+		
+	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Camera )' )
+	def cameras( self ):
+		"""
+			\remarks	return a list of all the camera objects in this scene
+			\sa			_nativeCameras
+			\return		<list> [ <blur3d.api.SceneCamera>, .. ]
+		"""
+		from blur3d.api import SceneCamera
+		return [ SceneCamera( self, nativeCamera ) for nativeCamera in self._nativeCameras() ]
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods

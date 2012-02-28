@@ -8,6 +8,7 @@
 #	\date		06/08/11
 #
 
+from exceptions import Exceptions
 from dispatch import Dispatch
 from clipboard import Clipboard
 from framerange import FrameRange

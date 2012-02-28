@@ -48,10 +48,12 @@ class SoftimageScene( AbstractScene ):
 			\param		nativeObjects	<list> [ <PySoftimage.xsi.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		if ( not selection ):
-			xsi.DeselectAll()
-		else:
-			xsi.SelectObj( selection )
+		#import blurdev.debug
+		#watch = blurdev.debug.Stopwatch( 'Total' )
+		#watch.newLap('Setting Selection')
+		xsi.DeselectAll()
+		xsi.SelectObj( selection )
+		#watch.stop()
 		return True
 		
 	def _addToNativeSelection( self, selection ):
@@ -99,7 +101,7 @@ class SoftimageScene( AbstractScene ):
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
 		if getsFromSelection:
-			objects = xsi.Selection
+			objects = [ obj for obj in xsi.Selection ]
 			if wildcard:
 				import re
 				expression = wildcard.replace('*', '.+').strip('.+')
@@ -112,6 +114,9 @@ class SoftimageScene( AbstractScene ):
 			root = self._nativeRootObject()
 			objects = root.FindChildren( wildcard, '', '', True )
 		return objects
+		
+	def _nativeSelection( self, wildcard='' ):
+		return self._nativeObjects( getsFromSelection=True, wildcard=wildcard )
 	
 	def _findNativeObject( self, name='', uniqueId=0 ):
 		"""
@@ -261,11 +266,17 @@ class SoftimageScene( AbstractScene ):
 		xsi.ExportModel( nativeModel, path, "", "" )
 		return True
 	
-	#--------------------------------------------------------
-	#			XMesh
-	#--------------------------------------------------------
+	def _isolateNativeObjects( self, nativeObjects ):
+		selection = self._nativeSelection()
+		self._setNativeSelection( nativeObjects )
+		xsi.IsolateSelected()
+		self._setNativeSelection( selection )
+		return True
 	
-		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												public methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
 	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True):
 		"""
 			\remarks	runXmesh cache function
@@ -274,11 +285,7 @@ class SoftimageScene( AbstractScene ):
 		"""
 		mesh = xsi.Export_XMesh(objList, stack, start, end, path, worldLock)
 		return True
-
-
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												public methods
-	#------------------------------------------------------------------------------------------------------------------------
+	
 	def loadFile( self, filename = '' , confirm = True):
 		"""
 			\remarks	loads the inputed filename into the application, returning true on success

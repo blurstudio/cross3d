@@ -97,13 +97,23 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		
 		return output
 	
-	def _nativeChildren( self ):
+	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
 			\sa			children
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
-		return self._nativePointer.children
+		if recursive:
+			if parent:
+				children = parent.children
+			else:
+				children = self._nativePointer.children
+			for child in children:
+				childrenCollector.append( child )
+				self._nativeChildren( True, child, childrenCollector )
+			return childrenCollector
+		else:
+			return self._nativePointer.children
 	
 	def _nativeLayer( self ):
 		"""

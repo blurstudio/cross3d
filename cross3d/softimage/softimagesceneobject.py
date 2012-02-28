@@ -26,15 +26,16 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\remarks	implements the AbstractSceneObject._findNativeChildren method to look up a specific native children for this object
 			\return		<PySotimage.xsi.Object> nativeObject
 		"""
-		return self.nativePointer().FindChild( name )
+		return self.nativePointer().FindChild( name, '', '', recursive )
 
-	def _nativeChildren(self):
+	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
+			\param		recursive <bool>
 			\sa			children
 			\return		<list> [ <PySotimage.xsi.Object> nativeObject, .. ]
 		"""
-		return self._nativePointer.Children
+		return [ obj for obj in self._nativePointer.FindChildren( '', '', '', recursive ) ]
 	
 	def _nativeParent( self ):
 		"""

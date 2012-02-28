@@ -792,6 +792,9 @@ class StudiomaxScene( AbstractScene ):
 			return output
 		return objects
 		
+	def _nativeSelection( self, wildcard='' ):
+		return self._nativeObjects( getsFromSelection=True, wildcard=wildcard )
+		
 	def _nativeRefresh( self ):
 		"""
 			\remarks	implements the AbstractScene._nativeRefresh method to refreshe the contents of the current scene
@@ -1376,11 +1379,18 @@ class StudiomaxScene( AbstractScene ):
 					toRemove.append( obj )
 		self._removeNativeObjects( toRemove )
 		return True
-	#--------------------------------------------------------
-	#			XMesh
-	#--------------------------------------------------------
-	
 		
+	def _isolateNativeObjects( self, nativeObjects ):
+		selection = self._nativeSelection()
+		self._setNativeSelection( nativeObjects )
+		mxs.macros.run( 'Tools', 'Isolate_Selection' )
+		self._setNativeSelection( selection )
+		return True
+		
+	#------------------------------------------------------------------------------------------------------------------------
+	# 												public methods
+	#------------------------------------------------------------------------------------------------------------------------
+	
 	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True, samples = 1, makeMat = True):
 		"""
 			\remarks	runXmesh cache function
@@ -1439,10 +1449,7 @@ class StudiomaxScene( AbstractScene ):
 		
 		#RETURN FINISH
 		return True	
-	#------------------------------------------------------------------------------------------------------------------------
-	# 												public methods
-	#------------------------------------------------------------------------------------------------------------------------
-	
+
 	def animationRange( self ):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
@@ -1545,7 +1552,6 @@ class StudiomaxScene( AbstractScene ):
 		
 		if ( filename ):
 			mxs.loadMaxFile( str( filename ), quiet=confirm)
- 
 			return True
 		return False
 	
@@ -1689,28 +1695,58 @@ class StudiomaxScene( AbstractScene ):
 			mxs.stopAnimation()
 		return True
 		
-	def setTimeControlLoop( self, switch ):
-		mxs.timeConfiguration.playbackLoop =  switch
+	def setTimeControlLoop( self, isLooping ):
+		"""
+			\remarks	sets whether the timeline is looping or not.
+			\param		isLooping <bool>
+			\return		<bool>
+		"""
+		mxs.timeConfiguration.playbackLoop =  isLooping
 		return True
 		
 	def isTimeControlLoop( self ):
+		"""
+			\remarks	gets whether the timeline is looping or not.
+			\return		<bool>
+		"""
 		return mxs.timeConfiguration.playbackLoop
 		
 	def animationFPS( self ):
+		"""
+			\remarks	gets the current scene's fps.
+			\return		<float>
+		"""
 		return float( mxs.frameRate )
 		
 	def currentFrame( self ):
+		"""
+			\remarks	gets the current scene's frame.
+			\return		<float>
+		"""
 		return int( mxs.currentTime )
 		
 	def setCurrentFrame( self, frame ):
+		"""
+			\remarks	sets the current scene's frame.
+			\param 		frame <int>
+			\return		<float>
+		"""
 		mxs.sliderTime = frame
 		return True
 		
 	def clearSelection( self ):
+		"""
+			\remarks	clears the scene's selection.
+			\return		<bool>
+		"""
 		mxs.clearSelection()
 		return True
 		
 	def undo( self ):
+		"""
+			\remarks	undos the last action.
+			\return		<bool>
+		"""
 		mxs.execute( 'max undo' )
 		return True
 

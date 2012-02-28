@@ -65,9 +65,12 @@ class AbstractSceneObject( SceneWrapper ):
 		return []
 		
 	@abstractmethod
-	def _nativeChildren( self ):
+	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
 		"""
 			\remarks	looks up the native children for this object
+			\param		recursive         <bool>
+			\param		parent		      <variant> nativeObject(used for recursive searches when necessary)
+			\param		childrenCollector <list> (used for recursive searches when necessary)
 			\sa			children
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
@@ -220,15 +223,16 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		return len( self._nativeChildren() )
 	
-	def children( self ):
+	def children( self, recursive = False ):
 		"""
 			\remarks	returns SceneObject wrappers over the children for this object
+			\param		recursive <bool>
 			\sa			childAt, childCount, findChild, _nativeChildren
 			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""
 		from blur3d.api import SceneObject
 		scene = self._scene
-		return [ SceneObject( scene, native ) for native in self._nativeChildren() ]
+		return [ SceneObject( scene, native ) for native in self._nativeChildren( recursive ) ]
 	
 	def deselect( self ):
 		"""
