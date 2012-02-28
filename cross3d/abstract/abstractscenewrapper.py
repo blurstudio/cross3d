@@ -9,9 +9,7 @@
 #	\date		03/15/10
 #
 
-from blur3d import abstractmethod
-# MCH 11/02/11 Disabling until blurdev has been passed out.
-#from blur3d import abstractmethod, pendingdeprecation
+from blur3d import abstractmethod, pendingdeprecation
 from blur3d.api	import UserProps
 from blur3d.api.abstract.blurtags import BlurTags
 
@@ -218,9 +216,12 @@ class AbstractSceneWrapper(object):
 			nativeController = controller.nativePointer()
 		return self._setNativeController( name, nativeController )
 	
-	# MCH 11/02/11 Disabling until blurdev has been passed out.
-#	@pendingdeprecation
+	@pendingdeprecation('Use setDisplayName() instead. Call setDisplayName to rename parent objects/Models.')
 	def setName( self, name ):
+		"""
+			\Remarks	Returns the full name of this object, including any model information in xsi.
+			\Returns	<str>
+		"""
 		return self.setDisplayName( name )
 		
 	@abstractmethod

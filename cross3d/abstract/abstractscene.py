@@ -713,7 +713,15 @@ class AbstractScene( QObject ):
 		
 		# by default, we assume that any other type can be naturally processed
 		return pyValue
-		
+	
+	@abstractmethod
+	def _unisolate(self):
+		r"""
+			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
+			\return		<bool>
+		"""
+		return False
+	
 	@pendingdeprecation
 	def _nativeModels( self ):
 		"""
@@ -871,7 +879,15 @@ class AbstractScene( QObject ):
 			\sa			restoreHeldState
 		"""
 		pass
-		
+	
+	@abstractmethod
+	def isIsolated(self):
+		r"""
+			\remarks	Returns if the scene is isolated.
+			\return		<bool>
+		"""
+		return False
+	
 	@abstractmethod
 	def isSlaveMode( self ):
 		"""
@@ -1473,7 +1489,6 @@ class AbstractScene( QObject ):
 			\remarks	isolates (hides all other objects) or unisolates the inputed objects in the scene
 			\sa			_isolateNativeObjects
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
-			\param		state		<bool>
 			\return		<bool> success
 		"""
 		return self._isolateNativeObjects( [ obj.nativePointer() for obj in objects ] )
@@ -1962,6 +1977,14 @@ class AbstractScene( QObject ):
 			name = '%s%02i' % (basename,index)
 			index += 1
 		return name
+	
+	def unisolate( self ):
+		"""
+			\remarks	Ends Isolation mode
+			\sa			_unisolate
+			\return		<bool> success
+		"""
+		return self._unisolate()
 	
 	def visibleObjects( self ):
 		"""

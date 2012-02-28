@@ -1386,6 +1386,17 @@ class StudiomaxScene( AbstractScene ):
 		mxs.macros.run( 'Tools', 'Isolate_Selection' )
 		self._setNativeSelection( selection )
 		return True
+	
+	def _unisolate(self):
+		r"""
+			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
+			\return		<bool>
+		"""
+		if mxs.Iso2lations == True:
+			mxs.Iso2Roll.C2Iso.changed(False)
+			return True
+		return False
+		
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -1532,6 +1543,13 @@ class StudiomaxScene( AbstractScene ):
 			\return		<list> [ <str>, .. ]
 		"""
 		return [ 'Max files (*.max)' ]
+	
+	def isIsolated(self):
+		r"""
+			\remarks	Returns if the scene is isolated.
+			\return		<bool>
+		"""
+		return mxs.Iso2lations == True
 	
 	def isSlaveMode( self ):
 		"""
