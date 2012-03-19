@@ -23,6 +23,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		if ( viewportID - 1 ) in range( mxs.viewport.numViews ):
 			mxs.viewport.activeViewport = viewportID
 
+		self._scene = scene
 		self._name = mxs.viewport.activeViewport	
 		self._slateIsActive = False
 		self._slateText = ''
@@ -69,8 +70,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		return True
 
 	def safeFrameSize( self ):
-		from blur3d.api import Scene
-		scene = Scene()
+		scene = self._scene
 		outputSize = [ scene.renderSize().width(), scene.renderSize().height() ]
 		viewSize = self.size()
 		
@@ -102,8 +102,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 		# collecting what we need
 		import os
-		from blur3d.api import Scene
-		scene = Scene()
+		scene = self._scene
 		pathSplit = os.path.split( path )
 		basePath = pathSplit[0]
 		file = pathSplit[1]
@@ -112,6 +111,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		fileExtension = 'jpg'
 		effects = options.get( 'effects', True )
 		initialRange = scene.animationRange()
+		application = self._scene.application()
 		
 		# checking inputs
 		if not ran:
@@ -170,10 +170,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			if camera:
 				if camera.hasMultiPassEffects() and effects:
 					camera.renderMultiPassEffects()
-					self.slateDraw()	
+					if application.version() != 14:
+						self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
-			image = mxs.gw.getViewportDib()
+			image = mxs.viewport.getViewportDib()
 			image.filename = imagePath
 			mxs.save( image )
 			if count == 100:
@@ -210,8 +211,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 	def slateDraw( self ):
 		# processing the text
 		import re
-		from blur3d.api import Scene
-		scene = Scene()
+		scene = self._scene
 		text = self._slateText
 		matches = re.findall( r'(\[)([F|f][R|r][A|a][M|m][E|e])( +)?(#[0-9]+)?( +)?(\])', text )
 		for match in matches:
