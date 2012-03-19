@@ -174,7 +174,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 						self.slateDraw()	
 
 			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
-			image = mxs.viewport.getViewportDib()
+			
+			if application.version() == 14 and camera.hasMultiPassEffects() and effects:
+				# Viewport allows to save the picture with multipass effects in Max 2012.
+				image = mxs.viewport.getViewportDib()
+			else:
+				image = mxs.gw.getViewportDib()
+			
 			image.filename = imagePath
 			mxs.save( image )
 			if count == 100:
