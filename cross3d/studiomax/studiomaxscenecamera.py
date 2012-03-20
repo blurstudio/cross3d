@@ -39,7 +39,9 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 		return mxs.cameraFOV.FOVtoMM( self.nativePointer().fov )
 		
 	def hasMultiPassEffects( self ):
-		return self.nativePointer().mpassEnabled
+		if mxs.isProperty( self._nativePointer, 'mpassEnabled' ):
+			return self._nativePointer.mpassEnabled
+		return False
 		
 	def renderMultiPassEffects( self ):
 		mxs.maxOps.displayActiveCameraViewWithMultiPassEffect()
