@@ -77,6 +77,23 @@ class AbstractSceneCamera( SceneObject ):
 			\return		<bool> success
 		"""
 		return False
+
+	@abstractmethod	
+	def pictureRatio( self ):
+		"""
+			\remarks	gets the camera's picture ratio.
+			\return		<bool> success
+		"""
+		return 0.0
+	
+	@abstractmethod	
+	def setPictureRatio( self, pictureRatio ):
+		"""
+			\remarks	sets the camera's picture ratio.
+			\param      pictureRatio <float>
+			\return		<bool> success
+		"""
+		return False
 	
 # register the symbol
 from blur3d import api

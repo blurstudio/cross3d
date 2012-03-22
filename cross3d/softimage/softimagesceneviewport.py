@@ -75,6 +75,13 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			from PyQt4.QtCore import QSize
 			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
 
+		# set camera's picture ratio
+		camera = self.camera()
+		if camera:
+			pictureRatio = float( resolution.width() ) / resolution.height() 
+			print pictureRatio
+			camera.setPictureRatio( pictureRatio )
+		
 		fps = self._scene.animationFPS()
 		
 		viewportCapture = xsi.Dictionary.GetObject( 'ViewportCapture' ).NestedObjects

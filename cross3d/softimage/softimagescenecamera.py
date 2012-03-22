@@ -45,6 +45,13 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		
 	def headlightIsActive( self ):
 		return xsi.GetValue( self.name() + '.camdisp.headlight' )
+		
+	def pictureRatio( self ):
+		return self.nativePointer().Parameters( 'aspect' ).Value 
+	
+	def setPictureRatio( self, pictureRatio ):
+		self.nativePointer().Parameters( 'aspect' ).Value = pictureRatio
+		return True
 
 # register the symbol
 from blur3d import api
