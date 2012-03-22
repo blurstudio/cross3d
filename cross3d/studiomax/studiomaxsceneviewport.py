@@ -95,7 +95,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, ran=None, **options ):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, **options ):
 		'''
 			/option <bool> effects
 		'''
@@ -114,8 +114,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		application = self._scene.application()
 		
 		# checking inputs
-		if not ran:
-			ran = initialRange
+		if not frameRange:
+			frameRange = initialRange
+		if not resolution:
+			resolution = scene.renderSize()
 
 		# storing infornation
 		initialGeometryVisibility = mxs.hideByCategory.geometry
@@ -136,7 +138,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		camera = self.camera()
 		
 		# setting the scene
-		scene.setAnimationRange( ran )
+		scene.setAnimationRange( frameRange )
 		
 		# setting the viewport
 		mxs.hideByCategory.geometry = False
@@ -158,9 +160,9 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		completed = True 
 		count = 0
 		
-		mxs.pyhelper.setViewportQuadSize( scene.renderSize().width(), scene.renderSize().height() )
+		mxs.pyhelper.setViewportQuadSize( resolution.width(), resolution.height() )
 
-		for frame in range( ran[0], ran[1] + 1 ):
+		for frame in range( frameRange[0], frameRange[1] + 1 ):
 			count = count + 1
 			if mxs.keyboard.escPressed:
 				completed = False

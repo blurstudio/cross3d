@@ -64,23 +64,25 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, frameRange=None, **options ):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
 		import os
-		from blur3d.api import Scene
-		scene = Scene()
+		scene = self._scene
+		
+		# checking inputs
 		if not frameRange:
 			frameRange = scene.animationRange()
-		
-		width = xsi.GetValue( "Passes.RenderOptions.ImageWidth" )
-		height = xsi.GetValue( "Passes.RenderOptions.ImageHeight" )
+		if not resolution:
+			from PyQt4.QtCore import QSize
+			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
+
 		fps = self._scene.animationFPS()
 		
 		viewportCapture = xsi.Dictionary.GetObject( 'ViewportCapture' ).NestedObjects
 		
 		viewportCapture( 'File Name' ).Value = fileName
 		viewportCapture( 'Padding' ).Value = '(fn).#(ext)'
-		viewportCapture( 'Width' ).Value = width
-		viewportCapture( 'Height' ).Value = height
+		viewportCapture( 'Width' ).Value = resolution.width()
+		viewportCapture( 'Height' ).Value = resolution.height()
 		viewportCapture( 'Scale Factor' ).Value = 1
 		viewportCapture( 'User Pixel Ratio' ).Value = True 
 		viewportCapture( 'Pixel Ratio' ).Value = 1 

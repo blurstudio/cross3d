@@ -58,7 +58,7 @@ class AbstractSceneViewport( QObject ):
 		
 	def setCamera( self, camera ):
 		"""
-			\remarks	sets the camera of the current viewport. added by douglas
+			\remarks	sets the camera of the current viewport
 			\param		camera <blur3d.api.SceneCamera> | <str>
 			\return		<bool> success
 		"""	
@@ -70,23 +70,24 @@ class AbstractSceneViewport( QObject ):
 
 	def cameraName( self ):
 		"""
-			\remarks	return the viewport's camera name. added by douglas
+			\remarks	return the viewport's camera name
 			\return		<variant> camera | None
 		"""
 		return ''
 
-	def generatePlayblast( self, fileName, ran=None, **options ):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
 		"""
-			\remarks	generates a playblast in the specific path. added by douglas
-			\param		filename where the playblast is save
-			\param		ran is the range of the playblast
+			\remarks	generates a playblast in the specific path
+			\param		filename <String>
+			\param		frameRange <List>
+			\param		resolution <QSize>
 			\return		<bool> success
 		"""
 		return False
 	
 	def setHeadlightIsActive( self, active ):
 		"""
-			\remarks	sets the headlight of the camera of the viewport. added by douglas
+			\remarks	sets the headlight of the camera of the viewport
 			\param		active <bool>
 			\return		<bool> success
 		"""
@@ -94,14 +95,14 @@ class AbstractSceneViewport( QObject ):
 		
 	def headlightIsActive( self ):
 		"""
-			\remarks	returns if the status of the headlight. added by douglas
+			\remarks	returns if the status of the headlight
 			\return		<bool> active
 		"""
 		return False
 		
 	def size( self ):
 		"""
-			\remarks	returns the viewport size. added by douglas
+			\remarks	returns the viewport size
 			\return		( <int>, <int> ) size
 		"""
 		return ( 0, 0 )
