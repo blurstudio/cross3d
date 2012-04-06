@@ -170,7 +170,7 @@ class FileSequence( object ):
 				while not normalisedSequence.isComplete():
 					continue
 				import subprocess
-				command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-vb', '20000k', '-y', outputPath ]
+				command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
 				process = subprocess.Popen( command )
 				process.communicate()
 				normalisedSequence.delete()
