@@ -23,7 +23,6 @@ class FileSequence( object ):
 			\remarks	Initialize the class.
 		"""
 		self._path = path
-		print 'PATH', self._path
 		self._step = step
 
 	def path( self ):
@@ -83,7 +82,6 @@ class FileSequence( object ):
 		
 	def setRange( self, range ):
 		tokens = self.nameTokens()
-		print 'PATH', self.path()
 		tokens[ 'start' ] = str( range[0] )
 		tokens[ 'end' ] = str( range[1] )
 		fileName = self.nameMask() % tokens
