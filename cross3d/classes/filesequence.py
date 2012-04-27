@@ -82,6 +82,8 @@ class FileSequence( object ):
 		
 	def setRange( self, range ):
 		tokens = self.nameTokens()
+		print self.name()
+		print self.path()
 		tokens[ 'start' ] = str( range[0] )
 		tokens[ 'end' ] = str( range[1] )
 		fileName = self.nameMask() % tokens
