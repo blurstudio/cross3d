@@ -9,7 +9,7 @@
 #
 
 from blur3d   							import pendingdeprecation
-from PySoftimage 						import xsi
+from PySoftimage 						import xsi, xsiFactory
 from blur3d.api.abstract.abstractscene  import AbstractScene
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -51,8 +51,9 @@ class SoftimageScene( AbstractScene ):
 		#import blurdev.debug
 		#watch = blurdev.debug.Stopwatch( 'Total' )
 		#watch.newLap('Setting Selection')
-		xsi.DeselectAll()
-		xsi.SelectObj( selection )
+		xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
+		xsiCollSelection.AddItems( selection )
+		xsi.SelectObj( xsiCollSelection )
 		#watch.stop()
 		return True
 		
@@ -62,6 +63,8 @@ class SoftimageScene( AbstractScene ):
 			\param		nativeObjects	<list> [ <PySoftimage.xsi.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
+		xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
+		xsiCollSelection.AddItems( selection )
 		xsi.AddToSelection( selection )
 		
 	def _nativeRootObject( self ):
