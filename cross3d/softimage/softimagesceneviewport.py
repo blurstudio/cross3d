@@ -79,7 +79,6 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		camera = self.camera()
 		if camera:
 			pictureRatio = float( resolution.width() ) / resolution.height() 
-			print pictureRatio
 			camera.setPictureRatio( pictureRatio )
 		
 		fps = self._scene.animationFPS()

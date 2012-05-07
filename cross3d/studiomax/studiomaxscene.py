@@ -1426,7 +1426,6 @@ class StudiomaxScene( AbstractScene ):
 		# I have to set the display to ticks in-order to access subframe information. This is to get around not having a proper 
 		# at time function
 		mxs.timeDisplayMode = mxs.pyhelper.namify("frameTicks")
-		print( makeMat)
 		if makeMat:
 			matUtils = mxs.XMeshSaver_MaterialUtils
 			theMaterial = matUtils.getMaterialFromNodes(objList)
@@ -1439,7 +1438,6 @@ class StudiomaxScene( AbstractScene ):
 				theMatLib = mxs.materialLibrary()
 				mxs.append(theMatLib, theMaterial)
 				mxs.saveTempMaterialLibrary( theMatLib, theMatLibPath)
-				print theMatLibPath
 		#BEGIN CACHE RECORD	
 		saver.SetSceneRenderBegin()		
 		for i in range(start,end):

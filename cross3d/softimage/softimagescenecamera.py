@@ -21,12 +21,10 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def lens( self ):
-		#print self._nativePointer.FullName
-		#return self._nativePointer.Parameters( 'projplanedist' ).Value
 		return xsi.GetValue( self.name() + '.camera.projplanedist' )
 		
 	def setLens( self, value ):
-		self.nativePointer().Parameters( 'projplanedist' ).Value = value
+		self._nativePointer.Parameters( 'projplanedist' ).Value = value
 
 	def showsFrame( self ):
 		return xsi.GetValue( self.name() + '.camvis.currenttime' )
@@ -47,10 +45,27 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 		return xsi.GetValue( self.name() + '.camdisp.headlight' )
 		
 	def pictureRatio( self ):
-		return self.nativePointer().Parameters( 'aspect' ).Value 
+		return self._nativePointer.Parameters( 'aspect' ).Value 
 	
 	def setPictureRatio( self, pictureRatio ):
-		self.nativePointer().Parameters( 'aspect' ).Value = pictureRatio
+		xsi.setValue( self.name() + '.camera.aspect', pictureRatio )
+		#self._nativePointer.Parameters( 'aspect' ).Value = pictureRatio
+		return True
+		
+	def farClippingPlane( self ):
+		return self._nativePointer.Parameters( 'far' ).Value 
+		
+	def setFarClippingPlane( self, distance ):
+		xsi.setValue( self.name() + '.camera.far', distance )
+		#self._nativePointer.Parameters( 'far' ).Value = distance
+		return True
+		
+	def nearClippingPlane( self ):
+		return self._nativePointer.Parameters( 'near' ).Value 
+		
+	def setNearClippingPlane( self, distance ):
+		xsi.setValue( self.name() + '.camera.near', distance )
+		#self._nativePointer.Parameters( 'near' ).Value = distance
 		return True
 
 # register the symbol

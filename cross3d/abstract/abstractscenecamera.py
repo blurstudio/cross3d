@@ -82,7 +82,7 @@ class AbstractSceneCamera( SceneObject ):
 	def pictureRatio( self ):
 		"""
 			\remarks	gets the camera's picture ratio.
-			\return		<bool> success
+			\return		<float>
 		"""
 		return 0.0
 	
@@ -90,6 +90,40 @@ class AbstractSceneCamera( SceneObject ):
 	def setPictureRatio( self, pictureRatio ):
 		"""
 			\remarks	sets the camera's picture ratio.
+			\param      pictureRatio <float>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod	
+	def farClippingPlane( self ):
+		"""
+			\remarks	gets the camera's far clipping plane distance.
+			\return		<float>
+		"""
+		return 0 
+
+	@abstractmethod	
+	def setFarClippingPlane( self, distance ):
+		"""
+			\remarks	sets the camera's far clipping plane distance.
+			\param      pictureRatio <float>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod		
+	def nearClippingPlane( self ):
+		"""
+			\remarks	gets the camera's near clipping plane distance.
+			\return		<float>
+		"""
+		return 0
+
+	@abstractmethod	
+	def setNearClippingPlane( self, distance ):
+		"""
+			\remarks	sets the camera's near clipping plane distance.
 			\param      pictureRatio <float>
 			\return		<bool> success
 		"""

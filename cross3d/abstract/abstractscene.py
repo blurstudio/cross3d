@@ -2048,7 +2048,6 @@ class AbstractScene( QObject ):
 			\param		renderPasses [ <blur3d.api.SceneRenderPass> ]
 			\return		<bool> success
 		"""
-		print renderPasses
 		return self._removeNativeRenderPasses( [ renderPass.nativePointer() for renderPass in renderPasses ] )
 
 	def createRenderPass( self, displayName ):
