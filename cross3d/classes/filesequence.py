@@ -102,13 +102,7 @@ class FileSequence( object ):
 		return True
   
 	def padding( self ):
-		padding = 1
-		start = self.nameToken( 'start' )
-		if not start == '0':
-			for digit in start:
-				if digit == '0':
-					padding = padding + 1
-		return padding
+		return len( str( self.nameTokens()[ 'start' ] ) )
 		
 	def setPadding( self, padding ):
 		start = str( self.start() ).zfill( padding )
