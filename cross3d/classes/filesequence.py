@@ -34,6 +34,19 @@ class FileSequence( object ):
 	def name( self ):
 		return os.path.split( self._path )[1]
 		
+	def setName( self, baseName='', start='', end='', extension='' ):
+		nameTokens = self.nameTokens()
+		if baseName:
+			nameTokens[ 'baseName' ] = baseName
+		if start:
+			nameTokens[ 'start' ] = start
+		if end:
+			nameTokens[ 'end' ] = end
+		if extension:
+			nameTokens[ 'extension' ] = extension
+		self._path = os.path.join( self.basePath(), self.nameMask() % nameTokens )
+		return True
+
 	def nameMask( self ):
 		return '%(baseName)s.%(start)s-%(end)s.%(extension)s'
 		
@@ -86,6 +99,7 @@ class FileSequence( object ):
 		tokens[ 'end' ] = str( range[1] )
 		fileName = self.nameMask() % tokens
 		self._path = os.path.join( self.basePath(), fileName )
+		return True
   
 	def padding( self ):
 		padding = 1
@@ -95,6 +109,12 @@ class FileSequence( object ):
 				if digit == '0':
 					padding = padding + 1
 		return padding
+		
+	def setPadding( self, padding ):
+		start = str( self.start() ).zfill( padding )
+		end = str( self.end() ).zfill( padding )
+		self.setName( start=start, end=end )
+		return True
 		
 	def basePath( self ):
 		return os.path.split( self._path )[0]
