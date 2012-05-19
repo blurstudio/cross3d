@@ -9,8 +9,6 @@
 #
 
 #------------------------------------------------------------------------------------------------------------------------
-
-import win32clipboard
 		
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +19,7 @@ class Clipboard( object ):
 			\remarks	Deletes the content of the clipboard.
 			\return		<bool> success
 		"""
+		import win32clipboard
 		win32clipboard.OpenClipboard()
 		win32clipboard.EmptyClipboard()
 		win32clipboard.CloseClipboard()
@@ -46,6 +45,7 @@ class Clipboard( object ):
 			\param		text <string>
 			\return		<bool> success
 		"""
+		import win32clipboard
 		win32clipboard.OpenClipboard()
 		win32clipboard.SetClipboardText( text )
 		win32clipboard.CloseClipboard()
