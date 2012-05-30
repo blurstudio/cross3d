@@ -9,6 +9,8 @@
 #	\date		05/23/11
 #
 
+from blur3d.naming import Name
+
 class BlurTags(dict):
 	def __init__(self, object):
 		dict.__init__(self)
@@ -93,6 +95,7 @@ class BlurTags(dict):
 	
 	def setdefault(self, key, default = None):
 		return self.lookupProps().setdefault(key, default)
+		
 	
 	def toString(self, prefix = '', seperator = ':', postfix = ' '):
 		out = ''
@@ -106,8 +109,21 @@ class BlurTags(dict):
 		for k, v in dict(*args, **kwargs).iteritems():
 			self[k] = v
 	
+	def updateTagsFromName( self, format = 'Legacy::Object' ):
+		name = Name( self._object.name(), format )
+		for element in name.elements():
+			key = element.objectName()
+			text = element.text()
+			if text == 'X':
+				if key in self:
+					del self[ key ]
+			else:
+				self.update({key:text})
+		
+	
 	def values(self):
 		return self.lookupProps().values()
+		
 
 # register the symbol
 from blur3d import api
