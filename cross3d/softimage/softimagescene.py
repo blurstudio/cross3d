@@ -104,6 +104,8 @@ class SoftimageScene( AbstractScene ):
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
 		if getsFromSelection:
+#			objects = xsiFactory.CreateObject( 'XSI.Collection' )
+#			objects.AddItems( objects )
 			objects = [ obj for obj in xsi.Selection ]
 			if wildcard:
 				import re
@@ -404,6 +406,7 @@ class SoftimageScene( AbstractScene ):
 	def undo( self ):
 		xsi.Undo( '' )
 		return True
+	
 
 # register the symbol
 from blur3d import api
