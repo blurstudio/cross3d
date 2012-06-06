@@ -11,6 +11,7 @@
 from blur3d   							import pendingdeprecation
 from PySoftimage 						import xsi, xsiFactory
 from blur3d.api.abstract.abstractscene  import AbstractScene
+from blurdev.decorators 				import stopwatch
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -345,7 +346,7 @@ class SoftimageScene( AbstractScene ):
 		"""
 		xsi.DeselectAll()
 		return True
-		
+
 	def setAnimationRange( self, animationRange ):
 		"""
 			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
