@@ -95,7 +95,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, **options ):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True ):
 		'''
 			/option <bool> effects
 		'''
@@ -109,7 +109,6 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		fileSplit = file.split( '.' )
 		fileName = '.'.join( fileSplit[:-1] )
 		fileExtension = 'jpg'
-		effects = options.get( 'effects', True )
 		initialRange = scene.animationRange()
 		application = self._scene.application()
 		
@@ -118,6 +117,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			frameRange = initialRange
 		if not resolution:
 			resolution = scene.renderSize()
+			
+		# set slate
+		if slate:
+			self.setSlateText( slate )
+			self.setSlateIsActive( True )
 
 		# storing infornation
 		initialGeometryVisibility = mxs.hideByCategory.geometry
@@ -208,6 +212,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.hideByCategory.bones = initialBoneObjectsVisibility
 		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
 		mxs.pyhelper.setViewportQuadSize( viewSize[0], viewSize[1] )
+		self.setSlateIsActive( False )
 		
 		if initialViewNumber != 1:
 			mxs.execute( 'max tool maximize' )

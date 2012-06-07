@@ -20,6 +20,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
 	
 	def __init__( self, scene, viewportID=0 ): 
+		self._visibility = {}
 		self._scene = scene
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
@@ -64,13 +65,50 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate='', effects=True ):
 		import os
-		scene = self._scene
+		nativeCamera = self._nativeCamera()
+		
+		# storing viewport visibility
+		self.storeVisibility()
+		
+		# set slate
+		if slate:
+			self.setSlateText( slate )
+			self.setSlateIsActive( True )
+			xsi.SetValue( nativeCamera.Name + '.camvis.currenttime', False )
+		else:
+			xsi.SetValue( nativeCamera.Name + '.camvis.currenttime', True )
+		
+		# setting visibility options
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objpolymesh' ).Value = True
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objparticles' ).Value = True
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objinstances' ).Value = True
+		
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'constructionlevel' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'gridaxisvis' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objlights' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcameras' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objimpgeometry' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcurves' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objhair' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objnulls' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltransfogroups' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnroots' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchneff' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrllattices' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltextsupp' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlwaves' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlother' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objannotationobjects' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
+		xsi.SetValue( 'preferences.ViewCube.show', False )
 		
 		# checking inputs
 		if not frameRange:
-			frameRange = scene.animationRange()
+			frameRange = self._scene.animationRange()
 		if not resolution:
 			from PyQt4.QtCore import QSize
 			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
@@ -105,8 +143,25 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
+		
+		# restoring visisibility
+		self.restoreVisibility()
+		
+		return True
+
+	def storeVisibility( self ):
+		for parameter in self._nativeCamera().Properties( 'Camera Visibility' ).Parameters:
+			self._visibility[ parameter.ScriptName ] = parameter.Value
+		self._visibility[ 'viewcubeshow' ] = xsi.GetValue( 'preferences.ViewCube.show' )
 		return True
 		
+	def restoreVisibility( self ):
+		for key in self._visibility:
+			if not key in [ 'viewcubeshow' ]:
+				self._nativeCamera().Properties( 'Camera Visibility' ).Parameters( key ).Value = self._visibility[ key ]
+		xsi.SetValue( 'preferences.ViewCube.show', self._visibility[ 'viewcubeshow' ] )
+		return True
+
 	def headlightIsActive( self, state ):
 		camera = self._nativeCamera()
 		xsi.SetValue( camera.FullName + '.camdisp.headlight', state )
