@@ -8,6 +8,7 @@
 #	\date		04/11/10
 #
 
+from blur3d	import abstractmethod
 from PyQt4.QtCore import QObject
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +45,103 @@ class AbstractSceneViewport( QObject ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	@abstractmethod
+	def cameraName( self ):
+		"""
+			\remarks	return the viewport's camera name
+			\return		<variant> camera | None
+		"""
+		return ''
+		
+	@abstractmethod
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
+		"""
+			\remarks	generates a playblast in the specific path
+			\param		filename <String>
+			\param		frameRange <List>
+			\param		resolution <QSize>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setHeadlightIsActive( self, active ):
+		"""
+			\remarks	sets the headlight of the camera of the viewport
+			\param		active <bool>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def headlightIsActive( self ):
+		"""
+			\remarks	returns if the status of the headlight
+			\return		<bool> active
+		"""
+		return False
+
+	@abstractmethod
+	def size( self ):
+		"""
+			\remarks	returns the viewport size
+			\return		( <int>, <int> ) size
+		"""
+		return ( 0, 0 )
+
+	@abstractmethod
+	def safeFrameSize( self ):
+		"""
+			\remarks	returns the size of the safe frame. added by douglas
+			\return		( <int>, <int> ) size
+		"""
+		return ( 0, 0 )
+
+	@abstractmethod
+	def safeFrameIsActive( self ):
+		"""
+			\remarks	returns the active of the safe frame. added by douglas
+			\return		<bool> active
+		"""
+		return False
+
+	@abstractmethod
+	def setSafeFrameIsActive( self, active ):
+		"""
+			\remarks	sets the active of the safe frame. added by douglas
+			\param		<bool> active
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def refresh( self ):
+		return False
+
+	@abstractmethod
+	def slateIsActive( self ):
+		return False
+
+	@abstractmethod
+	def setSlateIsActive( self, active ):
+		return False
+
+	@abstractmethod
+	def setSlateText( self, text='' ):
+		return False
+
+	@abstractmethod
+	def slateDraw( self ):
+		return False
+
+	@abstractmethod
+	def storeState( self ):
+		return False
+
+	@abstractmethod	
+	def restoreState( self ):
+		return False
+		
 	def camera( self ):
 		"""
 			\remarks	return the viewport's camera
@@ -55,7 +153,7 @@ class AbstractSceneViewport( QObject ):
 			return SceneCamera( self, camera )
 		from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 		return None
-		
+
 	def setCamera( self, camera ):
 		"""
 			\remarks	sets the camera of the current viewport
@@ -67,82 +165,6 @@ class AbstractSceneViewport( QObject ):
 		else:
 			cam = camera.nativePointer()
 		return self._setNativeCamera( cam )
-
-	def cameraName( self ):
-		"""
-			\remarks	return the viewport's camera name
-			\return		<variant> camera | None
-		"""
-		return ''
-
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
-		"""
-			\remarks	generates a playblast in the specific path
-			\param		filename <String>
-			\param		frameRange <List>
-			\param		resolution <QSize>
-			\return		<bool> success
-		"""
-		return False
-	
-	def setHeadlightIsActive( self, active ):
-		"""
-			\remarks	sets the headlight of the camera of the viewport
-			\param		active <bool>
-			\return		<bool> success
-		"""
-		return False
-		
-	def headlightIsActive( self ):
-		"""
-			\remarks	returns if the status of the headlight
-			\return		<bool> active
-		"""
-		return False
-		
-	def size( self ):
-		"""
-			\remarks	returns the viewport size
-			\return		( <int>, <int> ) size
-		"""
-		return ( 0, 0 )
-		
-	def safeFrameSize( self ):
-		"""
-			\remarks	returns the size of the safe frame. added by douglas
-			\return		( <int>, <int> ) size
-		"""
-		return ( 0, 0 )
-		
-	def safeFrameIsActive( self ):
-		"""
-			\remarks	returns the active of the safe frame. added by douglas
-			\return		<bool> active
-		"""
-		return False
-		
-	def setSafeFrameIsActive( self, active ):
-		"""
-			\remarks	sets the active of the safe frame. added by douglas
-			\param		<bool> active
-			\return		<bool> success
-		"""
-		return False
-
-	def refresh( self ):
-		return False
-		
-	def slateIsActive( self ):
-		return False
-	
-	def setSlateIsActive( self, active ):
-		return False
-		
-	def setSlateText( self, text='' ):
-		return False
-		
-	def slateDraw( self ):
-		return False
 
 # register the symbol
 from blur3d import api

@@ -20,7 +20,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
 	
 	def __init__( self, scene, viewportID=0 ): 
-		self._visibility = {}
+		self._state = {}
 		self._scene = scene
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
@@ -69,16 +69,16 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		import os
 		nativeCamera = self._nativeCamera()
 		
-		# storing viewport visibility
-		self.storeVisibility()
+		# storing viewport state
+		self.storeState()
 		
 		# set slate
 		if slate:
 			self.setSlateText( slate )
 			self.setSlateIsActive( True )
-			xsi.SetValue( nativeCamera.Name + '.camvis.currenttime', False )
+			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', False )
 		else:
-			xsi.SetValue( nativeCamera.Name + '.camvis.currenttime', True )
+			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', True )
 		
 		# setting visibility options
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objpolymesh' ).Value = True
@@ -144,22 +144,22 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
-		# restoring visisibility
-		self.restoreVisibility()
+		# restoring state
+		self.restoreState()
 		
 		return True
 
-	def storeVisibility( self ):
+	def storeState( self ):
 		for parameter in self._nativeCamera().Properties( 'Camera Visibility' ).Parameters:
-			self._visibility[ parameter.ScriptName ] = parameter.Value
-		self._visibility[ 'viewcubeshow' ] = xsi.GetValue( 'preferences.ViewCube.show' )
+			self._state[ parameter.ScriptName ] = parameter.Value
+		self._state[ 'viewcubeshow' ] = xsi.GetValue( 'preferences.ViewCube.show' )
 		return True
 		
-	def restoreVisibility( self ):
-		for key in self._visibility:
+	def restoreState( self ):
+		for key in self._state:
 			if not key in [ 'viewcubeshow' ]:
-				self._nativeCamera().Properties( 'Camera Visibility' ).Parameters( key ).Value = self._visibility[ key ]
-		xsi.SetValue( 'preferences.ViewCube.show', self._visibility[ 'viewcubeshow' ] )
+				self._nativeCamera().Properties( 'Camera Visibility' ).Parameters( key ).Value = self._state[ key ]
+		xsi.SetValue( 'preferences.ViewCube.show', self._state[ 'viewcubeshow' ] )
 		return True
 
 	def headlightIsActive( self, state ):
