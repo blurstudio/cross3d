@@ -682,7 +682,7 @@ class AbstractScene( QObject ):
 		return None
 		
 	@abstractmethod
-	def _removeNativeModel( self, models ):
+	def _removeNativeModels( self, models ):
 		"""
 			\remarks	deletes provided native models. Addded by douglas
 			\param		models [ <SceneModel>, ... ]
@@ -991,6 +991,13 @@ class AbstractScene( QObject ):
 		"""
 			\remarks	set the render output size for the scene
 			\param		size	<QSize>
+			\return		<bool> success
+		"""
+		return False
+		
+	def _exportNativeObjectsToFBX( self, nativeObjects, path, frameRange=None, showUI=True ):
+		"""
+			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
 		"""
 		return False
@@ -2059,13 +2066,13 @@ class AbstractScene( QObject ):
 		from blur3d.api import SceneRenderPass
 		return SceneRenderPass( self, self._createNativeRenderPass( displayName ) )
 
-	def removeModel( self, models ):
+	def removeModels( self, models ):
 		"""
 			\remarks	deletes provided models
 			\param		models [ <SceneModel>, ... ]
 			\return		<bool> success
 		"""
-		return self._removeNativeModel( [ model.nativePointer() for model in models ] )
+		return self._removeNativeModels( [ model.nativePointer() for model in models ] )
 
 	def exportModel( self, model, path ):
 		"""
@@ -2102,6 +2109,13 @@ class AbstractScene( QObject ):
 		"""
 		from blur3d.api import application
 		return application
+		
+	def exportObjectsToFBX( self, objects, path, frameRange=None, showUI=True ):
+		"""
+			\remarks	exports a given set of objects as FBX.
+			\return		<bool> success
+		"""
+		return self._exportNativeObjectsToFBX( [ obj.nativePointer() for obj in objects ], path, frameRange, showUI=showUI )
 		
 	@pendingdeprecation( 'Use Scene.objects( type=ObjectType.Model )' )
 	def models( self ):

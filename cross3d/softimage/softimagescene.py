@@ -34,9 +34,9 @@ class SoftimageScene( AbstractScene ):
 		"""
 		return xsi.ImportModel( path, '', '', '', name )( 'Value' )
 		
-	def _removeNativeModel( self, models ):
+	def _removeNativeModels( self, models ):
 		"""
-			\remarks	implements the AbstractScene._removeNativeModel to remove a native model in the scene. Addded by douglas
+			\remarks	implements the AbstractScene._removeNativeModels to remove a native model in the scene. Addded by douglas
 			\param		models [ <PySoftimage.xsi.Model>, ... ]
 			\return		<bool> success
 		"""
@@ -228,6 +228,39 @@ class SoftimageScene( AbstractScene ):
 		self.setSilentMode( False )
 		return renderPass
 		
+	def _exportNativeObjectsToFBX( self, nativeObjects, path, frameRange=None, showUI=True ):
+		"""
+			\remarks	exports a given set of nativeObjects as FBX.
+			\return		<bool> success
+		"""
+
+		initialSelection = self._nativeSelection()
+		initialFrameRange = self.animationRange()
+
+		if frameRange:
+			self.setAnimationRange( frameRange )
+
+		self._setNativeSelection( nativeObjects )
+		
+		xsi.FBXExportScaleFactor( 1 )
+		xsi.FBXExportGeometries( True )
+		xsi.FBXExportShapes( True )
+		xsi.FBXExportSkins( True )
+		xsi.FBXExportCameras( True )
+		xsi.FBXExportLights( True )
+		xsi.FBXExportDeformerAsSkeleton( False )
+		xsi.FBXExportEmbedMedias( False )
+		xsi.FBXExportAnimation( True )
+		xsi.FBXExportFrameRate( self.animationFPS() )
+		xsi.FBXExportKeepXSIEffectors( True )	
+		xsi.FBXExportSelection( True )
+		
+		xsi.FBXExport( path )
+		
+		self._setNativeSelection( initialSelection )
+		self.setAnimationRange( initialFrameRange )
+		return True
+		
 	def viewports( self ):
 		"""
 			\remarks	implements the AbstractScene.viewports method to return the visible viewports
@@ -405,10 +438,13 @@ class SoftimageScene( AbstractScene ):
 		return playControl.Parameters( "Loop" ).Value
 		
 	def undo( self ):
+		"""
+			\remarks	undos the last action.
+			\return		<bool>
+		"""
 		xsi.Undo( '' )
 		return True
 	
-
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Scene', SoftimageScene )

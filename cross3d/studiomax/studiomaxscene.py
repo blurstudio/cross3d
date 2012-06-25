@@ -1362,7 +1362,7 @@ class StudiomaxScene( AbstractScene ):
 			return models
 		return []
 		
-	def _removeNativeModel( self, models ):
+	def _removeNativeModels( self, models ):
 		"""
 			\remarks	implements the AbstractScene._removeNativeModel to remove a native model in the scene. Addded by douglas
 			\param		models [ <PySoftimage.xsi.Model>, ... ]
@@ -1387,8 +1387,8 @@ class StudiomaxScene( AbstractScene ):
 		self._setNativeSelection( selection )
 		return True
 	
-	def _unisolate(self):
-		r"""
+	def _unisolate( self ):
+		"""
 			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
 			\return		<bool>
 		"""
@@ -1396,7 +1396,45 @@ class StudiomaxScene( AbstractScene ):
 			mxs.Iso2Roll.C2Iso.changed(False)
 			return True
 		return False
+	
+	def _exportNativeObjectsToFBX( self, nativeObjects, path, frameRange=None, showUI=True ):
+		"""
+			\remarks	exports a given set of objects as FBX.
+			\return		<bool> success
+		"""
+		initialSelection = self._nativeSelection()
+		initialFrameRange = self.animationRange()
 		
+		if frameRange:
+			self.setAnimationRange( frameRange )
+
+		self._setNativeSelection( nativeObjects )
+
+		mxs.FBXExporterSetParam( 'Animation', True )
+		mxs.FBXExporterSetParam( 'ASCII', False )
+		mxs.FBXExporterSetParam( 'BakeAnimation', True )
+		mxs.FBXExporterSetParam( 'BakeFrameStart', frameRange[0] )
+		mxs.FBXExporterSetParam( 'BakeFrameEnd', frameRange[1] )
+		mxs.FBXExporterSetParam( 'BakeFrameStep', 1 )
+		mxs.FBXExporterSetParam( 'BakeResampleAnimation', True )
+		mxs.FBXExporterSetParam( 'Cameras', True )
+		mxs.FBXExporterSetParam( 'FileVersion', 'FBX201000' )
+		mxs.FBXExporterSetParam( 'ShowWarning', False )
+		mxs.FBXExporterSetParam( 'Skin', True )
+		mxs.FBXExporterSetParam( 'Lights', True )
+		mxs.FBXExporterSetParam( 'UpAxis', 'Y' )
+		mxs.FBXExporterSetParam( 'FilterKeyReducer', False )
+		mxs.FBXExporterSetParam( 'PushSettings' )
+
+		if showUI:
+			mxs.exportFile( path, selectedOnly=True, using='FBXEXP' )
+		else:
+			mxs.exportFile( path, mxs.pyhelper.namify( 'noPrompt' ), selectedOnly=True, using='FBXEXP' )
+		
+		self._setNativeSelection( initialSelection )
+		self.setAnimationRange( initialFrameRange )
+
+		return True
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods

@@ -66,6 +66,9 @@ class FrameRange( list ):
 		return True
 		
 	def overlap( self, frameRange ):
+		"""
+			\remarks	Returns the overlaping range if any.
+		"""
 		if self.overlaps( frameRange ):
 			if self[0] < frameRange[0]:
 				start = frameRange[0]
@@ -80,4 +83,14 @@ class FrameRange( list ):
 			None
 			
 	def merge( self, frameRange ):
+		"""
+			\remarks	Returns a range that covers both framerange.
+		"""
 		return FrameRange( [ min( self[0], frameRange[0] ), max( self[1], frameRange[1] ) ] )
+
+	def pad( self, padding ):
+		"""
+			\remarks	Adds handles to the range.
+		"""
+		self[0] = self[0] - padding
+		self[1] = self[1] + padding
