@@ -88,9 +88,17 @@ class FrameRange( list ):
 		"""
 		return FrameRange( [ min( self[0], frameRange[0] ), max( self[1], frameRange[1] ) ] )
 
-	def pad( self, padding ):
+	def padded( self, padding ):
 		"""
-			\remarks	Adds handles to the range.
+			\remarks	Returns the padded range.
 		"""
-		self[0] = self[0] - padding
-		self[1] = self[1] + padding
+		return FrameRange( [ self[0] - padding, self[1] + padding ] )
+		
+		
+		
+	def offset( self, offset ):
+		"""
+			\remarks	Returns the offset range.
+		"""
+		return FrameRange( [ self[0] + offset, self[1] + offset ] )
+		
