@@ -233,15 +233,30 @@ class SoftimageScene( AbstractScene ):
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
 		"""
+		
+		# Collecting the controllers we want to plot.
+		controllers = []
+		for nativeObject in nativeObjects:
+			transformsGlobal = nativeObject.Kinematics.Global
+			transformsLocal = nativeObject.Kinematics.Local
+			for transform in [ 'pos', 'rot', 'scl' ]:
+				for axis in 'xyz':
+					controllerGlobal = transformsGlobal.Parameters( transform + axis )
+					controllerLocal = transformsLocal.Parameters( transform + axis )
+					if controllerGlobal.IsAnimated() or controllerLocal.isAnimated():
+						controllers.append( controllerLocal )
 
-		initialSelection = self._nativeSelection()
-		initialFrameRange = self.animationRange()
+		# Storing all the stuff we will be doing.
+		xsi.OpenUndo( "Plotting and Exporting to FBX" )
 
+		# Defining the range.
 		if frameRange:
 			self.setAnimationRange( frameRange )
 
+		# Setting the selection.
 		self._setNativeSelection( nativeObjects )
 		
+		# Setting the FBX export options.
 		xsi.FBXExportScaleFactor( 1 )
 		xsi.FBXExportGeometries( True )
 		xsi.FBXExportShapes( True )
@@ -255,10 +270,14 @@ class SoftimageScene( AbstractScene ):
 		xsi.FBXExportKeepXSIEffectors( True )	
 		xsi.FBXExportSelection( True )
 		
+		# Plotting and exporting the FBX File.
+		xsi.PlotAndApplyActions( controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True )
 		xsi.FBXExport( path )
+
+		# Restoring the scene state.
+		xsi.CloseUndo()
+		xsi.Undo("")
 		
-		self._setNativeSelection( initialSelection )
-		self.setAnimationRange( initialFrameRange )
 		return True
 		
 	def viewports( self ):
