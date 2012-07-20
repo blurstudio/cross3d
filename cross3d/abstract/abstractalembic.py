@@ -1,5 +1,5 @@
 ##
-#   :namespace  blur3d.api.softimage.softimagealembic
+#   :namespace  blur3d.api.abstract.abstractalembic
 #
 #   :remarks    [desc::commented]
 #   
@@ -7,35 +7,28 @@
 #   :author     Blur Studio
 #   :date       07/10/12
 #
-#------------------------------------------------------------------------------------------------------------------------
 
-from PySoftimage import xsi
-from blur3d.api.abstract.abstractalembic import AbstractAlembic
+from blur3d import abstractmethod
 
-class SoftimageAlembic( AbstractAlembic ):
-		
+class AbstractAlembic:
+	
+	@abstractmethod
 	def _nativeImportFile( self, file ):
 		"""
 			\remarks	imports alembic file
 			\param		
 			\return		<bool> success of import
 		"""
-		# not yet implemented
 		return None		
 		
+	@abstractmethod
 	def _nativeExportFile( self, writeJobs ):
 		"""
 			\remarks	export alembic files contained in writeJobs object
 			\param		
 			\return		<bool> success of export
 		"""
-		try:
-			print writeJobs.arguments()
-			xsi.alembic_export( writeJobs.arguments() )
-			return True
-		except:
-			return False
-	
+		return None		
 	
 	def importFile( self ):
 		# not yet implemented
@@ -47,16 +40,4 @@ class SoftimageAlembic( AbstractAlembic ):
 
 # register the symbol
 from blur3d import api
-api.registerSymbol( 'Alembic', SoftimageAlembic )
-
-	
-
-		
-		
-	
-		
-		
-		
-	
-		
-	
+api.registerSymbol( 'Alembic', AbstractAlembic, ifNotFound = True )

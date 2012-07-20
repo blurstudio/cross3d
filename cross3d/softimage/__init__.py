@@ -24,3 +24,6 @@ def init():
 	import softimagescenecamera
 	import softimagescenerenderpass
 	import softimagesceneviewport
+	import softimagealembic
+	import softimagewritejob
+	import softimagewritejobs
