@@ -30,7 +30,6 @@ class SoftimageAlembic( AbstractAlembic ):
 			\return		<bool> success of export
 		"""
 		try:
-			print writeJobs.arguments()
 			xsi.alembic_export( writeJobs.arguments() )
 			return True
 		except:

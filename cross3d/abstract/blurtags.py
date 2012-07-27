@@ -109,8 +109,8 @@ class BlurTags(dict):
 		for k, v in dict(*args, **kwargs).iteritems():
 			self[k] = v
 	
-	def updateTagsFromName( self, format = 'Legacy::Object' ):
-		name = Name( self._object.name(), format )
+	def updateTagsFromName( self, format = None ):
+		name = Name( self._object.displayName(), format )
 		for element in name.elements():
 			key = element.objectName()
 			text = element.text()
