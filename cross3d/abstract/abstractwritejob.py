@@ -115,7 +115,20 @@ class AbstractWriteJob( object ):
 # convert to string
 	def arguments( self ):
 		return
-		
+
+class AbstractPointCacheWriteJob( AbstractWriteJob ):
+	def __init__( self ):
+		AbstractWriteJob.__init__( self )
+		self._normals = False
+		self._uvs = False
+		self._faceSets = False
+		self._bindPose = False
+		self._purePointCache = True
+		self._dynamicTopology = False
+		self._globalSpace = True
+
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'WriteJob', AbstractWriteJob, ifNotFound = True )
+api.registerSymbol( 'PointCacheWriteJob', AbstractPointCacheWriteJob, ifNotFound = True )
