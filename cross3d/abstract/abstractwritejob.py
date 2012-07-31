@@ -128,6 +128,17 @@ class AbstractPointCacheWriteJob( AbstractWriteJob ):
 		self._globalSpace = True
 
 
+class AbstractPointCacheWriteJob( AbstractWriteJob ):
+	def __init__( self ):
+		AbstractPointCacheWriteJob.__init__( self )
+		self._normals = False
+		self._uvs = False
+		self._faceSets = False
+		self._bindPose = False
+		self._purePointCache = False
+		self._dynamicTopology = False
+		self._globalSpace = False
+		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'WriteJob', AbstractWriteJob, ifNotFound = True )

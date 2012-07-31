@@ -166,33 +166,30 @@ class FileSequence( object ):
 		if deletesBasePath:
 			basePath = self.basePath()
 			if os.path.exists( basePath ):
-				os.rmdir( basePath )
-		else:
-			for path in self.paths():
-				if os.path.exists( path ):
-					os.remove( path )
+				os.removedirs( basePath )
+		for path in self.paths():
+			if os.path.exists( path ):
+				os.remove( path )
 
-	def generateMOV( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
+	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
+		print outputPath
 		if not outputPath:
 			outputPath = os.path.join(( self.basePath() ), self.baseName() + '.mov' )
 		extension = os.path.splitext( outputPath )[1]
-		if extension == '.mov':
-			if self.isComplete():
-				normalisedSequencePath = os.path.join(  self.basePath(), self.baseName() + '_Temp.1-' + str( self.count() ) + '.' + self.extension() )
-				normalisedSequence = FileSequence( normalisedSequencePath )
-				self.copy( normalisedSequence )
-				while not normalisedSequence.isComplete():
-					continue
-				import subprocess
-				command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
-				process = subprocess.Popen( command )
-				process.communicate()
-				normalisedSequence.delete()
-				return True
-			else:
-				raise( 'Input sequence ' + str( self._path ) + ' is missing frames' )
+		if self.isComplete():
+			normalisedSequencePath = os.path.join(  self.basePath(), self.baseName() + '_Temp.1-' + str( self.count() ) + '.' + self.extension() )
+			normalisedSequence = FileSequence( normalisedSequencePath )
+			self.copy( normalisedSequence )
+			while not normalisedSequence.isComplete():
+				continue
+			import subprocess
+			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
+			process = subprocess.Popen( command )
+			process.communicate()
+			normalisedSequence.delete()
+			return True
 		else:
-			raise( 'Argument 1 should be a path to a mov file' )
+			raise( 'Input sequence ' + str( self._path ) + ' is missing frames' )
 		return True
 		
 	def link( self, output ):
