@@ -91,7 +91,8 @@ class SoftimageUserProps(AbstractUserProps):
 	def unescapeValue(string):
 		"""
 			\remarks	replaces any html codes with their associated unstorable characters
-			\return		<str>
+						does not pickle/unpickle data.
+			\return		<float>||<int>||<list>||<dict>||<tuple>||<unicode>
 		"""
 		string = unicode(string)
 		string, type = SoftimageUserProps._decodeString(string)
@@ -100,8 +101,12 @@ class SoftimageUserProps(AbstractUserProps):
 		elif type == int:
 			return int(string)
 		elif type in (list, dict, tuple):
-			return eval(string)
-		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+			try:
+				return eval(string)
+			except:
+				return string
+		return string
+		#return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
 	@staticmethod
 	def _decodeString(string):
