@@ -78,7 +78,8 @@ class SoftimageApplication(AbstractApplication):
 		versionDic = {
 		"10.1.46.0" : "XSI2012",
 		"8.0.249.0" : "XSI2010",
-		'default' : "XSI2012"}
+		"11.0.525.0" : "XSI2013",
+		'default' : "XSI2013"}
 		
 		if versionDic.has_key(version):
 			jobType = versionDic[str(version)]
