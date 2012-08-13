@@ -85,7 +85,7 @@ class SoftimageApplication(AbstractApplication):
 			jobType = versionDic[str(version)]
 		else:
 			jobType = versionDic['default']
-		print("debug =" + jobType)
+		#print("debug =" + jobType)
 		return jobType
 		
 	def refresh( self ):
