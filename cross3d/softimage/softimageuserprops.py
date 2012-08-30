@@ -4,7 +4,7 @@
 #	\remarks	The blur3d.api.SoftimageUserProps handles storing and retreving custom
 #				properties from objects
 #	
-#	\author		mikeh@blur.com
+#	\author		mikeh@blur.com 
 #	\author		Blur Studio
 #	\date		05/26/11
 #

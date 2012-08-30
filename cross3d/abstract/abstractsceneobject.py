@@ -5,7 +5,7 @@
 #				This class will provide a generic overview structure for all manipulations of 3d objects
 #	
 #	\author		eric@blur.com
-#	\author		Blur Studio
+#	\author		Blur Studio 
 #	\date		03/15/10
 #
 
@@ -226,7 +226,7 @@ class AbstractSceneObject( SceneWrapper ):
 	def children( self, recursive = False, wildcard = '', type = '' ):
 		"""
 			\remarks	returns SceneObject wrappers over the children for this object
-			\param		recursive <bool>
+			\param		recursive <bool> wildcard <str> type <str>
 			\sa			childAt, childCount, findChild, _nativeChildren
 			\return		<list> [ <blur3d.api.SceneObject>, .. ]
 		"""

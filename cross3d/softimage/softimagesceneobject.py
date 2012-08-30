@@ -6,7 +6,7 @@
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio
-#	\date		04/04/11
+#	\date		04/04/11 
 #
 
 from PySoftimage import xsi
@@ -31,19 +31,21 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	def _nativeChildren( self, recursive = False, wildcard = '', type = '', parent = '', childrenCollector = [] ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
-			\param		recursive <bool>
+			\param		recursive <bool> wildcard <string> type <string parent <string> childrenCollector <list>
 			\sa			children
-			\return		<list> [ <PySotimage.xsi.Object> nativeObject, .. ]
+			\return		<list> [ <PySoftimage.xsi.Object> nativeObject, .. ]
 		"""
-		nativeType = self._nativeTypeOfObjectType( type )
+		nativeType = ''
+		if type != '':
+			nativeType = self._nativeTypeOfObjectType( type )
 		#return [ obj for obj in self._nativePointer.FindChildren( name, nativeType, parent, recursive ) ]
-		return self._nativePointer.FindChildren( wildcard, nativeType, parent, recursive )
+		return self._nativePointer.FindChildren( wildcard, nativeType, '', recursive )
 	
 	def _nativeParent( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeParent method to look up the native parent for this object
 			\sa			parent, setParent, _setNativeParent
-			\return		<Py3dsMax.mxs.Object> nativeObject || None
+			\return		<PySoftimage.xsi.Object> nativeObject || None
 		"""
 		return self._nativePointer.Parent
 	
@@ -51,7 +53,7 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeParent method to set the native parent for this object
 			\sa			parent, setParent, _nativeParent
-			\param		<Py3dsMax.mxs.Object> nativeObject || None
+			\param		<PySoftimage.xsi.Object> nativeObject || None
 			\return		<bool> success
 		"""
 		xsi.Application.ParentObj(self._nativePointer, nativeParent)

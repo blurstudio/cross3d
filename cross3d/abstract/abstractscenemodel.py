@@ -6,7 +6,7 @@
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio
-#	\date		04/05/10
+#	\date		04/05/10 
 #
 
 from blur3d import abstractmethod
