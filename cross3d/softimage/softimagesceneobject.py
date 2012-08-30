@@ -28,14 +28,16 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		"""
 		return self.nativePointer().FindChild( name, '', '', recursive )
 
-	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
+	def _nativeChildren( self, recursive = False, wildcard = '', type = '', parent = '', childrenCollector = [] ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
 			\param		recursive <bool>
 			\sa			children
 			\return		<list> [ <PySotimage.xsi.Object> nativeObject, .. ]
 		"""
-		return [ obj for obj in self._nativePointer.FindChildren( '', '', '', recursive ) ]
+		nativeType = self._nativeTypeOfObjectType( type )
+		#return [ obj for obj in self._nativePointer.FindChildren( name, nativeType, parent, recursive ) ]
+		return self._nativePointer.FindChildren( wildcard, nativeType, parent, recursive )
 	
 	def _nativeParent( self ):
 		"""
@@ -100,6 +102,25 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	
 	@staticmethod
+	def _nativeTypeOfObjectType( objectType ):
+		"""
+			\remarks	reimplements the AbstractSceneObject._nativeTypeOfObjectType method to return the nativeType of the ObjectType supplied
+			\param		<blur3d.api.constants.ObjectType> objectType || None
+			\return		<bool> success
+		"""	
+		if objectType == ObjectType.Geometry:
+			return 'polymsh'
+		elif objectType == ObjectType.Light:
+			return 'light'
+		elif objectType == ObjectType.Camera:
+			return 'camera'
+		elif objectType == ObjectType.Model:
+			return '#model'
+		else:
+			return None
+		return AbstractSceneObject._nativeTypeOfObjectType( objectType )
+	
+	@staticmethod
 	def _typeOfNativeObject( nativeObject ):
 		"""
 			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
@@ -107,22 +128,22 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		
-		type 	= nativeObject.Type
+		type = nativeObject.Type
 		
 		# check to see if the object is a geometry type
 		if type == 'polymsh':
 			return ObjectType.Geometry
 		
 		# check to see if the object is a light type
-		if type == 'light':
+		elif type == 'light':
 			return ObjectType.Light
 		
 		# check to see if the object is a camera type
-		if type == 'camera':
+		elif type == 'camera':
 			return ObjectType.Camera
 			
 		# check to see if the object is a model type
-		if type == '#model':
+		elif type == '#model':
 			return ObjectType.Model
 			
 		return AbstractSceneObject._typeOfNativeObject( nativeObject )

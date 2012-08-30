@@ -67,13 +67,12 @@ class SoftimageUserProps(AbstractUserProps):
 		return item
 
 	def lookupProps(self):
-		baseprops = self._nativePointer.Properties
+		baseprops = self._nativePointer.Properties.Filter( 'UserDataBlob' )
 		props = {}
 		for prop in baseprops:
-			if prop.Type in ("UserDataBlob"):
-				key = prop.Name
-				value = prop.Value
-				props[key] = self.unescapeValue(value)
+			key = prop.Name
+			value = prop.Value
+			props[ key ] = self.unescapeValue( value )
 		return props
 	
 	@staticmethod

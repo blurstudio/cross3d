@@ -22,8 +22,8 @@ class AbstractSceneModel( SceneObject ):
 	# 												public methods
 	#--------------------------------------------------------------------------------------------------------------------
 		
-	def objects( self ):
-		return self.children( recursive=True )
+	def objects( self, wildcard = '', type = '' ):
+		return self.children( recursive = True, wildcard = wildcard, type = type )
 	
 #------------------------------------------------------------------------------------------------------------------------
 

@@ -33,9 +33,9 @@ class AbstractSceneObject( SceneWrapper ):
 				if not c._objectType == ObjectType.Generic:
 					cls._subClasses[ c._objectType ] = c
 		
-		nativeType = cls._typeOfNativeObject( nativeObject )
-		if nativeType in cls._subClasses:
-			c = cls._subClasses[ nativeType ]
+		sceneObjectType = cls._typeOfNativeObject( nativeObject )
+		if sceneObjectType in cls._subClasses:
+			c = cls._subClasses[ sceneObjectType ]
 			return SceneWrapper.__new__( c )
 		return SceneWrapper.__new__( cls )
 		
@@ -65,7 +65,7 @@ class AbstractSceneObject( SceneWrapper ):
 		return []
 		
 	@abstractmethod
-	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
+	def _nativeChildren( self, recursive = False, wildcard = '', type = '', parent = '', childrenCollector = [] ):
 		"""
 			\remarks	looks up the native children for this object
 			\param		recursive         <bool>
@@ -223,7 +223,7 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		return len( self._nativeChildren() )
 	
-	def children( self, recursive = False ):
+	def children( self, recursive = False, wildcard = '', type = '' ):
 		"""
 			\remarks	returns SceneObject wrappers over the children for this object
 			\param		recursive <bool>
@@ -232,7 +232,7 @@ class AbstractSceneObject( SceneWrapper ):
 		"""
 		from blur3d.api import SceneObject
 		scene = self._scene
-		return [ SceneObject( scene, native ) for native in self._nativeChildren( recursive ) ]
+		return [ SceneObject( scene, native ) for native in self._nativeChildren( recursive, wildcard, type ) ]
 	
 	def deselect( self ):
 		"""
@@ -534,6 +534,16 @@ class AbstractSceneObject( SceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
+
+	@staticmethod
+	def _nativeTypeOfObjectType( objectType ):
+		"""
+			\remarks	[virtual]	returns the nativeObject Type of the ObjectType supplied
+			\param		<variant> ObjectType || None
+			\return		<bool> success
+		"""
+		return None
+
 
 	@staticmethod
 	def _typeOfNativeObject( nativeObject ):
