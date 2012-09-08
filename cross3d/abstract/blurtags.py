@@ -114,7 +114,7 @@ class BlurTags(dict):
 		for element in name.elements():
 			key = element.objectName()
 			text = element.text()
-			if text == 'X':
+			if text == 'x':
 				if key in self:
 					del self[ key ]
 			else:
