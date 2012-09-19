@@ -12,21 +12,25 @@
 from blur3d import abstractmethod
 from blur3d.api import SceneObject
 from blur3d.constants import ObjectType
+from blur3d import api
 
-#------------------------------------------------------------------------------------------------------------------------
 
-class AbstractSceneModel( SceneObject ):
+class AbstractSceneModel(SceneObject):
+	"""
+	The SceneModel class provides the base foundation for the 3d Object 
+	framework for the blur3d system.  This class will provide a generic 
+	overview structure for all manipulations of 3d models
+	"""
+
 	_objectType = ObjectType.Model
 
 	#--------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#--------------------------------------------------------------------------------------------------------------------
-		
-	def objects( self, wildcard = '', type = '' ):
-		return self.children( recursive = True, wildcard = wildcard, type = type )
-	
-#------------------------------------------------------------------------------------------------------------------------
+
+	def objects(self, wildcard='', type=''):
+		return self.children(recursive=True, wildcard=wildcard, type=type)
+
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneModel', AbstractSceneModel, ifNotFound = True )
+api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

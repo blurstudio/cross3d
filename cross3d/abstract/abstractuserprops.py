@@ -24,121 +24,130 @@
 #|prop['customProp'] = 'My custom property'
 
 import blur3d
+from blur3d import api
+
+
 dispatchObject = blur3d.api.dispatch.dispatchObject
 
+
 class AbstractUserProps(dict):
+	"""
+	The blur3d.api.UserProps package creates an abstract wrapper from a 
+	3d system to use storing and retreiving custom user props
+	"""
+
 	def __init__(self, nativePointer):
 		dict.__init__(self)
 		self._nativePointer = nativePointer
-	
+
 	def __contains__(self, key):
 		return key in self.lookupProps()
-	
+
 	def __getitem__(self, key):
 		return dict.__getitem__(self, key)
-	
+
 	def __setitem__(self, key, value):
 		dict.__setitem__(self, key, value)
 		self.emitChange()
-	
+
 	def __str__(self):
 		return str(self.lookupProps())
-	
-#	def __repr__(self):
-#		return 'UserProps(%s)' % self._nativePointer
-	
+
 	def clear(self):
 		self.lookupProps().clear()
-	
+
 	def copy(self):
 		return self.lookupProps().copy()
-	
+
 	def emitChange(self, key):
 		if key == 'BlurTags':
 			dispatchObject('blurTagChanged', self._nativePointer)
 		else:
 			dispatchObject('customPropChanged', self._nativePointer)
-	
+
 	def keys(self):
 		return self.lookupProps().keys()
-	
+
 	def items(self):
 		return self.lookupProps().items()
-	
+
 	def iteritems(self):
 		return self.lookupProps().iteritems()
-	
+
 	def iterkeys(self):
 		return self.lookupProps().iterkeys()
-	
+
 	def itervalues(self):
 		return self.lookupProps().itervalues()
-	
+
 	def has_key(self, key):
 		return self.lookupProps().has_key(key)
-	
-	def get(self, key, default = None):
+
+	def get(self, key, default=None):
 		return self.lookupProps().get(key, default)
-	
+
 	def lookupProps(self):
 		"""
-			\remarks	this is the workhorse method for the class, it is responsible for providing the dictionary of key value pares used for 
-						most of the class. If it is unabstracted it will return a empty dictionary
-			\return		<dict>
+		This is the workhorse method for the class, it is responsible for 
+		providing the dictionary of key value pares used for most of the 
+		class. If it is unabstracted it will return a empty dictionary
+		
+		:return: dict
+		
 		"""
 		return {}
-	
-	def pop(self, key, default = None):
+
+	def pop(self, key, default=None):
 		return self.lookupProps().pop(key, default)
-	
+
 	def popitem(self):
 		return self.lookupProps().popitem()
-	
-	def setdefault(self, key, default = None):
+
+	def setdefault(self, key, default=None):
 		return self.lookupProps().setdefault(key, default)
-	
+
 	def update(self, *args, **kwargs):
 		for k, v in dict(*args, **kwargs).iteritems():
 			self[k] = v
-	
+
 	def values(self):
 		return self.lookupProps().values()
-	
+
 	@staticmethod
 	def escapeKey(string):
 		"""
-			\remarks	replaces any unstorable characters in key with their html codes
-			\return		<str>
+		Replaces any unstorable characters in key with their html codes
+		
 		"""
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)
 		return string.replace(' ', '&#32;').replace('\n', '&#10;').replace('\r', '&#13;')
-	
+
 	@staticmethod
 	def escapeValue(string):
 		"""
-			\remarks	replaces any unstorable characters in value with their html codes
-			\return		<str>
+		Replaces any unstorable characters in value with their html codes
+
 		"""
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)
-		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')		
-	
+		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')
+
 	@staticmethod
 	def unescapeKey(string):
 		"""
-			\remarks	replaces any html codes with their associated unstorable characters
-			\return		<str>
+		Replaces any html codes with their associated unstorable characters
+
 		"""
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)
 		return string.replace('&#32;', ' ').replace('&#10;', '\n').replace('&#13;', '\r')
-	
+
 	@staticmethod
 	def unescapeValue(string):
 		"""
-			\remarks	replaces any html codes with their associated unstorable characters
-			\return		<str>
+		Replaces any html codes with their associated unstorable characters
+
 		"""
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)
@@ -146,5 +155,4 @@ class AbstractUserProps(dict):
 
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'UserProps', AbstractUserProps, ifNotFound = True )
+api.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)

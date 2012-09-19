@@ -8,71 +8,65 @@
 #	\date		09/08/10
 #
 
-from blur3d		import abstractmethod
+from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
+from blur3d import api
 
-class AbstractSceneCache( SceneWrapper ):
+
+class AbstractSceneCache(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def disable( self ):
-		"""
-			\remarks	convenience method for disabling this cache in the scene
-			\sa			setEnabled
-			\return		<bool> success
+	def disable(self):
+		"""Convenience method for disabling this cache in the scene
+
 		"""
 		return self.setEnabled(False)
-	
-	def controllers( self ):
-		"""
-			\remarks	return a list of the controllers that are currently on this cache instance
-			\return		<list> [ <blur3d.api.SceneAnimationController> controller, .. ]
+
+	def controllers(self):
+		"""Return a list of the controllers that are currently on this 
+		cache instance
+		
+		:return: a list of :class:`blur3d.api.SceneAnimationController`'s
+			
 		"""
 		from blur3d.api import SceneAnimationController
-		return [ SceneAnimationController( self._scene, nativeControl ) for nativeControl in self._nativeControllers() ]
-	
-	def enable( self ):
-		"""
-			\remarks	convenience method for enabling this cache in the scene
-			\sa			setEnabled
-			\return		<bool> success
+		return [ SceneAnimationController(self._scene, nativeControl) for nativeControl in self._nativeControllers() ]
+
+	def enable(self):
+		"""Convenience method for enabling this cache in the scene
+
 		"""
 		return self.setEnabled(True)
-	
+
 	@abstractmethod
-	def filename( self ):
-		"""
-			\remarks	return the filename that this cache is pulling from
-			\return		<str> filename
+	def filename(self):
+		"""Return the filename that this cache is pulling from
+			
 		"""
 		return ''
+
+	@abstractmethod
+	def isEnabled(self):
+		"""Return wether or not this cache is enabled in the scene
 			
-	@abstractmethod
-	def isEnabled( self ):
-		"""
-			\remarks	return wether or not this cache is enabled in the scene
-			\return		<bool> enabled
 		"""
 		return False
-		
+
 	@abstractmethod
-	def setEnabled( self, state ):
-		"""
-			\remarks	mark whether or not this cache is enabled in the scene
-			\param		state		<bool>
-			\return		<bool> success
+	def setEnabled(self, state):
+		"""Mark whether or not this cache is enabled in the scene
+
 		"""
 		return False
-	
+
 	@abstractmethod
-	def setFilename( self, filename ):
-		"""
-			\remarks	set the filename for this cache data to the inputed filename
-			\param		filename	<str>
-			\return		<bool> success
+	def setFilename(self, filename):
+		"""Set the filename for this cache data to the inputed filename
+
 		"""
 		return False
-	
+
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneCache', AbstractSceneCache, ifNotFound = True )
+api.registerSymbol('SceneCache', AbstractSceneCache, ifNotFound=True)

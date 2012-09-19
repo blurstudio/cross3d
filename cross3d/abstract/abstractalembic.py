@@ -9,35 +9,51 @@
 #
 
 from blur3d import abstractmethod
+from blur3d import api
+
 
 class AbstractAlembic:
-	
+
 	@abstractmethod
-	def _nativeImportFile( self, file ):
-		"""
-			\remarks	imports alembic file
-			\param		
-			\return		<bool> success of import
-		"""
-		return None		
+	def _nativeImportFile(self, filepath):
+		"""Imports alembic file.
 		
+		:return: success of import
+		:rtype: bool
+
+		"""
+		return None
+
 	@abstractmethod
-	def _nativeExportFile( self, writeJobs ):
-		"""
-			\remarks	export alembic files contained in writeJobs object
-			\param		
-			\return		<bool> success of export
-		"""
-		return None		
-	
-	def importFile( self ):
-		# not yet implemented
-		pass
+	def _nativeExportFile(self, writeJobs):
+		"""Export alembic files contained in writeJobs object
 		
-	def exportFile( self, writeJobs ):
-		success = self._nativeExportFile( writeJobs )
+		:return: success of export
+		:rtype: bool
+
+		"""
+		return None
+
+	def importFile(self, filepath):
+		"""Imports alembic file.
+		
+		:return: success of import
+		:rtype: bool
+
+		"""
+		success = self._nativeImportFile(filepath)
 		return success
 
+	def exportFile(self, writeJobs):
+		"""Export alembic files contained in writeJobs object
+		
+		:return: success of export
+		:rtype: bool
+
+		"""
+		success = self._nativeExportFile(writeJobs)
+		return success
+
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'Alembic', AbstractAlembic, ifNotFound = True )
+api.registerSymbol('Alembic', AbstractAlembic, ifNotFound=True)

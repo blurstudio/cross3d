@@ -8,40 +8,48 @@
 #	\date		09/08/10
 #
 
-from blur3d		import abstractmethod
+from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
+from blur3d import api
 
-class AbstractSceneRenderer( SceneWrapper ):
+
+class AbstractSceneRenderer(SceneWrapper):
+	"""
+	The SceneRenderer class provides an interface to editing 
+	renderers in a Scene environment for any DCC application
+	"""
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def edit( self ):
+	def edit(self):
 		"""
-			\remarks	allow the user to edit the renderer
-			\return		<bool> success
+		Allow the user to edit the renderer
+
 		"""
 		return False
-	
-	@abstractmethod	
-	def rendererType( self ):
+
+	@abstractmethod
+	def rendererType(self):
 		"""
-			\remarks	return the renderer type for this instance
-			\sa			setRendererType
-			\return		<blur3d.constants.RendererType>
+		Return the renderer type for this instance
+		
+		:return: :data:`blur3d.constants.RendererType`
+		
 		"""
 		return 0
-	
+
 	@abstractmethod
-	def setRendererType( self, rendererType ):
+	def setRendererType(self, rendererType):
 		"""
-			\remarks	set the renderer type for this instance to the inputed type
-			\sa			rendererType
-			\param		rendererType	<blur3d.constants.RendererType>
-			\return		<bool> success
+		Set the renderer type for this instance to the inputed type
+		
+		:param rendererType: :data:`blur3d.constants.RendererType`
+		:return: bool
+
 		"""
 		return False
-		
+
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneRenderer', AbstractSceneRenderer, ifNotFound = True )
+api.registerSymbol('SceneRenderer', AbstractSceneRenderer, ifNotFound=True)

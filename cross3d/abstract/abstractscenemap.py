@@ -8,32 +8,33 @@
 #	\date		09/08/10
 #
 
-from blur3d		import abstractmethod
+from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
+from blur3d import api
 
-class AbstractSceneMap( SceneWrapper ):
+
+class AbstractSceneMap(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def edit( self ):
-		"""
-			\remarks	allow the user to edit the map
-			\return		<bool> success
+	def edit(self):
+		"""Allow the user to edit the map
+
 		"""
 		return False
-		
+
 	@staticmethod
-	def fromXml( scene, xml ):
-		"""
-			\remarks	create a new map from the inputed xml data
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		
-		"""
-		if ( xml ):
-			return scene.findMap( name = xml.attribute( 'name' ), uniqueId = int(xml.attribute( 'id', 0 )) )
-		return None
+	def fromXml(scene, xml):
+		"""Create a new map from the inputed xml data
 		
+		:param xml: :class:`blurdev.XML.XMLElement`
+
+		"""
+		if (xml):
+			return scene.findMap(name=xml.attribute('name'), uniqueId=int(xml.attribute('id', 0)))
+		return None
+
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneMap', AbstractSceneMap, ifNotFound = True )
+api.registerSymbol('SceneMap', AbstractSceneMap, ifNotFound=True)

@@ -8,164 +8,166 @@
 #	\date		04/11/10
 #
 
-from blur3d	import abstractmethod
 from PyQt4.QtCore import QObject
 
-#------------------------------------------------------------------------------------------------------------------------
+from blur3d	import abstractmethod
+from blur3d import api
 
-class AbstractSceneViewport( QObject ):
-	def __init__( self, scene, viewportID=0 ):
-		super( AbstractSceneViewport, self ).__init__()
-		
+
+class AbstractSceneViewport(QObject):
+	"""
+	The SceneRenderPass class will define all the operations for 
+	viewport interaction  
+	"""
+
+	def __init__(self, scene, viewportID=0):
+		super(AbstractSceneViewport, self).__init__()
+
 		self._scene = scene
 		self.name = ''
 		self._slateIsActive = False
 		self._slateText = ''
-		
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def _nativeCamera( self ):
+	def _nativeCamera(self):
 		"""
 			\remarks	return the viewport's native camera. added by douglas
 			\return		<variant> camera | None
 		"""
 		return None
 
-	def _setNativeCamera( self, nativeCamera ):
+	def _setNativeCamera(self, nativeCamera):
 		"""
 			\remarks	sets the native camera of the current viewport. added by douglas
 			\param		nativeCamera <variant> | <str>
 			\return		<bool> success
 		"""
 		return False
-	
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
 	@abstractmethod
-	def cameraName( self ):
-		"""
-			\remarks	return the viewport's camera name
-			\return		<variant> camera | None
+	def cameraName(self):
+		"""Return the viewport's camera name
+
 		"""
 		return ''
+
+	@abstractmethod
+	def generatePlayblast(self, fileName, frameRange=None, resolution=None, **options):
+		"""Generates a playblast in the specific path
 		
-	@abstractmethod
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, **options ):
-		"""
-			\remarks	generates a playblast in the specific path
-			\param		filename <String>
-			\param		frameRange <List>
-			\param		resolution <QSize>
-			\return		<bool> success
+		:param filename: path to file
+		:param frameRange: two-item list of frames ie. (start, end)
+		:param resolution: a :class:`PyQt4.QtCore.QSize` object
+
 		"""
 		return False
 
 	@abstractmethod
-	def setHeadlightIsActive( self, active ):
-		"""
-			\remarks	sets the headlight of the camera of the viewport
-			\param		active <bool>
-			\return		<bool> success
+	def setHeadlightIsActive(self, active):
+		"""Sets the headlight of the camera of the viewport
+
 		"""
 		return False
 
 	@abstractmethod
-	def headlightIsActive( self ):
-		"""
-			\remarks	returns if the status of the headlight
-			\return		<bool> active
+	def headlightIsActive(self):
+		"""Returns if the status of the headlight
+
 		"""
 		return False
 
 	@abstractmethod
-	def size( self ):
-		"""
-			\remarks	returns the viewport size
-			\return		( <int>, <int> ) size
-		"""
-		return ( 0, 0 )
-
-	@abstractmethod
-	def safeFrameSize( self ):
-		"""
-			\remarks	returns the size of the safe frame. added by douglas
-			\return		( <int>, <int> ) size
-		"""
-		return ( 0, 0 )
-
-	@abstractmethod
-	def safeFrameIsActive( self ):
-		"""
-			\remarks	returns the active of the safe frame. added by douglas
-			\return		<bool> active
-		"""
-		return False
-
-	@abstractmethod
-	def setSafeFrameIsActive( self, active ):
-		"""
-			\remarks	sets the active of the safe frame. added by douglas
-			\param		<bool> active
-			\return		<bool> success
-		"""
-		return False
+	def size(self):
+		"""Returns the viewport size
 		
-	@abstractmethod
-	def refresh( self ):
-		return False
+		:returns: two-item tuple of ints. ie. (width, height)
 
-	@abstractmethod
-	def slateIsActive( self ):
-		return False
-
-	@abstractmethod
-	def setSlateIsActive( self, active ):
-		return False
-
-	@abstractmethod
-	def setSlateText( self, text='' ):
-		return False
-
-	@abstractmethod
-	def slateDraw( self ):
-		return False
-
-	@abstractmethod
-	def storeState( self ):
-		return False
-
-	@abstractmethod	
-	def restoreState( self ):
-		return False
-		
-	def camera( self ):
 		"""
-			\remarks	return the viewport's camera
-			\return		<blur3d.api.SceneCamera>
+		return (0, 0)
+
+	@abstractmethod
+	def safeFrameSize(self):
+		"""Returns the size of the safe frame. added by douglas
+		
+		:returns: two-item tuple of ints. ie. (width, height)
+		
+		"""
+		return (0, 0)
+
+	@abstractmethod
+	def safeFrameIsActive(self):
+		"""Returns the active of the safe frame. added by douglas
+
+		"""
+		return False
+
+	@abstractmethod
+	def setSafeFrameIsActive(self, active):
+		"""Sets the active of the safe frame. added by douglas
+
+		"""
+		return False
+
+	@abstractmethod
+	def refresh(self):
+		return False
+
+	@abstractmethod
+	def slateIsActive(self):
+		return False
+
+	@abstractmethod
+	def setSlateIsActive(self, active):
+		return False
+
+	@abstractmethod
+	def setSlateText(self, text=''):
+		return False
+
+	@abstractmethod
+	def slateDraw(self):
+		return False
+
+	@abstractmethod
+	def storeState(self):
+		return False
+
+	@abstractmethod
+	def restoreState(self):
+		return False
+
+	def camera(self):
+		"""Return the viewport's camera
+		
+		:return: :class:`blur3d.api.SceneCamera`
+		
 		"""
 		from blur3d.api import SceneCamera
 		camera = self._nativeCamera()
 		if camera:
-			return SceneCamera( self, camera )
+			return SceneCamera(self, camera)
 		from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 		return None
 
-	def setCamera( self, camera ):
+	def setCamera(self, camera):
+		"""Sets the camera of the current viewport
+		
+		:param camera: :class:`blur3d.api.SceneCamera` or None
+
 		"""
-			\remarks	sets the camera of the current viewport
-			\param		camera <blur3d.api.SceneCamera> | <str>
-			\return		<bool> success
-		"""	
-		if type( camera ) == str or type( camera ) == unicode:
+		if type(camera) == str or type(camera) == unicode:
 			cam = camera
 		else:
 			cam = camera.nativePointer()
-		return self._setNativeCamera( cam )
+		return self._setNativeCamera(cam)
+
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneViewport', AbstractSceneViewport )
+api.registerSymbol('SceneViewport', AbstractSceneViewport)

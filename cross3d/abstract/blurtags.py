@@ -10,73 +10,80 @@
 #
 
 from blur3d.naming import Name
+from blur3d import api
+
 
 class BlurTags(dict):
+	"""
+	The blur3d.api.BlurTags retreives the BlurTags property using UserProps 
+	it then converts the string into a python dictionary
+	"""
+
 	def __init__(self, object):
 		dict.__init__(self)
 		self._object = object
-	
+
 	def __contains__(self, key):
 		return key in self.lookupProps()
-	
+
 	def __delitem__(self, key):
 		props = self.lookupProps()
 		del props[key]
 		self._object.userProps()['BlurTags'] = str(props)
-	
+
 	def __getitem__(self, key):
 		return self.lookupProps().__getitem__(key)
-	
+
 	def __setitem__(self, key, value):
 		props = self.lookupProps()
 		props[key] = value
 		self._object.userProps()['BlurTags'] = str(props)
-	
+
 	def __str__(self):
 		return str(self.lookupProps())
-	
-#	def __repr__(self):
-#		return 'BlurTags(%s)' % self._nativePointer
-	
+
 	def clear(self):
 		self.lookupProps().clear()
-	
+
 	def copy(self):
 		return self.lookupProps().copy()
-	
+
 	def keys(self):
 		return self.lookupProps().keys()
-	
+
 	def items(self):
 		return self.lookupProps().items()
-	
+
 	def iteritems(self):
 		return self.lookupProps().iteritems()
-	
+
 	def iterkeys(self):
 		return self.lookupProps().iterkeys()
-	
+
 	def itervalues(self):
 		return self.lookupProps().itervalues()
-	
+
 	def has_key(self, key):
 		return self.lookupProps().has_key(key)
-	
-	def get(self, key, default = None):
+
+	def get(self, key, default=None):
 		return self.lookupProps().get(key, default)
-	
+
 	def lookupProps(self):
 		"""
-			\remarks	this is the workhorse method for the class, it is responsible for providing the dictionary of key value pares used for 
-						most of the class. If the tag exists it returns an evaluated version of its contents
-			\return		<dict>
+		This is the workhorse method for the class, it is responsible for 
+		providing the dictionary of key value pares used for most of the 
+		class. If the tag exists it returns an evaluated version of its 
+		contents
+		
+		:return: dict
 		"""
 		props = self._object.userProps()
 		if 'BlurTags' in props:
 			return props['BlurTags']
 		return {}
-	
-	def pop(self, key, default = None):
+
+	def pop(self, key, default=None):
 		if not key in self.lookupProps():
 			if default:
 				return default
@@ -84,7 +91,7 @@ class BlurTags(dict):
 		out = self[key]
 		del self[key]
 		return out
-	
+
 	def popitem(self):
 		data = self.lookupProps()
 		if not data:
@@ -92,25 +99,25 @@ class BlurTags(dict):
 		item = data.popitem()
 		del self[item[0]]
 		return item
-	
-	def setdefault(self, key, default = None):
+
+	def setdefault(self, key, default=None):
 		return self.lookupProps().setdefault(key, default)
-		
-	
-	def toString(self, prefix = '', seperator = ':', postfix = ' '):
+
+
+	def toString(self, prefix='', seperator=':', postfix=' '):
 		out = ''
 		for key, value in self.lookupProps().items():
 			line = prefix + key + seperator + unicode(value) + postfix
 			out += line
 		return out
-		
-	
+
+
 	def update(self, *args, **kwargs):
 		for k, v in dict(*args, **kwargs).iteritems():
 			self[k] = v
-	
-	def updateTagsFromName( self, format = None ):
-		name = Name( self._object.displayName(), format )
+
+	def updateTagsFromName(self, format=None):
+		name = Name(self._object.displayName(), format)
 		for element in name.elements():
 			key = element.objectName()
 			text = element.text()
@@ -119,12 +126,11 @@ class BlurTags(dict):
 					del self[ key ]
 			else:
 				self.update({key:text})
-		
-	
+
+
 	def values(self):
 		return self.lookupProps().values()
-		
+
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'BlurTags', BlurTags, ifNotFound = True )
+api.registerSymbol('BlurTags', BlurTags, ifNotFound=True)

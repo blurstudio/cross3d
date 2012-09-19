@@ -9,17 +9,20 @@
 #
 
 import os
+from blur3d import api
 
-class AbstractWriteJobs( list ):
-	def add( self, job ):
-		self.append( job )
-		
-	def filesExist( self ):
+
+class AbstractWriteJobs(list):
+
+	def add(self, job):
+		self.append(job)
+
+	def filesExist(self):
 		for job in self:
-			if not os.path.exists( job.fileName() ):
+			if not os.path.exists(job.fileName()):
 				return False
 		return True
 
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'WriteJobs', AbstractWriteJobs, ifNotFound = True )
+api.registerSymbol('WriteJobs', AbstractWriteJobs, ifNotFound=True)

@@ -10,41 +10,43 @@
 #	\date		09/08/10
 #
 
-from blur3d						import abstractmethod
-from abstractsceneobjectgroup 	import AbstractSceneObjectGroup
+from blur3d import abstractmethod
+from abstractsceneobjectgroup import AbstractSceneObjectGroup
+from blur3d import api
 
-class AbstractSceneLayer( AbstractSceneObjectGroup ):
-	def __init__( self, scene, nativeLayer ):
-		AbstractSceneObjectGroup.__init__( self, scene, nativeLayer )
-		
+
+class AbstractSceneLayer(AbstractSceneObjectGroup):
+
+	def __init__(self, scene, nativeLayer):
+		AbstractSceneObjectGroup.__init__(self, scene, nativeLayer)
+
 		# define custom properties
-		self._altMtlIndex		= -1
-		self._altPropIndex		= -1
-	
+		self._altMtlIndex		 = -1
+		self._altPropIndex		 = -1
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def _nativeAltMaterials( self ):
+	def _nativeAltMaterials(self):
 		"""
 			\remarks	return a list of the alternate materials associated with this layer
-			\sa			altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials
-						setCurrentAltMaterialIndex, _setNativeAltMaterials, _setNativeAltMaterialAt
+
 			\return		<list> [ <variant> nativeMaterial, .. ]
 		"""
 		return []
-	
+
 	@abstractmethod
-	def _nativeLayerGroup( self ):
+	def _nativeLayerGroup(self):
 		"""
 			\remarks	return the layer group that this layer belongs to
-			\sa			layerGroup, setLayerGroup, _setNativeLayerGroup
+
 			\return		<variant> nativeLayerGroup || None
 		"""
 		return None
-	
+
 	@abstractmethod
-	def _setNativeAltMaterialAt( self, index, nativeMaterial ):
+	def _setNativeAltMaterialAt(self, index, nativeMaterial):
 		"""
 			\remarks	set the material in the alternate materials list at the inputed index to the given material
 			\param		index			<index>
@@ -52,689 +54,676 @@ class AbstractSceneLayer( AbstractSceneObjectGroup ):
 			\return		<bool> success
 		"""
 		return False
-	
+
 	@abstractmethod
-	def _setNativeAltMaterials( self, nativeMaterials ):
+	def _setNativeAltMaterials(self, nativeMaterials):
 		"""
 			\remarks	set the alternate material list for this layer
 			\param		nativeMaterials	<list> [ <variant> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
 		return False
-	
+
 	@abstractmethod
-	def _setNativeLayerGroup( self, nativeLayerGroup ):
+	def _setNativeLayerGroup(self, nativeLayerGroup):
 		"""
 			\remarks	set the layer group that this layer belongs to
-			\sa			layerGroup, setLayerGroup, _nativeLayerGroup
+
 			\param		<variant> nativeLayerGroup || None
 			\return		<bool> success
 		"""
 		return False
-	
+
 	@abstractmethod
-	def _setNativeWireColor( self, nativeColor ):
+	def _setNativeWireColor(self, nativeColor):
 		"""
 			\remarks	set the wirecolor for this layer instance
-			\sa			setWireColor
+
 			\param		nativeColor		<variant>
 			\return		<bool> success
 		"""
 		return False
-	
+
 	@abstractmethod
-	def _nativeWireColor( self ):
+	def _nativeWireColor(self):
 		"""
 			\remarks	return the wirecolor for this layer instance
-			\sa			nativeColor
+
 			\return		<variant> nativeColor || None
 		"""
 		return None
-	
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	def addAltMaterial( self, material ):
+	def addAltMaterial(self, material):
 		"""
-			\remarks	add the inputed material to the list of possible alternate materials for this layer
-			\sa			altMaterials, setAltMaterials
-			\param		material	<blur3d.api.SceneMaterial>
-			\return		<bool> success
+		Add the inputed material to the list of possible alternate 
+		materials for this layer
+		
+		:param material: :class:`blur3d.api.SceneMaterial`
+
 		"""
 		altMtls = self.altMaterials()
-		altMtls.append( material )
-		return self.setAltMaterials( altMtls )
-	
-	def addAltPropSet( self, propSet ):
+		altMtls.append(material)
+		return self.setAltMaterials(altMtls)
+
+	def addAltPropSet(self, propSet):
 		"""
-			\remarks	add the property set to the list of possible alternate property sets for this layer
-			\sa			altPropSets, setAltPropSets
-			\param		propSet		<blur3d.api.ScenePropSet>
-			\return		<bool> success
+		Add the property set to the list of possible alternate property 
+		sets for this layer
+		
+		:param propSet: :class:`blur3d.api.ScenePropSet`
+
 		"""
 		propSets = self.altPropSets()
-		propSets.append( propSet )
-		return self.setAltPropSets( propSets )
-	
+		propSets.append(propSet)
+		return self.setAltPropSets(propSets)
+
 	@abstractmethod
-	def advancedAltMaterialStateAt( self, index ):
+	def advancedAltMaterialStateAt(self, index):
 		"""
-			\remarks	return a mapping for the advanced alternate material status of a given alternate material
-						slot
-			\param		index	<int>
-			\return		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+		Return a mapping for the advanced alternate material status of a 
+		given alternate material slot
+		
+		:param index: int
+		:return: A dictionary with the BaseMaterialID as keys with values of
+		         tuples of (SceneMaterial, ignored)
+		         
+		         {int baseMaterialId: (:class:`blur3d.api.SceneMaterial` override, bool ignored), .. }
+
 		"""
 		return {}
-		
-	def altMaterialAt( self, index ):
-		"""
-			\remarks	retrieve the alternate material at the inputed index
-			\sa			altMaterialCount, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\param		index	<int>
-			\return		<blur3d.api.SceneMaterial> || None
+
+	def altMaterialAt(self, index):
+		"""Retrieve the alternate material at the inputed index
+
+		:param index: int
+		:return: :class:`blur3d.api.SceneMaterial` or None
+
 		"""
 		mtls = self._nativeAltMaterials()
-		if ( 0 <= index and index < len(mtls) ):
+		if (0 <= index and index < len(mtls)):
 			mtl = mtls[index]
-			if ( mtl ):
+			if (mtl):
 				from blur3d.api import SceneMaterial
-				return SceneMaterial( self._scene, mtl )
+				return SceneMaterial(self._scene, mtl)
 			else:
 				return None
 		return None
-	
-	def altMaterialCount( self ):
+
+	def altMaterialCount(self):
 		"""
 			\remarks	return the number of alternate materials that this layer is associated with
-			\sa			altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
+
 			\return		<int> count
 		"""
-		return len( self._nativeAltMaterials() )
-	
-	def altMaterials( self ):
+		return len(self._nativeAltMaterials())
+
+	def altMaterials(self):
 		"""
 			\remarks	return a list of the alternate materials held by this layer
-			\sa			altMaterialAt, altMaterialCount, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
+
 			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
 		"""
 		from blur3d.api import SceneMaterial
 		output = []
 		for mtl in self._nativeAltMaterials():
-			if ( mtl ):
-				output.append( SceneMaterial( self._scene, mtl ) )
+			if (mtl):
+				output.append(SceneMaterial(self._scene, mtl))
 			else:
-				output.append( None )
+				output.append(None)
 		return output
-	
+
 	@abstractmethod
-	def altMaterialFlags( self ):
-		"""
-			\remarks	return a list of material duplication flags for this layer
-			\return		<list> [ <blur3d.constants.MaterialDuplicateOptions>, .. ]
+	def altMaterialFlags(self):
+		"""Return a list of material duplication flags for this layer
+		
+		:return: a list of :data:`blur3d.constants.MaterialDuplicateOptions`'s
+			
 		"""
 		return []
-	
-	def altMaterialFlagsAt( self, index ):
-		"""
-			\remarks	return the material flags at the inputed index
-			\param		index	<int>
-			\return		<blur3d.constants.MaterialDuplicateOptions>
+
+	def altMaterialFlagsAt(self, index):
+		"""Return the material flags at the inputed index
+		
+		:return: :data:`blur3d.constants.MaterialDuplicateOptions`
+
 		"""
 		flags = self.altMaterialFlags()
-		if ( 0 <= index and index < len(flags) ):
+		if (0 <= index and index < len(flags)):
 			return flags[index]
 		return 0
-	
-	def altPropSetAt( self, index ):
-		"""
-			\remarks	retrive the alternate SceneObjectPropSet at the inputed index
-			\sa			altPropSetCount, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<blur3d.api.SceneObjectPropSet> || None
+
+	def altPropSetAt(self, index):
+		"""Retrive the alternate SceneObjectPropSet at the inputed index
+
+		:return: :class:`blur3d.api.SceneObjectPropSet` or None
+			
 		"""
 		propsets = self.altPropSets()
-		if ( 0 <= index and index < len(propsets) ):
+		if (0 <= index and index < len(propsets)):
 			return propsets[index]
 		return None
-	
-	def altPropSetCount( self ):
+
+	def altPropSetCount(self):
+		"""Retrieve the number of alternate SceneObjectPropSet's for this layer
+
 		"""
-			\remarks	retrive the number of alternate SceneObjectPropSet's for this layer
-			\sa			altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<int> count
-		"""
-		return len( self.altPropSets() )
-	
+		return len(self.altPropSets())
+
 	@abstractmethod
-	def altPropSets( self ):
-		"""
-			\remarks	retrive the alternate SceneObjectPropSet's for this layer
-			\sa			altPropSetCount, altPropAt, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<list> [ <blur3d.api.SceneObjectPropSet>, .. ]
+	def altPropSets(self):
+		"""Retrive the alternate SceneObjectPropSet's for this layer
+
+		:return: a list of :class:`blur3d.api.SceneObjectPropSet`'s
+
 		"""
 		return []
-	
-	def defineAltMaterialAt( self, index, material ):
+
+	def defineAltMaterialAt(self, index, material):
 		"""
-			\remarks	defines a new material for the inputed index, provided the material at that index is not already defined
-			\sa			altMaterialAt, setAltMaterialAt
-			\param		index		<int>
-			\param		material	<blur3d.api.SceneMaterial>
-			\return		<bool> success
+		Defines a new material for the inputed index, provided the 
+		material at that index is not already defined
+
+		:param index: int
+		:param material: :class:`blur3d.api.SceneMaterial`
+		:rtype: bool
+		
 		"""
 		existing = self.altMaterialAt(index)
-		if ( not existing ):
-			return self.setAltMaterialAt( index, material )
+		if (not existing):
+			return self.setAltMaterialAt(index, material)
 		return False
-	
-	def defineAltPropSetAt( self, index, propSet ):
+
+	def defineAltPropSetAt(self, index, propSet):
 		"""
-			\remarks	defines a new property set for the inputed index, provided the property set at that index is not already defined
-			\sa			altPropSetAt, setAltPropSetAt
-			\param		index	<int>
-			\param		propSet	<blur3d.api.ScenePropSet>
-			\return		<bool> success
+		Defines a new property set for the inputed index, provided the 
+		property set at that index is not already defined
+		
+		:param index: int
+		:param propSet: :class:`blur3d.api.ScenePropSet`
+		:rtype: bool
+		
 		"""
 		existing = self.altPropSetAt(index)
-		if ( not (existing and existing.isActive()) ):
-			return self.setAltPropSetAt( index, propSet )
+		if (not (existing and existing.isActive())):
+			return self.setAltPropSetAt(index, propSet)
 		return False
-	
-	def currentAltMaterialIndex( self ):
-		"""
-			\remarks	retrive the index of the currently applied alternate material for this layer
-			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterial, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<int> index
+
+	def currentAltMaterialIndex(self):
+		"""Retrieve the index of the currently applied alternate material 
+		for this layer
+
+		:rtype: int
+		
 		"""
 		return self._altMtlIndex
-	
-	def currentAltMaterial( self ):
+
+	def currentAltMaterial(self):
+		"""Retrieve the current alt material
+		
+		:rtype: :class:`blur3d.api.SceneMaterial`
+
 		"""
-			\remarks	retrive the index of the currently applied alternate material for this layer
-			\sa			altMaterialAt, altMaterialCount, altMaterials, currentAltMaterialIndex, setAltMaterialAt, setAltMaterials, 
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<int> index
-		"""
-		return self.altMaterialAt( self._altMtlIndex )
-	
-	def currentAltPropSetIndex( self ):
-		"""
-			\remarks	retrive the alternate object property set at the inputed index
-			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, setAltPropSetAt, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<int> index
+		return self.altMaterialAt(self._altMtlIndex)
+
+	def currentAltPropSetIndex(self):
+		"""Retrieve the alternate object property set index
+
+		:rtype: int
+		
 		"""
 		return self._altPropIndex
+
+	def currentAltPropSet(self):
+		"""Retrieve the alternate object property set at the inputed index
 		
-	def currentAltPropSet( self ):
+		:rtype: :class:`blur3d.api.ScenePropSet`
+
 		"""
-			\remarks	retrive the alternate object property set at the inputed index
-			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<int> index
+		return self.altPropSetAt(self._altPropIndex)
+
+	def hasAltMaterialFlagAt(self, index, flag):
 		"""
-		return self.altPropSetAt( self._altPropIndex )
-	
-	def hasAltMaterialFlagAt( self, index, flag ):
-		"""
-			\remarks	return whether or not a given material duplication flag is set for the inputed alt material index
-			\param		index	<int>
-			\param		flag	<blur3d.constants.MaterialDuplicateOptions>
-			\return		<bool> found
+		Return whether or not a given material duplication flag is set for 
+		the inputed alt material index
+		
+		:param index: int
+		:param flag: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:return: found
+		:rtype: bool
+
 		"""
 		flags = self.altMaterialFlags()
-		if ( 0 <= index and index < len( flags ) ):
+		if (0 <= index and index < len(flags)):
 			return (flags[index] & flag) != 0
 		return False
-	
+
 	@abstractmethod
-	def hasAdvancedAltMaterialStateAt( self, index ):
+	def hasAdvancedAltMaterialStateAt(self, index):
 		"""
-			\remarks	return whether or not an advanced state for an alternate material has been defined for the inputed
-						alternate material index
-			\param		index	<int>
-			\return		<bool> found
+		Return whether or not an advanced state for an alternate material 
+		has been defined for the inputed
+
 		"""
 		return False
-	
-	def indexOfAltMaterial( self, material ):
-		"""
-			\remarks	return the index of the inputed material for the current layer
-			\param		material	<blur3d.api.SceneMaterial>
-			\return		<int> index (-1 if not found)
+
+	def indexOfAltMaterial(self, material):
+		"""Return the index of the inputed material for the current layer
+		
+		:param: :class:`blur3d.api.SceneMaterial`
+		:return: index of material, or -1 if not found
+
 		"""
 		mtls = self.altMaterials()
 		try:
 			return mtls.index(material)
 		except:
 			return -1
-	
-	def indexOfAltPropSet( self, propSet ):
-		"""
-			\remarks	return the index of the inputed property set for the current layer
-			\param		propSet		<blur3d.api.ScenePropSet>
-			\return		<int> index (-1 if not found)
+
+	def indexOfAltPropSet(self, propSet):
+		"""Return the index of the inputed property set for the current layer
+		
+		:param propSet: :class:`blur3d.api.ScenePropSet`
+		:return: index of material, or -1 if not found
+		
 		"""
 		propSets = self.altPropSets()
 		try:
 			return propSets.index(propSet)
 		except:
 			return -1
-	
+
 	@abstractmethod
-	def isActive( self ):
-		"""
-			\remarks	return whether or not this layer is currently active in the scene
-			\sa			setActive
-			\return		<bool> active
+	def isActive(self):
+		"""Return whether or not this layer is currently active in the scene
+		
 		"""
 		return False
-	
+
 	@abstractmethod
-	def isWorldLayer( self ):
-		"""
-			\remarks	return whether or not this layer is the root world layer of the scene
-			\return		<bool> is world
+	def isWorldLayer(self):
+		"""Return whether or not this layer is the root world layer of the 
+		scene
+
 		"""
 		return False
-	
-	def isolate( self ):
+
+	def isolate(self):
 		"""
-			\remarks	reimplements the AbstractSceneObjectGroup.isolate method to isolate just this layer (hide all other layers)
-			\return		<bool> success
+		Reimplements the :meth:`blur3d.api.SceneObjectGroup.isolate` method 
+		to isolate just this layer (hide all other layers)
+
 		"""
 		scene = self._scene
-		
+
 		for layer in scene.layers():
-			if ( not layer == self ):
+			if (not layer == self):
 				layer.hide()
 			else:
 				layer.unhide()
-				
+
 		scene.emitLayerStateChanged()
 		return True
-	
-	def groupName( self ):
+
+	def groupName(self):
 		"""
-			\remarks	implements the AbstractSceneObjectGroup.groupName method to retrieve the group name for this object group instance
-			\return		<str> name
+		Implements the :meth:`blur3d.api.SceneObjectGroup.groupName`
+		method to retrieve the group name for this object group instance
+
 		"""
 		layerGroup = self.layerGroup()
-		if ( layerGroup ):
+		if (layerGroup):
 			return layerGroup.groupName()
 		return ''
-	
-	def layerGroup( self ):
-		"""
-			\remarks	return the layer group that this layer belongs to
-			\sa			_nativeLayerGroup
-			\return		<blur3d.api.SceneLayerGroup> || None
+
+	def layerGroup(self):
+		"""Return the layer group that this layer belongs to
+		
+		:return: :class:`blur3d.api.SceneLayerGroup` or None
+
 		"""
 		nativeGroup = self._nativeLayerGroup()
-		if ( nativeGroup ):
+		if (nativeGroup):
 			from blur3d.api import SceneLayerGroup
-			return SceneLayerGroup( self._scene, nativeGroup )
+			return SceneLayerGroup(self._scene, nativeGroup)
 		return None
-	
+
 	@abstractmethod
-	def layerGroupOrder( self ):
-		"""
-			\remarks	return the sort order for this layer within its layer group
-			\sa			setLayerGroupOrder
-			\return		<int> index
+	def layerGroupOrder(self):
+		"""Return the sort order for this layer within its layer group
+
 		"""
 		return -1
-	
-	def recordLayerState( self, xml ):
-		"""
-			\remarks	records the layer's current state to xml
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		<bool> success
+
+	def recordLayerState(self, xml):
+		"""Records the layer's current state to xml
+		
+		:param xml: :class:`blurdev.XML.XMLElement`
+
 		"""
 		# don't bother recording hidden layers
-		if ( not self.isVisible() ):
+		if (not self.isVisible()):
 			return False
-		
+
 		# record the layer state
-		node = xml.addNode( 'layer' )
-		node.setAttribute( 'name', 		self.name() )
-		node.setAttribute( 'id', 		self.uniqueId() )
-		
+		node = xml.addNode('layer')
+		node.setAttribute('name', 		self.name())
+		node.setAttribute('id', 		self.uniqueId())
+
 		# record the propSetOverride
 		propSet = self.propSetOverride()
-		if ( propSet ):
-			propSet.recordXml( node.addNode( 'propSetOverride' ) )
-		
+		if (propSet):
+			propSet.recordXml(node.addNode('propSetOverride'))
+
 		# record the material override
 		material = self.materialOverride()
-		if ( material ):
-			material.recordXml( node.addNode( 'materialOverride' ) )
-		
+		if (material):
+			material.recordXml(node.addNode('materialOverride'))
+
 		# record the environment override for the world layer
-		if ( self.isWorldLayer() ):
+		if (self.isWorldLayer()):
 			override = self._scene.environmentMapOverride()
-			if ( override ):
-				override.recordXml( node.addNode( 'environmentMapOverride' ) )
-		
+			if (override):
+				override.recordXml(node.addNode('environmentMapOverride'))
+
 		return True
-	
-	def restoreLayerState( self, xml ):
-		"""
-			\remarks	restore the layer's state from the inputed xml
-			\param		xml		<blurdev.XML.XMLDocument>
-			\return		<bool> success
-		"""
-		if ( not xml ):
-			return False
+
+	def restoreLayerState(self, xml):
+		"""Restore the layer's state from the inputed xml
 		
+		:param xml: :class:`blurdev.XML.XMLDocument`
+
+		"""
+		if (not xml):
+			return False
+
 		# set visible
 		self.setVisible(True)
-		
+
 		# determine the alterante state for this layer
 		scene = self._scene
 		from blur3d.api import SceneMaterial, SceneMap, SceneObjectPropSet
-		self.setPropSetOverride( 	SceneObjectPropSet.fromXml( scene, xml.findChild( 'propSetOverride' ) ) )
-		self.setMaterialOverride( 	SceneMaterial.fromXml( 		scene, xml.findChild( 'materialOverride' ) ) )
-		
+		self.setPropSetOverride(SceneObjectPropSet.fromXml(scene, xml.findChild('propSetOverride')))
+		self.setMaterialOverride(SceneMaterial.fromXml(scene, xml.findChild('materialOverride')))
+
 		# restore environment override
-		if ( self.isWorldLayer() ):
-			scene.setEnvironmentMapOverride( SceneMap.fromXml( scene, xml.findChild( 'environmentMapOverride' ) ) )
-	
-	def removeAltMaterialAt( self, index ):
-		"""
-			\remarks	remove the material at the inputed index from the material list
-			\param		index	<int>
-			\return		<bool> success
+		if (self.isWorldLayer()):
+			scene.setEnvironmentMapOverride(SceneMap.fromXml(scene, xml.findChild('environmentMapOverride')))
+
+	def removeAltMaterialAt(self, index):
+		"""Remove the material at the inputed index from the material list
+
 		"""
 		altMtls = self.altMaterials()
-		if ( 0 <= index and index < len(altMtls) ):
+		if (0 <= index and index < len(altMtls)):
 			# reset the alternate materials for this layer
-			self.setAltMaterials( altMtls[:index] + altMtls[index+1:] )
-			
+			self.setAltMaterials(altMtls[:index] + altMtls[index + 1:])
+
 			# remove any advanced alternate material states at the given index
 			self.removeAdvancedAltMaterialStateAt(index)
 			return True
 		return False
-	
+
 	@abstractmethod
-	def removeAdvancedAltMaterialStateAt( self, index ):
+	def removeAdvancedAltMaterialStateAt(self, index):
 		"""
-			\remarks	remove the advanced alternate material state from the layer at the alternate material index
-			\param		index		<int>
-			\return		<bool> success
+		Remove the advanced alternate material state from the layer at 
+		the alternate material index
+
 		"""
 		return False
-	
-	def removeAltPropSetAt( self, index ):
+
+	def removeAltPropSetAt(self, index):
 		"""
-			\remarks	remove the propset at the inputed index from this layer's list of alternate property sets
-			\param		index	<int>
-			\return		<bool> success
+		Remove the propset at the inputed index from this layer's list of 
+		alternate property sets
+
 		"""
 		altPropSets = self.altPropSets()
-		if ( 0 <= index and index < len(altPropSets) ):
-			return self.setAltPropSets( altPropSets[:index] + altPropSets[index+1:] )
+		if (0 <= index and index < len(altPropSets)):
+			return self.setAltPropSets(altPropSets[:index] + altPropSets[index + 1:])
 		return False
-	
+
 	@abstractmethod
-	def setActive( self, state ):
-		"""
-			\remarks	mark this layer as the active scene layer
-			\sa			isActive
-			\param		state	<bool>
-			\return		<bool> success
+	def setActive(self, state):
+		"""Mark this layer as the active scene layer
+
 		"""
 		return False
-	
-	def setAltMaterialAt( self, index, material ):
+
+	def setAltMaterialAt(self, index, material):
 		"""
-			\remarks	sets the alternate material at the inputed index to the given material instance
-			\sa			altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterials
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<bool> success
+		Sets the alternate material at the inputed index to the given 
+		material instance
+
 		"""
 		nativePointer = None
-		if ( material ):
+		if (material):
 			nativePointer = material.nativePointer()
-			
-		return self._setNativeAltMaterialAt( index, nativePointer )
-	
-	def setAltMaterials( self, materials ):
-		"""
-			\remarks	sets the alternate material list for this layer
-			\sa			altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterialAt
-						setCurrentAltMaterialIndex, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<bool> success
+
+		return self._setNativeAltMaterialAt(index, nativePointer)
+
+	def setAltMaterials(self, materials):
+		"""Sets the alternate material list for this layer
 
 		"""
 		mtls = []
 		for mtl in materials:
-			if ( mtl ):
-				mtls.append( mtl.nativePointer() )
+			if (mtl):
+				mtls.append(mtl.nativePointer())
 			else:
-				mtls.append( None )
-				
-		return self._setNativeAltMaterials( mtls )
-	
-	def setAltMaterialFlagAt( self, index, flag, state = True ):
+				mtls.append(None)
+
+		return self._setNativeAltMaterials(mtls)
+
+	def setAltMaterialFlagAt(self, index, flag, state=True):
 		"""
-			\remarks	set whether or not a given material duplication flag is on for the inputed alt material index
-			\param		index	<int>
-			\param		flag	<blur3d.constants.MaterialDuplicateOptions>
-			\param		state	<bool> on
-			\return		<bool> success
+		Set whether or not a given material duplication flag is on for the 
+		inputed alt material index
+		
+		:param index: int
+		:param flat: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:param state: bool
+
 		"""
 		flags = self.altMaterialFlags()
-		if ( 0 <= index and index < len( flags ) ):
-			if ( state ):
+		if (0 <= index and index < len(flags)):
+			if (state):
 				flags[index] |= flag
 			else:
 				flags[index] ^= flag
-				
-			return self.setAltMaterialFlags( flags )
+
+			return self.setAltMaterialFlags(flags)
 		return False
-	
-	def setAltMaterialFlagsAt( self, index, flags ):
+
+	def setAltMaterialFlagsAt(self, index, flags):
 		"""
-			\remarks	set the alternate material flags at the inputed index for this instance
-			\param		index	<int>
-			\param		flags	<blur3d.constants.MaterialDuplicateOptions>
-			\return		<bool> success
+		Set the alternate material flags at the inputed index for this instance
+			
+		:param index: int
+		:param flags: :data:`blur3d.constants.MaterialDuplicateOptions`
+
 		"""
 		mflags = self.altMaterialFlags()
-		if ( 0 <= index and index < len( mflags ) ):
+		if (0 <= index and index < len(mflags)):
 			mflags[index] = flags
-			return self.setAltMaterialFlags( mflags )
+			return self.setAltMaterialFlags(mflags)
 		return False
-	
+
 	@abstractmethod
-	def setAltMaterialFlags( self, flags ):
-		"""
-			\remarks	set the alternate material flags for this instance
-			\param		flags	<list> [ <blur3d.constants.MaterialDuplicateOptions>
-			\return		<bool> success
+	def setAltMaterialFlags(self, flags):
+		"""Set the alternate material flags for this instance
+		
+		:param flags: list of 
+		              :data:`<blur3d.constants.MaterialDuplicateOptions`'s
+
 		"""
 		return False
-	
+
 	@abstractmethod
-	def setAltPropSetAt( self, index, propSet ):
-		"""
-			\remarks	set the alternate object property set at the inputed index
-			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSets,
-						setCurrentAltPropSetIndex
-			\return		<bool> success
+	def setAltPropSetAt(self, index, propSet):
+		"""Set the alternate object property set at the inputed index
+
 		"""
 		return False
-	
+
 	@abstractmethod
-	def setAltPropSets( self, propSets ):
-		"""
-			\remarks	set the alternate object property set list for this layer
-			\sa			altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, 
-						setCurrentAltPropSetIndex
-			\return		<bool> success
+	def setAltPropSets(self, propSets):
+		"""Set the alternate object property set list for this layer
+
 		"""
 		return False
-	
-	def setCurrentAltMaterialIndex( self, index ):
+
+	def setCurrentAltMaterialIndex(self, index):
 		"""
-			\remarks	set the current index for the alternate material, applying the alternate material when necessary
-			\sa			setMaterialOverride, altMaterialCount, altMaterialAt, altMaterials, currentAltMaterial, currentAtlMaterialIndex, setAltMaterialAt, setAltMaterialAt
-						setAltMaterials, _nativeAltMaterials, _setNativeAltMaterials, _setNativeAltMaterialAt
-			\return		<bool> changed
+		Set the current index for the alternate material, applying the 
+		alternate material when necessary
+
 		"""
 		# do not need to reprocess
-		if ( index == self._altMtlIndex ):
+		if (index == self._altMtlIndex):
 			return False
-		
+
 		mtls = self.altMaterials()
-		
+
 		# apply an override state
-		if ( 0 <= index and index < len(mtls) ):
+		if (0 <= index and index < len(mtls)):
 			self._altMtlIndex = index
-			return self.setMaterialOverride( mtls[index] )
-			
+			return self.setMaterialOverride(mtls[index])
+
 		# clear an override state
-		elif ( index == -1 ):
+		elif (index == -1):
 			self._altMtlIndex = index
 			return self.clearMaterialOverride()
-			
+
 		return False
-	
-	def setCurrentAltPropSetIndex( self, index ):
+
+	def setCurrentAltPropSetIndex(self, index):
 		"""
-			\remarks	set the current index for the alternate object property set, applyting the set to the objects on this layer when necessary
-			\sa			setPropSetOverride, altPropSetCount, altPropSetAt, altPropSets, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, 
-						setAltPropSets
-			\return		<bool> changed
+		Set the current index for the alternate object property set, 
+		applyting the set to the objects on this layer when necessary
+
 		"""
 		# do not need to reprocess
-		if ( index == self._altPropIndex ):
+		if (index == self._altPropIndex):
 			return False
-		
+
 		propsets = self.altPropSets()
-		
+
 		# apply an override state
-		if ( 0 <= index and index < len(propsets) and propsets[index].isActive() ):
-			if ( self.setPropSetOverride( propsets[index] ) ):
+		if (0 <= index and index < len(propsets) and propsets[index].isActive()):
+			if (self.setPropSetOverride(propsets[index])):
 				self._altPropIndex = index
 				return True
 			return False
-		
+
 		# clear the override state
-		elif ( index == -1 ):
-			if ( self.clearPropSetOverride() ):
+		elif (index == -1):
+			if (self.clearPropSetOverride()):
 				self._altPropIndex = index
 				return True
 			return False
-			
+
 		else:
 			return False
-	
-	def setGroupName( self, name ):
+
+	def setGroupName(self, name):
 		"""
-			\remarks	implements the AbstractSceneObjectGroup.groupName method to set the group name for this object group instance
-			\sa			groupName
-			\param		name	<str>
-			\return		<bool> success
+		Implements the AbstractSceneObjectGroup.groupName method to set the 
+		group name for this object group instance
+
 		"""
-		layerGroup = self._scene.findLayerGroup( name)
-		if ( layerGroup ):
-			return self.setLayerGroup( layerGroup )
+		layerGroup = self._scene.findLayerGroup(name)
+		if (layerGroup):
+			return self.setLayerGroup(layerGroup)
 		return False
-	
-	def setMaterialOverride( self, material, options = -1, advancedState = None ):
+
+	def setMaterialOverride(self, material, options= -1, advancedState=None):
 		"""
-			\remarks	overloads the AbstractSceneObjectGroup.setMaterialOverride method to make sure we get recorded alternate properties
-						before applying overrides
-			\param		material		<blur3d.gui.SceneMaterial>
-			\param		options			<blur3d.constants.MaterialOverrideOptions>
-			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
-			\return		<bool> success
+		Overloads the :meth:`blur3d.api.SceneObjectGroup.setMaterialOverride`
+		method to make sure we get recorded alternate properties before 
+		applying overrides
+		
+		:param material: :class:`blur3d.api.SceneMaterial`
+		:param options: :data:`blur3d.constants.MaterialOverrideOptions`
+		:param advancedState: <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+
 		"""
 		amtls = self.altMaterials()
-		
+
 		# make sure we have the advanced material state options
-		if ( material in amtls ):
-			index			= amtls.index(material)
-			options 		= self.altMaterialFlagsAt( index )
-			advancedState	= self.advancedAltMaterialStateAt( index )
+		if (material in amtls):
+			index			 = amtls.index(material)
+			options 		 = self.altMaterialFlagsAt(index)
+			advancedState	 = self.advancedAltMaterialStateAt(index)
+
+		return AbstractSceneObjectGroup.setMaterialOverride(self, material, options=options, advancedState=advancedState)
+
+	def setLayerGroup(self, layerGroup):
+		"""Set the layer group that this layer is associated with
 		
-		return AbstractSceneObjectGroup.setMaterialOverride( self, material, options = options, advancedState = advancedState )
-	
-	def setLayerGroup( self, layerGroup ):
-		"""
-			\remarks	set the layer group that this layer is associated with
-			\sa			layerGroup, _setNativeLayerGroup
-			\param		layerGroup	<blur3d.api.SceneLayerGroup> || None
-			\return		<bool> success
+		:param layerGroup: :class:`blur3d.api.SceneLayerGroup` or None
+
 		"""
 		nativeGroup = None
-		if ( layerGroup ):
+		if (layerGroup):
 			nativeGroup = layerGroup.nativePointer()
-		
-		return self._setNativeLayerGroup( nativeGroup )
-	
+
+		return self._setNativeLayerGroup(nativeGroup)
+
 	@abstractmethod
-	def setLayerGroupOrder( self, groupOrder ):
-		"""
-			\remarks	set the layer group sort order for this layer within its layer group
-			\sa			layerGroupOrder
-			\param		groupOrder		<int>
-			\return		<bool> changed
+	def setLayerGroupOrder(self, groupOrder):
+		"""Set the layer group sort order for this layer within its layer group
+
 		"""
 		return False
-		
+
 	@abstractmethod
-	def setAdvancedAltMaterialStateAt( self, index, altMaterialState ):
+	def setAdvancedAltMaterialStateAt(self, index, altMaterialState):
 		"""
-			\remarks	set a mapping for the advanced alternate material status of a given alternate material
-						slot
-			\param		index	<int>
-			\param		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
-			\return		<bool> success
+		Set a mapping for the advanced alternate material status of a given
+		alternate material slot
+		
+		:param index: int
+		:param altMaterialState: <dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+
 		"""
 		return False
-	
-	def setWireColor( self, color ):
+
+	def setWireColor(self, color):
+		"""Set the wire color for this layer
+		
+		:param color: :class:`PyQt4.QtGui.QColor`
+
 		"""
-			\remarks	set the wire color for this layer
-			\sa			wireColor, _setNativeWireColor
-			\param		color	<QColor>
-			\return		<bool> success
-		"""
-		return self._setNativeWireColor( self._scene._toNativeValue( color ) )
-	
-	def wireColor( self ):
-		"""
-			\remarks	return the wire color for this layer
-			\sa			setWireColor, _nativeWireColor
-			\return		<QColor>
+		return self._setNativeWireColor(self._scene._toNativeValue(color))
+
+	def wireColor(self):
+		"""Return the wire color for this layer
+		
+		:rtype: :class:`PyQt4.QtGui.QColor`
+		
 		"""
 		clr = self._nativeWireColor()
-		if ( clr ):
-			return self._scene._fromNativeValue( clr )
-			
+		if (clr):
+			return self._scene._fromNativeValue(clr)
+
 		from PyQt4.QtGui import QColor
 		return QColor()
-	
+
 	@staticmethod
-	def fromXml( scene, xml ):
-		"""
-			\remarks	create a new layer from the inputed xml data
-			\param		xml		<blurdev.XML.XMLElement>
-			\return		
-		"""
-		if ( xml ):
-			return scene.findLayer( name = xml.attribute( 'name' ), uniqueId = int(xml.attribute( 'id',0 )) )
-		return None
+	def fromXml(scene, xml):
+		"""Create a new layer from the inputed xml data
 		
+		:param xml: :class:`blurdev.XML.XMLElement`
+
+		"""
+		if (xml):
+			return scene.findLayer(name=xml.attribute('name'), uniqueId=int(xml.attribute('id', 0)))
+		return None
+
+
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneLayer', AbstractSceneLayer, ifNotFound = True )
+api.registerSymbol('SceneLayer', AbstractSceneLayer, ifNotFound=True)
