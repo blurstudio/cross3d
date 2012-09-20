@@ -93,6 +93,9 @@ class SoftimageApplication(AbstractApplication):
 		xsi.Refresh()
 		return True
 	
+	def log( self, message ):
+		xsi.LogMessage( message )
+		
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Application', SoftimageApplication)
