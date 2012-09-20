@@ -163,7 +163,10 @@ class AbstractApplication(QObject):
 		
 		"""
 		return ''
-
+		
+	@abstractmethod
+	def log( self, message ):
+		pass
 
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
