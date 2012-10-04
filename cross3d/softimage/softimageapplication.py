@@ -79,6 +79,7 @@ class SoftimageApplication(AbstractApplication):
 		"10.1.46.0" : "XSI2012",
 		"8.0.249.0" : "XSI2010",
 		"11.0.525.0" : "XSI2013",
+		"11.1.57.0" : "XSI2013_SP1"
 		'default' : "XSI2013"}
 		
 		if versionDic.has_key(version):
