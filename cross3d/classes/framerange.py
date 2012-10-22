@@ -12,7 +12,7 @@
 
 class FrameRange( list ):
 	
-	def __init__( self, args ):
+	def __init__( self, args=None ):
 		"""
 			\remarks	Initialize the class.
 		"""
