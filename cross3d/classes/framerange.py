@@ -16,12 +16,12 @@ class FrameRange( list ):
 		"""
 			\remarks	Initialize the class.
 		"""
-		if len( args ) > 1:
-			args = args[0:2]
-		elif args:
+		if not args:
+			args = [0,0]
+		elif len( args ) == 1:
 			args.append( args[0] )
 		else:
-			args = [0,0]
+			args = args[0:2]
 		try:
 			args = list( args )
 			args[0] = int( args[0] )
