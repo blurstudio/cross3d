@@ -1734,7 +1734,7 @@ class AbstractScene(QObject):
 			\remarks	saves the current file
 			\return		<bool> success
 		"""
-		return self.saveFileAs(self.currentFilename())
+		return self.saveFileAs(self.currentFileName())
 
 	def setEnvironmentMap(self, sceneMap):
 		"""
