@@ -1000,7 +1000,50 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
+		
+	@abstractmethod
+	def setRenderFrameRange(self, frameRange):
+		"""
+			\remarks	set the render frame range of the scene
+			\param		size	<blur3d.api.FrameRange>
+			\return		<bool> success
+		"""
+		return False
 
+	@abstractmethod
+	def setRenderPixelAspect(self, pixelAspect):
+		"""
+			\remarks	set the render pixel aspect of the scene
+			\param		pixelAspect	<int>
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod
+	def renderPixelAspect(self, ):
+		"""
+			\remarks	returns the render pixel aspect of the scene
+			\return		<int> pixelAspect
+		"""
+		return 1.0
+		
+	@abstractmethod
+	def setRenderMissingFramesOnly(self, renderMissingFramesOnly ):
+		"""
+			\remarks	sets if the renderer is rendering missing frames only.
+			\param		renderMissingFramesOnly	<bool>
+			\return		<bool> success
+		"""
+		return False
+	
+	@abstractmethod
+	def renderMissingFramesOnly(self):
+		"""
+			\remarks	gets if the renderer is rendering missing frames only.
+			\return		<bool> renderMissingFramesOnly
+		"""
+		return False
+		
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.

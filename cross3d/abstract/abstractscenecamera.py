@@ -141,6 +141,16 @@ class AbstractSceneCamera(SceneObject):
 		"""
 		return False
 
+	@abstractmethod
+	def generateRender( self, **options ):
+		"""
+			\remarks	renders an image sequence form that camera with the current render settings
+			\param 		path <String>
+			\param 		frameRange <FrameRange>
+			\param 		resolution <QtCore.QSize>
+			\return		<blur3d.api.constants.CameraType>
+		"""
+		return False
 
 # register the symbol
 api.registerSymbol('SceneCamera', AbstractSceneCamera, ifNotFound=True)

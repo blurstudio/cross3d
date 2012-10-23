@@ -11,6 +11,7 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
+import subprocess
 
 from framerange import FrameRange
 
@@ -70,9 +71,9 @@ class FileSequence( object ):
 	def baseName( self ):
 		return self.nameToken( 'baseName' )
 		
-	def uniqueName( self, rangePlaceHolder='' ):
+	def uniqueName( self, rangePlaceHolder=None ):
 		nameSplit = [ self.baseName(), self.extension() ]
-		if rangePlaceHolder:
+		if rangePlaceHolder != None:
 			nameSplit.insert( 1, rangePlaceHolder )
 		return '.'.join( nameSplit )
 
@@ -80,7 +81,7 @@ class FileSequence( object ):
 		if returnsAsString:
 			return self.nameToken( 'range' )
 		return FrameRange( [ self.start(), self.end() ] ) 
-	 
+
 	def start( self ):
 		return int( self.nameToken( 'start' ) )
 
@@ -100,11 +101,14 @@ class FileSequence( object ):
 		fileName = self.nameMask() % tokens
 		self._path = os.path.join( self.basePath(), fileName )
 		return True
-  
+	
 	def padding( self ):
 		return len( str( self.nameTokens()[ 'start' ] ) )
 		
 	def setPadding( self, padding ):
+		"""
+			/param <int> padding
+		"""
 		start = str( self.start() ).zfill( padding )
 		end = str( self.end() ).zfill( padding )
 		self.setName( start=start, end=end )
@@ -172,7 +176,6 @@ class FileSequence( object ):
 				os.remove( path )
 
 	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
-		print outputPath
 		if not outputPath:
 			outputPath = os.path.join(( self.basePath() ), self.baseName() + '.mov' )
 		extension = os.path.splitext( outputPath )[1]
@@ -182,7 +185,9 @@ class FileSequence( object ):
 			self.copy( normalisedSequence )
 			while not normalisedSequence.isComplete():
 				continue
-			import subprocess
+			outputBasePath = os.path.split( outputPath )[0]
+			if not os.path.exists( outputBasePath ):
+				os.makedirs( outputBasePath )
 			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
 			process = subprocess.Popen( command )
 			process.communicate()

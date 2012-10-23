@@ -1697,18 +1697,71 @@ class StudiomaxScene( AbstractScene ):
 			\param		animationRange	<tuple> ( <int> start, <int> end )
 			\return		<bool> success
 		"""
-		start, end 			= animationRange
-		mxs.animationRange 	= mxs.interval( start, end )
+		start, end = animationRange
+		mxs.animationRange = mxs.interval( start, end )
 		return True
-	
-	def setRenderSize( self, size ):
+
+	def setRenderOutputPath(self, outputPath):
+		"""
+			\remarks	set the render output path for the scene
+			\param		outputPath	<str>
+			\return		<bool> success
+		"""
+		mxs.rendOutputFilename =  outputPath
+		return True
+		
+	def setRenderSize(self, size):
 		"""
 			\remarks	implements AbstractScene.setRenderSize method to set the current output width and height for renders for this scene
 			\param		size	<QSize>
 			\return		<bool> success
 		"""
-		mxs.renderWidth 	= size.width()
-		mxs.renderHeight	= size.height()
+		mxs.renderWidth = size.width()
+		mxs.renderHeight = size.height()
+		
+	def setRenderFrameRange(self, frameRange):
+		"""
+			\remarks	set the render frame range of the scene
+			\param		size	<blur3d.api.FrameRange>
+			\return		<bool> success
+		"""
+		# not the ideal way to deal with all the options but I am in the rush
+		mxs.rendTimeType = 3
+		mxs.rendStart = frameRange[0]
+		mxs.rendEnd = frameRange[1]
+		return True
+
+	def setRenderPixelAspect(self, pixelAspect):
+		"""
+			\remarks	set the render pixel aspect of the scene
+			\param		pixelAspect	<int>
+			\return		<bool> success
+		"""
+		mxs.renderPixelAspect = pixelAspect
+		return True
+		
+	def renderPixelAspect(self, ):
+		"""
+			\remarks	returns the render pixel aspect of the scene
+			\return		<int> pixelAspect
+		"""
+		return mxs.renderPixelAspect
+		
+	def setRenderMissingFramesOnly(self, renderMissingFramesOnly):
+		"""
+			\remarks	sets if the renderer is rendering missing frames only.
+			\param		renderMissingFramesOnly	<bool>
+			\return		<bool> success
+		"""
+		mxs.skipRenderedFrames = renderMissingFramesOnly
+		return True
+	
+	def renderMissingFramesOnly(self):
+		"""
+			\remarks	gets if the renderer is rendering missing frames only.
+			\return		<bool> renderMissingFramesOnly
+		"""
+		return mxs.skipRenderedFrames
 	
 	def setLayerGroups( self, layerGroups ):
 		"""
