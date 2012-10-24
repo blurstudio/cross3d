@@ -73,7 +73,7 @@ class FileSequence( object ):
 		
 	def uniqueName( self, rangePlaceHolder=None ):
 		nameSplit = [ self.baseName(), self.extension() ]
-		if rangePlaceHolder != None:
+		if rangePlaceHolder is not None:
 			nameSplit.insert( 1, rangePlaceHolder )
 		return '.'.join( nameSplit )
 
@@ -126,7 +126,7 @@ class FileSequence( object ):
 	def codePath( self ):
 		return os.path.join( self.basePath(), self.codeName() )
 		
-	def uniquePath( self, rangePlaceHolder='' ):
+	def uniquePath( self, rangePlaceHolder=None ):
 		return os.path.join( self.basePath(), self.uniqueName( rangePlaceHolder ) )
 		
 	def exists( self ):
