@@ -174,7 +174,7 @@ class Dispatch(QObject):
 				debug.debugMsg('The signal %s has been disconnected, but was not recorded as connected.' % signal, debug.DebugLevel.Mid)
 		# disconnect signals if nothing is connected
 		if self._isConnected and not self._connections:
-			print "Trying to disconnect signals"
+			# print "Trying to disconnect signals"
 			self.disconnectSignals()
 
 	def dispatch(self, signal, *args):
