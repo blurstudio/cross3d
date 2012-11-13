@@ -208,7 +208,7 @@ def XSILoadPlugin( reg ):
 #	reg.RegisterEvent( 'XsiApplication_sequenceRenderRequested',	constants.siOnBeginSequence )
 #	reg.RegisterEvent( 'XsiApplication_sequenceRenderFinished',		constants.siOnEndSequence )
 #	reg.RegisterEvent( 'XsiApplication_timeChanged',				constants.siOnTimeChange )
-	reg.RegisterEvent( 'XsiApplication_valueChanged',				constants.siOnValueChange )
+#	reg.RegisterEvent( 'XsiApplication_valueChanged',				constants.siOnValueChange )
 
 	# Note:  dataChanged slows down xsi
 	
