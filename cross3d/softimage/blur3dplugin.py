@@ -22,6 +22,7 @@ import inspect
 #-------------------------------------------------------------------------------------------------------------
 
 _signalsEnabled = True
+_enableValueChanged = False
 
 #-------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +138,7 @@ def XsiApplication_sceneSaveAsFinished_OnEvent( ctxt ):
 #	pass
 	
 def XsiApplication_valueChanged_OnEvent( ctxt ):
-	if _signalsEnabled:
+	if _signalsEnabled and _enableValueChanged:
 		GetAttribute = ctxt.GetAttribute
 		object = GetAttribute( 'Object' ).parent
 		fullname = GetAttribute( 'fullName' )
@@ -171,6 +172,32 @@ def XsiApplication_valueChanged_OnEvent( ctxt ):
 #		else:
 #			print 'Unknown signal', fullname, previousValue, object
 
+#-------------------------------------------------------------------------------------------------------------
+# Get the enabled state for ValueChanged
+def Blur3d_valueChangedEnabled_Init( ctxt ):
+	oCmd = ctxt.Source
+	oCmd.Description = ""
+	oCmd.ReturnValue = True
+	return True
+	
+def Blur3d_valueChangedEnabled_Execute():
+	return _enableValueChanged
+
+# set the enabled state for ValueChanged
+def Blur3d_enableValueChanged_Init( ctxt ):
+	oCmd = ctxt.Source
+	oCmd.Description = ""
+	oCmd.ReturnValue = True
+	
+	oArgs = oCmd.Arguments
+	oArgs.Add("state",constants.siArgumentInput)
+	
+	return True
+	
+def Blur3d_enableValueChanged_Execute(state):
+	global _enableValueChanged
+	_enableValueChanged = state
+	return True
 
 #-------------------------------------------------------------------------------------------------------------
 
@@ -211,6 +238,9 @@ def XSILoadPlugin( reg ):
 #	reg.RegisterEvent( 'XsiApplication_valueChanged',				constants.siOnValueChange )
 
 	# Note:  dataChanged slows down xsi
+	
+	reg.RegisterCommand("Blur3d_enableValueChanged", "Blur3d_enableValueChanged")
+	reg.RegisterCommand("Blur3d_valueChangedEnabled", "Blur3d_valueChangedEnabled")
 	
 	return True
 
