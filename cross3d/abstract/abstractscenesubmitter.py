@@ -1319,7 +1319,7 @@ s
 
 		# make sure we have a valid job name and job type at least for this submission (required for all jobs)
 		if (not (self.jobName() and self.jobType())):
-			scene.emitProgressErrored('Preparing to Submit', 'No job name and/or job type has been provided for submission.')
+			self.scene.emitProgressErrored('Preparing to Submit', 'No job name and/or job type has been provided for submission.')
 			return False
 
 		# submit a render job
