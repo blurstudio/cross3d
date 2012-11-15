@@ -1552,7 +1552,8 @@ class StudiomaxScene( AbstractScene ):
 				if ( not layer ):
 					rem_attr( root, i+1 )
 		
-	def currentFileName( self ):
+	@classmethod
+	def currentFileName( cls ):
 		"""
 			\remarks	implements AbstractScene.currentFileName method to return the current filename for the scene that is active in the application
 			\return		<str>

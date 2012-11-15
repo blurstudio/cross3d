@@ -854,8 +854,8 @@ class AbstractScene(QObject):
 		"""
 		return False
 
-	@abstractmethod
-	def currentFileName(self):
+	@classmethod
+	def currentFileName(cls):
 		"""
 			\remarks	returns the current filename for the scene that is active in the application
 			\return		<str>

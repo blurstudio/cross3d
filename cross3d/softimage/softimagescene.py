@@ -368,8 +368,9 @@ class SoftimageScene( AbstractScene ):
 			\return		<float> fps
 		"""
 		return float( xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Rate" ).Value )
-		
-	def currentFileName( self ):
+	
+	@classmethod
+	def currentFileName( cls ):
 		"""
 			\remarks	implements AbstractScene.currentFileName method to return the current filename for the scene that is active in the application
 			\return		<str>
