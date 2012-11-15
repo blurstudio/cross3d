@@ -17,6 +17,7 @@ _nativeObjectTypes = { 	'light'         : ObjectType.Light,
 						'camera'        : ObjectType.Camera,
 						'Thinking'      : ObjectType.Particle,
 						'PF_Source'     : ObjectType.Particle,
+						'FumeFX'		: ObjectType.FumeFX,
 						'GeometryClass' : ObjectType.Geometry }
 							
 class StudiomaxSceneObject( AbstractSceneObject ):
