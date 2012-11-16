@@ -83,6 +83,22 @@ class SoftimageSceneObject( AbstractSceneObject ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
+	def getCacheName(self, type):
+		typeDic = {	"Pc":".pc2",
+					"Tmc":".tmc",
+					"Abc":".abc",
+					"Icecache":".icecache"}
+					
+					
+		obj = self._nativePointer
+		name = obj.Fullname
+		cacheName = name.replace("." , "" )
+		cacheName = cacheName +  typeDic[type]
+		
+		
+		return cacheName
+		
+		
 	def deleteProperty( self, propertyName ):
 		"""
 			\remarks	implements the AbstractSceneObject.deleteProperty that deletes a property of this object.
@@ -98,7 +114,54 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\return		<str> name
 		"""
 		return self._nativePointer.ObjectID
+	
+	def applyCache(self, path, type):
+		"""Applies cache to object
+		param <string>path , <string>types "Pc","Tmc","Icecache", "Abc", Type 
+		return cache object
+		"""
+		obj = self._nativePointer
+		if type == "Pc":
+			
+			cache = obj.ActivePrimitive.ConstructionHistory.Find( "BlurPCOperator" )
+			if not cache:
+				#print(self._nativePointer)
+				xsi.BlurPCAddDeformer(self._nativePointer)
+				cache = obj.ActivePrimitive.ConstructionHistory.Find( "BlurPCOperator" )
+				cache.Parameters("Filename").Value = path
+				#xsi.setValue((cache.Fullname +".Filename"), path)
+				return cache
+			else:
+				cache.Parameters("Filename").Value = path
+				return cache
 		
+		elif type == "Tmc":
+			kine = obj.Kinematics.Global
+			tmcop = kine.NestedObjects("TmcOp")
+
+			
+			if not tmcop:
+				cache = xsi.ApplyTmcOp(self._nativePointer)
+				tmcop = kine.NestedObjects("TmcOp")
+			
+			tmcop.Parameters("Filename").Value = path
+						
+			return tmcop
+		
+		elif type =="Icecache":
+			cache = xsi.AddFileCacheSource(obj, path)
+			return cache
+			
+			
+		elif type == "abc":
+			print("unsupported")
+			return None
+		
+		else:
+			print("unsupported cache Type")
+			return None
+			
+			
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
