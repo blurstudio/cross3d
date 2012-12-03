@@ -1080,7 +1080,7 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self._cacheNativeMap(cacheType, sceneMap.nativePointer())
-
+	
 	def cacheMaterial(self, cacheType, material):
 		"""
 			\remarks	cache the inputed material in the scene for the given cache type

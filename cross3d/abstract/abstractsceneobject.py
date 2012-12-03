@@ -52,6 +52,13 @@ class AbstractSceneObject(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	@abstractmethod
+	def _nativeType(self):
+		"""
+			\remarks	finds the native type and return it as a string
+			ry)
+			\return		str
+		"""
+		return str
 	def _findNativeChild(self, name, recursive=False, parent=None):
 		"""
 			\remarks	finds the child by the name and returns it
@@ -189,7 +196,12 @@ class AbstractSceneObject(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-
+	def getCacheName(self, type):
+		"""return the str of cache name depending on software.
+		"""
+		
+		return None
+		
 	def addCacheFromFile(self, cacheFile):
 		"""Adds a new cache based on the inputed filename
 		
@@ -203,7 +215,14 @@ class AbstractSceneObject(SceneWrapper):
 			from blur3d.api import SceneCache
 			return SceneCache(self._scene, nativeCache)
 		return None
-
+	
+	def applyCache(self, path, type):
+		"""Applies cache to object
+		param Type <cache type>
+		return cache object
+		"""
+		
+		return None
 	def caches(self, cacheType=0):
 		"""Return a list of the caches that are applied to this object
 		
