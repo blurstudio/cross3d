@@ -8,7 +8,7 @@
 #	\date		04/01/11
 #
 
-from blur3d   							import pendingdeprecation
+from blur3d   							import pendingdeprecation, constants
 from PySoftimage 						import xsi, xsiFactory
 from blur3d.api.abstract.abstractscene  import AbstractScene
 from blurdev.decorators 				import stopwatch
@@ -398,6 +398,24 @@ class SoftimageScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		xsi.DeselectAll()
+		return True
+
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+		"""
+			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
+			\param		fps 		<float>
+			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
+			\return		<bool> success
+		"""
+		playControl = xsi.ActiveProject.Properties('Play Control')
+		# Only update the change timing if it needs to change
+		current = playControl.Parameters('KeepFrameTiming').Value
+		if current and changeType == constants.FPSChangeType.Seconds:
+			playControl.Parameters('KeepFrameTiming').Value = 0 # seconds
+		elif not current and changeType == constants.FPSChangeType.Frames:
+			playControl.Parameters('KeepFrameTiming').Value = 1 # frames
+		playControl.Parameters('Format').Value = 11 # switch to custom format 
+		playControl.Parameters('Rate').Value = fps
 		return True
 
 	def setAnimationRange( self, animationRange ):

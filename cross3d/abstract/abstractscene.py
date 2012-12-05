@@ -19,7 +19,7 @@
 #	\date		03/15/10
 #
 
-from blur3d			import abstractmethod, pendingdeprecation
+from blur3d			import abstractmethod, pendingdeprecation, constants
 from PyQt4.QtCore 	import QObject, pyqtSignal
 
 class AbstractScene(QObject):
@@ -960,6 +960,16 @@ class AbstractScene(QObject):
 		"""
 			\remarks	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
 			\param		filename 	<str>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+		"""
+			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
+			\param		fps 		<float>
+			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
 			\return		<bool> success
 		"""
 		return False

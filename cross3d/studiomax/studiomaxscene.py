@@ -8,7 +8,7 @@
 #	\date		03/15/10
 #
 
-from blur3d   							import pendingdeprecation
+from blur3d   							import pendingdeprecation, constants
 from blurdev  							import debug
 from Py3dsMax 							import mxs
 from blur3d.api.abstract.abstractscene 	import AbstractScene
@@ -1690,6 +1690,46 @@ class StudiomaxScene( AbstractScene ):
 		if ( filename ):
 			mxs.saveMaxFile( str(filename) )
 			return True
+		return False
+	
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+		"""
+			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
+						Note: This will not scale frames properly if over frame 10,000,000.
+			\param		fps 		<float>
+			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
+			\return		<bool> success
+		"""
+		# No need to change it if the frameRate is already correct
+		if mxs.frameRate != fps:
+			if changeType == constants.FPSChangeType.Frames:
+				from blur3d.api.studiomax.rescaletime import RescaleTime
+				from blur3d.api import FrameRange
+				# If we dont save it as a class variable it will go out of scope and all of the
+				# QTimers will not be called.
+				self._rescaleTime = RescaleTime()
+				def finishFrameRate(checkRate):
+					# If the current frame range doesn't match the value we passed into RescaleTime
+					# a error has occurred and we dont want to change the fps
+					errorCheck = checkRate == self.animationRange().end()
+					if errorCheck:
+						mxs.frameRate = round(fps)
+					self.setAnimationRange(animRange)
+					self.setCurrentFrame(currFrame)
+					if not errorCheck:
+						from blur3d.api import Exceptions
+						raise Exceptions.Blur3DFPSChangeFailed('Changing the FPS appears to have failed. Your FPS has not been changed.')
+				# because RescaleTime.scaleTime requires the use of QTimers we need to listen for the signal
+				# before finishing the conversion
+				self._rescaleTime.scaleTimeFinished.connect(finishFrameRate)
+				animRange = self.animationRange()
+				currFrame = self.currentFrame()
+				self.setAnimationRange(FrameRange((0, 10000000)))
+				self._rescaleTime.scaleTime(round(10000000 * mxs.frameRate/float(fps)))
+			else:
+				mxs.frameRate = round(fps)
+			return True
+		
 		return False
 	
 	def setAnimationRange( self, animationRange ):

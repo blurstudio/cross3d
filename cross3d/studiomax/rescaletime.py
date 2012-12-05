@@ -13,14 +13,17 @@ from win32gui import *
 from win32api import *
 import win32con
 from Py3dsMax import GetWindowHandle
-from PyQt4.QtCore import QRect, QPoint, QTimer
+from PyQt4.QtCore import QRect, QPoint, QTimer, pyqtSignal, QObject
 
-class RescaleTime:
-
+class RescaleTime(QObject):
 	virtualKeyMap = {'del':0x2e, '0':0x30, '1':0x31, '2':0x32, '3':0x33, '4':0x34, '5':0x35, '6':0x36, '7':0x37, '8':0x38, '9':0x39}
 	hardwareKeyMap = {'del':0xE0, '0':0x0B, '1':0x02, '2':0x03, '3':0x04, '4':0x05, '5':0x06, '6':0x07, '7':0x08, '8':0x09, '9':0x0A}
+	# Listen for this signal to be emitted when calling scaleTime. scaleTime is using QTimers to wait for window animation
+	# so the code execution does not block code exicution moving foward.
+	scaleTimeFinished = pyqtSignal(int)
 
 	def __init__(self):
+		super(RescaleTime, self).__init__()
 		self.minimzedWindows = []
 		self.endTimeValue = 0
 		self.timerDelay = 50
@@ -31,7 +34,8 @@ class RescaleTime:
 		Uses the Mouse and keyboard to rescale the max timeline to value. This is a hack to add script
 		functionality that maxscript has been lacking for at least 2 years.
 		"""
-		self.endTimeValue = value
+		# Max does not expect floats for this value
+		self.endTimeValue = int(value)
 		self.useTimers = True
 		self.mouseToTimeButton()
 
@@ -48,21 +52,21 @@ class RescaleTime:
 				tcDlg = hwnd
 				break
 		else:
-			print 'Unable to find the %s window' % name
+#			print 'Unable to find the %s window' % name
 			return None
 		return tcDlg
 
 	def clickPoint(self, id):
 		if id:
 			pnt = ClientToScreen(id,(5,5))
-			print 'ClickPoint', pnt
+#			print 'ClickPoint', pnt
 			currentCursorPos = GetCursorPos()
 			SetCursorPos(pnt)
 			mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,pnt[0],pnt[1],0,0)
 			mouse_event(win32con.MOUSEEVENTF_LEFTUP,pnt[0],pnt[1],0,0)
 			SetCursorPos(currentCursorPos)
-		else:
-			print "Could not find window to click on"
+#		else:
+#			print "Could not find window to click on"
 
 	def pressKey(self, key):
 		keybd_event(self.virtualKeyMap[key], self.hardwareKeyMap[key], 0, 0)
@@ -87,7 +91,7 @@ class RescaleTime:
 			if hwnd != maxHwnd:
 				rect = GetWindowRect(hwnd)
 				if QRect(QPoint(rect[0], rect[1]), QPoint(rect[2], rect[3])).contains(pnt):
-					print hwnd, GetWindowRect(hwnd), GetWindowText(hwnd), GetClassName(hwnd)
+#					print hwnd, GetWindowRect(hwnd), GetWindowText(hwnd), GetClassName(hwnd)
 					self.minimzedWindows.append(hwnd)
 					ShowWindow( hwnd, win32con.SW_MINIMIZE )
 		
@@ -111,8 +115,8 @@ class RescaleTime:
 					tpDepth -= 1
 			if tpDepth == 1:
 				tpChildren.append((hwnd,GetWindowRect(hwnd)[1]))
-			if tpDepth:
-				print '\t'*len(stack), hwnd, GetClassName(hwnd), GetWindowRect(hwnd)
+#			if tpDepth:
+#				print '\t'*len(stack), hwnd, GetClassName(hwnd), GetWindowRect(hwnd)
 			stack.append(hwnd)
 			if tpDepth or GetClassName(hwnd) == 'TimePanel':
 				tpDepth += 1
@@ -124,9 +128,9 @@ class RescaleTime:
 			else:
 				timeButtonParent = tpChildren[1][0]
 		else:
-			print "Couldn't find the CustToolbar that is the parent of the time button"
+#			print "Couldn't find the CustToolbar that is the parent of the time button"
 			return
-		print "Found timeButtonParent", timeButtonParent
+#		print "Found timeButtonParent", timeButtonParent
 		hwnds = []
 		EnumChildWindows(timeButtonParent,self.EnumWindowsProc,hwnds)
 		timeButton, timeButtonX = None, None
@@ -148,13 +152,13 @@ class RescaleTime:
 
 	def mouseToReScaleButton(self):
 		tcDlg = self.findThreadWindow('Time Configuration')
-		print tcDlg
+#		print tcDlg
 		hwnds = []
 		EnumChildWindows(tcDlg,self.EnumWindowsProc,hwnds)
 		shwnd = None
 		for hwnd in hwnds:
 			if GetWindowText(hwnd) == 'Re-scale Time':
-				print 'Found re-scale time!----------------------------------------', hwnd
+#				print 'Found re-scale time!----------------------------------------', hwnd
 				shwnd = hwnd
 				break
 		self.clickPoint(shwnd)
@@ -175,10 +179,10 @@ class RescaleTime:
 			if GetWindowText(hwnd) == 'End Time:':
 				labelRect = GetWindowRect(hwnd)
 				labelHwnd = hwnd
-				print 'Found End Time label', labelHwnd, labelRect
+#				print 'Found End Time label', labelHwnd, labelRect
 			elif GetWindowText(hwnd) == "OK":
 				okBtn = hwnd
-				print 'Found the Ok Button', hwnd
+#				print 'Found the Ok Button', hwnd
 			if okBtn and labelRect:
 				break
 		if labelRect:
@@ -187,7 +191,7 @@ class RescaleTime:
 					left, top, right, bottom = GetWindowRect(hwnd)
 					# use the text label's geometry to identify the custom edit
 					if top >= labelRect[1] and top <= labelRect[3] and GetClassName(hwnd) == 'CustEdit':
-						print 'Clicking on', hwnd, GetClassName(hwnd)
+#						print 'Clicking on', hwnd, GetClassName(hwnd)
 						endTimeEdit = hwnd
 						break
 		if endTimeEdit:
@@ -202,16 +206,18 @@ class RescaleTime:
 
 	def mouseToTimeConfigOk(self):
 		tcDlg = self.findThreadWindow('Time Configuration')
-		print tcDlg
+#		print tcDlg
 		hwnds = []
 		EnumChildWindows(tcDlg,self.EnumWindowsProc,hwnds)
 		shwnd = None
 		for hwnd in hwnds:
 			if GetWindowText(hwnd) == 'OK':
-				print 'Found re-scale time!----------------------------------------', hwnd
+#				print 'Found re-scale time!----------------------------------------', hwnd
 				shwnd = hwnd
 				break
 		self.clickPoint(shwnd)
+		if self.useTimers:
+			self.scaleTimeFinished.emit(self.endTimeValue)
 		self.useTimers = False
 		self.restoreWindows()
 
@@ -239,6 +245,6 @@ class RescaleTime:
 			btn.setGeometry(QRect(dlg.mapFromGlobal(QPoint(rect[0], rect[1])), dlg.mapFromGlobal(QPoint(rect[2], rect[3]))))
 			btn.clicked.connect(btn.lower)
 			btn.setToolTip('%i, %s, %s, %0.2f, %0.2f, %0.2f, %0.2f' % (hwnd, GetWindowText(hwnd), GetClassName(hwnd), rect[0], rect[1], rect[2], rect[3]))
-			print '\t'*len(stack), btn.toolTip()
+#			print '\t'*len(stack), btn.toolTip()
 			stack.append(hwnd)
 		return dlg

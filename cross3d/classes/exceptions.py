@@ -16,4 +16,10 @@ class Exceptions:
 		'''
 			Raise exceptions specific to blur3d.
 		'''
-			
+		pass
+	
+	class Blur3DFPSChangeFailed(Blur3DException):
+		"""
+			Exception Raised if unable to change the FPS
+		"""
+		pass
