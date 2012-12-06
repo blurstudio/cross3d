@@ -1692,12 +1692,14 @@ class StudiomaxScene( AbstractScene ):
 			return True
 		return False
 	
-	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
 		"""
 			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
-						Note: This will not scale frames properly if over frame 10,000,000.
+						If you have any code that you need to run after changing the fps and plan to use it in
+						3dsMax you will need to pass that code into the callback argument.
 			\param		fps 		<float>
 			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
+			\param		callback	<funciton>					Code called after the fps is changed.
 			\return		<bool> success
 		"""
 		# No need to change it if the frameRate is already correct
@@ -1719,6 +1721,8 @@ class StudiomaxScene( AbstractScene ):
 					if not errorCheck:
 						from blur3d.api import Exceptions
 						raise Exceptions.Blur3DFPSChangeFailed('Changing the FPS appears to have failed. Your FPS has not been changed.')
+					if callback:
+						callback()
 				# because RescaleTime.scaleTime requires the use of QTimers we need to listen for the signal
 				# before finishing the conversion
 				self._rescaleTime.scaleTimeFinished.connect(finishFrameRate)
@@ -1728,6 +1732,8 @@ class StudiomaxScene( AbstractScene ):
 				self._rescaleTime.scaleTime(round(10000000 * mxs.frameRate/float(fps)))
 			else:
 				mxs.frameRate = round(fps)
+				if callback:
+					callback()
 			return True
 		
 		return False

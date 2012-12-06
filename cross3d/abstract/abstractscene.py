@@ -965,11 +965,14 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
-	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
 		"""
 			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
+						If you have any code that you need to run after changing the fps and plan to use it in
+						3dsMax you will need to pass that code into the callback argument.
 			\param		fps 		<float>
 			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
+			\param		callback	<funciton>					Code called after the fps is changed.
 			\return		<bool> success
 		"""
 		return False

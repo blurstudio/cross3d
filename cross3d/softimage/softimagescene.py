@@ -400,11 +400,15 @@ class SoftimageScene( AbstractScene ):
 		xsi.DeselectAll()
 		return True
 
-	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames):
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
+		
 		"""
 			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
+						If you have any code that you need to run after changing the fps and plan to use it in
+						3dsMax you will need to pass that code into the callback argument.
 			\param		fps 		<float>
 			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
+			\param		callback	<funciton>					Code called after the fps is changed.
 			\return		<bool> success
 		"""
 		playControl = xsi.ActiveProject.Properties('Play Control')
@@ -416,6 +420,8 @@ class SoftimageScene( AbstractScene ):
 			playControl.Parameters('KeepFrameTiming').Value = 1 # frames
 		playControl.Parameters('Format').Value = 11 # switch to custom format 
 		playControl.Parameters('Rate').Value = fps
+		if callback:
+			callback()
 		return True
 
 	def setAnimationRange( self, animationRange ):
