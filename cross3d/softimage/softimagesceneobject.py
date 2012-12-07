@@ -181,6 +181,10 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			return 'camera'
 		elif objectType == ObjectType.Model:
 			return '#model'
+		elif objectType == ObjectType.NurbsSurface:
+			return 'surfmsh'
+		elif objectType == ObjectType.Curve:
+			return 'crvlist'
 		else:
 			return None
 		return AbstractSceneObject._nativeTypeOfObjectType( objectType )
@@ -196,9 +200,12 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		type = nativeObject.Type
 		
 		# check to see if the object is a geometry type
-		if type == 'polymsh':
+		if type in  'polymsh':
 			return ObjectType.Geometry
-		
+		if type  == 'surfmsh':
+			return ObjectType.NurbsSurface
+		if type == 'crvlist':
+			return ObjectType.Curve
 		# check to see if the object is a light type
 		elif type == 'light':
 			return ObjectType.Light
