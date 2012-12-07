@@ -90,8 +90,8 @@ class RescaleTime(QObject):
 		for hwnd in hwnds:
 			if hwnd != maxHwnd:
 				rect = GetWindowRect(hwnd)
-				if QRect(QPoint(rect[0], rect[1]), QPoint(rect[2], rect[3])).contains(pnt):
-#					print hwnd, GetWindowRect(hwnd), GetWindowText(hwnd), GetClassName(hwnd)
+				if QRect(QPoint(rect[0], rect[1]), QPoint(rect[2], rect[3])).contains(pnt) and IsWindowVisible(hwnd):
+#					print hwnd, GetWindowRect(hwnd), GetWindowText(hwnd), GetClassName(hwnd), IsWindowVisible(hwnd)
 					self.minimzedWindows.append(hwnd)
 					ShowWindow( hwnd, win32con.SW_MINIMIZE )
 		
@@ -212,14 +212,18 @@ class RescaleTime(QObject):
 		shwnd = None
 		for hwnd in hwnds:
 			if GetWindowText(hwnd) == 'OK':
-#				print 'Found re-scale time!----------------------------------------', hwnd
+#				print 'Found OK Button!----------------------------------------', hwnd
 				shwnd = hwnd
 				break
 		self.clickPoint(shwnd)
+		self.restoreWindows()
+		if self.useTimers:
+			QTimer.singleShot(self.timerDelay, self.finishScaling)
+	
+	def finishScaling(self):
 		if self.useTimers:
 			self.scaleTimeFinished.emit(self.endTimeValue)
 		self.useTimers = False
-		self.restoreWindows()
 
 	@staticmethod
 	def qtMirror(tcDlg):
