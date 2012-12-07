@@ -1735,7 +1735,8 @@ class StudiomaxScene( AbstractScene ):
 				if callback:
 					callback()
 			return True
-		
+		if callback:
+			callback()
 		return False
 	
 	def setAnimationRange( self, animationRange ):
