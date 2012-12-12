@@ -12,7 +12,7 @@
 from win32gui import *
 from win32api import *
 import win32con
-from Py3dsMax import GetWindowHandle
+from Py3dsMax import GetWindowHandle, mxs
 from PyQt4.QtCore import QRect, QPoint, QTimer, pyqtSignal, QObject
 
 class RescaleTime(QObject):
@@ -28,6 +28,7 @@ class RescaleTime(QObject):
 		self.endTimeValue = 0
 		self.timerDelay = 50
 		self.useTimers = False
+		self.uiWarningWND = None
 
 	def scaleTime(self, value):
 		"""
@@ -38,6 +39,23 @@ class RescaleTime(QObject):
 		self.endTimeValue = int(value)
 		self.useTimers = True
 		self.mouseToTimeButton()
+
+	def warningDialog(self, parent, title='Adjusting Framerate', msg='The framerate is being\n adjusted you may see\n some dialogs flashing.'):
+		from PyQt4.QtWinMigrate import QWinWidget
+		from PyQt4.QtGui import QMainWindow, QLabel
+		from PyQt4.QtCore import QTimer
+		self.uiMaxWND = QWinWidget(parent)
+		self.uiWarningWND = QMainWindow( self.uiMaxWND )
+		self.uiWarningWND.setWindowTitle('bob')
+		x,y,w,h = GetWindowRect(parent)
+		self.uiWarningWND.setGeometry(x+15, y+40, 303, 110)
+		lbl = QLabel(self.uiWarningWND)
+		fnt = lbl.font()
+		fnt.setPointSize(20)
+		lbl.setGeometry(0,0,300,106)
+		lbl.setFont(fnt)
+		lbl.setText(msg)
+		self.uiWarningWND.show()
 
 	@staticmethod
 	def EnumWindowsProc(hwnd,list):
@@ -65,6 +83,7 @@ class RescaleTime(QObject):
 			mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,pnt[0],pnt[1],0,0)
 			mouse_event(win32con.MOUSEEVENTF_LEFTUP,pnt[0],pnt[1],0,0)
 			SetCursorPos(currentCursorPos)
+			mxs.setWaitCursor()
 #		else:
 #			print "Could not find window to click on"
 
@@ -101,7 +120,10 @@ class RescaleTime(QObject):
 		self.minimzedWindows = []
 	
 	def mouseToTimeButton(self):
+		mxs.setWaitCursor()
 		maxHwnd = GetWindowHandle()
+		if self.useTimers:
+			self.warningDialog(maxHwnd)
 		hwnds = []
 		EnumChildWindows(maxHwnd,self.EnumWindowsProc,hwnds)
 		stack = [maxHwnd]
@@ -151,6 +173,7 @@ class RescaleTime(QObject):
 			QTimer.singleShot(self.timerDelay, self.mouseToReScaleButton)
 
 	def mouseToReScaleButton(self):
+		mxs.setWaitCursor()
 		tcDlg = self.findThreadWindow('Time Configuration')
 #		print tcDlg
 		hwnds = []
@@ -167,6 +190,7 @@ class RescaleTime(QObject):
 			QTimer.singleShot(self.timerDelay, self.mouseToEndTime)
 
 	def mouseToEndTime(self):
+		mxs.setWaitCursor()
 		rstDlg = self.findThreadWindow('Re-scale Time')
 		labelRect = None
 		labelHwnd = None
@@ -205,6 +229,7 @@ class RescaleTime(QObject):
 				QTimer.singleShot(self.timerDelay, self.mouseToTimeConfigOk)
 
 	def mouseToTimeConfigOk(self):
+		mxs.setWaitCursor()
 		tcDlg = self.findThreadWindow('Time Configuration')
 #		print tcDlg
 		hwnds = []
@@ -223,6 +248,9 @@ class RescaleTime(QObject):
 	def finishScaling(self):
 		if self.useTimers:
 			self.scaleTimeFinished.emit(self.endTimeValue)
+			mxs.setArrowCursor()
+			if self.uiWarningWND:
+				QTimer.singleShot(1000, self.uiWarningWND.close)
 		self.useTimers = False
 
 	@staticmethod
