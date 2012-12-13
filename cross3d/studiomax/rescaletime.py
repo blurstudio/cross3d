@@ -41,11 +41,10 @@ class RescaleTime(QObject):
 		self.mouseToTimeButton()
 
 	def warningDialog(self, parent, title='Adjusting Framerate', msg='The framerate is being\n adjusted you may see\n some dialogs flashing.'):
-		from PyQt4.QtWinMigrate import QWinWidget
-		from PyQt4.QtGui import QMainWindow, QLabel
+		from blurdev.gui import Window
+		from PyQt4.QtGui import QLabel
 		from PyQt4.QtCore import QTimer
-		self.uiMaxWND = QWinWidget(parent)
-		self.uiWarningWND = QMainWindow( self.uiMaxWND )
+		self.uiWarningWND = Window()
 		self.uiWarningWND.setWindowTitle('bob')
 		x,y,w,h = GetWindowRect(parent)
 		self.uiWarningWND.setGeometry(x+15, y+40, 303, 110)
