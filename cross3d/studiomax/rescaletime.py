@@ -163,7 +163,11 @@ class RescaleTime(QObject):
 			if timeButtonX is None or xPos > timeButtonX:
 				timeButton = hwnd
 				timeButtonX = xPos
-		SetForegroundWindow(maxHwnd)
+		try:
+			SetForegroundWindow(maxHwnd)
+		except:
+			import blurdev
+			blurdev.debug.debugMsg('Unable to set forground window to max')
 		SetActiveWindow (maxHwnd)
 		self.minimizeWindows(timeButton)
 		self.clickPoint(timeButton)
