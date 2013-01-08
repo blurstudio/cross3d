@@ -29,6 +29,7 @@ class RescaleTime(QObject):
 		self.timerDelay = 50
 		self.useTimers = False
 		self.uiWarningWND = None
+		self.restoreMaxWindow = False
 
 	def scaleTime(self, value):
 		"""
@@ -38,7 +39,7 @@ class RescaleTime(QObject):
 		# Max does not expect floats for this value
 		self.endTimeValue = int(value)
 		self.useTimers = True
-		self.mouseToTimeButton()
+		self.maximizeMax()
 
 	def warningDialog(self, parent, title='FPS', msg='Adjusting frame rate,\n please wait...'):
 		from blurdev.gui import Window
@@ -117,6 +118,20 @@ class RescaleTime(QObject):
 		for hwnd in self.minimzedWindows:
 			ShowWindow( hwnd, win32con.SW_RESTORE )
 		self.minimzedWindows = []
+	
+	def maximizeMax(self):
+		"""
+			Maximize max to ensure that the Time Configuration button is on the monitor and clickable, and to 
+			ensure that the dialogs will be on screen.
+		"""
+		self.restoreMaxWindow = False
+		maxHwnd = GetWindowHandle()
+		if GetWindowPlacement(maxHwnd)[1] == win32con.SW_SHOWNORMAL:
+			ShowWindow( maxHwnd, win32con.SW_MAXIMIZE )
+			self.restoreMaxWindow = True
+			QTimer.singleShot(self.timerDelay, self.mouseToTimeButton)
+			return
+		self.mouseToTimeButton()
 	
 	def mouseToTimeButton(self):
 		mxs.setWaitCursor()
@@ -251,6 +266,8 @@ class RescaleTime(QObject):
 	def finishScaling(self):
 		if self.useTimers:
 			self.scaleTimeFinished.emit(self.endTimeValue)
+			if self.restoreMaxWindow:
+				ShowWindow( GetWindowHandle(), win32con.SW_RESTORE )
 			mxs.setArrowCursor()
 			if self.uiWarningWND:
 				QTimer.singleShot(1000, self.uiWarningWND.close)
