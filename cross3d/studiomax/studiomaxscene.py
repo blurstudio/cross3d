@@ -1698,7 +1698,7 @@ class StudiomaxScene( AbstractScene ):
 			\param		filename 	<str>
 			\return		<bool> success
 		"""
-		mxs.saveMaxFile( path )
+		mxs.saveMaxFile( path, useNewFile=False )
 		return True
 	
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
