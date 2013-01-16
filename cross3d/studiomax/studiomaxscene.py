@@ -1691,6 +1691,15 @@ class StudiomaxScene( AbstractScene ):
 			mxs.saveMaxFile( str(filename) )
 			return True
 		return False
+		
+	def saveCopy( self, path ):
+		"""
+			\remarks	implements AbstractScene.saveCopy to save a copy of the current scene
+			\param		filename 	<str>
+			\return		<bool> success
+		"""
+		mxs.saveMaxFile( path )
+		return True
 	
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
 		"""

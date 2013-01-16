@@ -963,6 +963,15 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
+		
+	@abstractmethod
+	def saveCopy( self, path ):
+		"""
+			\remarks	Saves a copy of the current scene to the inputed name specified.
+			\param		filename 	<str>
+			\return		<bool> success
+		"""
+		return False
 
 	@abstractmethod
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
