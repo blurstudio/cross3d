@@ -60,13 +60,10 @@ class FileSequence( object ):
 			for key in dict.keys():
 				dict[ key ] = dict[ key ][::-1]
 			return dict
-		return None
+		return {}
 
 	def nameToken( self, key ):
-		if self.nameTokens().has_key( key ):
-			return self.nameTokens()[ key ]
-		else:
-			return None
+		return self.nameTokens().get( key, '' )
 
 	def baseName( self ):
 		return self.nameToken( 'baseName' )
