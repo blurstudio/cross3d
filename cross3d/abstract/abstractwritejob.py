@@ -15,13 +15,15 @@ class AbstractWriteJob(object):
 
 	def __init__(self):
 		super(AbstractWriteJob, self).__init__()
-
+		#define these in the instance
 		self._fileName = ''
 		self._objects = []
 		self._inFrame = 0
 		self._outFrame = 0
 		self._step = 0
 		self._substep = 0
+
+		#these are normally set by a subclass
 		self._normals = False
 		self._uvs = False
 		self._faceSets = False
@@ -144,6 +146,33 @@ class AbstractPointCacheWriteJob(AbstractWriteJob):
 		self._globalSpace = False
 
 
+class AbstractCrowdWriteJob(AbstractWriteJob):
+
+	def __init__(self):
+		AbstractWriteJob.__init__(self)
+		self._normals = True
+		self._uvs = True
+		self._faceSets = True
+		self._bindPose = True
+		self._purePointCache = False
+		self._dynamicTopology = False
+		self._globalSpace = True
+
+class AbstractDynamicTopologyWriteJob(AbstractWriteJob):
+
+	def __init__(self):
+		AbstractWriteJob.__init__(self)
+		self._normals = True
+		self._uvs = True
+		self._faceSets = True
+		self._bindPose = True
+		self._purePointCache = False
+		self._dynamicTopology = True
+		self._globalSpace = True
+
+
 # register the symbol
 api.registerSymbol('WriteJob', AbstractWriteJob, ifNotFound=True)
 api.registerSymbol('PointCacheWriteJob', AbstractPointCacheWriteJob, ifNotFound=True)
+api.registerSymbol('CrowdWriteJob', AbstractCrowdWriteJob, ifNotFound=True)
+api.registerSymbol('AbstractDynamicTopologyWriteJob', AbstractDynamicTopologyWriteJob, ifNotFound=True)

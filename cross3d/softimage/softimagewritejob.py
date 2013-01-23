@@ -2,7 +2,7 @@
 #   :namespace  blur3d.api.softimage.softimagewritejob
 #
 #   :remarks    [desc::commented]
-#   
+#
 #   :author     enoch@blur.com
 #   :author     Blur Studio
 #   :date       07/10/12
@@ -13,13 +13,13 @@ from blur3d.api.abstract.abstractwritejob import AbstractWriteJob
 class SoftimageWriteJob( AbstractWriteJob ):
 	def __init__( self ):
 		AbstractWriteJob.__init__( self )
-		
+
 	def objectsAsString( self ):
 		return ','.join( [ unicode( object.name() ) for object in self._objects ] )
 
 # convert to string
 	def arguments( self ):
-		jobItems = [ 'filename=%s' % self._fileName, 
+		jobItems = [ 'filename=%s' % self._fileName,
 					 'objects=%s' % self.objectsAsString(),
 					 'in=%i' % self._inFrame,
 					 'out=%i' % self._outFrame,
@@ -32,10 +32,11 @@ class SoftimageWriteJob( AbstractWriteJob ):
 					 'purepointcache=%s' % unicode( self._purePointCache ).lower(),
 					 'dynamictopology=%s' % unicode( self._dynamicTopology ).lower(),
 					 'globalspace=%s' % unicode( self._globalSpace ).lower() ]
-					 
+
 		return ';'.join( jobItems )
-		
+
 class SoftimagePointCacheWriteJob( SoftimageWriteJob ):
+
 	def __init__( self ):
 		SoftimageWriteJob.__init__( self )
 		self._normals = False
@@ -46,7 +47,36 @@ class SoftimagePointCacheWriteJob( SoftimageWriteJob ):
 		self._dynamicTopology = False
 		self._globalSpace = True
 
+
+class SoftimageCrowdWriteJob(SoftimagetWriteJob):
+
+	def __init__(self):
+		SoftimagetWriteJob.__init__(self)
+		self._normals = True
+		self._uvs = True
+		self._faceSets = True
+		self._bindPose = True
+		self._purePointCache = False
+		self._dynamicTopology = False
+		self._globalSpace = True
+
+
+class SoftimagetDynamicTopologyWriteJob(SoftimagetWriteJob):
+
+	def __init__(self):
+		SoftimagetWriteJob.__init__(self)
+		self._normals = True
+		self._uvs = True
+		self._faceSets = True
+		self._bindPose = True
+		self._purePointCache = False
+		self._dynamicTopology = True
+		self._globalSpace = True
+
+
 #register the symbol
 from blur3d import api
-api.registerSymbol( 'WriteJob', SoftimageWriteJob )
-api.registerSymbol( 'PointCacheWriteJob', SoftimagePointCacheWriteJob )
+api.registerSymbol('WriteJob', SoftimageWriteJob)
+api.registerSymbol('PointCacheWriteJob', SoftimagePointCacheWriteJob)
+api.registerSymbol('CrowdWriteJob', SoftimageCrowdWriteJob)
+api.registerSymbol('DynamicTopologyWriteJob', SoftimagetDynamicTopologyWriteJob)
