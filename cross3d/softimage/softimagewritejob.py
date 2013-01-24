@@ -48,10 +48,10 @@ class SoftimagePointCacheWriteJob( SoftimageWriteJob ):
 		self._globalSpace = True
 
 
-class SoftimageCrowdWriteJob(SoftimagetWriteJob):
+class SoftimageCrowdWriteJob(SoftimageWriteJob):
 
 	def __init__(self):
-		SoftimagetWriteJob.__init__(self)
+		SoftimageWriteJob.__init__(self)
 		self._normals = True
 		self._uvs = True
 		self._faceSets = True
@@ -61,10 +61,10 @@ class SoftimageCrowdWriteJob(SoftimagetWriteJob):
 		self._globalSpace = True
 
 
-class SoftimagetDynamicTopologyWriteJob(SoftimagetWriteJob):
+class SoftimageDynamicTopologyWriteJob(SoftimageWriteJob):
 
 	def __init__(self):
-		SoftimagetWriteJob.__init__(self)
+		SoftimageWriteJob.__init__(self)
 		self._normals = True
 		self._uvs = True
 		self._faceSets = True
@@ -79,4 +79,4 @@ from blur3d import api
 api.registerSymbol('WriteJob', SoftimageWriteJob)
 api.registerSymbol('PointCacheWriteJob', SoftimagePointCacheWriteJob)
 api.registerSymbol('CrowdWriteJob', SoftimageCrowdWriteJob)
-api.registerSymbol('DynamicTopologyWriteJob', SoftimagetDynamicTopologyWriteJob)
+api.registerSymbol('DynamicTopologyWriteJob', SoftimageDynamicTopologyWriteJob)
