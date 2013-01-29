@@ -15,10 +15,14 @@
 #	\date		06/07/11
 #
 
+import os
+
 from blur3d.api.abstract.abstractapplication import AbstractApplication
 #from blur3d.api.dispatch import Dispatch
 from PySoftimage import xsi
-import os
+from blur3d import api
+
+
 dispatch = None
 
 class SoftimageApplication(AbstractApplication):
@@ -109,6 +113,6 @@ class SoftimageApplication(AbstractApplication):
 	def log( self, message ):
 		xsi.LogMessage( message )
 		
+		
 # register the symbol
-from blur3d import api
 api.registerSymbol( 'Application', SoftimageApplication)

@@ -15,6 +15,7 @@ def init():
 	
 	# import softimage classes
 	import softimageuserprops
+	import softimageundocontext
 	import softimageapplication
 	import softimagescene
 	import softimagescenewrapper

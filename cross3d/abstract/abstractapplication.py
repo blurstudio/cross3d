@@ -167,6 +167,33 @@ class AbstractApplication(QObject):
 	@abstractmethod
 	def log( self, message ):
 		pass
+	
+	def undoContext(self, name):
+		"""
+		Returns a context guard for the undo stack.  Everything that takes
+		place within this context guard will appear as a single undo
+		operation in the stack.
+		
+		"""
+		return api.UndoContext(name)
+	
+	def openUndo(self, name):
+		"""
+		Opens a new undo context.  It is important that the user takes care
+		to call closeUndo() to close the context, even if an error or
+		exception occurs; otherwise, the undo stack will remain open and 
+		unusable.		
+		"""
+		api.UndoContext.openUndo(name)
+		
+	def closeUndo(self):
+		"""
+		Close the undo context.  This call should always follw a call to
+		openUndo().
+		"""
+		api.UndoContext.closeUndo()
+	
+	
 
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
