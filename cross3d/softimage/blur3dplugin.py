@@ -14,6 +14,7 @@
 from win32com.client 	import constants
 from PyQt4.QtCore		import Qt
 import blur3d
+from blurdev import debug
 from blur3d.api import dispatch
 dispatchRename = blur3d.api.dispatch.dispatchRename
 dispatchObject = blur3d.api.dispatch.dispatchObject
@@ -45,8 +46,11 @@ def XsiApplication_fileImportFinished_OnEvent( ctxt ):
 	dispatchSignal('sceneImportFinished')
 	
 def XsiApplication_objectAdded_OnEvent( ctxt ):
-	for object in ctxt.GetAttribute('Objects'):
-		dispatchObject('objectCreated', object)
+	try:
+		for object in ctxt.GetAttribute('Objects'):
+			dispatchObject('objectCreated', object)
+	except TypeError:
+		debug.debugMsg("Unable to process objectCreated Event because it did not return a list." )
 	
 def XsiApplication_objectRemoved_OnEvent( ctxt ):
 	for name in ctxt.GetAttribute('ObjectNames'):
