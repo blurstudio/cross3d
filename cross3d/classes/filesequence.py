@@ -161,7 +161,27 @@ class FileSequence( object ):
 				for i, o in zip( self.paths(), output.paths() ):
 					shutil.copy( i, o )
 				return True
-			return False
+			else:
+				raise('FileSequence.copy only supports outputting to a sequence with the same amount of frames.')
+		else:
+			raise('FileSequence.copy only supports outputting to a complete sequence.')
+	
+	def convert( self, output ):
+		if self.isComplete():
+			if self.count() == output.count():
+				inputExtension = self.extension()
+				outputExtension = output.extension()
+				from PyQt4.QtGui import QImage
+				if inputExtension.lower() == 'exr' and outputExtension.lower() == 'jpg':
+					for i, o in zip( self.paths(), output.paths()):
+						QImage(i, 'exr_nogamma').save(o)
+					return True
+				else:
+					raise('FileSequence.convert does not supports %s to %s' % (inputExtension, outputExtension))
+			else:
+				raise('FileSequence.convert only supports outputting to a sequence with the same amount of frames.')
+		else:
+			raise('FileSequence.convert only supports outputting to a complete sequence.')
 
 	def delete( self, deletesBasePath=False ):
 		if deletesBasePath:
@@ -178,15 +198,27 @@ class FileSequence( object ):
 		extension = os.path.splitext( outputPath )[1]
 		if self.isComplete():
 			normalisedSequencePath = os.path.join(  self.basePath(), self.baseName() + '_Temp.1-' + str( self.count() ) + '.' + self.extension() )
-			normalisedSequence = FileSequence( normalisedSequencePath )
-			self.copy( normalisedSequence )
+			normalisedSequence = FileSequence(normalisedSequencePath)
+			
+			# Managing EXR sequences.
+			if (self.extension().lower() == 'exr'):
+				normalisedSequencePath = os.path.join(  self.basePath(), self.baseName() + '_Temp.1-' + str( self.count() ) + '.' + 'jpg' )
+				normalisedSequence = FileSequence(normalisedSequencePath)
+				self.convert(normalisedSequence)
+				
+			# Managing all other cases.
+			else:
+				normalisedSequencePath = os.path.join(  self.basePath(), self.baseName() + '_Temp.1-' + str( self.count() ) + '.' + self.extension() )
+				normalisedSequence = FileSequence(normalisedSequencePath)
+				self.copy(normalisedSequence)
+				
 			while not normalisedSequence.isComplete():
 				continue
 			outputBasePath = os.path.split( outputPath )[0]
 			if not os.path.exists( outputBasePath ):
 				os.makedirs( outputBasePath )
 			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
-			process = subprocess.Popen( command )
+			process = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE )
 			process.communicate()
 			normalisedSequence.delete()
 			return True

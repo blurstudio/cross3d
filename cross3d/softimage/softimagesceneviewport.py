@@ -9,7 +9,11 @@
 #	\date		04/11/10
 #
 
+import os
+import time
+
 from PySoftimage import xsi
+from blur3d.api import Exceptions
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -66,13 +70,26 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		return cameraName
 
 	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate='', effects=True ):
-		import os
-		nativeCamera = self._nativeCamera()
+		"""
+			Creates an unpadded JPG file sequence from the viewport for a given range.
+		"""
 		
-		# storing viewport state
+		# Collecting data.
+		nativeCamera = self._nativeCamera()
+		firstFrameFileName = fileName.replace('.jpg', '.%d.jpg' % frameRange[0])
+		lastFrameFileName = fileName.replace('.jpg', '.%d.jpg' % frameRange[1])
+		
+		try:
+			firstFrameStartTime = os.path.getmtime(firstFrameFileName)
+			lastFrameStartTime = os.path.getmtime(lastFrameFileName)
+		except os.error:
+			firstFrameStartTime = 0
+			lastFrameStartTime = 0
+		
+		# Storing viewport state.
 		self.storeState()
 		
-		# set slate
+		# Setting slate.
 		if slate:
 			self.setSlateText( slate )
 			self.setSlateIsActive( True )
@@ -80,7 +97,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		else:
 			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', True )
 		
-		# setting visibility options
+		# Setting visibility options.
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objpolymesh' ).Value = True
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objparticles' ).Value = True
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objinstances' ).Value = True
@@ -106,14 +123,14 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
 		xsi.SetValue( 'preferences.ViewCube.show', False )
 		
-		# checking inputs
+		# Checking inputs.
 		if not frameRange:
 			frameRange = self._scene.animationRange()
 		if not resolution:
 			from PyQt4.QtCore import QSize
 			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
 
-		# set camera's picture ratio
+		# Set camera's picture ratio.
 		camera = self.camera()
 		if camera:
 			pictureRatio = float( resolution.width() ) / resolution.height() 
@@ -144,9 +161,25 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
-		# restoring state
+		# Restoring state.
 		self.restoreState()
 		
+		# If the famouse capture Softimage bug happened we raise a specific error.
+		try:
+			firstFrameEndTime = os.path.getmtime(firstFrameFileName)
+			if not firstFrameStartTime < firstFrameEndTime:
+				raise Exceptions.OutputFailed('The native Softimage capture bug happened.')
+		except os.error:
+			raise Exceptions.OutputFailed('The native Softimage capture bug happened.')
+			
+		# If the capture was not completed we just return False.
+		try:
+			lastFrameEndTime = os.path.getmtime(lastFrameFileName)
+			if not lastFrameStartTime < lastFrameEndTime:
+					return False
+		except os.error:
+			return False
+			
 		return True
 
 	def storeState( self ):

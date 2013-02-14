@@ -18,7 +18,13 @@ class Exceptions:
 		'''
 		pass
 	
-	class Blur3DFPSChangeFailed(Blur3DException):
+	class FPSChangeFailed(Blur3DException):
+		"""
+			Exception Raised if unable to change the FPS
+		"""
+		pass
+		
+	class OutputFailed(Blur3DException):
 		"""
 			Exception Raised if unable to change the FPS
 		"""

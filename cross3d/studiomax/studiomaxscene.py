@@ -1729,7 +1729,7 @@ class StudiomaxScene( AbstractScene ):
 					self.setCurrentFrame(currFrame)
 					if not errorCheck:
 						from blur3d.api import Exceptions
-						raise Exceptions.Blur3DFPSChangeFailed('Changing the FPS appears to have failed. Your FPS has not been changed.')
+						raise Exceptions.FPSChangeFailed('Changing the FPS appears to have failed. Your FPS has not been changed.')
 					if callback:
 						callback()
 				# because RescaleTime.scaleTime requires the use of QTimers we need to listen for the signal
