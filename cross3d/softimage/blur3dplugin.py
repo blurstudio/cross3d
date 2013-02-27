@@ -125,11 +125,11 @@ def XsiApplication_sceneSaveAsFinished_OnEvent( ctxt ):
 	#print 'state change', inspect.stack()[0][3], _signalsEnabled
 	dispatchSignal('sceneSaveFinished', ctxt.GetAttribute('FileName'))
 	
-#def XsiApplication_selectionChanged_OnEvent( ctxt ):
-#	# Send different signals based on this
-#	# int( ctxt.GetAttribute( 'ChangeType' )
-#	_signalsEnabled = True
-#		dispatch.selectionChanged.emit()
+def XsiApplication_selectionChanged_OnEvent( ctxt ):
+	# Send different signals based on this
+	# int( ctxt.GetAttribute( 'ChangeType' )
+	_signalsEnabled = True
+	dispatch.selectionChanged.emit()
 	
 #def XsiApplication_sequenceRenderRequested_OnEvent( ctxt ):
 #	blurdev.core.sequenceRenderRequested.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
@@ -235,7 +235,7 @@ def XSILoadPlugin( reg ):
 	reg.RegisterEvent( 'XsiApplication_sceneSaveFinished',			constants.siOnEndSceneSave2 )
 	reg.RegisterEvent( 'XsiApplication_sceneSaveAsRequested',		constants.siOnBeginSceneSaveAs )
 	reg.RegisterEvent( 'XsiApplication_sceneSaveAsFinished',		constants.siOnEndSceneSaveAs )
-#	reg.RegisterEvent( 'XsiApplication_selectionChanged',			constants.siOnSelectionChange )
+	reg.RegisterEvent( 'XsiApplication_selectionChanged',			constants.siOnSelectionChange )
 #	reg.RegisterEvent( 'XsiApplication_sequenceRenderRequested',	constants.siOnBeginSequence )
 #	reg.RegisterEvent( 'XsiApplication_sequenceRenderFinished',		constants.siOnEndSequence )
 #	reg.RegisterEvent( 'XsiApplication_timeChanged',				constants.siOnTimeChange )
