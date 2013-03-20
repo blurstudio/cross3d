@@ -19,7 +19,8 @@ class RescaleTime(QObject):
 	virtualKeyMap = {'del':0x2e, '0':0x30, '1':0x31, '2':0x32, '3':0x33, '4':0x34, '5':0x35, '6':0x36, '7':0x37, '8':0x38, '9':0x39}
 	hardwareKeyMap = {'del':0xE0, '0':0x0B, '1':0x02, '2':0x03, '3':0x04, '4':0x05, '5':0x06, '6':0x07, '7':0x08, '8':0x09, '9':0x0A}
 	# Listen for this signal to be emitted when calling scaleTime. scaleTime is using QTimers to wait for window animation
-	# so the code execution does not block code exicution moving foward.
+	# so the code execution does not block code exicution moving foward. The int value provided is the framerate requested,
+	# it can be used to check if the change was successfull.
 	scaleTimeFinished = pyqtSignal(int)
 
 	def __init__(self):
@@ -189,6 +190,9 @@ class RescaleTime(QObject):
 		# Allow the window to appear before continuing
 		if self.useTimers:
 			QTimer.singleShot(self.timerDelay, self.mouseToReScaleButton)
+		else:
+			# scale time failed, emit callback so caller can reset the values.
+			self.scaleTimeFinished.emit(self.endTimeValue)
 
 	def mouseToReScaleButton(self):
 		mxs.setWaitCursor()
@@ -206,6 +210,9 @@ class RescaleTime(QObject):
 		# Allow the window to appear before continuing
 		if self.useTimers:
 			QTimer.singleShot(self.timerDelay, self.mouseToEndTime)
+		else:
+			# scale time failed, emit callback so caller can reset the values.
+			self.scaleTimeFinished.emit(self.endTimeValue)
 
 	def mouseToEndTime(self):
 		mxs.setWaitCursor()
@@ -245,6 +252,9 @@ class RescaleTime(QObject):
 			# Allow the window to appear before continuing
 			if self.useTimers:
 				QTimer.singleShot(self.timerDelay, self.mouseToTimeConfigOk)
+				return
+		# scale time failed, emit callback so caller can reset the values.
+		self.scaleTimeFinished.emit(self.endTimeValue)
 
 	def mouseToTimeConfigOk(self):
 		mxs.setWaitCursor()
@@ -262,6 +272,9 @@ class RescaleTime(QObject):
 		self.restoreWindows()
 		if self.useTimers:
 			QTimer.singleShot(self.timerDelay, self.finishScaling)
+		else:
+			# scale time failed, emit callback so caller can reset the values.
+			self.scaleTimeFinished.emit(self.endTimeValue)
 	
 	def finishScaling(self):
 		if self.useTimers:
