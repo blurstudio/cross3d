@@ -49,6 +49,8 @@ class AbstractScene(QObject):
 		self._updatesDisabled 	 = 0
 		self._materialCache		 = None
 		self._mapCache			 = None
+		self._metaData 		     = None
+		self._state		    	 = {}
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -985,7 +987,23 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
-
+		
+	@abstractmethod
+	def storeState( self ):
+		"""
+			\remarks	stores the state of the scene.
+			\return		<bool> success
+		"""
+		return False
+		
+	@abstractmethod		
+	def restoreState( self ):
+		"""
+			\remarks	restores the state of the scene based on previously stored state.
+			\return		<bool> success
+		"""
+		return False
+		
 	@abstractmethod
 	def setAnimationRange(self, animationRange):
 		"""

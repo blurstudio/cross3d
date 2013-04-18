@@ -86,8 +86,12 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			firstFrameStartTime = 0
 			lastFrameStartTime = 0
 		
-		# Storing viewport state.
+		# Storing object states.
+		self._scene.storeState()
 		self.storeState()
+		
+		# Setting the scene range. Apparently if you don't it causes an animation layer issue.
+		self._scene.setAnimationRange(frameRange)
 		
 		# Setting slate.
 		if slate:
@@ -161,7 +165,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
-		# Restoring state.
+		# Restoring states.
+		self._scene.restoreState()
 		self.restoreState()
 		
 		# If the famouse capture Softimage bug happened we raise a specific error.

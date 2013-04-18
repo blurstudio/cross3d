@@ -19,10 +19,6 @@ class SoftimageScene( AbstractScene ):
 	def __init__( self ):
 		AbstractScene.__init__( self )
 		
-		# create custom properties
-		self._metaData 			= None
-		self._mapCache			= None
-		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -424,6 +420,30 @@ class SoftimageScene( AbstractScene ):
 			callback()
 		return True
 
+	def storeState( self ):
+		"""
+			\remarks	stores the state of the scene.
+			\return		<bool> success
+		"""
+		playControl = xsi.ActiveProject.Properties( "Play Control" )
+		self._state['rangeIn'] = playControl.Parameters( "In" ).Value
+		self._state['rangeOut'] = playControl.Parameters( "Out" ).Value
+		self._state['rangeGlobalIn'] = playControl.Parameters( "GlobalIn" ).Value
+		self._state['rangeGlobalOut'] = playControl.Parameters( "GlobalOut" ).Value
+		return True
+		
+	def restoreState( self ):
+		"""
+			\remarks	restores the state of the scene based on previously stored state.
+			\return		<bool> success
+		"""
+		playControl = xsi.ActiveProject.Properties( "Play Control" )
+		playControl.Parameters( "In" ).Value = self._state.get('rangeIn', 0)
+		playControl.Parameters( "Out" ).Value = self._state.get('rangeOut', 100)
+		playControl.Parameters( "GlobalIn" ).Value = self._state.get('rangeGlobalIn', 0)
+		playControl.Parameters( "GlobalOut" ).Value = self._state.get('rangeGlobalOut', 100)
+		return True
+		
 	def setAnimationRange( self, animationRange ):
 		"""
 			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
