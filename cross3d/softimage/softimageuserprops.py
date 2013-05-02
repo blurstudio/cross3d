@@ -95,6 +95,7 @@ class SoftimageUserProps(AbstractUserProps):
 		"""
 		string = unicode(string)
 		string, type = SoftimageUserProps._decodeString(string)
+		print ['StringType', string, type]
 		if type == float:
 			return float(string)
 		elif type == int:
@@ -109,11 +110,11 @@ class SoftimageUserProps(AbstractUserProps):
 	
 	@staticmethod
 	def _decodeString(string):
-		if re.search('\[.+\]', string):
+		if re.search('\[.*\]', string):
 			return string, list
-		if re.search('{.+}', string):
+		if re.search('{.*}', string):
 			return string, dict
-		if re.search('\(.+\)', string):
+		if re.search('\(.*\)', string):
 			return string, tuple
 		if string.find('.') != -1:
 			try:

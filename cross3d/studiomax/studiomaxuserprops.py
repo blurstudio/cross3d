@@ -117,9 +117,9 @@ class StudiomaxUserProps(AbstractUserProps):
 				return val, float
 			except:
 				pass
-		if re.search('\{.+\}', string):
+		if re.search('\{.*\}', string):
 			return string, dict
-		if re.search('#\(.+\)', string):
+		if re.search('#\(.*\)', string):
 			data = []
 			s = string
 			open, close = StudiomaxUserProps._posCounter(s)
@@ -128,7 +128,7 @@ class StudiomaxUserProps(AbstractUserProps):
 				s = s[:open-2]+'['+s[open:close]+']'+s[close+1:]
 				open, close = StudiomaxUserProps._posCounter(s)
 			return s, list
-		if re.search('\(.+\)', string):
+		if re.search('\(.*\)', string):
 			return string, tuple
 		try:
 			int(string)
