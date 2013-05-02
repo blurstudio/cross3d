@@ -10,7 +10,7 @@
 #
 
 #from PySoftimage import xsi
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps
+from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 from blur3d import api
 import re
 #from blurdev.enum import enum
@@ -128,5 +128,10 @@ class SoftimageUserProps(AbstractUserProps):
 			pass
 		return string, None
 
+class SoftimageFileProps(SoftimageUserProps):
+	def __init__(self, nativePointer):
+		super(SoftimageFileProps, self).__init__( api.Scene().rootObject().nativePointer())
+
 # register the symbol
 api.registerSymbol( 'UserProps', SoftimageUserProps )
+api.registerSymbol( 'FileProps', SoftimageFileProps )

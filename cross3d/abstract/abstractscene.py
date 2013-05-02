@@ -41,6 +41,7 @@ class AbstractScene(QObject):
 
 	# create the scene instance
 	_instance = None
+	_currentFileName = ''
 
 	def __init__(self):
 		QObject.__init__(self)
@@ -862,7 +863,7 @@ class AbstractScene(QObject):
 			\remarks	returns the current filename for the scene that is active in the application
 			\return		<str>
 		"""
-		return ''
+		return cls._currentFileName
 
 	@abstractmethod
 	def fileType(self):
@@ -2023,6 +2024,17 @@ class AbstractScene(QObject):
 
 		return self.updatesEnabled()
 
+	def setUserProps(self, newDict):
+		"""
+		Ovewrites the current custom properties with the provided dict. You should always build this dict from userProps,
+		if you don't it may be possible you will overwrite data stored by other plugins, users, etc.
+		:param newDict: dict
+		"""
+		from blur3d.api import FileProps
+		props = self.userProps()
+		props.clear()
+		props.update(newDict)
+
 	def stats(self):
 		"""
 			\remarks	return an instance of blur3d.api.SceneStats to be able to collect information on this scene
@@ -2082,6 +2094,15 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self._unisolate()
+
+	def userProps(self):
+		"""Returns the FileProps object associated with this file
+		:return; :class:`blur3d.api.FileProps`
+		"""
+		from blur3d.api import FileProps
+		# Note currentFileName is ignored by most software specific implementations. It is used only
+		# for the abstract implementation as we have no application to ask for the current file
+		return FileProps(self.currentFileName())
 
 	def visibleObjects(self):
 		"""

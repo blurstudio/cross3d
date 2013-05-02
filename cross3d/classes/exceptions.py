@@ -18,6 +18,12 @@ class Exceptions:
 		'''
 		pass
 	
+	class FileNotDSO(Exception):
+		"""
+			Exception raised if unable to open dso file properties.
+		"""
+		pass
+	
 	class FPSChangeFailed(Blur3DException):
 		"""
 			Exception Raised if unable to change the FPS

@@ -25,7 +25,8 @@
 
 import blur3d
 from blur3d import api
-
+from blurdev.media.dsofile import DSOFile as _DSOFile
+from PyQt4.QtCore import QTimer as _QTimer
 
 dispatchObject = blur3d.api.dispatch.dispatchObject
 
@@ -51,7 +52,7 @@ class AbstractUserProps(dict):
 		self.emitChange()
 
 	def __str__(self):
-		return str(self.lookupProps())
+		return unicode(self.lookupProps())
 
 	def clear(self):
 		self.lookupProps().clear()
@@ -59,7 +60,7 @@ class AbstractUserProps(dict):
 	def copy(self):
 		return self.lookupProps().copy()
 
-	def emitChange(self, key):
+	def emitChange(self, key=None):
 		if key == 'BlurTags':
 			dispatchObject('blurTagChanged', self._nativePointer)
 		else:
@@ -153,6 +154,95 @@ class AbstractUserProps(dict):
 			string = unicode(string)
 		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 
+class AbstractFileProps(AbstractUserProps):
+	def __init__(self, fileName=''):
+		super(AbstractFileProps, self).__init__(None)
+		self.fileName = fileName
+		self._dso = _DSOFile()
+		self._closeScheduled = False
+		self._saveScheduled = False
+	
+	def __delitem__(self, key):
+		if self._dso.open(self.fileName):
+			self._saveScheduled = True
+			if self._dso.removeCustomProperty(key):
+				self._close()
+				return True
+			raise KeyError('FileProps does not contain key: %s' % key)
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+	
+	def __getitem__(self, key):
+		if self._dso.open(self.fileName):
+			self._scheduleClose()
+			out = self._dso.customProperty(key)
+			if out:
+				return out.value()
+			raise KeyError('FileProps does not contain key: %s' % key)
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+	
+	def __setitem__(self, key, value):
+		if self._dso.open(self.fileName):
+			self._saveScheduled = True
+			prop = self._dso.customProperty(key)
+			if prop:
+				prop.setValue(value)
+			else:
+				self._dso.addCustomProperty(key, value)
+			self._close()
+			self.emitChange()
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+	
+	def __repr__(self):
+		return self.__str__()
+	
+	def _close(self):
+		if self._saveScheduled:
+			self._saveScheduled = False
+			self._dso.save()
+		self._dso.close()
+		self._closeScheduled = False
+	
+	def _scheduleClose(self, save=False):
+		if save:
+			self._saveScheduled = save
+		if not self._closeScheduled:
+			_QTimer.singleShot(0, self._close)
+			self._closeScheduled = True
+	
+	def clear(self):
+		"""
+		Removes all attributes and imedeately saves the changes. There is no QTimer delay.
+		"""
+		if self._dso.open(self.fileName):
+			self._dso.clear()
+			self._saveScheduled = True
+			self._close()
+			self.emitChange()
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+	
+	def lookupProps(self):
+		if self._dso.open(self.fileName):
+			self._scheduleClose()
+			return {prop.name(): prop.value() for prop in self._dso.customProperties()}
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+	
+	def update(self, *args, **kwargs):
+		"""
+		Adds all provided items and imedeately saves the changes. There is no QTimer delay.
+		"""
+		if self._dso.open(self.fileName):
+			for k, v in dict(*args, **kwargs).iteritems():
+				self[k] = v
+			self._saveScheduled = True
+			self._close()
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
 
 # register the symbol
 api.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)
+api.registerSymbol('FileProps', AbstractFileProps, ifNotFound=True)

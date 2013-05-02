@@ -10,7 +10,9 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps
+from PyQt4.QtCore import QDate
+from datetime import date
+from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 import re
 
 class StudiomaxUserProps(AbstractUserProps):
@@ -153,8 +155,63 @@ class StudiomaxUserProps(AbstractUserProps):
 		else:
 			return -1,-1
 		return openPos, pos
-			
+
+class StudiomaxFileProps(AbstractFileProps):
+	def __init__(self, fileName=''):
+		super(StudiomaxFileProps, self).__init__(None)
+		self.customName = mxs.pyhelper.namify('custom')
+	
+	def __delitem__(self, key):
+		index = mxs.fileProperties.findProperty(self.customName, key)
+		if index:
+			return mxs.fileProperties.deleteProperty(self.customName, key)
+		raise KeyError('FileProps does not contain key: %s' % key)
+	
+	def __getitem__(self, key):
+		index = mxs.fileProperties.findProperty(self.customName, key)
+		if index:
+			return mxs.fileProperties.getPropertyValue(self.customName, index)
+		raise KeyError('FileProps does not contain key: %s' % key)
+	
+	def __setitem__(self, key, value):
+		isDate = False
+		if isinstance(value, QDate):
+			value = value.toString('MM/dd/yyyy')
+			isDate = True
+		elif isinstance(value, date):
+			value = value.strftime('%m/%d/%Y')
+			isDate = True
+		# addProperty is also setProperty
+		if isDate:
+			mxs.fileProperties.addProperty(self.customName, key, value, mxs.pyhelper.namify('date'))
+		else:
+			mxs.fileProperties.addProperty(self.customName, key, value)
+		self.emitChange(key)
+	
+	def __repr__(self):
+		return self.__str__()
+	
+	def clear(self):
+		"""
+		Removes all attributes and imedeately saves the changes. There is no QTimer delay.
+		"""
+		for i in range(1, mxs.fileProperties.getNumProperties(self.customName)):
+			mxs.fileProperties.deleteProperty(self.customName, i)
+	
+	def lookupProps(self):
+		out = {}
+		for i in range(1, mxs.fileProperties.getNumProperties(self.customName) + 1):
+			out.update({mxs.fileProperties.getPropertyName(self.customName, i): mxs.fileProperties.getPropertyValue(self.customName, i)})
+		return out
+	
+	def update(self, *args, **kwargs):
+		"""
+		Adds all provided items and imedeately saves the changes. There is no QTimer delay.
+		"""
+		for k, v in dict(*args, **kwargs).iteritems():
+			self[k] = v
 
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'UserProps', StudiomaxUserProps )
+api.registerSymbol( 'FileProps', StudiomaxFileProps )
