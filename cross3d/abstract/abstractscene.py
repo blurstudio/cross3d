@@ -1969,7 +1969,7 @@ class AbstractScene(QObject):
 		if (propSet):
 			nativePropSet = propSet.nativePointer()
 
-		return self._setNativePropSetOverride(self, [ obj.nativePointer() for obj in objects ], nativePropSet)
+		return self._setNativePropSetOverride([ obj.nativePointer() for obj in objects ], nativePropSet)
 
 	def setMaterialOverride(self, objects, material, options=None, advancedState=None):
 		"""
