@@ -10,7 +10,7 @@
 #
 
 from Py3dsMax import mxs
-from PyQt4.QtCore import QDate
+from PyQt4.QtCore import QDate, QString
 from datetime import date
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 import re
@@ -170,7 +170,13 @@ class StudiomaxFileProps(AbstractFileProps):
 	def __getitem__(self, key):
 		index = mxs.fileProperties.findProperty(self.customName, key)
 		if index:
-			return mxs.fileProperties.getPropertyValue(self.customName, index)
+			value = mxs.fileProperties.getPropertyValue(self.customName, index)
+			if isinstance(value, (unicode, str)):
+				try:
+					value = eval(value)
+				except:
+					pass
+			return value
 		raise KeyError('FileProps does not contain key: %s' % key)
 	
 	def __setitem__(self, key, value):
@@ -181,6 +187,8 @@ class StudiomaxFileProps(AbstractFileProps):
 		elif isinstance(value, date):
 			value = value.strftime('%m/%d/%Y')
 			isDate = True
+		elif not isinstance(value, (float, int, str, unicode, QString)):
+			value = repr(value)
 		# addProperty is also setProperty
 		if isDate:
 			mxs.fileProperties.addProperty(self.customName, key, value, mxs.pyhelper.namify('date'))
