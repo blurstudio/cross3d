@@ -308,6 +308,13 @@ class AbstractSceneObject(SceneWrapper):
 		return self.cachedIcon(self.objectType())
 
 	@abstractmethod
+	def isBoxMode(self):
+		"""Returns whether or not this object is in boxMode
+
+		"""
+		return False
+
+	@abstractmethod
 	def isFrozen(self):
 		"""Returns whether or not this object is frozen(locked)
 		
@@ -405,6 +412,13 @@ class AbstractSceneObject(SceneWrapper):
 
 		"""
 		return self.setSelected(True)
+
+	@abstractmethod
+	def setBoxMode(self, state):
+		"""Sets whether this object is in boxMode
+
+		"""
+		return False
 
 	@abstractmethod
 	def setFrozen(self, state):

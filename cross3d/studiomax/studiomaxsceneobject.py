@@ -269,6 +269,14 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+
+	def isBoxMode( self ):
+		"""
+			\remarks	implements the AbstractSceneObject.isBoxMode to return whether or not this object is in boxMode
+			\sa			setBoxMode
+			\return		<bool> boxMode
+		"""
+		return self._nativePointer.boxmode
 	
 	def isFrozen( self ):
 		"""
@@ -293,7 +301,16 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> selected
 		"""
 		return self._nativePointer.isselected
-		
+
+	def setBoxMode( self, state ):
+		"""
+			\remarks	implements the AbstractSceneObject.setBoxMode to set whether this object is in boxMode or not
+			\sa			isBoxMode
+			\return		<bool> success
+		"""
+		self._nativePointer.boxmode = state
+		return True
+
 	def setFrozen( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setFrozen to freezes(locks)/unfreezes(unlocks) this object
