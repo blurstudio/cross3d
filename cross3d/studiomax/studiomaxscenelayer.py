@@ -671,7 +671,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			altPropIds		= list(data.value('altPropIds'))
 			scene			= self._scene
 			
-			for i in range(len(altPropValues)):
+			for i in range(len(altPropIds)):
 				altProp = SceneObjectPropSet( scene, None )
 				altProp.setUniqueId( altPropIds[i] )
 				altProp._setValueString( altPropValues[i] )
