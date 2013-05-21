@@ -27,6 +27,7 @@ def init():
 	import abstractscenematerial
 	import abstractscenemap
 	import abstractsceneatmospheric
+	import abstractscenefx
 	import abstractscenerenderer
 	import abstractscenemodel
 	import abstractscenecamera

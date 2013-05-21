@@ -225,6 +225,15 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
+	def _NativeFx(self, name='', uniqueId=0):
+		"""
+			\remarks	look up the native fx from this scene instance
+			\param		name	<str>
+			\return		<variant> nativeFx || None
+		"""
+		return None
+
+	@abstractmethod
 	def _findNativeObject(self, name='', uniqueId=0):
 		"""
 			\remarks	looks up a native object based on the inputed name
@@ -357,6 +366,15 @@ class AbstractScene(QObject):
 		return []
 
 	@abstractmethod
+	def _saveNativeMaterialsToLibrary(self, filename=''):
+		"""
+			\remarks	saves materials to the given library path
+			\param		filename	<str>
+			\return		<bool>		success
+		"""
+		return False
+
+	@abstractmethod
 	def _nativeActiveLayer(self):
 		"""
 			\remarks	returns the native active layer from the scene
@@ -370,6 +388,14 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the native atmospheric instances for this scene
 			\return		<list> [ <variant> nativeAtmospheric, .. ]
+		"""
+		return []
+
+	@abstractmethod
+	def _nativeFx(self):
+		"""
+			\remarks	return the native fx instances for this scene
+			\return		<list> [ <variant> nativeFx, .. ]
 		"""
 		return []
 
@@ -857,6 +883,15 @@ class AbstractScene(QObject):
 		"""
 		return False
 
+	@abstractmethod
+	def closeRenderSceneDialog(self):
+		"""
+			\remarks	closes an open render scene dialog
+			\sa			openRenderSceneDialog
+			\return		<bool> success
+		"""
+		return False
+
 	@classmethod
 	def currentFileName(cls):
 		"""
@@ -915,6 +950,15 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def openRenderSceneDialog(self):
+		"""
+			\remarks	opens a render scene dialog
+			\sa			closeRenderSceneDialog
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
 	def property(self, key, default=None):
 		"""
 			\remarks	returns a global scene value
@@ -931,6 +975,15 @@ class AbstractScene(QObject):
 			\return		<str>
 		"""
 		return ''
+
+	@abstractmethod
+	def renderSavesFile(self):
+		"""
+			\remarks	return whether render output will be saved to disk
+			\sa			setRenderSavesFile
+			\return		<bool>
+		"""
+		return False
 
 	@abstractmethod
 	def renderSize(self):
@@ -986,6 +1039,16 @@ class AbstractScene(QObject):
 			\param		changeType	<constants.FPSChangeType>	Defaults to constants.FPSChangeType.Frames
 			\param		callback	<funciton>					Code called after the fps is changed.
 			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def setRenderSavesFile(self, state):
+		"""
+			\remarks	sets whether render output will be saved to disk
+			\sa			renderSavesFile
+			\param		state	<bool>
+			\return		N/A
 		"""
 		return False
 		
@@ -1532,6 +1595,15 @@ class AbstractScene(QObject):
 				return SceneMap(self, nativeMap)
 			return None
 
+	def fxs(self):
+		"""
+			\remarks	returns the fx instances from this scene
+			\return		<list> [ <blur3d.api.SceneFx>, .. ]
+		"""
+		from blur3d.api import SceneFx
+		nativeFxs = self._nativeFxs()
+		return [ SceneFx(self, fx) for fx in nativeFxs ]
+
 	def getObject(self):
 		"""
 			\remarks	invokes the application's ability to let a user select an Object from the scene
@@ -1652,6 +1724,14 @@ class AbstractScene(QObject):
 			return output
 		else:
 			return objects
+
+	def saveMaterialsToLibrary(self, filename=''):
+		"""
+			\remarks	saves materials to a given material library
+			\param		filename	<str>
+			\return		<bool>		success
+		"""
+		return self._saveNativeMaterialsToLibrary(filename)
 
 	def selection(self, wildcard='', type=0):
 		"""

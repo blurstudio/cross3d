@@ -42,6 +42,16 @@ class AbstractSceneObjectGroup(SceneWrapper):
 		return False
 
 	@abstractmethod
+	def _addNativeFx(self, nativeFx):
+		"""Add the native fx to the object group
+
+		:param nativeFx: list of nativeFx items
+		:return bool
+
+		"""
+		return False
+
+	@abstractmethod
 	def _addNativeObjects(self, nativeObjects):
 		"""
 			\remarks	add the native objects to the object group
@@ -77,6 +87,15 @@ class AbstractSceneObjectGroup(SceneWrapper):
 		return []
 
 	@abstractmethod
+	def _nativeFxs(self):
+		"""
+			\remarks	return a list of the fx that are associated with this object group
+			\sa			fxs
+			\return		<list> [ <variant> nativeFx, .. ]
+		"""
+		return []
+
+	@abstractmethod
 	def _nativeObjects(self):
 		"""
 			\remarks	return a list of the native objects that are currently on this group
@@ -106,6 +125,15 @@ class AbstractSceneObjectGroup(SceneWrapper):
 		"""
 			\remarks	set the linked atmopherics to this object group to the inputed list of atmospherics
 			\param		nativeAtmospherics	<list> [ <variant> nativeAtmospheric, .. ]
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def _setNativeFxs(self, nativeFxs):
+		"""
+			\remarks	set the linked fxs to this object group to the inputed list of fxs
+			\param		nativeFxs	<list> [ <variant> nativeFx, .. ]
 			\return		<bool> success
 		"""
 		return False
@@ -155,6 +183,16 @@ class AbstractSceneObjectGroup(SceneWrapper):
 		
 		"""
 		return self._addNativeAtmospherics([ atmos.nativePointer() for atmos in atmospherics ])
+
+	def addFxs(self, fxs):
+		"""Add the fxs to this object group
+		
+		:param fxs: list of :class:`blur3d.api.SceneFx` 
+		                     objects
+		:return: bool
+		
+		"""
+		return self._addNativeFxs([ fx.nativePointer() for fx in fxs ])
 
 	def addObjects(self, objects):
 		"""Add the objects to this object group
@@ -227,6 +265,15 @@ class AbstractSceneObjectGroup(SceneWrapper):
 		
 		"""
 		return self.setFrozen(True)
+
+	def fxs(self):
+		"""Return a list of the fxs that are part of this object group
+			
+		:return: list of :class:`blur3d.api.SceneFx` objects
+		
+		"""
+		from blur3d.api import SceneFx
+		return [ SceneFx(self._scene, fx) for fx in self._nativeFxs() ]
 
 	def hasMaterialOverrideFlag(self, flag):
 		"""
@@ -465,6 +512,18 @@ class AbstractSceneObjectGroup(SceneWrapper):
 
 		"""
 		return self._setNativeAtmospherics([ atmos.nativePointer() for atmos in atmospherics ])
+
+	def setFxs(self, fxs):
+		"""
+		Sets the fxs that are associated with this object group 
+		to the inputed list of fxs
+		
+		:param fxs: list of :class:`blur3d.api.SceneFx`
+		                     objects
+		:return: bool
+
+		"""
+		return self._setNativeFxs([ fx.nativePointer() for fx in fxs ])
 
 	def setPropSetOverride(self, propSet):
 		"""

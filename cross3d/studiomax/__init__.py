@@ -30,6 +30,7 @@ def init():
 	import studiomaxscenepropset
 	import studiomaxscenemap
 	import studiomaxsceneatmospheric
+	import studiomaxscenefx
 	import studiomaxscenerenderer
 	import studiomaxscenecamera
 	import studiomaxsceneanimationcontroller

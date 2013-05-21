@@ -15,7 +15,7 @@ from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
 _nativeObjectTypes = { 	'light'         : ObjectType.Light,
 						'camera'        : ObjectType.Camera,
-						'Thinking'      : ObjectType.Particle,
+						'Thinking'      : ObjectType.Particle | ObjectType.Thinking,
 						'PF_Source'     : ObjectType.Particle,
 						'FumeFX'		: ObjectType.FumeFX,
 						'GeometryClass' : ObjectType.Geometry }
@@ -269,6 +269,15 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+
+	def clone( self ):
+		"""
+			\remarks	implements the AbstractSceneobject.clone to make a clone of this object in the scene
+			\sa			N/A
+			\return		<Py3dsMax.mxs.Object>
+		"""
+		cloneObject = mxs.pyhelper.cloneobjects([self._nativePointer])
+		return self.__class__(self.scene(), cloneObject[0])
 
 	def isBoxMode( self ):
 		"""

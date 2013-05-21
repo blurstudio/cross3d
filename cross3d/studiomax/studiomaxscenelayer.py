@@ -217,6 +217,24 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			layer.metaData().setValue( 'linkedAtmos', latm )
 		
 		return True
+
+	def _addNativeFx(self, nativeFx):
+		"""
+			\remarks	implements the AbstractSceneObjectGroup._addNativeFx method to add a list of Fx to this layer
+			\param		nativeFx	<list>
+			\return		<bool> success
+		"""
+		data = self.metaData()
+		fxIds = list(data.value('linkedFx'))
+		unique_id = mxs.blurUtil.uniqueId
+
+		for fx in nativeFx:
+			uid = unique_id(fx)
+			if not uid in fxIds:
+				fxIds.append(uid)
+
+		data.setValue('linkedFx', fxIds)
+		return True
 	
 	def _addNativeObjects( self, nativeObjects ):
 		"""
@@ -311,6 +329,15 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				output.append(effect)
 			
 		return output
+
+	def _nativeFxs(self):
+		"""
+			\remarks	implements the AbstractObjectGroup._nativeFxs method to return a list of the fx instances linked to this layer
+			\return		<list> [ nativeAtmospheric, .. ]
+		"""
+		layerFxIds = list(self.metaData().value('linkedFx'))
+		fxInstances = [f.nativePointer() for f in self.scene().fxs() if mxs.blurUtil.uniqueId(f.nativePointer()) in layerFxIds]
+		return fxInstances
 	
 	def _nativeLayerGroup( self ):
 		"""
@@ -531,6 +558,21 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			layer.metaData().setValue( 'linkedAtmos', latm )
 		
 		return True
+
+	def _setNativeFxs( self, nativeFxs ):
+		"""
+			\remarks	implements the AbstractObjectGroup._setNativeFxs method to set the inputed list of fxs
+			\param		nativeFxs	<list> [ nativeFx, .. ]
+			\return		<bool> success
+		"""
+		atm 		= []
+		unique_id 	= mxs.blurUtil.uniqueId
+		
+		# collect the id's for this layer
+		for atmos in nativeFxs:
+			atm.append( unique_id( atmos ) )
+		self.metaData().setValue( 'linkedFx', atm )
+		return True
 	
 	def _setNativeWireColor( self, nativeColor ):
 		"""
@@ -676,7 +718,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\remarks	implements the AbstractSceneLayer.isWorldLayer method to check if this layer is the root world layer or not
 			\return		<bool> is world
 		"""
-		return self._nativePointer.name == '0'
+		if hasattr(self._nativePointer, 'name'):
+			return self._nativePointer.name == '0'
+		else:
+			return False
 	
 	def layerGroupOrder( self ):
 		"""
@@ -741,7 +786,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\sa			name
 			\return		<str> name
 		"""
-		name = self._nativePointer.name
+		if hasattr(self._nativePointer, 'name'):
+			name = self._nativePointer.name
+		else:
+			return ''
 		if ( name == '0' ):
 			return 'World Layer'
 		return name
@@ -1058,6 +1106,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# update the atmospherics on this layer
 		for atmos in self.atmospherics():
 			atmos.setEnabled( not state )
+
+		# update the fx instances on this layer
+		for fx in self.fxs():
+			fx.setEnabled( not state )
 			
 		return True
 	

@@ -652,6 +652,21 @@ class StudiomaxScene( AbstractScene ):
 			
 			return output
 		return []
+
+	def _saveNativeMaterialsToLibrary(self, filename=''):
+		"""
+			\remarks	saves materials to the given library, or prompts the user to select a save location if none is given
+			\param		filename	<str>
+			\return		<bool>		success
+		"""
+		from PyQt4.QtGui import QFileDialog
+		filename = QFileDialog.getSaveFileName(None, 'Save Material Library', '', 'Material Library files (*.mat)')
+		filename = str(filename)
+		if ( filename ):
+			if not filename.endswith('.mat'):
+				filename = '{base}.mat'.format(base=filename)
+			mxs.saveTempMaterialLibrary(mxs.sceneMaterials, filename)
+		return True
 	
 	def _nativeActiveLayer( self ):
 		"""
@@ -713,6 +728,30 @@ class StudiomaxScene( AbstractScene ):
 			maps = list(data.value('environmentMaps'))
 			return maps[index-1]
 		return None
+
+	def _nativeFxs( self ):
+		"""
+			\remarks	implements the AbstractScene._nativeFx method to return a list of the fx instances in this scene
+			\return		<list>
+		"""
+		from blur3d.constants import ObjectType
+		tps = [o for o in self.objects() if o.objectType() & ObjectType.Thinking]
+
+		def _crawlForSubDyns(dynset):
+			from copy import copy
+			subs = mxs.pyhelper.getSubDyns(dynset)
+			subs = [s for s in subs if hasattr(s, 'name') and s.name.startswith('DS:')]
+			finalList = copy(subs)
+			for sub in subs:
+				if mxs.pyhelper.getSubDyns(sub):
+					finalList.extend(_crawlForSubDyns(sub))
+			return finalList
+
+		fxInstances = []
+		for tp in tps:
+			fxInstances.extend(_crawlForSubDyns(tp.nativePointer().dynamic_master))
+
+		return fxInstances
 	
 	def _nativeLayers( self ):
 		"""
@@ -1551,6 +1590,15 @@ class StudiomaxScene( AbstractScene ):
 				# remove the layer reference
 				if ( not layer ):
 					rem_attr( root, i+1 )
+
+	def closeRenderSceneDialog(self):
+		"""
+			\remarks	implements the AbstractScene.closeRenderSceneDialog to close an open render scene dialog
+			\sa			openRenderSceneDialog
+			\return		<bool> success
+		"""
+		mxs.renderscenedialog.close()
+		return True
 		
 	@classmethod
 	def currentFileName( cls ):
@@ -1559,6 +1607,22 @@ class StudiomaxScene( AbstractScene ):
 			\return		<str>
 		"""
 		return mxs.maxFilePath + mxs.maxFileName
+
+	def fileName( self ):
+		"""
+			\remarks	implements the AbstractScene.fileName to return the name of the current scene file.
+			\sa			filePath
+			\return		<str> file name
+		"""
+		return mxs.maxfilename
+
+	def filePath( self ):
+		"""
+			\remarks	implements the AbstractScene.filePath to return the directory path of the current scene file.
+			\sa			fileName
+			\return		<str> directory path
+		"""
+		return mxs.maxfilepath
 	
 	def holdCurrentState( self ):
 		"""
@@ -1633,6 +1697,15 @@ class StudiomaxScene( AbstractScene ):
 			self._metaData = data
 				
 		return self._metaData
+
+	def openRenderSceneDialog(self):
+		"""
+			\remarks	implements AbstractScene.openRenderSceneDialog to open a render scene dialog
+			\sa			closeRenderSceneDialog
+			\return		<bool> success
+		"""
+		mxs.renderscenedialog.open()
+		return True
 	
 	def property( self, key, default = None ):
 		"""
@@ -1646,6 +1719,14 @@ class StudiomaxScene( AbstractScene ):
 			return default
 		
 		return self._fromNativeValue( value )
+
+	def renderSavesFile(self):
+		"""
+			\remarks	implements AbstractScene.renderSavesFile to return whether renders are set to save frames to disk
+			\sa			getRenderSavesFile
+			\return		<bool>
+		"""
+		return mxs.rendsavefile
 	
 	def renderSize( self ):
 		"""
@@ -1765,6 +1846,16 @@ class StudiomaxScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		mxs.rendOutputFilename =  outputPath
+		return True
+
+	def setRenderSavesFile(self, state):
+		"""
+			\remarks	implements AbstractScene.setRenderSavesFile to tell renders to save frames to disk
+			\sa			renderSavesFile
+			\param		state	<bool>
+			\return		<bool> success
+		"""
+		mxs.rendsavefile = state
 		return True
 		
 	def setRenderSize(self, size):
