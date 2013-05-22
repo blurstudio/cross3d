@@ -410,7 +410,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				return propSets[index]
 			else:
 				from blurdev import debug
-				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(mtls),self.name()) )
+				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(propSets),self.name()) )
 				return None
 				
 		return None
