@@ -1330,6 +1330,12 @@ class StudiomaxScene( AbstractScene ):
 					obj.enable_particles = state
 					obj.baseObject.activateParticles( state )
 					continue
+
+			# toggle caches
+			if ( options & VisibilityToggleOptions.ToggleCaches ):
+				for object in nativeObjects:
+					state = not object.ishidden
+					mxs.blur3dhelper.toggleCaches(object, state)
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):

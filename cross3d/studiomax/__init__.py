@@ -10,12 +10,14 @@
 #
 
 from blurdev.enum import enum
+from blurdev import relativePath
 
 StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
 
 def init():
 	# make sure we can import maxscript
 	from Py3dsMax import mxs
+	mxs.filein(relativePath(__file__, 'maxscript/helpers.ms'))
 	
 	# load the maxscript classes
 	import studiomaxuserprops
