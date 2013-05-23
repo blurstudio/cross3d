@@ -1,5 +1,5 @@
 /*!
-	mxs_pyhelper.ms
+	helpers.ms
 	
 	this file defines a struct of methods designed to help out the python integration
 	for methods that are not easily transferrable to python
