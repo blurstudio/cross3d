@@ -9,8 +9,12 @@ global blur3dhelper
 	struct Blur3dHelperStruct (
 
 		-- Visibility toggle for PC objects.
-		function toggleCaches pcMods state = (
-			_blurLibrary.load "blurPointCache"	
+		function toggleCaches mods state = (
+			_blurLibrary.load "blurPointCache"
+			pcMods = #()
+			for i = 1 to mods.count do
+				if classOf mods[i] == Point_Cache do
+					append PCMods mods[i] 	
 			for i = 1 to pcMods.count do (
 				if state != pcMods[i].enabled do (
 					if ( not state and _blurPointCache.canDisablePCObject obj ) then 	
