@@ -1331,10 +1331,14 @@ class StudiomaxScene( AbstractScene ):
 					obj.baseObject.activateParticles( state )
 					continue
 
-			# toggle caches
-			if ( options & VisibilityToggleOptions.ToggleCaches ):
+			# Toggle point caches.
+			if options & VisibilityToggleOptions.TogglePointCaches:
 				mods = [m for m in obj.modifiers]
-				mxs.blur3dhelper.toggleCaches(mods, state)
+				mxs.blur3dhelper.togglePointCaches(mods, state)
+
+			# Toggle transform caches.
+			if options & VisibilityToggleOptions.ToggleTransformCaches:
+				mxs.blur3dhelper.toggleTransformCache(obj, state)
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
