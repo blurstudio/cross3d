@@ -1333,9 +1333,8 @@ class StudiomaxScene( AbstractScene ):
 
 			# toggle caches
 			if ( options & VisibilityToggleOptions.ToggleCaches ):
-				for object in nativeObjects:
-					state = not object.ishidden
-					mxs.blur3dhelper.toggleCaches(object, state)
+				mods = [m for m in obj.modifiers]
+				mxs.blur3dhelper.toggleCaches(mods, state)
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
