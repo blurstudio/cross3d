@@ -33,7 +33,7 @@ global blur3dhelper
 				)
 				else (
 					for child in obj.children do (
-						if ( hasVisibleDescendent child ) do (
+						if ( blur3dhelper.hasVisibleDescendent child ) do (
 							found = true
 							exit
 						)
@@ -51,7 +51,7 @@ global blur3dhelper
 				)
 				else (
 					for obj in refs.dependentNodes obj do (
-						if ( hasVisibleReference obj ) then (
+						if ( blur3dhelper.hasVisibleReference obj ) then (
 							fount = true
 							exit
 						)
@@ -70,11 +70,11 @@ global blur3dhelper
 						success = false
 						exit
 					)
-					if ( hasVisibleDescendent obj ) do (
+					if ( blur3dhelper.hasVisibleDescendent obj ) do (
 						success = false
 						exit
 					)
-					if ( hasVisibleReference obj ) do (
+					if ( blur3dhelper.hasVisibleReference obj ) do (
 						success = false
 						exit
 					)
@@ -86,7 +86,7 @@ global blur3dhelper
 		function toggleTransformCache obj state = (
 			if ( isproperty obj #controller and classof obj.controller == transform_cache ) then (
 				if ( obj.controller.enabled != state ) then (
-					if ( not state and canDisableTMController obj.controller ) then obj.controller.enabled = false
+					if ( not state and blur3dhelper.canDisableTMController obj.controller ) then obj.controller.enabled = false
 					else obj.controller.enabled = True
 				)
 			)
