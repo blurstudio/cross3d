@@ -95,7 +95,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True ):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True ):
 		'''
 			/option <bool> effects
 		'''
@@ -145,14 +145,16 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		scene.setAnimationRange( frameRange )
 		
 		# setting the viewport
-		mxs.hideByCategory.geometry = False
-		mxs.hideByCategory.shapes = True
-		mxs.hideByCategory.lights = True
-		mxs.hideByCategory.cameras = True
-		mxs.hideByCategory.helpers = True
-		mxs.hideByCategory.spacewarps = True
-		mxs.hideByCategory.particles = False
-		mxs.hideByCategory.bones = True
+		if geometryOnly:
+			mxs.hideByCategory.geometry = False
+			mxs.hideByCategory.shapes = True
+			mxs.hideByCategory.lights = True
+			mxs.hideByCategory.cameras = True
+			mxs.hideByCategory.helpers = True
+			mxs.hideByCategory.spacewarps = True
+			mxs.hideByCategory.particles = False
+			mxs.hideByCategory.bones = True
+			
 		scene.clearSelection()
 		mxs.displaySafeFrames = False
 		mxs.viewport.setGridVisibility( self._name, False )

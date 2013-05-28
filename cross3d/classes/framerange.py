@@ -61,9 +61,19 @@ class FrameRange( list ):
 		return FrameRange( [ ( frameRange[0] - self[0] ), ( frameRange[1] - self[1] ) ] )
 				
 	def overlaps( self, frameRange ):
+		"""
+			\remarks	Returns weather the ranges overlaps.
+			\param		separator <string>
+		"""
 		if self[0] > frameRange[1] or self[1] < frameRange[0]:
 			return False
 		return True
+		
+	def extends( self, frameRange ):
+		"""
+			\remarks	Returns weather the range includes additional frames.
+		"""
+		return self[0] < frameRange[0] or self[1] > frameRange[1]
 		
 	def overlap( self, frameRange ):
 		"""

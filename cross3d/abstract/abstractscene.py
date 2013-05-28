@@ -51,6 +51,7 @@ class AbstractScene(QObject):
 		self._materialCache		 = None
 		self._mapCache			 = None
 		self._metaData 		     = None
+		self._buffer             = {}
 		self._state		    	 = {}
 
 	#------------------------------------------------------------------------------------------------------------------------
@@ -800,7 +801,7 @@ class AbstractScene(QObject):
 	@abstractmethod
 	def setSilentMode(self, switch):
 		"""
-			\remarks	sets the software to make sure that windows are not popping. added by douglas
+			\remarks	Makes the application silent during intense calls.
 			\return		<bool> success
 		"""
 		return False

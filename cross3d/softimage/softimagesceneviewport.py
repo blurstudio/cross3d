@@ -69,7 +69,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate='', effects=True ):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True ):
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
 		"""
@@ -101,31 +101,34 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		else:
 			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', True )
 		
-		# Setting visibility options.
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objpolymesh' ).Value = True
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objparticles' ).Value = True
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objinstances' ).Value = True
-		
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'constructionlevel' ).Value = False
+		# Setting regular visibility options.
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'gridaxisvis' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objlights' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcameras' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objimpgeometry' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcurves' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objhair' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objnulls' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltransfogroups' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnroots' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchneff' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrllattices' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltextsupp' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlwaves' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlother' ).Value = False
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'constructionlevel' ).Value = False
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objannotationobjects' ).Value = False
-		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
 		xsi.SetValue( 'preferences.ViewCube.show', False )
+		
+		if geometryOnly:
+			
+			# Setting geometry only visibility options.
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objpolymesh' ).Value = True
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objparticles' ).Value = True
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objinstances' ).Value = True
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objlights' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcameras' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objimpgeometry' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objcurves' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objhair' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objnulls' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltransfogroups' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnroots' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchneff' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrllattices' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrltextsupp' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlchnjnts' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlwaves' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlother' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
 		
 		# Checking inputs.
 		if not frameRange:

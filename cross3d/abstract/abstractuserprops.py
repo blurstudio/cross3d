@@ -227,10 +227,7 @@ class AbstractFileProps(AbstractUserProps):
 	def lookupProps(self):
 		if self._dso.open(self.fileName):
 			self._scheduleClose()
-			out = {}
-			for prop in self._dso.customProperties():
-				out[prop.name()] = prop.value()
-			return out
+			return {prop.name(): prop.value() for prop in self._dso.customProperties()}
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
 	

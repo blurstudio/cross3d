@@ -224,7 +224,7 @@ class FileSequence( object ):
 			return True
 		else:
 			raise( 'Input sequence ' + str( self._path ) + ' is missing frames' )
-		return True
+		return False
 		
 	def link( self, output ):
 		if self.isComplete():

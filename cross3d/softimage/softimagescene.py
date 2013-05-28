@@ -459,16 +459,29 @@ class SoftimageScene( AbstractScene ):
 		
 	def setSilentMode( self, switch ):
 		"""
-			\remarks	implements AbstractScene.setAutoInspect method to set the Auto Inspect state
+			\remarks	implements AbstractScene.setSilentMode method to make the application silent during intense calls.
 			\param		switch	<bool>
 			\return		<bool> success
 		"""
 		if switch:
-			xsi.SetValue("preferences.scripting.cmdlog", False, "")
+			if not self._buffer.get('silentMode', None):
+				self._buffer['silentMode'] = {}
+				self._buffer['silentMode']['cmdlog'] = xsi.GetValue( "preferences.scripting.cmdlog")
+				self._buffer['silentMode']['msglogverbose'] = xsi.GetValue( "preferences.scripting.msglogverbose")
+				self._buffer['silentMode']['msglogrealtime'] = xsi.GetValue( "preferences.scripting.msglogrealtime")
+				self._buffer['silentMode']['autoinspect'] = xsi.GetValue( "preferences.Interaction.autoinspect")
+				
+			xsi.SetValue( "preferences.scripting.cmdlog", False, "")
+			xsi.SetValue( "preferences.scripting.msglogverbose", False, "")
+			xsi.SetValue( "preferences.scripting.msglogrealtime", False, "")
 			xsi.SetValue( "preferences.Interaction.autoinspect", False, "" )
 		else:
-			xsi.SetValue( "preferences.Interaction.autoinspect", True, "" )
-			xsi.SetValue("preferences.scripting.cmdlog", True, "")
+			if self._buffer.get('silentMode', None):
+				xsi.SetValue( "preferences.scripting.cmdlog", self._buffer['silentMode']['cmdlog'], "")
+				xsi.SetValue( "preferences.scripting.msglogverbose", self._buffer['silentMode']['msglogverbose'], "")
+				xsi.SetValue( "preferences.scripting.msglogrealtime", self._buffer['silentMode']['msglogrealtime'], "")
+				xsi.SetValue( "preferences.Interaction.autoinspect", self._buffer['silentMode']['autoinspect'], "" )
+				del self._buffer['silentMode']
 		return True
 			
 	def retime( self, offset, scale = 1, activeRange = None, pivot = None ):
