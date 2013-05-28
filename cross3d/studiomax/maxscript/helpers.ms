@@ -84,10 +84,14 @@ global blur3dhelper
 		),
 	
 		function toggleTransformCache obj state = (
-			if ( isproperty obj #controller and classof obj.controller == transform_cache ) then (
-				if ( obj.controller.enabled != state ) then (
-					if ( not state and blur3dhelper.canDisableTMController obj.controller ) then obj.controller.enabled = false
-					else obj.controller.enabled = True
+			if ( isproperty obj #controller and classof obj.controller == transform_cache ) do (
+				if ( obj.controller.enabled != state ) do (
+					if ( not state and blur3dhelper.canDisableTMController obj.controller ) then (
+						obj.controller.enabled = false
+					)
+					else (
+						obj.controller.enabled = true
+					)
 				)
 			)
 		)
