@@ -170,15 +170,18 @@ class StudiomaxFileProps(AbstractFileProps):
 	def __getitem__(self, key):
 		index = mxs.fileProperties.findProperty(self.customName, key)
 		if index:
-			value = mxs.fileProperties.getPropertyValue(self.customName, index)
-			if isinstance(value, (unicode, str)):
-				try:
-					value = eval(value)
-				except:
-					pass
-			return value
+			return self.__getValueForIndex__(index)
 		raise KeyError('FileProps does not contain key: %s' % key)
 	
+	def __getValueForIndex__(self, index):
+		value = mxs.fileProperties.getPropertyValue(self.customName, index)
+		if isinstance(value, (unicode, str)):
+			try:
+				value = eval(value)
+			except:
+				pass
+		return value
+		
 	def __setitem__(self, key, value):
 		isDate = False
 		if isinstance(value, QDate):
@@ -209,7 +212,7 @@ class StudiomaxFileProps(AbstractFileProps):
 	def lookupProps(self):
 		out = {}
 		for i in range(1, mxs.fileProperties.getNumProperties(self.customName) + 1):
-			out.update({mxs.fileProperties.getPropertyName(self.customName, i): mxs.fileProperties.getPropertyValue(self.customName, i)})
+			out.update({mxs.fileProperties.getPropertyName(self.customName, i): self.__getValueForIndex__(i)})
 		return out
 	
 	def update(self, *args, **kwargs):
