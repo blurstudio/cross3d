@@ -139,4 +139,5 @@ class AbstractScenePropSet(SceneWrapper):
 
 # register the class to the system
 api.registerSymbol('ScenePropSet', AbstractScenePropSet)
+api.registerSymbol('SceneObjectPropSet', AbstractScenePropSet)
 
