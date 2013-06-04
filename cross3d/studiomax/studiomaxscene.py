@@ -1766,6 +1766,16 @@ class StudiomaxScene( AbstractScene ):
 		mxs.gc()	# second time removes items that are ready for removal
 		
 		return True
+
+	def select(self):
+		"""
+			\remarks	implements AbstractScene.select to launch Max's "selectByName" dialog and then select the user's choice.
+			\return		<list> objects
+		"""
+		selection = mxs.selectByName()
+		mxs.select(selection)
+		self.update()
+		return self.selection()
 	
 	def saveFileAs( self, filename = '' ):
 		"""

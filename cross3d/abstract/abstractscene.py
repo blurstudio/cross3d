@@ -1734,6 +1734,14 @@ class AbstractScene(QObject):
 		"""
 		return self._saveNativeMaterialsToLibrary(filename)
 
+	@abstractmethod
+	def select(self):
+		"""
+			\remarks	launches the application's selection dialog and returns the selected objects
+			\return		<list> [<blur3d.api.Variant>, ..]
+		"""
+		pass
+
 	def selection(self, wildcard='', type=0):
 		"""
 			\remarks	returns the currently selected objects from the scene
