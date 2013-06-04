@@ -37,6 +37,7 @@ def init():
 	import abstractsceneanimationkey
 	import abstractscenecache
 	import abstractscenesubmitter
+	import abstractscenepropset
 	import abstractalembic
 	import abstractwritejob
 	import abstractwritejobs
