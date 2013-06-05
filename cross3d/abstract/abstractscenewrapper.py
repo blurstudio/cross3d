@@ -36,6 +36,9 @@ class AbstractSceneWrapper(object):
 		self._scene				 = scene
 		self._nativePointer		 = nativePointer
 
+	def __str__(self):
+		return '<%s (%s)>' % (super(AbstractSceneWrapper, self).__str__().split()[0].split('.')[-1], self.displayName())
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------

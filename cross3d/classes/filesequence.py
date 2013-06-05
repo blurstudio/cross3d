@@ -162,9 +162,9 @@ class FileSequence( object ):
 					shutil.copy( i, o )
 				return True
 			else:
-				raise('FileSequence.copy only supports outputting to a sequence with the same amount of frames.')
+				raise Exception('FileSequence.copy only supports outputting to a sequence with the same amount of frames.')
 		else:
-			raise('FileSequence.copy only supports outputting to a complete sequence.')
+			raise Exception('FileSequence.copy only supports outputting to a complete sequence.')
 	
 	def convert( self, output ):
 		if self.isComplete():
@@ -177,11 +177,11 @@ class FileSequence( object ):
 						QImage(i, 'exr_nogamma').save(o)
 					return True
 				else:
-					raise('FileSequence.convert does not supports %s to %s' % (inputExtension, outputExtension))
+					raise Exception('FileSequence.convert does not supports %s to %s' % (inputExtension, outputExtension))
 			else:
-				raise('FileSequence.convert only supports outputting to a sequence with the same amount of frames.')
+				raise Exception('FileSequence.convert only supports outputting to a sequence with the same amount of frames.')
 		else:
-			raise('FileSequence.convert only supports outputting to a complete sequence.')
+			raise Exception('FileSequence.convert only supports outputting to a complete sequence.')
 
 	def delete( self, deletesBasePath=False ):
 		if deletesBasePath:
@@ -223,7 +223,7 @@ class FileSequence( object ):
 			normalisedSequence.delete()
 			return True
 		else:
-			raise( 'Input sequence ' + str( self._path ) + ' is missing frames' )
+			raise Exception( 'Input sequence %s is missing frames' % self._path )
 		return False
 		
 	def link( self, output ):

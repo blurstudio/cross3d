@@ -21,6 +21,7 @@
 
 from blur3d			import abstractmethod, pendingdeprecation, constants
 from PyQt4.QtCore 	import QObject, pyqtSignal
+import collections as _collections
 
 class AbstractScene(QObject):
 	# layer signals
@@ -2080,6 +2081,8 @@ class AbstractScene(QObject):
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
+		if not isinstance(objects, _collections.Iterable):
+			raise TypeError("Requires a list of blur3d.api.SceneObject's.")
 		return self._setNativeSelection([ obj.nativePointer() for obj in objects ])
 
 	def addToSelection(self, objects): # new douglas

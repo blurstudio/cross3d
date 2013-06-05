@@ -300,7 +300,9 @@ class SoftimageScene( AbstractScene ):
 			\return		<PySoftimage.xsi.Model> nativeModel
 		"""
 		root = self._nativeRootObject()
-		return root.addModel( nativeObjects, name )
+		fact = xsiFactory.CreateObject( 'XSI.Collection' )
+		fact.AddItems(nativeObjects)
+		return root.addModel( fact, name )
 		
 	def _createNativeCamera( self, name = 'Camera', type = 'Standard' ):
 		"""
@@ -431,7 +433,15 @@ class SoftimageScene( AbstractScene ):
 		self._state['rangeGlobalIn'] = playControl.Parameters( "GlobalIn" ).Value
 		self._state['rangeGlobalOut'] = playControl.Parameters( "GlobalOut" ).Value
 		return True
-		
+	
+	def renderSize(self):
+		"""
+			\remarks	return the render output size for the scene
+			\return		<QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		return QSize(xsi.GetValue("Passes.RenderOptions.ImageWidth"), xsi.GetValue("Passes.RenderOptions.ImageHeight"))
+	
 	def restoreState( self ):
 		"""
 			\remarks	restores the state of the scene based on previously stored state.
@@ -456,7 +466,26 @@ class SoftimageScene( AbstractScene ):
 		playControl.Parameters( "GlobalIn" ).Value = animationRange[0]
 		playControl.Parameters( "GlobalOut" ).Value = animationRange[1]
 		return True
-		
+	
+	def setRenderSize(self, size):
+		"""
+			\remarks	set the render output size for the scene
+			\param		size	<QSize>
+			\return		<bool> success
+		"""
+		from PyQt4.QtCore import QSize
+		if isinstance(size, QSize):
+			width = size.width()
+			height = size.height()
+		elif isinstance(size, list):
+			if len(size) < 2:
+				raise TypeError('You must provide a width and a height when setting the render size using a list')
+			width = size[0]
+			height = size[1]
+		xsi.SetValue("Passes.RenderOptions.ImageWidth", width)
+		xsi.SetValue("Passes.RenderOptions.ImageHeight", height)
+		return True
+	
 	def setSilentMode( self, switch ):
 		"""
 			\remarks	implements AbstractScene.setSilentMode method to make the application silent during intense calls.
