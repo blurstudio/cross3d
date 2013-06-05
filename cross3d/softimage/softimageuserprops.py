@@ -95,7 +95,6 @@ class SoftimageUserProps(AbstractUserProps):
 		"""
 		string = unicode(string)
 		string, type = SoftimageUserProps._decodeString(string)
-		print ['StringType', string, type]
 		if type == float:
 			return float(string)
 		elif type == int:
