@@ -161,7 +161,14 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			print("unsupported cache Type")
 			return None
 			
-			
+	def translation(self, local=False):
+		"""
+		Returns the translation of the current object.
+		:param local: If True return the local translation. Default False.
+		"""
+		trans = self._nativePointer.Kinematics.Global
+		return trans.posx.Value, trans.posy.Value, trans.posz.Value
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------

@@ -505,6 +505,21 @@ class AbstractSceneObject(SceneWrapper):
 		from PyQt4.QtGui import QColor
 		return self._setNativeWireColor(self._scene._toNativeValue(QColor(color)))
 
+	def translate(self, transform, relative=False):
+		"""
+		:param transform: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the translation as relative or absolute
+		"""
+		self._scene.translate([self], transform, relative)
+
+	@abstractmethod
+	def translation(self, local=False):
+		"""
+		Returns the translation of the current object.
+		:param local: If True return the local translation. Default False.
+		"""
+		return 0, 0, 0
+
 	@abstractmethod
 	def unfreeze(self):
 		"""Unfreezes (unlocks) the object in the scene

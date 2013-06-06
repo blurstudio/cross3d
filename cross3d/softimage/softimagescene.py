@@ -538,7 +538,17 @@ class SoftimageScene( AbstractScene ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		playControl.Parameters( "Loop" ).Value = switch
 		return True
-		
+	
+	def translate(self, objects, transform, relative=False):
+		"""
+		Translates the object in the scene
+		:param objects: Translate these objects
+		:param transform: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the translation as relative or absolute. Absolute by default.
+		"""
+		relative = {True:'siRelative', False:'siAbsolute'}[relative]
+		xsi.Translate([obj.nativePointer() for obj in objects], transform[0], transform[1], transform[2], relative)
+	
 	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )
 		return playControl.Parameters( "Loop" ).Value

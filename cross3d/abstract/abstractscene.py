@@ -2148,6 +2148,16 @@ class AbstractScene(QObject):
 
 		return self._toggleNativeVisibleState(nativeObjects, options)
 
+	@abstractmethod
+	def translate(self, objects, transform, relative=False):
+		"""
+		Translates the object in the scene
+		:param objects: Translate these objects
+		:param transform: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the translation as relative or absolute. Absolute by default.
+		"""
+		return False
+
 	def update(self):
 		"""
 			\remarks	refreshes the current scene based on the updates enabled flag
