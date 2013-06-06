@@ -1667,6 +1667,20 @@ class StudiomaxScene( AbstractScene ):
 			\return		<bool> state
 		"""
 		return mxs.getQuietMode()
+
+	def keyInTangentType(self):
+		"""
+			\remarks	return the current in tangent type of the scene
+			\return		<value_wrapper> name
+		"""
+		return mxs.BezierDefaultParams.inTangentType
+
+	def keyOutTangentType(self):
+		"""
+			\remarks	return the current out tangent type of the scene
+			\return		<value_wrapper> name
+		"""
+		return mxs.BezierDefaultParams.outTangentType
 	
 	def loadFile( self, filename = '', confirm = True ):
 		"""
@@ -1857,6 +1871,30 @@ class StudiomaxScene( AbstractScene ):
 		start, end = animationRange
 		mxs.animationRange = mxs.interval( start, end )
 		return True
+
+	def setKeyInTangentType(self, tangentType):
+		"""
+			\remarks	implements AbstractScene.setKeyInTangentType method to set the in tangent type for the scene
+			\param		tangentType <str|name>
+			\raises		ValueError
+			\return		N/A
+		"""
+		# Make sure we have a name.  This should allow anything that stringifies
+		# properly to be given, as well.
+		tangentType = mxs.pyhelper.namify(str(tangentType))
+		if not mxs.BezierDefaultParams.setProperty('inTangentType', tangentType):
+			raise ValueError('Given tangent type is invalid: {tt}'.format(tt=str(tangentType)))
+
+	def setKeyOutTangentType(self, tangentType):
+		"""
+			\remarks	implements AbstractScene.setKeyOutTangentType method to set the out tangent type for the scene
+			\param		tangentType <str|name>
+			\raises		ValueError
+			\return		N/A
+		"""
+		tangentType = mxs.pyhelper.namify(str(tangentType))
+		if not mxs.BezierDefaultParams.setProperty('outTangentType', tangentType):
+			raise ValueError('Given tangent type is invalid: {tt}'.format(tt=str(tangentType)))
 
 	def setRenderOutputPath(self, outputPath):
 		"""

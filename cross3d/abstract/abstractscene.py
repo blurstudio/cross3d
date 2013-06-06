@@ -943,6 +943,22 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def keyInTangentType(self):
+		"""
+			\remarks	return the current in tangent type of the scene
+			\return		name
+		"""
+		pass
+
+	@abstractmethod
+	def keyOutTangentType(self):
+		"""
+			\remarks	return the current out tangent type of the scene
+			\return		name
+		"""
+		pass
+
+	@abstractmethod
 	def loadFile(self, filename='', confirm=True):
 		"""
 			\remarks	loads the inputed filename into the application, returning true on success
@@ -1012,6 +1028,24 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
+
+	@abstractmethod
+	def setKeyInTangentType(self, tangentType):
+		"""
+			\remarks	sets the in tangent type for the scene
+			\sa			setKeyOutTangentType, keyInTangentType, keyOutTangentType
+			\return		N/A
+		"""
+		pass
+
+	@abstractmethod
+	def setKeyInTangentType(self, tangentType):
+		"""
+			\remarks	sets the in tangent type for the scene
+			\sa			setKeyInTangentType, keyInTangentType, keyOutTangentType
+			\return		N/A
+		"""
+		pass
 
 	@abstractmethod
 	def saveFileAs(self, filename=''):
