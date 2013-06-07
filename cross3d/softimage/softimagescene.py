@@ -486,6 +486,16 @@ class SoftimageScene( AbstractScene ):
 		xsi.SetValue("Passes.RenderOptions.ImageHeight", height)
 		return True
 	
+	def setRotation(self, objects, axes, relative=False):
+		"""
+		Rotates the provided objects in the scene
+		:param objects: Rotate these objects
+		:param axes: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the rotation as relative or absolute. Absolute by default.
+		"""
+		relative = {True:'siRelative', False:'siAbsolute'}[relative]
+		xsi.Rotate([obj.nativePointer() for obj in objects], axes[0], axes[1], axes[2], relative)
+	
 	def setSilentMode( self, switch ):
 		"""
 			\remarks	implements AbstractScene.setSilentMode method to make the application silent during intense calls.
@@ -539,15 +549,15 @@ class SoftimageScene( AbstractScene ):
 		playControl.Parameters( "Loop" ).Value = switch
 		return True
 	
-	def translate(self, objects, transform, relative=False):
+	def translate(self, objects, axes, relative=False):
 		"""
-		Translates the object in the scene
+		Translates the objects in the scene
 		:param objects: Translate these objects
-		:param transform: A list with a length of 3 floats representing x, y, z
+		:param axes: A list with a length of 3 floats representing x, y, z
 		:param relative: Apply the translation as relative or absolute. Absolute by default.
 		"""
 		relative = {True:'siRelative', False:'siAbsolute'}[relative]
-		xsi.Translate([obj.nativePointer() for obj in objects], transform[0], transform[1], transform[2], relative)
+		xsi.Translate([obj.nativePointer() for obj in objects], axes[0], axes[1], axes[2], relative)
 	
 	def isTimeControlLoop( self ):
 		playControl = xsi.ActiveProject.Properties( "Play Control" )

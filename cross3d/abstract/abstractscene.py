@@ -800,6 +800,16 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def setRotation(self, objects, axes, relative=False):
+		"""
+		Rotates the provided objects in the scene
+		:param objects: Rotate these objects
+		:param axes: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the rotation as relative or absolute. Absolute by default.
+		"""
+		return False
+
+	@abstractmethod
 	def setSilentMode(self, switch):
 		"""
 			\remarks	Makes the application silent during intense calls.
@@ -2191,11 +2201,11 @@ class AbstractScene(QObject):
 		return self._toggleNativeVisibleState(nativeObjects, options)
 
 	@abstractmethod
-	def translate(self, objects, transform, relative=False):
+	def translate(self, objects, axes, relative=False):
 		"""
 		Translates the object in the scene
 		:param objects: Translate these objects
-		:param transform: A list with a length of 3 floats representing x, y, z
+		:param axes: A list with a length of 3 floats representing x, y, z
 		:param relative: Apply the translation as relative or absolute. Absolute by default.
 		"""
 		return False

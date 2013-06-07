@@ -407,6 +407,14 @@ class AbstractSceneObject(SceneWrapper):
 			return SceneObject(self._scene, nativeParent)
 		return None
 
+	@abstractmethod
+	def rotation(self, local=False):
+		"""
+		Returns the rotation of the current object.
+		:param local: If True return the local rotation. Default False.
+		"""
+		return 0, 0, 0
+
 	def select(self):
 		"""Selects this object in the scene
 
@@ -488,6 +496,15 @@ class AbstractSceneObject(SceneWrapper):
 			nativeParent = parent.nativePointer()
 		return self._setNativeParent(nativeParent)
 
+	def setRotation(self, axes, relative=False):
+		"""
+		Rotates the provided objects in the scene
+		:param objects: Rotate these objects
+		:param axes: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the rotation as relative or absolute. Absolute by default.
+		"""
+		self._scene.setRotation([self], axes, relative)
+
 	@abstractmethod
 	def setSelected(self, state):
 		"""Selects/deselects this object
@@ -505,12 +522,12 @@ class AbstractSceneObject(SceneWrapper):
 		from PyQt4.QtGui import QColor
 		return self._setNativeWireColor(self._scene._toNativeValue(QColor(color)))
 
-	def translate(self, transform, relative=False):
+	def translate(self, axes, relative=False):
 		"""
-		:param transform: A list with a length of 3 floats representing x, y, z
+		:param axes: A list with a length of 3 floats representing x, y, z
 		:param relative: Apply the translation as relative or absolute
 		"""
-		self._scene.translate([self], transform, relative)
+		self._scene.translate([self], axes, relative)
 
 	@abstractmethod
 	def translation(self, local=False):
