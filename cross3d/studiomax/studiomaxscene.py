@@ -1617,6 +1617,22 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		return mxs.maxFilePath + mxs.maxFileName
 
+	def exportFile(self, file, using=None, prompt=False, selectedOnly=True):
+		"""
+			\remarks	implements AbstractScene.exportFile method to export objects from the scene to a file on disk
+			\raises		ValueError
+			\return		N/A
+		"""
+		kwargs = {'selectedOnly':selectedOnly}
+		if using:
+			kwargs['using'] = using
+		if prompt:
+			result = mxs.exportFile(file, **kwargs)
+		else:
+			result = mxs.exportFile(file, mxs.pyhelper.namify('noPrompt'), **kwargs)
+		if not result:
+			raise ValueError('Unable to export to given file path: {file}'.format(file=file))
+
 	def fileName( self ):
 		"""
 			\remarks	implements the AbstractScene.fileName to return the name of the current scene file.

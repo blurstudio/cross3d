@@ -903,6 +903,14 @@ class AbstractScene(QObject):
 		return cls._currentFileName
 
 	@abstractmethod
+	def exportFile(self):
+		"""
+			\remarks	exports objects from the scene to a file on disk
+			\return		N/A
+		"""
+		pass
+
+	@abstractmethod
 	def fileType(self):
 		"""
 			\remarks	returns the main file type for this type of application
