@@ -131,7 +131,7 @@ class AbstractSceneWrapper(object):
 			
 		"""
 		from blur3d.api import SceneAnimationController
-		return [ SceneAnimationController(self, nativeController) for nativeController in self._nativeControllers ]
+		return [ SceneAnimationController(self, nativeController) for nativeController in self._nativeControllers() ]
 
 	def controller(self, name):
 		"""
