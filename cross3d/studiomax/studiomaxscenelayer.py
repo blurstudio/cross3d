@@ -671,7 +671,13 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			altPropIds		= list(data.value('altPropIds'))
 			scene			= self._scene
 			
-			for i in range(len(altPropIds)):
+			for i in range(len(altPropValues)):
+				# If, for some reason, we have a mismatch between the number
+				# of ids and the number of property sets, we can correct that
+				# problem here and update the metadata for the layer.
+				if (i + 1) > len(altPropIds):
+					altPropIds.append(mxs.blurUtil.genUniqueId())
+					data.setValue('altPropIds', altPropIds)
 				altProp = SceneObjectPropSet( scene, None )
 				altProp.setUniqueId( altPropIds[i] )
 				altProp._setValueString( altPropValues[i] )
