@@ -94,6 +94,60 @@ global blur3dhelper
 					)
 				)
 			)
+		),
+
+		function getTransformController object = (
+			return object.transform.controller
+		),
+
+		function setTransformController object controller = (
+			object.transform.controller = controller
+		),
+
+		function replaceTransformController source target frame = (
+			at time frame (
+				with animate on target.transform = source.transform
+			)
+		),
+
+		function replaceCameraProperties source target frame = (
+			targetClass = classof target
+			sourceClass = classof source
+			at time frame (
+				with animate on (
+					if targetClass == freecamera and sourceClass != VRayPhysicalCamera do (
+						target.fov = source.fov
+						target.nearclip = source.nearclip
+						target.farclip = source.farclip
+					)
+					if sourceClass == VRayPhysicalCamera and targetClass == freecamera do (
+						target.mpassEffect.focalDepth = source.focus_distance
+						target.fov = source.fov
+					)
+				)
+			)
+		),
+
+		function objectIsAnimated object = (
+			object.transform.isAnimated
+		),
+
+		function getFirstPositionKeyFrameNumber object = (
+			if object.position.isAnimated do (
+				try (
+					return object.position.controller.keys[1].time.frame
+				)
+				catch()
+			)
+		),
+
+		function getLastPositionKeyFrameNumber object = (
+			if object.position.isAnimated do (
+				try (
+					return object.position.controller.keys[object.position.controller.keys.count].time.frame
+				)
+				catch()
+			)
 		)
 	)
 
