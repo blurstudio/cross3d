@@ -1273,6 +1273,7 @@ class StudiomaxScene( AbstractScene ):
 		Event				= mxs.Event
 		FumeFX				= mxs.FumeFX
 		PF_Source			= mxs.PF_Source
+		XMeshLoader			= mxs.XMeshLoader
 		
 		for obj in nativeObjects:
 			state 	= not obj.ishidden
@@ -1339,6 +1340,12 @@ class StudiomaxScene( AbstractScene ):
 			# Toggle transform caches.
 			if options & VisibilityToggleOptions.ToggleTransformCaches:
 				mxs.blur3dhelper.toggleTransformCache(obj, state)
+
+			# Toggle XMeshLoaders to save memory and redraw speed.
+			if options & VisibilityToggleOptions.ToggleXMeshes:
+				if mcls == XMeshLoader:
+					obj.enableViewportMesh = state
+					obj.keepMeshInMemory = state
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
