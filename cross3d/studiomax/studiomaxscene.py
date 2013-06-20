@@ -1274,6 +1274,7 @@ class StudiomaxScene( AbstractScene ):
 		FumeFX				= mxs.FumeFX
 		PF_Source			= mxs.PF_Source
 		XMeshLoader			= mxs.XMeshLoader
+		Frost				= mxs.Frost
 		
 		for obj in nativeObjects:
 			state 	= not obj.ishidden
@@ -1346,6 +1347,11 @@ class StudiomaxScene( AbstractScene ):
 				if mcls == XMeshLoader:
 					obj.enableViewportMesh = state
 					obj.keepMeshInMemory = state
+
+			# Toggle Frost viewport mesh calculation.
+			if options & VisibilityToggleOptions.ToggleFrost:
+				if mcls == Frost:
+					obj.enableViewportMesh = state
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
