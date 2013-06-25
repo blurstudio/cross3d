@@ -738,6 +738,8 @@ class StudiomaxScene( AbstractScene ):
 		tps = [o for o in self.objects() if o.objectType() & ObjectType.Thinking]
 
 		def _crawlForSubDyns(dynset):
+			if not dynset:
+				return []
 			from copy import copy
 			subs = mxs.pyhelper.getSubDyns(dynset)
 			subs = [s for s in subs if hasattr(s, 'name') and s.name.startswith('DS:')]
