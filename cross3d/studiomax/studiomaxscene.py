@@ -741,11 +741,11 @@ class StudiomaxScene( AbstractScene ):
 			if not dynset:
 				return []
 			from copy import copy
-			subs = mxs.pyhelper.getSubDyns(dynset)
+			subs = mxs.blur3dhelper.getSubDyns(dynset)
 			subs = [s for s in subs if hasattr(s, 'name') and s.name.startswith('DS:')]
 			finalList = copy(subs)
 			for sub in subs:
-				if mxs.pyhelper.getSubDyns(sub):
+				if mxs.blur3dhelper.getSubDyns(sub):
 					finalList.extend(_crawlForSubDyns(sub))
 			return finalList
 

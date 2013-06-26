@@ -148,6 +148,13 @@ global blur3dhelper
 				)
 				catch()
 			)
+		),
+
+		-- get subdyn sets from a dynamic master tied to a thinking particle object
+		function getSubDyns object = (
+			local subdyns = #()
+			subdyns = for sub = 1 to object.numsubs collect object[sub]
+			subdyns
 		)
 	)
 
