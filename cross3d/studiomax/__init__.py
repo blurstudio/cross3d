@@ -1,8 +1,7 @@
 ##
-#	\namespace	blur3d.scenes
+#	\namespace	blur3d.studiomax
 #
-#	\remarks	The blur3d.scenes package creates an abstract wrapper from a 3d system
-#				to use when dealing with scenes
+#	\remarks	The blur3d.studiomax package contains the necessary classes to control 3D Studio Max.
 #	
 #	\author		eric@blur.com
 #	\author		Blur Studio
@@ -15,11 +14,12 @@ from blurdev import relativePath
 StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
 
 def init():
-	# make sure we can import maxscript
+	
+	# Making sure we can import the layer.
 	from Py3dsMax import mxs
 	mxs.filein(relativePath(__file__, 'maxscript/helpers.ms'))
 	
-	# load the maxscript classes
+	# Importing the layer's classes.
 	import studiomaxuserprops
 	import studiomaxapplication
 	import studiomaxscene

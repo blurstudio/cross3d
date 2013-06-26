@@ -1,8 +1,7 @@
 ##
-#	\namespace	blur3d.scenes
+#	\namespace	blur3d.softimage
 #
-#	\remarks	The blur3d.scenes package creates an abstract wrapper from a 3d system
-#				to use when dealing with scenes
+#	\remarks	The blur3d.softimage package contains the necessary classes to control Softimage.
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio
@@ -10,10 +9,11 @@
 #
 
 def init():
-	# make sure we can import softimage
+	
+	# Making sure we can import the layer.
 	from PySoftimage import xsi
 	
-	# import softimage classes
+	# Importing the layer's classes.
 	import softimageuserprops
 	import softimageundocontext
 	import softimageapplication
