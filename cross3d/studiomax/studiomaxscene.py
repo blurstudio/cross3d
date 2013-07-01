@@ -1277,6 +1277,7 @@ class StudiomaxScene( AbstractScene ):
 		PF_Source			= mxs.PF_Source
 		XMeshLoader			= mxs.XMeshLoader
 		Frost				= mxs.Frost
+		VRayStereoscopic	= mxs.VRayStereoscopic
 		
 		for obj in nativeObjects:
 			state 	= not obj.ishidden
@@ -1354,6 +1355,11 @@ class StudiomaxScene( AbstractScene ):
 			if options & VisibilityToggleOptions.ToggleFrost:
 				if mcls == Frost:
 					obj.enableViewportMesh = state
+
+			# Toggle VRayStereoscopic helpers.
+			if options & VisibilityToggleOptions.ToggleVRayStereoscopics:
+				if mcls == VRayStereoscopic:
+					obj.enabled = state
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
