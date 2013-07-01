@@ -14,4 +14,5 @@ def init():
 	import pyfbsdk as mob
 	
 	# Importing the layer's classes.
+	import motionbuilderapplication
 	import motionbuilderscene
