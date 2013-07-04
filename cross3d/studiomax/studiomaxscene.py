@@ -1262,22 +1262,24 @@ class StudiomaxScene( AbstractScene ):
 			nativeObjects = mxs.objects
 	
 		# store maxscript values
-		superclassof		= mxs.superClassOf
-		classof				= mxs.classof
-		B2_Main_Light		= mxs.B2_Main_Light
-		VRaySun				= mxs.VraySun
-		VRayIES				= mxs.VRayIES
-		VRayAmbientLight	= mxs.VRayAmbientLight
-		Light_Portal		= mxs.Light_Portal
-		XRefObject			= mxs.XRefObject
-		Missing_Light		= mxs.Missing_Light
-		Light				= mxs.Light
-		Event				= mxs.Event
-		FumeFX				= mxs.FumeFX
-		PF_Source			= mxs.PF_Source
-		XMeshLoader			= mxs.XMeshLoader
-		Frost				= mxs.Frost
-		VRayStereoscopic	= mxs.VRayStereoscopic
+		superclassof			= mxs.superClassOf
+		classof					= mxs.classof
+		B2_Main_Light			= mxs.B2_Main_Light
+		VRaySun					= mxs.VraySun
+		VRayIES					= mxs.VRayIES
+		VRayAmbientLight		= mxs.VRayAmbientLight
+		Light_Portal			= mxs.Light_Portal
+		XRefObject				= mxs.XRefObject
+		Missing_Light			= mxs.Missing_Light
+		Light					= mxs.Light
+		Event					= mxs.Event
+		FumeFX					= mxs.FumeFX
+		PF_Source				= mxs.PF_Source
+		XMeshLoader				= mxs.XMeshLoader
+		Frost					= mxs.Frost
+		VRayStereoscopic		= mxs.VRayStereoscopic
+		Alembic_Mesh_Geometry 	= mxs.Alembic_Mesh_Geometry
+		Alembic_Mesh_Topology 	= mxs.Alembic_Mesh_Topology
 		
 		for obj in nativeObjects:
 			state 	= not obj.ishidden
@@ -1360,6 +1362,12 @@ class StudiomaxScene( AbstractScene ):
 			if options & VisibilityToggleOptions.ToggleVRayStereoscopics:
 				if mcls == VRayStereoscopic:
 					obj.enabled = state
+
+			if options & VisibilityToggleOptions.ToggleAlembic:
+				geoMods = [m for m in obj.modifiers if mxs.classof(m) == Alembic_Mesh_Geometry]
+				topoMods = [m for m in obj.modifiers if mxs.classof(m) == Alembic_Mesh_Topology]
+				for mod in (topoMods + geoMods):
+					mod.enabled = state
 					
 			# EKH 2011: looks like this isn't actually giving speed increases and really slows down layer toggling
 #			if ( options & VisibilityToggleOptions.ToggleCaches ):
@@ -1509,7 +1517,7 @@ class StudiomaxScene( AbstractScene ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True, samples = 1, makeMat = True):
+	def cacheXmesh(self, path, objList, start, end, worldLock, stack = 3, saveVelocity = True, ignoreTopology  = True, samples = 1, makeMat = False):
 		"""
 			\remarks	runXmesh cache function
 			\param		models [ <SceneModel>, ... ]
