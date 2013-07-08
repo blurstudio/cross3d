@@ -1570,6 +1570,7 @@ class StudiomaxScene( AbstractScene ):
 					#saver.SetSceneRenderEnd()
 		#END CACHE RECORD
 		saver.SetSceneRenderEnd()
+		mxs.timeDisplayMode = mxs.pyhelper.namify("frames")
 		
 		#RETURN FINISH
 		return True	
