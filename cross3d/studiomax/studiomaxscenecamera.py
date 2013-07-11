@@ -36,6 +36,17 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 		elif ( cls == mxs.VRayPhysicalCamera ):
 			return CameraType.VRayPhysical
 		return 0
+
+	def filmWidth(self):
+		"""
+			\remarks	Returns the film_width of the camera.
+			\return		film_width (float)
+		"""
+		try:
+			fw = self._nativePointer.film_width
+		except AttributeError:
+			return None
+		return fw
 		
 	def lens( self ):
 		"""
@@ -90,7 +101,18 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 			mxs.undisplay( bitmap )
 		else:
 			bitmap = mxs.render( outputFile=path, frame=mxs.pyHelper.namify( 'current' ), camera=self._nativePointer, outputWidth=resolution.width(), outputHeight=resolution.height(), pixelAspect=pixelAspect )	
-		
+
+	def setFilmWidth(self, width):
+		"""
+			\remarks	Sets the film_width value for the camera.
+			\param		width <float>
+			\return		n/a
+		"""
+		try:
+			self._nativePointer.film_width = float(width)
+		except AttributeError:
+			pass
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneCamera', StudiomaxSceneCamera )

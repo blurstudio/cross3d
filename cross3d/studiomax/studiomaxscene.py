@@ -1969,6 +1969,8 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		mxs.renderWidth = size.width()
 		mxs.renderHeight = size.height()
+		if mxs.renderSceneDialog.isOpen():
+			mxs.renderSceneDialog.update()
 		
 	def setRenderFrameRange(self, frameRange):
 		"""

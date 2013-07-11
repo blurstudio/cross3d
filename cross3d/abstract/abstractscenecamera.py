@@ -27,6 +27,10 @@ class AbstractSceneCamera(SceneObject):
 		"""
 		return 0
 
+	@abstractmethod
+	def filmWidth(self):
+		pass
+
 	def isCameraType(self, cameraType):
 		"""
 		Return whether or not this camera is a kind of the inputed 
@@ -41,6 +45,10 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def lens(self):
 		return 0.0
+
+	@abstractmethod
+	def setFilmWidth(self, width):
+		pass
 
 	@abstractmethod
 	def setLens(self, value):
