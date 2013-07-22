@@ -12,12 +12,24 @@
 
 import os
 import subprocess
+import re
 
 from framerange import FrameRange
 
 #------------------------------------------------------------------------------------------------------------------------
 
 class FileSequence( object ):
+	@classmethod
+	def sequenceForPath(cls, fileName, step=1):
+		"""
+		Given a single file in a file sequence, create a FileSequence object that represents the current sequence on disk.
+		:param fileName: the filename to pull the image sequence from.
+		
+		.. seealso:: :func:`blurdev.media.imageSequenceFromFileName`
+		.. note:: This is subject to the notes for blurdev.media.imageSequenceFromFileName
+		"""
+		import blurdev.media
+		return cls(blurdev.media.imageSequenceReprFromFileName(fileName, '{pre}{firstNum}-{lastNum}{post}'), step)
 
 	def __init__( self, path, step=1 ):
 		"""
@@ -49,11 +61,10 @@ class FileSequence( object ):
 		return True
 
 	def nameMask( self ):
-		return '%(baseName)s.%(start)s-%(end)s.%(extension)s'
+		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 		
 	def nameTokens( self ):
-		import re
-		regex = re.compile(r'^((?P<extension>[A-Za-z][A-Za-z][A-Za-z]).)((?P<range>(?P<end>[0-9]+)\-(?P<start>[0-9]+)).)(?P<baseName>[A-Za-z0-9_.]+)$')
+		regex = re.compile(r'^((?P<extension>[A-Za-z][A-Za-z][A-Za-z]).)((?P<range>(?P<end>[0-9]+)\-(?P<start>[0-9]+))(?P<separator>.))(?P<baseName>[A-Za-z0-9_.]+)$')
 		match = regex.match( self.name()[::-1] )
 		if match:
 			dict =  match.groupdict()
@@ -115,14 +126,21 @@ class FileSequence( object ):
 		return os.path.split( self._path )[0]
 
 	def paddingCode( self ):
-		return '%' + str( self.padding() ) + 'd'
+		return '%0' + str( self.padding() ) + 'd'
 
 	def codeName( self ):
-		return self.baseName() + '.' + self.paddingCode() + '.' + self.extension()
+		return self.baseName() + self.nameToken('separator') + self.paddingCode() + '.' + self.extension()
 
 	def codePath( self ):
 		return os.path.join( self.basePath(), self.codeName() )
-		
+	
+	def framePath(self, frame):
+		start = self.start()
+		end = self.end()
+		if start <= frame <= end:
+			return self.codePath() % frame
+		raise ValueError('The frame provided is outside the range of the FileSequence. {start}, {end}'.format(start=start, end=end))
+	
 	def uniquePath( self, rangePlaceHolder=None ):
 		return os.path.join( self.basePath(), self.uniqueName( rangePlaceHolder ) )
 		
@@ -136,7 +154,7 @@ class FileSequence( object ):
 	def paths( self ):
 		paths = []
 		for frame in range( self.start(), self.end() + 1, self._step ):
-			name = self.baseName() + '.' + str( frame ).zfill( self.padding() ) + '.' + self.extension()
+			name = self.baseName() + self.nameToken('separator') + str( frame ).zfill( self.padding() ) + '.' + self.extension()
 			paths.append( os.path.join( self.basePath(), name ) )
 		return paths
 		
@@ -148,7 +166,7 @@ class FileSequence( object ):
 	def missingFrames( self ):
 		frames = []
 		for frame in range( self.start(), self.end() + 1, self._step ):
-			name = self.baseName() + '.' + str( frame ).zfill( self.padding() ) + '.' + self.extension()
+			name = self.baseName() + self.nameToken('separator') + str( frame ).zfill( self.padding() ) + '.' + self.extension()
 			path = os.path.join( self.basePath(), name )
 			if not os.path.exists( path ):
 				frames.append( frame )

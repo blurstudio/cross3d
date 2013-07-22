@@ -98,6 +98,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			self.setSlateText( slate )
 			self.setSlateIsActive( True )
 			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', False )
+		elif slate == None:
+			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', False )
 		else:
 			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', True )
 		
