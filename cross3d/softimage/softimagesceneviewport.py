@@ -178,9 +178,9 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		try:
 			firstFrameEndTime = os.path.getmtime(firstFrameFileName)
 			if not firstFrameStartTime < firstFrameEndTime:
-				raise Exceptions.OutputFailed('The native Softimage capture bug happened.')
+				raise Exceptions.OutputFailed('The playblast failed due to a native Softimage bug. Do not panic, the fix is easy. Open the regular capture window, change the format to anything. Close the window and try again.')
 		except os.error:
-			raise Exceptions.OutputFailed('The native Softimage capture bug happened.')
+			raise Exceptions.OutputFailed('The playblast failed due to a native Softimage bug. Do not panic, the fix is easy. Open the regular capture window, change the format to anything. Close the window and try again.')
 			
 		# If the capture was not completed we just return False.
 		try:
