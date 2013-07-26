@@ -60,42 +60,55 @@ class _ConnectionDef:
 	def asDict(signal, callback, arguments = '', function = 'dispatch', callbackType=ConnectionType.General):
 		return {signal:_ConnectionDef(signal, callback, arguments, function, callbackType)}
 
+class _ConnectionStore(object):
+	def __init__(self):
+		self._store = []
+
+	def update(self, connection):
+		self._store.append(connection)
+
+	def getConnectionsBySignalName(self, signal):
+		return [c for c in self._store if c.signal == signal]
+
+	def getSignalNames(self):
+		return list(set([c.signal for c in self._store]))
+
 class StudiomaxApplication(AbstractApplication):
 	# create a mapping of callbacks to be used when connecting signals
-	_connectionMap = {}
-	_connectionMap.update(_ConnectionDef.asDict('sceneNewRequested', 'systemPreNew'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneNewFinished', 'systemPostNew'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneOpenRequested', 'filePreOpen', '""'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneOpenFinished', 'filePostOpen', '""'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeRequested', 'filePreMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeRequested', 'objectXrefPreMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeRequested', 'sceneXrefPreMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeFinished', 'filePostMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeFinished', 'objectXrefPostMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneMergeFinished', 'sceneXrefPostMerge'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneSaveRequested', 'filePreSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneSaveFinished', 'filePostSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
-	_connectionMap.update(_ConnectionDef.asDict('scenePreReset', 'systemPreReset'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneReset', 'systemPostReset'))
-	_connectionMap.update(_ConnectionDef.asDict('layerCreated', 'layerCreated'))
-	_connectionMap.update(_ConnectionDef.asDict('layerDeleted', 'layerDeleted'))
-	_connectionMap.update(_ConnectionDef.asDict('startupFinished', 'postSystemStartup'))
-	_connectionMap.update(_ConnectionDef.asDict('shutdownStarted', 'preSystemShutdown'))
-	_connectionMap.update(_ConnectionDef.asDict('sceneImportFinished', 'postImport'))
-	_connectionMap.update(_ConnectionDef.asDict('selectionChanged', 'selectionSetChanged'))
-	_connectionMap.update(_ConnectionDef.asDict('objectFreeze', 'nodeFreeze', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectUnfreeze', 'nodeUnfreeze', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectHide', 'nodeHide', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectUnHide', 'nodeUnHide', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectRenamed', 'nodeNameSet', '(if (ms_args != undefined) then (#(ms_args[1], ms_args[2], ms_args[3])) else #("", "", ""))', 'dispatchRename'))
-	_connectionMap.update(_ConnectionDef.asDict('objectCreated', 'nodeCreated', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectCloned', 'nodeCloned', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectAdded', 'sceneNodeAdded', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectPreDelete', 'nodePreDelete', 'ms_args', 'preDelete'))
-	_connectionMap.update(_ConnectionDef.asDict('objectPostDelete', 'nodePostDelete', function = 'postDelete'))
-	_connectionMap.update(_ConnectionDef.asDict('objectParented', 'nodeLinked', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('objectUnparented', 'nodeUnlinked', 'ms_args', 'dispatchObject'))
-	_connectionMap.update(_ConnectionDef.asDict('viewportRedrawn', '', function='dispatchFunction', callbackType=_ConnectionDef.ConnectionType.Viewport))
+	_connectionMap = _ConnectionStore()
+	_connectionMap.update(_ConnectionDef('sceneNewRequested', 'systemPreNew'))
+	_connectionMap.update(_ConnectionDef('sceneNewFinished', 'systemPostNew'))
+	_connectionMap.update(_ConnectionDef('sceneOpenRequested', 'filePreOpen', '""'))
+	_connectionMap.update(_ConnectionDef('sceneOpenFinished', 'filePostOpen', '""'))
+	_connectionMap.update(_ConnectionDef('sceneMergeRequested', 'filePreMerge'))
+	_connectionMap.update(_ConnectionDef('sceneMergeRequested', 'objectXrefPreMerge'))
+	_connectionMap.update(_ConnectionDef('sceneMergeRequested', 'sceneXrefPreMerge'))
+	_connectionMap.update(_ConnectionDef('sceneMergeFinished', 'filePostMerge'))
+	_connectionMap.update(_ConnectionDef('sceneMergeFinished', 'objectXrefPostMerge'))
+	_connectionMap.update(_ConnectionDef('sceneMergeFinished', 'sceneXrefPostMerge'))
+	_connectionMap.update(_ConnectionDef('sceneSaveRequested', 'filePreSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
+	_connectionMap.update(_ConnectionDef('sceneSaveFinished', 'filePostSave', '(if (ms_args != undefined) then (ms_args as string) else "")'))
+	_connectionMap.update(_ConnectionDef('scenePreReset', 'systemPreReset'))
+	_connectionMap.update(_ConnectionDef('sceneReset', 'systemPostReset'))
+	_connectionMap.update(_ConnectionDef('layerCreated', 'layerCreated'))
+	_connectionMap.update(_ConnectionDef('layerDeleted', 'layerDeleted'))
+	_connectionMap.update(_ConnectionDef('startupFinished', 'postSystemStartup'))
+	_connectionMap.update(_ConnectionDef('shutdownStarted', 'preSystemShutdown'))
+	_connectionMap.update(_ConnectionDef('sceneImportFinished', 'postImport'))
+	_connectionMap.update(_ConnectionDef('selectionChanged', 'selectionSetChanged'))
+	_connectionMap.update(_ConnectionDef('objectFreeze', 'nodeFreeze', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectUnfreeze', 'nodeUnfreeze', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectHide', 'nodeHide', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectUnHide', 'nodeUnHide', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectRenamed', 'nodeNameSet', '(if (ms_args != undefined) then (#(ms_args[1], ms_args[2], ms_args[3])) else #("", "", ""))', 'dispatchRename'))
+	_connectionMap.update(_ConnectionDef('objectCreated', 'nodeCreated', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectCloned', 'nodeCloned', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectAdded', 'sceneNodeAdded', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectPreDelete', 'nodePreDelete', 'ms_args', 'preDelete'))
+	_connectionMap.update(_ConnectionDef('objectPostDelete', 'nodePostDelete', function = 'postDelete'))
+	_connectionMap.update(_ConnectionDef('objectParented', 'nodeLinked', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('objectUnparented', 'nodeUnlinked', 'ms_args', 'dispatchObject'))
+	_connectionMap.update(_ConnectionDef('viewportRedrawn', '', function='dispatchFunction', callbackType=_ConnectionDef.ConnectionType.Viewport))
 	
 	def _connectStudiomaxSignal(self, connDef, blurdevSignal):
 		"""
@@ -133,9 +146,10 @@ class StudiomaxApplication(AbstractApplication):
 			\remarks	Connects a single callback. This allows blur3d to only have to respond to callbacks that tools actually
 						need, instead of all callbacks.
 		"""
-		if signal in self._connectionMap:
-			object = self._connectionMap[signal]
-			self._connectStudiomaxSignal(object, signal)
+		if signal in self._connectionMap.getSignalNames():
+			connections = self._connectionMap.getConnectionsBySignalName(signal)
+			for object in connections:
+				self._connectStudiomaxSignal(object, signal)
 		else:
 			debug.debugMsg('Connect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
 	
@@ -143,13 +157,14 @@ class StudiomaxApplication(AbstractApplication):
 		"""
 			\remarks	Disconnect a single callback when it is no longer used.
 		"""
-		if signal in self._connectionMap:
-			connDef = self._connectionMap[signal]
-			if connDef.callbackType == connDef.ConnectionType.Viewport:
-				mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % connDef.signal))
-			else:
-				namify = mxs.pyhelper.namify
-				mxs.callbacks.removeScripts(namify(self._connectionMap[signal].callback), id = namify('blur3dcallbacks'))
+		if signal in self._connectionMap.getSignalNames():
+			connections = self._connectionMap.getConnectionsBySignalName(signal)
+			for connDef in connections:
+				if connDef.callbackType == connDef.ConnectionType.Viewport:
+					mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % connDef.signal))
+				else:
+					namify = mxs.pyhelper.namify
+					mxs.callbacks.removeScripts(namify(connDef.callback), id = namify('blur3dcallbacks'))
 		else:
 			debug.debugMsg('Disconnect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
 	
