@@ -136,6 +136,7 @@ class StudiomaxScenePropSet( AbstractScenePropSet ):
 		for key, active in self._active.items():
 			if ( active ):
 				tips[key] = '%s: %s' % (key,self.value(key))
+		tips['id'] = 'ID: {id}'.format(id=str(self.uniqueId()))
 		keys = tips.keys()
 		keys.sort()
 		
