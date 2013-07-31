@@ -2366,6 +2366,7 @@ class AbstractScene(QObject):
 		else:
 			return True
 
+	@pendingdeprecation('Use blur3d.api.application instead. This function is just pointing to that.')
 	def application(self):
 		"""
 			\remarks	returns the application class.
