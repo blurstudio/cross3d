@@ -56,7 +56,7 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			\param		<PySoftimage.xsi.Object> nativeObject || None
 			\return		<bool> success
 		"""
-		xsi.Application.ParentObj(self._nativePointer, nativeParent)
+		xsi.Application.ParentObj(nativeParent, self._nativePointer)
 		return True
 		
 	def _nativeModel( self ):
@@ -171,6 +171,13 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		else:
 			trans = self._nativePointer.Kinematics.Global
 		return trans.rotx.Value, trans.roty.Value, trans.rotz.Value
+	
+	def setHidden(self, state):
+		"""Hides/unhides this object
+		"""
+		self._nativePointer.Properties('Visibility').Parameters('viewvis').SetValue(not state)
+		self._nativePointer.Properties('Visibility').Parameters('rendvis').SetValue(not state)
+		return True
 	
 	def translation(self, local=False):
 		"""
