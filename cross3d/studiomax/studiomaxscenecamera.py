@@ -31,7 +31,7 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 		
 		cls = mxs.classof(self._nativePointer)
 		if ( cls in (mxs.FreeCamera,mxs.TargetCamera) ):
-			return CamearType.Standard
+			return CameraType.Standard
 		
 		elif ( cls == mxs.VRayPhysicalCamera ):
 			return CameraType.VRayPhysical
