@@ -69,7 +69,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
 		return cameraName
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True ):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True ):
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
 		"""
