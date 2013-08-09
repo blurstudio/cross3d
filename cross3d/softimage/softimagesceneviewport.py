@@ -131,6 +131,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlwaves' ).Value = False
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objctrlother' ).Value = False
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
+			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'custominfo' ).Value = False
 		
 		# Checking inputs.
 		if not frameRange:
