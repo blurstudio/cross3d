@@ -43,7 +43,11 @@ class AbstractSceneCamera(SceneObject):
 		return (self.cameraType() & cameraType) > 0
 
 	@abstractmethod
-	def lens(self):
+	def fov(self, rounded=False):
+		return 0.0
+		
+	@abstractmethod
+	def lens(self, filmWidth=None, rounded=False):
 		return 0.0
 
 	@abstractmethod

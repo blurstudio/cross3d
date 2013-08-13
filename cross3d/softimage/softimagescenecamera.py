@@ -9,6 +9,8 @@
 #	\date		03/15/10
 #
 
+import math
+
 from PySoftimage import xsi
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
@@ -20,8 +22,21 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def lens( self ):
-		return xsi.GetValue( self.name() + '.camera.projplanedist' )
+	def fov(self, rounded=False):
+		fov = xsi.GetValue( self.name() + '.camera.fov' )
+		if rounded:
+			return int(round(fov))
+		return fov
+	
+	def lens( self, filmWidth=None, rounded=False ):
+		if filmWidth:
+			fov = math.radians(self.fov())
+			lens = (0.5 * float(filmWidth)) / math.tan(fov / 2.0)
+		else:
+			lens = xsi.GetValue( self.name() + '.camera.projplanedist' )
+		if rounded:
+			return int(round(lens))
+		return lens
 		
 	def setLens( self, value ):
 		self._nativePointer.Parameters( 'projplanedist' ).Value = value
