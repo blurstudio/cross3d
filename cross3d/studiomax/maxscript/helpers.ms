@@ -8,6 +8,15 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function removeBitmapSubs bitmap = (
+			tvps = getclassinstances bitmaptex asTrackViewPick:true
+			for tvp in tvps do (
+				if tvp.client[tvp.subNum].value == bitmap do (
+					tvp.client[tvp.subNum].value = undefined
+				)
+			)
+		),
+
 		-- Visibility toggle for PC objects.
 		function togglePointCaches mods state = (
 			_blurLibrary.load "blurPointCache"
@@ -52,7 +61,7 @@ global blur3dhelper
 				else (
 					for obj in refs.dependentNodes obj do (
 						if ( blur3dhelper.hasVisibleReference obj ) then (
-							fount = true
+							found = true
 							exit
 						)
 					)
