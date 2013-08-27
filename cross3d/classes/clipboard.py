@@ -31,12 +31,12 @@ class Clipboard( object ):
 			\return		<string> text
 		"""
 		import win32clipboard
-		win32clipboard.OpenClipboard()
 		try:
+			win32clipboard.OpenClipboard()
 			value = win32clipboard.GetClipboardData( win32clipboard.CF_TEXT )
+			win32clipboard.CloseClipboard()
 		except:
 			value = ''
-		win32clipboard.CloseClipboard()
 		return value
 		
 	def setText( self, text ):
