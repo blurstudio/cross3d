@@ -2338,6 +2338,15 @@ class AbstractScene(QObject):
 		"""
 		return self._removeNativeModels([ model.nativePointer() for model in models ])
 
+	@abstractmethod
+	def renameObjects(self, objects, names):
+		"""
+			\remarks	renames the given objects to the corresponding name in the names list
+			\param		objects [<SceneObject>, ...], names [<str>, ...]
+			\return		<bool> success
+		"""
+		return False
+
 	def exportModel(self, model, path):
 		"""
 			\remarks	exports a specified model to a specific path

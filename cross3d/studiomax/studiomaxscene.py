@@ -1789,6 +1789,14 @@ class StudiomaxScene( AbstractScene ):
 		
 		return self._fromNativeValue( value )
 
+	def renameObjects(self, objects, names):
+		"""
+			\remarks	renames the given objects to the corresponding name in the names list
+			\param		objects [<SceneObject>, ...], names [<str>, ...]
+			\return		<bool> success
+		"""
+		mxs.blurUtil.setNames([o.nativePointer() for o in objects], names)
+
 	def renderSavesFile(self):
 		"""
 			\remarks	implements AbstractScene.renderSavesFile to return whether renders are set to save frames to disk
