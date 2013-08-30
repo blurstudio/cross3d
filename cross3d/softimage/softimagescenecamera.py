@@ -23,11 +23,28 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def fov(self, rounded=False):
-		fov = xsi.GetValue( self.name() + '.camera.fov' )
+		fov = self._nativePointer.fov.Value
 		if rounded:
 			return int(round(fov))
 		return fov
 	
+	def filmWidth(self):
+		"""
+			\remarks	Returns the film_width of the camera in mm.
+			\return		film_width (float)
+		"""
+		width = self._nativePointer.projplanewidth.Value
+		return width / 0.039370
+		
+	def setFilmWidth(self, width):
+		"""
+			\remarks	Sets the film_width value for the camera.
+			\param		width <float>
+			\return		n/a
+		"""
+		self._nativePointer.projplanewidth.Value = width * 0.039370
+		return True
+		
 	def lens( self, filmWidth=None, rounded=False ):
 		if filmWidth:
 			fov = math.radians(self.fov())
