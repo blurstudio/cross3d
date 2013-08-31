@@ -12,7 +12,7 @@ global blur3dhelper
 			current = mtl.materialList.count
 			mtl.materialList.count = (current + 1)
 			mtl.mapEnabled[(current + 1)] = on
-			mtl.materialIDList[(current + 1)] = current
+			mtl.materialIDList[(current + 1)] = (current + 1)
 			mtl.names[(current + 1)] = ""
 		),
 
