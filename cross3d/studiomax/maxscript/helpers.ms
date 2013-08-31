@@ -8,6 +8,14 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function appendToMultiMtl mtl = (
+			current = mtl.materialList.count
+			mtl.materialList.count = (current + 1)
+			mtl.mapEnabled[(current + 1)] = on
+			mtl.materialIDList[(current + 1)] = current
+			mtl.names[(current + 1)] = ""
+		),
+
 		function removeBitmapSubs bitmap = (
 			tvps = getclassinstances bitmaptex asTrackViewPick:true
 			for tvp in tvps do (
