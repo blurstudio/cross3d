@@ -14,7 +14,15 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 #------------------------------------------------------------------------------------------------------------------------
 
 class SoftimageSceneModel( AbstractSceneModel ):
-	pass
+	def _setNativeParent( self, nativeParent ):
+		"""
+			\remarks	implements the AbstractSceneObject._setNativeParent method to set the native parent for this object
+			\sa			parent, setParent, _nativeParent
+			\param		<PySoftimage.xsi.Object> nativeObject || None
+			\return		<bool> success
+		"""
+		xsi.Application.ParentObj(nativeParent, self._nativePointer)
+		return True
 	
 # register the symbol
 from blur3d import api
