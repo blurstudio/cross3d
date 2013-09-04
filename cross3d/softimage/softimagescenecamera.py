@@ -23,7 +23,10 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def fov(self, rounded=False):
-		fov = self._nativePointer.fov.Value
+		#TODO: (brendana 9/3/13) should this take account keys and current frame? 
+		param_name = '{}.camera.fov'.format(self._nativePointer.FullName)
+		prop = xsi.Dictionary.GetObject(param_name) 
+		fov = prop.Value
 		if rounded:
 			return int(round(fov))
 		return fov
