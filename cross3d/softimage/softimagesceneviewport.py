@@ -50,7 +50,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 
 	def _setNativeCamera( self, nativeCamera ):
 		if type( nativeCamera ) == str or type( nativeCamera ) == unicode:
-			cameraName = nativeCamera
+			cameraName = nativeCamera	
 		else:
 			cameraName = nativeCamera.FullName
 		if nativeCamera:
@@ -64,10 +64,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def cameraName( self ):
-		cameraName = self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
-		if cameraName in self.sceneCameras:
-			cameraName = '.'.join( [ 'Views', 'View' + self.name, cameraName + 'Camera' ] )
-		return cameraName
+		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
 
 	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True ):
 		"""
@@ -104,6 +101,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			xsi.SetValue( nativeCamera.FullName + '.camvis.currenttime', True )
 		
 		# Setting regular visibility options.
+		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'gridvis' ).Value = False
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'gridaxisvis' ).Value = False
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'constructionlevel' ).Value = False
 		nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objannotationobjects' ).Value = False
