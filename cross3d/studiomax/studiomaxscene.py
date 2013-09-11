@@ -349,8 +349,11 @@ class StudiomaxScene( AbstractScene ):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<Py3dsMax.mxs.Layer> nativeLayer || None
 		"""
-		lay = mxs.layerManager.newLayerFromName( str(name) )
-		if ( lay ):
+		name = unicode(name)
+		lay = self._findNativeLayer(name)
+		if not lay:
+			lay = mxs.layerManager.newLayerFromName( name )
+		if lay:
 			from blur3d.api import SceneLayer
 			SceneLayer(self,lay)._addNativeObjects(nativeObjects)
 		return lay
