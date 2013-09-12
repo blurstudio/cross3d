@@ -69,13 +69,13 @@ class StudiomaxSceneFx( AbstractSceneFx ):
 		else:
 			return False
 	
-	def setEnabled( self, state ):
+	def setEnabled(self, state, ids=[]):
 		"""
 			\remarks	this is a no-op since there doesn't appear to be a way to affect dynamics object this way.
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		return True
+		mxs.blur3dhelper.toggleSubDyn(self.nativePointer(), state)
 		
 	def uniqueId( self ):
 		"""

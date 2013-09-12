@@ -99,6 +99,10 @@ global blur3dhelper
 			)
 			success
 		),
+
+		function toggleSubDyn subDyn state = (
+			subDyn.on = state
+		),
 	
 		function toggleTransformCache obj state = (
 			if ( isproperty obj #controller and classof obj.controller == transform_cache ) do (
