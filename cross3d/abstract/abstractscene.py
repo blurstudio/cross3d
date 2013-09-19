@@ -1031,7 +1031,7 @@ class AbstractScene(QObject):
 		return QSize()
 
 	@abstractmethod
-	def reset(self):
+	def reset(self, silent=False):
 		"""
 			\remarks	resets this scene for all the data and in the application
 			\return		<bool> success
