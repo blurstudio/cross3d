@@ -1816,12 +1816,15 @@ class StudiomaxScene( AbstractScene ):
 		from PyQt4.QtCore import QSize
 		return QSize( mxs.renderWidth, mxs.renderHeight )
 	
-	def reset( self ):
+	def reset(self, silent=False):
 		"""
 			\remarks	implements AbstractScene.reset to reset this scene for all the data and in the application
 			\return		<bool> success
 		"""
-		mxs.resetMaxFile()
+		if silent:
+			mxs.resetMaxFile(mxs.pyhelper.namify('#noPrompt'))
+		else:
+			mxs.resetMaxFile()
 		return True
 		
 	def restoreHeldState( self ):
