@@ -744,7 +744,13 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\param		name	<str>
 			\return		<bool> success
 		"""
-		return self._nativePointer.setname( str(name) )
+		self._nativePointer.setname( str(name) )
+		# Reset the metadata and requery it from the scene file.  That will
+		# force an update of the name value and ensure we don't create a
+		# disconnect between the metadata entry and the newly-renamed layer.
+		self._metaData = None
+		self.metaData()
+		return
 	
 	def metaData( self ):
 		if ( not self._metaData ):
@@ -766,6 +772,8 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 					# lookup the property
 					if ((is_prop( attr, 'lnm' ) and layerName == attr.lnm) or attr.lid == layerId ):
 						metaData = LayerMetaData(attr)
+						if attr.lnm != layerName:
+							metaData.setValue('layerName', str(self.name()))
 						break
 					
 					# create a new one if necessary
