@@ -103,15 +103,16 @@ class SoftimageScene( AbstractScene ):
 		if getsFromSelection:
 #			objects = xsiFactory.CreateObject( 'XSI.Collection' )
 #			objects.AddItems( objects )
-			objects = [ obj for obj in xsi.Selection ]
 			if wildcard:
 				import re
 				expression = wildcard.replace('*', '.+').strip('.+')
 				output = []
-				for obj in objects:
+				for obj in xsi.Selection:
 					if re.findall( expression, obj.FullName, flags=re.I ):
 						output.append( obj )
 				return output
+			else:
+				objects = [ obj for obj in xsi.Selection ]
 		else:
 			root = self._nativeRootObject()
 			objects = root.FindChildren( wildcard, '', '', True )
