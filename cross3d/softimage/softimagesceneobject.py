@@ -160,7 +160,22 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		else:
 			print("unsupported cache Type")
 			return None
-	
+			
+	def resetTransforms(self, pos=True, rot=True, scl=True):
+		"""
+			Resets the transforms to zero.
+		"""
+		if pos and rot and scl:
+			xsi.ResetTransform(self._nativePointer, "siObj", "siSRT", "siXYZ")
+		else:
+			if pos:
+				xsi.ResetTransform(self._nativePointer, "siObj", "siTrn", "siXYZ")
+			if rot:
+				xsi.ResetTransform(self._nativePointer, "siObj", "siRot", "siXYZ")
+			if pos:
+				xsi.ResetTransform(self._nativePointer, "siObj", "siScl", "siXYZ")
+		return True
+		
 	def rotation(self, local=False):
 		"""
 		Returns the rotation of the current object.
@@ -178,7 +193,13 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		self._nativePointer.Properties('Visibility').Parameters('viewvis').SetValue(not state)
 		self._nativePointer.Properties('Visibility').Parameters('rendvis').SetValue(not state)
 		return True
-	
+
+	def key(self, target='keyable'):
+		"""
+			Set keys on the object parameters.
+		"""
+		xsi.SaveKeyOnKeyable(self._nativePointer)
+		
 	def translation(self, local=False):
 		"""
 		Returns the translation of the current object.
@@ -209,6 +230,8 @@ class SoftimageSceneObject( AbstractSceneObject ):
 			return 'camera'
 		elif objectType == ObjectType.Model:
 			return '#model'
+		elif objectType == ObjectType.Group:
+			return '#group'
 		elif objectType == ObjectType.NurbsSurface:
 			return 'surfmsh'
 		elif objectType == ObjectType.Curve:
@@ -226,26 +249,28 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		"""
 		
 		type = nativeObject.Type
-		
-		# check to see if the object is a geometry type
-		if type in  'polymsh':
+
+		if type in 'polymsh':
 			return ObjectType.Geometry
-		if type  == 'surfmsh':
+			
+		if type == 'surfmsh':
 			return ObjectType.NurbsSurface
+			
 		if type == 'crvlist':
 			return ObjectType.Curve
-		# check to see if the object is a light type
+			
 		elif type == 'light':
 			return ObjectType.Light
 		
-		# check to see if the object is a camera type
 		elif type == 'camera':
 			return ObjectType.Camera
 			
-		# check to see if the object is a model type
 		elif type == '#model':
 			return ObjectType.Model
 			
+		elif type == '#Group':
+			return ObjectType.Group
+	
 		return AbstractSceneObject._typeOfNativeObject( nativeObject )
 
 # register the symbol

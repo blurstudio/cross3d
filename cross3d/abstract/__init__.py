@@ -15,15 +15,17 @@ def init():
 	module when necessary
 	"""
 	import abstractuserprops
-	import blurtags
+	import tags
 	import abstractundocontext
 	import abstractapplication
+	import abstractcollection
 	import abstractscene
 	import abstractscenewrapper
 	import abstractsceneobject
-	import abstractsceneobjectgroup
+	import abstractcontainer
 	import abstractscenelayer
 	import abstractscenelayergroup
+	import abstractgroup
 	import abstractscenematerial
 	import abstractscenemap
 	import abstractsceneatmospheric
@@ -38,6 +40,3 @@ def init():
 	import abstractscenecache
 	import abstractscenesubmitter
 	import abstractscenepropset
-	import abstractalembic
-	import abstractwritejob
-	import abstractwritejobs

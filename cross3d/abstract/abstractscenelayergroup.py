@@ -14,7 +14,6 @@ from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
 from blur3d import api
 
-
 class AbstractSceneLayerGroup(SceneWrapper):
 
 	#------------------------------------------------------------------------------------------------------------------------

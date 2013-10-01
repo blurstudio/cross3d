@@ -1690,7 +1690,7 @@ class AbstractScene(QObject):
 		if (nativeMap):
 			return SceneMap(self, nativeMap)
 		return None
-
+		
 	def hideObjects(self, objects, state):
 		"""
 			\remarks	hides the inputed objects based on the given state
@@ -2127,17 +2127,19 @@ class AbstractScene(QObject):
 
 		return self._setNativeMaterialOverride([ obj.nativePointer() for obj in objects ], nativeMaterial, options=options, advancedState=advancedState)
 
-	def setSelection(self, objects):
+	def setSelection(self, objects, additive=False):
 		"""
 			\remarks	selects the inputed objects in the scene
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
+		if additive:
+			return self.addToSelection(objects)
 		if not isinstance(objects, _collections.Iterable):
 			raise TypeError("Requires a list of blur3d.api.SceneObject's.")
 		return self._setNativeSelection([ obj.nativePointer() for obj in objects ])
 
-	def addToSelection(self, objects): # new douglas
+	def addToSelection(self, objects):
 		"""
 			\remarks	add the inputed objects to the selection in the scene
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
@@ -2178,14 +2180,6 @@ class AbstractScene(QObject):
 		props = self.userProps()
 		props.clear()
 		props.update(newDict)
-
-	def stats(self):
-		"""
-			\remarks	return an instance of blur3d.api.SceneStats to be able to collect information on this scene
-			\return		<blur3d.api.SceneStats>
-		"""
-		from blur3d.api import SceneStats
-		return SceneStats(self)
 
 	def toggleVisibleState(self, objects=None, options=None):
 		"""

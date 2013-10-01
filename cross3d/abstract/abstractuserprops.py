@@ -13,8 +13,8 @@
 #|scene = blur3d.api.Scene()
 #|selection = scene.selection()
 #|object = selection[0]
-#|# set blurTags
-#|tags = object.blurTags()
+#|# set Tags
+#|tags = object.tags()
 #|tags.update(type='Character', entity='Dalton', usage='Shaded', location='Right', 
 #|render='Rndr', cache='tmc', variation = 3)
 #|tags['subdivision'] = 4
@@ -60,8 +60,8 @@ class AbstractUserProps(dict):
 		return self.lookupProps().copy()
 
 	def emitChange(self, key=None):
-		if key == 'BlurTags':
-			dispatchObject('blurTagChanged', self._nativePointer)
+		if key == 'Tags':
+			dispatchObject('TagChanged', self._nativePointer)
 		else:
 			dispatchObject('customPropChanged', self._nativePointer)
 

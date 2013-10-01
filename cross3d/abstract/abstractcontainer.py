@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneobjectgroup
+#	\namespace	blur3d.api.abstract.abstractcontainer
 #
-#	\remarks	The AbstractSceneObjectGroup class provides an interface for working on sets of SceneObject's as a singular group
+#	\remarks	The AbstractContainer class provides an interface for objects that "group" several scene objects.
 #	
 #	\author		eric@blur.com
 #	\author		Blur Studio
@@ -9,14 +9,14 @@
 #
 
 from blur3d import abstractmethod
+from blur3d.constants import ObjectType
 from blur3d.api import SceneWrapper
 from blur3d import api
 
-
-class AbstractSceneObjectGroup(SceneWrapper):
+class AbstractContainer(SceneWrapper):
 	"""
-	The SceneObjectGroup class provides an interface for working on sets of 
-	SceneObject's as a singular group
+		The SceneObjectGroup class provides an interface for working on sets of 
+		SceneObject's as a singular group
 	"""
 
 	def __init__(self, scene, nativeGroup):
@@ -601,4 +601,4 @@ class AbstractSceneObjectGroup(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('SceneObjectGroup', AbstractSceneObjectGroup, ifNotFound=True)
+api.registerSymbol('Container', AbstractContainer, ifNotFound=True)

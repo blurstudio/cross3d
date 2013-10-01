@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.BlurTags
+#	\namespace	blur3d.api.Tags
 #
-#	\remarks	The blur3d.api.BlurTags retreives the BlurTags property using UserProps it then converts the
+#	\remarks	The blur3d.api.Tags retreives the Tags property using UserProps it then converts the
 #				string into a python dictionary
 #	
 #	\author		mikeh@blur.com
@@ -13,9 +13,9 @@ from blur3d.naming import Name
 from blur3d import api
 
 
-class BlurTags(dict):
+class Tags(dict):
 	"""
-	The blur3d.api.BlurTags retreives the BlurTags property using UserProps 
+	The blur3d.api.Tags retreives the tags property using UserProps 
 	it then converts the string into a python dictionary
 	"""
 
@@ -29,7 +29,7 @@ class BlurTags(dict):
 	def __delitem__(self, key):
 		props = self.lookupProps()
 		del props[key]
-		self._object.userProps()['BlurTags'] = str(props)
+		self._object.userProps()['Tags'] = str(props)
 
 	def __getitem__(self, key):
 		return self.lookupProps().__getitem__(key)
@@ -37,7 +37,7 @@ class BlurTags(dict):
 	def __setitem__(self, key, value):
 		props = self.lookupProps()
 		props[key] = value
-		self._object.userProps()['BlurTags'] = str(props)
+		self._object.userProps()['Tags'] = str(props)
 
 	def __str__(self):
 		return str(self.lookupProps())
@@ -79,8 +79,8 @@ class BlurTags(dict):
 		:return: dict
 		"""
 		props = self._object.userProps()
-		if 'BlurTags' in props:
-			return props['BlurTags']
+		if 'Tags' in props:
+			return props['Tags']
 		return {}
 
 	def pop(self, key, default=None):
@@ -133,4 +133,4 @@ class BlurTags(dict):
 
 
 # register the symbol
-api.registerSymbol('BlurTags', BlurTags, ifNotFound=True)
+api.registerSymbol('Tags', Tags, ifNotFound=True)

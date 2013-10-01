@@ -19,12 +19,9 @@ def init():
 	import softimageapplication
 	import softimagescene
 	import softimagescenewrapper
-	import softimagesceneobjectmetadata # not in abstract
 	import softimagesceneobject
+	import softimagegroup
 	import softimagescenemodel
 	import softimagescenecamera
 	import softimagescenerenderpass
 	import softimagesceneviewport
-	import softimagealembic
-	import softimagewritejob
-	import softimagewritejobs

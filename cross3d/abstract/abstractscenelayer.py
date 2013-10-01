@@ -11,14 +11,13 @@
 #
 
 from blur3d import abstractmethod
-from abstractsceneobjectgroup import AbstractSceneObjectGroup
+from abstractcontainer import AbstractContainer
 from blur3d import api
 
-
-class AbstractSceneLayer(AbstractSceneObjectGroup):
+class AbstractSceneLayer(AbstractContainer):
 
 	def __init__(self, scene, nativeLayer):
-		AbstractSceneObjectGroup.__init__(self, scene, nativeLayer)
+		AbstractContainer.__init__(self, scene, nativeLayer)
 
 		# define custom properties
 		self._altMtlIndex		 = -1
@@ -27,6 +26,7 @@ class AbstractSceneLayer(AbstractSceneObjectGroup):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	
 	@abstractmethod
 	def _nativeAltMaterials(self):
 		"""
@@ -631,7 +631,7 @@ class AbstractSceneLayer(AbstractSceneObjectGroup):
 
 	def setGroupName(self, name):
 		"""
-		Implements the AbstractSceneObjectGroup.groupName method to set the 
+		Implements the AbstractContainer.groupName method to set the 
 		group name for this object group instance
 
 		"""
@@ -659,7 +659,7 @@ class AbstractSceneLayer(AbstractSceneObjectGroup):
 			options 		 = self.altMaterialFlagsAt(index)
 			advancedState	 = self.advancedAltMaterialStateAt(index)
 
-		return AbstractSceneObjectGroup.setMaterialOverride(self, material, options=options, advancedState=advancedState)
+		return AbstractContainer.setMaterialOverride(self, material, options=options, advancedState=advancedState)
 
 	def setLayerGroup(self, layerGroup):
 		"""Set the layer group that this layer is associated with

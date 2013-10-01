@@ -24,9 +24,9 @@ def init():
 	import studiomaxapplication
 	import studiomaxscene
 	import studiomaxscenewrapper
-	import studiomaxsceneobject
-	import studiomaxscenemodel	
-	import studiomaxscenelayer	
+	import studiomaxsceneobject	
+	import studiomaxscenelayer
+	import studiomaxgroup	
 	import studiomaxscenelayergroup	
 	import studiomaxscenematerial	
 	import studiomaxscenepropset
@@ -34,6 +34,7 @@ def init():
 	import studiomaxsceneatmospheric
 	import studiomaxscenefx
 	import studiomaxscenerenderer
+	import studiomaxscenemodel
 	import studiomaxscenecamera
 	import studiomaxsceneanimationcontroller
 	import studiomaxsceneanimationkey

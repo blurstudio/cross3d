@@ -14,7 +14,6 @@ from blur3d.api import SceneWrapper
 from blur3d.constants import ObjectType
 from blur3d import api
 
-
 class AbstractSceneObject(SceneWrapper):
 	"""
 	The SceneObject class provides the base foundation for the 3d 
@@ -35,13 +34,14 @@ class AbstractSceneObject(SceneWrapper):
 			\remarks	acts as a factory to return the right type of scene object
 			\return		<variant> SceneObject
 		"""
-		#print SceneWrapper.__subclasses__()
+		# print SceneWrapper.__subclasses__()
 		if not cls._subClasses:
 			for c in cls._subclasses(cls):
 				if not c._objectType == ObjectType.Generic:
 					cls._subClasses[ c._objectType ] = c
 
 		sceneObjectType = cls._typeOfNativeObject(nativeObject)
+			
 		if sceneObjectType in cls._subClasses:
 			c = cls._subClasses[ sceneObjectType ]
 			return SceneWrapper.__new__(c)
@@ -396,10 +396,9 @@ class AbstractSceneObject(SceneWrapper):
 		return self._objectType
 
 	def parent(self):
-		"""Returns the parent item for this object
-		
-		:return: :class:`blur3d.api.SceneObject` or None
-
+		"""
+			Returns the parent item for this object	
+			:return: :class:`blur3d.api.SceneObject` or None
 		"""
 		nativeParent = self._nativeParent()
 		if (nativeParent):
@@ -408,16 +407,23 @@ class AbstractSceneObject(SceneWrapper):
 		return None
 
 	@abstractmethod
+	def resetTransforms(self, pos=True, rot=True, scl=True):
+		"""
+			Resets the transforms to zero.
+		"""
+		return False
+		
+	@abstractmethod
 	def rotation(self, local=False):
 		"""
-		Returns the rotation of the current object.
-		:param local: If True return the local rotation. Default False.
+			Returns the rotation of the current object.
+			:param local: If True return the local rotation. Default False.
 		"""
 		return 0, 0, 0
 
 	def select(self):
-		"""Selects this object in the scene
-
+		"""
+			Selects this object in the scene
 		"""
 		return self.setSelected(True)
 
@@ -437,11 +443,18 @@ class AbstractSceneObject(SceneWrapper):
 
 	@abstractmethod
 	def setHidden(self, state):
-		"""Hides/unhides this object
-
+		"""
+			Hides/unhides this object
 		"""
 		return False
-
+	
+	@abstractmethod
+	def key(self, target='keyable'):
+		"""
+			Set keys on the object parameters.
+		"""
+		return False
+		
 	def setLayer(self, layer):
 		"""Sets the layer for this object to the inputed SceneLayer
 		

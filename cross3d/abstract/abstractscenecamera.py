@@ -1,23 +1,29 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneobject
+#	\namespace	blur3d.api.abstract.abstractscenecamera
 #
-"""
-The AbstractSceneObject class provides the base foundation for the 3d 
-Object framework for the blur3d system.  This class will provide a 
-generic overview structure for all manipulations of 3d objects.
-
-"""
-
+#	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the blur3d system
+#				This class will provide a generic overview structure for all manipulations of 3d objects
+#	
+#	\author		eric@blur.com
+#	\author		Blur Studio 
+#	\date		03/15/10
+#
 
 from blur3d	import abstractmethod
 from blur3d.api import SceneObject
 from blur3d.constants import ObjectType
 from blur3d import api
 
+class AbstractSceneCamera(SceneObject):	
+	"""
+		The AbstractSceneObject class provides the base foundation for the 3d 
+		Object framework for the blur3d system.  This class will provide a 
+		generic overview structure for all manipulations of 3d objects.
 
-class AbstractSceneCamera(SceneObject):
+	"""
+
 	_objectType = ObjectType.Camera
-
+		
 	@abstractmethod
 	def cameraType(self):
 		"""Return the camera type for this camera instance
