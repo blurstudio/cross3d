@@ -9,11 +9,10 @@
 #	\date		05/26/11
 #
 
-#from PySoftimage import xsi
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
-from blur3d import api
 import re
-#from blurdev.enum import enum
+from blur3d import api
+from win32com.client import constants
+from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 
 class SoftimageUserProps(AbstractUserProps):
 	#dataTypes = enum('ClusterProperty', 'CustomProperty', 'Property', 'UserDataBlob', 'UserDataMap')
@@ -38,7 +37,8 @@ class SoftimageUserProps(AbstractUserProps):
 		if isinstance(value, (list, dict, tuple)):
 			value = unicode(value)
 		if not prop:
-			prop = self._nativePointer.AddProperty( 'UserDataBlob', False, key)
+			prop = self._nativePointer.AddProperty('UserDataBlob', False, key)
+			prop.SetCapabilityFlag(constants.siNotInspectable, True)
 		prop.Value = value
 		self.emitChange(key)
 

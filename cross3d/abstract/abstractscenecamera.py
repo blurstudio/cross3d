@@ -23,6 +23,10 @@ class AbstractSceneCamera(SceneObject):
 	"""
 
 	_objectType = ObjectType.Camera
+
+	def __init__(self, scene, nativeCamera):
+		super(AbstractSceneCamera, self).__init__(scene, nativeCamera)
+		self._viewOptions = {}
 		
 	@abstractmethod
 	def cameraType(self):
@@ -93,14 +97,6 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def generateDotXSI(self, path, range=None):
-		"""This is a temporary place for that method as it will belong to 
-		blur3d.pipeline. 
-
-		"""
-		return False
-
-	@abstractmethod
 	def pictureRatio(self):
 		"""Gets the camera's picture ratio.
 		
@@ -168,6 +164,14 @@ class AbstractSceneCamera(SceneObject):
 			\param 		resolution <QtCore.QSize>
 			\return		<blur3d.api.constants.CameraType>
 		"""
+		return False
+		
+	@abstractmethod
+	def viewOptions(self):
+		return {}
+	
+	@abstractmethod
+	def setViewOptions(self, viewOptions):
 		return False
 
 # register the symbol

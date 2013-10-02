@@ -21,7 +21,7 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-
+		
 	def fov(self, rounded=False):
 		#TODO: (brendana 9/3/13) should this take account keys and current frame? 
 		param_name = '{}.camera.fov'.format(self._nativePointer.FullName)
@@ -101,6 +101,28 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 	def setNearClippingPlane( self, distance ):
 		xsi.setValue( self.name() + '.camera.near', distance )
 		#self._nativePointer.Parameters( 'near' ).Value = distance
+		return True
+		
+	def viewOptions(self):
+		viewOptions = {'Camera Visibility': {}, 'Camera Display': {}}
+		
+		for parameter in self._nativePointer.Properties( 'Camera Visibility' ).Parameters:
+			viewOptions['Camera Visibility'][ parameter.ScriptName ] = parameter.Value
+			
+		for parameter in self._nativePointer.Properties( 'Camera Display' ).Parameters:
+			viewOptions['Camera Display'][ parameter.ScriptName ] = parameter.Value
+			
+		viewOptions[ 'viewcubeshow' ] = xsi.GetValue( 'preferences.ViewCube.show' )
+		return viewOptions
+		
+	def setViewOptions( self, viewOptions ):
+		for prop in viewOptions:
+			if prop in [ 'Camera Visibility', 'Camera Display' ]:
+				for param in viewOptions[prop]:
+					if not param in ['hidlincol', 'wrfrmdpthcuecol']:
+						print prop, param
+						self._nativePointer.Properties(prop).Parameters(param).Value = viewOptions[prop][param]
+		xsi.SetValue( 'preferences.ViewCube.show', viewOptions.get( 'viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
 
 # register the symbol

@@ -191,18 +191,11 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			
 		return True
 
-	def storeState( self ):
-		for parameter in self._nativeCamera().Properties( 'Camera Visibility' ).Parameters:
-			self._state[ parameter.ScriptName ] = parameter.Value
-		self._state[ 'viewcubeshow' ] = xsi.GetValue( 'preferences.ViewCube.show' )
-		return True
+	def viewOptions(self):
+		return self.camera().viewOptions()
 		
-	def restoreState( self ):
-		for key in self._state:
-			if not key in [ 'viewcubeshow' ]:
-				self._nativeCamera().Properties( 'Camera Visibility' ).Parameters( key ).Value = self._state[ key ]
-		xsi.SetValue( 'preferences.ViewCube.show', self._state[ 'viewcubeshow' ] )
-		return True
+	def setViewOptions( self, viewOptions ):
+		return self.camera().setViewOptions(viewOptions)
 
 	def headlightIsActive( self, state ):
 		camera = self._nativeCamera()

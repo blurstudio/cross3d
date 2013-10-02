@@ -25,6 +25,7 @@ class AbstractSceneViewport(QObject):
 
 		self._scene = scene
 		self.name = ''
+		self._state = {}
 		self._slateIsActive = False
 		self._slateText = ''
 
@@ -50,7 +51,7 @@ class AbstractSceneViewport(QObject):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-
+		
 	@abstractmethod
 	def cameraName(self):
 		"""Return the viewport's camera name
@@ -134,15 +135,22 @@ class AbstractSceneViewport(QObject):
 	@abstractmethod
 	def slateDraw(self):
 		return False
-
+		
 	@abstractmethod
-	def storeState(self):
+	def viewOptions(self):
+		return {}
+	
+	@abstractmethod
+	def setViewOptions(self, viewOptions):
 		return False
-
-	@abstractmethod
+		
 	def restoreState(self):
-		return False
+		return self.setViewOptions(self._state)
 
+	def storeState( self ):
+		self._state = self.viewOptions()
+		return True
+		
 	def camera(self):
 		"""Return the viewport's camera
 		
