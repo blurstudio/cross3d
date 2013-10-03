@@ -38,6 +38,10 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		
 	def _nativeCamera( self ):
 		cameraName = self.cameraName()
+		
+		if cameraName in self.sceneCameras:
+			cameraName = "Views.View%s.%sCamera" % (self.name, cameraName)
+
 		if cameraName == 'Render Pass':
 			from blur3d.api import Scene
 			scene = Scene()
