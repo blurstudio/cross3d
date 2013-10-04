@@ -470,7 +470,7 @@ class AbstractScene(QObject):
 		return []
 
 	@abstractmethod
-	def _nativeMaterials(self):
+	def _nativeMaterials(self, baseMaterials=False):
 		"""
 			\remarks	collect all the native materials in this scene
 			\sa			materials
@@ -1744,13 +1744,13 @@ class AbstractScene(QObject):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial(self, nativeMaterial) for nativeMaterial in self._loadNativeMaterialsFromLibrary(filename) ]
 
-	def materials(self):
+	def materials(self, baseMaterials=False):
 		"""
 			\remarks	returns a list of all the materials in the scene wrapped as SceneMaterials
 			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
 		"""
 		from blur3d.api import SceneMaterial
-		return [ SceneMaterial(self, obj) for obj in self._nativeMaterials() ]
+		return [ SceneMaterial(self, obj) for obj in self._nativeMaterials(baseMaterials) ]
 
 	def maps(self):
 		"""

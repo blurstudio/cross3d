@@ -105,7 +105,7 @@ class AbstractContainer(SceneWrapper):
 		return []
 
 	@abstractmethod
-	def _nativeMaterials(self):
+	def _nativeMaterials(self, baseMaterials=False):
 		"""
 			\remarks	return a list of all the native materials that are contained within this object group
 			\return		<list> [ <variant> nativeMaterial, .. ]
@@ -360,7 +360,7 @@ class AbstractContainer(SceneWrapper):
 		from blur3d.api import SceneObject
 		return [ SceneObject(self._scene, obj) for obj in self._nativeObjects() ]
 
-	def materials(self):
+	def materials(self, baseMaterials=False):
 		"""
 		Return a list of all the materials contained within this object group
 		
@@ -368,7 +368,7 @@ class AbstractContainer(SceneWrapper):
 		
 		"""
 		from blur3d.api import SceneMaterial
-		return [ SceneMaterial(self._scene, mtl) for mtl in self._nativeMaterials() ]
+		return [ SceneMaterial(self._scene, mtl) for mtl in self._nativeMaterials(baseMaterials) ]
 
 	def materialOverride(self):
 		"""

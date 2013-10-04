@@ -358,7 +358,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		return mxs.pyhelper.getLayerNodes( self._nativePointer )
 		
-	def _nativeMaterials( self ):
+	def _nativeMaterials(self, baseMaterials=False):
 		"""
 			\remarks	implements the AbstractSceneObjectGroup._nativeMaterials method to return a list of the native materials that are currently on this layer
 			\sa			materials
@@ -366,8 +366,18 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		mtls = []
 		for obj in self._nativeObjects():
-			omtl = obj.material
-			if ( omtl and not omtl in mtls ):
+			if baseMaterials and self.materialOverride():
+				from blur3d.constants import MaterialCacheType
+				from blur3d.api.studiomax import StudiomaxAppData
+				get_userprop = mxs.getUserProp
+				get_appdata	= mxs.getAppData
+				mid = get_appdata(obj, StudiomaxAppData.AltMtlIndex)
+				if mid == None:
+					mid = get_userprop(obj, 'basematerial')
+				omtl = self.scene()._cachedNativeMaterial(MaterialCacheType.BaseMaterial, mid)
+			else:
+				omtl = obj.material
+			if omtl and not omtl in mtls:
 				mtls.append(omtl)
 		return mtls
 	
