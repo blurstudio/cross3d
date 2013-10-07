@@ -528,7 +528,7 @@ class AbstractScene(QObject):
 			\remarks	removes the inputed objects from the scene
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		names			<list> [ <str> name, .. ]
-			\param		display		<bool> 	tags whether or not the names are display names or object names
+			\param		display		<bool> 	flags whether or not the names are display names or object names
 			\return		<bool> success
 		"""
 		return False
@@ -1939,7 +1939,7 @@ class AbstractScene(QObject):
 			\sa			_renameNativeObjects
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\param		names		<list> [ <str>, .. ]
-			\param		display		<bool> 	tags whether or not the names are display names or object names
+			\param		display		<bool> 	flags whether or not the names are display names or object names
 			\return		<bool> success
 		"""
 		return self._renameNativeObjects([ object.nativePointer() for object in objects ], names, display=display)

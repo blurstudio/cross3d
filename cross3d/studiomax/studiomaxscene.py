@@ -878,7 +878,7 @@ class StudiomaxScene( AbstractScene ):
 			\remarks	implements the AbstractScene._renameNativeObjects to rename the inputed objects from the scene
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\param		names			<list> [ <str> name, .. ]
-			\param		display			<bool> 	tags whether or not the names are display names or object names
+			\param		display			<bool> 	flags whether or not the names are display names or object names
 			\return		<bool> success
 		"""
 		# make sure we have the proper number of names and objects

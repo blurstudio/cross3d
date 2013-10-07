@@ -15,7 +15,6 @@ def init():
 	module when necessary
 	"""
 	import abstractuserprops
-	import tags
 	import abstractundocontext
 	import abstractapplication
 	import abstractcollection

@@ -11,7 +11,6 @@
 
 from blur3d import abstractmethod, pendingdeprecation
 from blur3d.api	import UserProps
-from blur3d.api.abstract.tags import Tags
 from blur3d import api
 
 
@@ -102,9 +101,6 @@ class AbstractSceneWrapper(object):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-		
-	def tags(self):
-		return Tags(self)
 
 	def copy(self):
 		"""Create a copy of this wrapper in the scene

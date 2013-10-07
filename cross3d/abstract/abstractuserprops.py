@@ -8,27 +8,12 @@
 #	\author		Blur Studio
 #	\date		05/26/11
 #
-#|# get object
-#|import blur3d
-#|scene = blur3d.api.Scene()
-#|selection = scene.selection()
-#|object = selection[0]
-#|# set Tags
-#|tags = object.tags()
-#|tags.update(type='Character', entity='Dalton', usage='Shaded', location='Right', 
-#|render='Rndr', cache='tmc', variation = 3)
-#|tags['subdivision'] = 4
-#|# set custom properties
-#|prop = object.userProps()
-#|prop['tagA'] = 36
-#|prop['customProp'] = 'My custom property'
 
-import blur3d
-from blur3d import api
+import blur3d.api
+from blur3d.naming import Name
 from PyQt4.QtCore import QTimer as _QTimer
 
 dispatchObject = blur3d.api.dispatch.dispatchObject
-
 
 class AbstractUserProps(dict):
 	"""
@@ -39,6 +24,22 @@ class AbstractUserProps(dict):
 	def __init__(self, nativePointer):
 		dict.__init__(self)
 		self._nativePointer = nativePointer
+		
+		# Handling and cleaning legacy tags. This is going away soon.
+		if 'BlurTags' in self.keys():
+			for key in self['BlurTags']:
+				self[key] = self['BlurTags'][key]
+			scene = blur3d.api.Scene()
+			obj = blur3d.api.SceneObject(scene, nativePointer)
+			if not obj.model().isReferenced():
+				del self['BlurTags']
+		if 'Tags' in self.keys():
+			for key in self['Tags']:
+				self[key] = self['Tags'][key]
+			scene = blur3d.api.Scene()
+			obj = blur3d.api.SceneObject(scene, nativePointer)
+			if not obj.model().isReferenced():
+				del self['Tags']
 
 	def __contains__(self, key):
 		return key in self.lookupProps()
@@ -97,6 +98,25 @@ class AbstractUserProps(dict):
 		"""
 		return {}
 
+	def toString(self, prefix='', seperator=':', postfix=' '):
+		out = ''
+		for key in self.keys():
+			value = self[key]
+			line = prefix + key + seperator + unicode(value) + postfix
+			out += line
+		return out
+		
+	def updateFromName(self, format=None):
+		name = Name(self._object.displayName(), format)
+		for element in name.elements():
+			key = element.objectName()
+			text = element.text()
+			if text == 'x':
+				if key in self:
+					del self[key]
+			else:
+				self[key] = text
+		
 	def pop(self, key, default=None):
 		return self.lookupProps().pop(key, default)
 
@@ -251,5 +271,5 @@ class AbstractFileProps(AbstractUserProps):
 			raise blur3d.api.Exceptions.FileNotDSO
 
 # register the symbol
-api.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)
-api.registerSymbol('FileProps', AbstractFileProps, ifNotFound=True)
+blur3d.api.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)
+blur3d.api.registerSymbol('FileProps', AbstractFileProps, ifNotFound=True)

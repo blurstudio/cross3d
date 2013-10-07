@@ -158,8 +158,8 @@ class StudiomaxUserProps(AbstractUserProps):
 
 class StudiomaxFileProps(AbstractFileProps):
 	def __init__(self, fileName=''):
-		super(StudiomaxFileProps, self).__init__(None)
 		self.customName = mxs.pyhelper.namify('custom')
+		super(StudiomaxFileProps, self).__init__(None)
 	
 	def __delitem__(self, key):
 		index = mxs.fileProperties.findProperty(self.customName, key)
