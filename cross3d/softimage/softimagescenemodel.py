@@ -9,6 +9,7 @@
 #	\date		04/04/11
 #
 
+from win32com.client import constants
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -27,6 +28,9 @@ class SoftimageSceneModel( AbstractSceneModel ):
 	
 	def _nativeGroups(self, wildcard='*'):
 		return self._nativePointer.Groups.Filter('', '', wildcard)
+		
+	def isReferenced(self):
+		return self._nativePointer.ModelKind == constants.siModelKind_Reference
 	
 # register the symbol
 from blur3d import api

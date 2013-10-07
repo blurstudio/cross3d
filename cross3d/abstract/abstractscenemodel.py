@@ -30,6 +30,10 @@ class AbstractSceneModel(SceneObject):
 	@abstractmethod
 	def _nativeGroups(self, wildcard='*'):
 		return []
+
+	@abstractmethod
+	def isReferenced(self):
+		return False
 		
 	def objects(self, wildcard='', type=''):
 		return self.children(recursive=True, wildcard=wildcard, type=type)

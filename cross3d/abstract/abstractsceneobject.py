@@ -34,7 +34,6 @@ class AbstractSceneObject(SceneWrapper):
 			\remarks	acts as a factory to return the right type of scene object
 			\return		<variant> SceneObject
 		"""
-		# print SceneWrapper.__subclasses__()
 		if not cls._subClasses:
 			for c in cls._subclasses(cls):
 				if not c._objectType == ObjectType.Generic:
@@ -585,10 +584,10 @@ class AbstractSceneObject(SceneWrapper):
 		:return: :class:`blur3d.api.SceneModel` or None
 			
 		"""
-		from blur3d.api import Scene, SceneModel
 		nativeModel = self._nativeModel()
 		if nativeModel:
-			return SceneModel(Scene(), nativeModel)
+			from blur3d.api import SceneModel
+			return SceneModel(self._scene, nativeModel)
 		return None
 
 	def deleteProperty(self, propertyName):
