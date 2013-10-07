@@ -107,7 +107,7 @@ class AbstractUserProps(dict):
 		return out
 		
 	def updateFromName(self, format=None):
-		name = Name(self._object.displayName(), format)
+		name = Name(self._nativePointer.name, format)
 		for element in name.elements():
 			key = element.objectName()
 			text = element.text()
