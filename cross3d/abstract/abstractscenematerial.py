@@ -60,7 +60,8 @@ class AbstractSceneMaterial(SceneWrapper):
 
 		"""
 		from blur3d.api import SceneMaterial
-		return [ SceneMaterial(self._scene, mtl) for mtl in self._nativeSubmaterials() ]
+		subMtls = [s for s in self._nativeSubmaterials() if s]
+		return [ SceneMaterial(self._scene, mtl) for mtl in subMtls ]
 
 	@staticmethod
 	def cachedIcon(materialType):
