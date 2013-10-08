@@ -18,10 +18,8 @@
 import os
 
 from blur3d.api.abstract.abstractapplication import AbstractApplication
-#from blur3d.api.dispatch import Dispatch
 from PySoftimage import xsi
 from blur3d import api
-
 
 dispatch = None
 
@@ -84,6 +82,28 @@ class SoftimageApplication(AbstractApplication):
 		
 	def name( self ):
 		return "Softimage"
+		
+	def exportAlembic(self, filename, **kwargs):
+		from blur3d.api import Scene
+		scene = Scene()
+		
+		job = {'filename': filename}
+		job.update(**kwargs)
+		
+		objects = kwargs.get('objects', scene.selection())
+		job["objects"] = ",".join([obj.name() for obj in objects])
+	
+		job['in'] = kwargs.get('in', scene.animationRange()[0])
+		job['out'] = kwargs.get('out', scene.animationRange()[1])
+		
+		jobString = ";".join( [ "=".join([k,str(v)]) for k, v in job.iteritems()] )
+		print jobString 
+		return xsi.alembic_export(jobString)
+	
+	def importAlembic(self, filename, **kwargs):
+		job = {'filename': filename}
+		job.update(**kwargs)
+		return xsi.alembic_import_jobs(";".join( [ "=".join([k,str(v)]) for k, v in job.iteritems()] ))
 		
 	def nameAndVersion( self ):
 		"""

@@ -132,6 +132,14 @@ class AbstractApplication(QObject):
 		return 0
 
 	@abstractmethod
+	def exportAlembic(self, filename, **kwargs):
+		return False
+	
+	@abstractmethod
+	def importAlembic(self, filename, **kwargs):
+		return False
+	
+	@abstractmethod
 	def name(self):
 		"""
 		Returns the unique name of the software.
