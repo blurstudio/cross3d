@@ -120,7 +120,6 @@ class SoftimageSceneCamera( AbstractSceneCamera ):
 			if prop in [ 'Camera Visibility', 'Camera Display' ]:
 				for param in viewOptions[prop]:
 					if not param in ['hidlincol', 'wrfrmdpthcuecol']:
-						print prop, param
 						self._nativePointer.Properties(prop).Parameters(param).Value = viewOptions[prop][param]
 		xsi.SetValue( 'preferences.ViewCube.show', viewOptions.get( 'viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
