@@ -52,7 +52,7 @@ class AbstractUserProps(dict):
 		self.emitChange()
 
 	def __str__(self):
-		return unicode(self.lookupProps())
+		return '<{cls} {props}>'.format(cls=self.__class__.__name__, props=unicode(self.lookupProps()))
 
 	def clear(self):
 		self.lookupProps().clear()
@@ -123,8 +123,24 @@ class AbstractUserProps(dict):
 	def popitem(self):
 		return self.lookupProps().popitem()
 
+	def setAllHidden(self, state):
+		"""
+		Make all user props visible or hidden if the software supports it.
+		:param state: Should the propery be shown or hidden
+		"""
+		for key in self.keys():
+			self.setHidden(key, state)
+
 	def setdefault(self, key, default=None):
 		return self.lookupProps().setdefault(key, default)
+
+	def setHidden(self, key, state):
+		"""
+		Hide the mecinism that stores user props in software that supports it.
+		:param key: The key used to access the user prop
+		:param state: If the item is hidden or shown
+		"""
+		return False
 
 	def update(self, *args, **kwargs):
 		for k, v in dict(*args, **kwargs).iteritems():

@@ -75,6 +75,18 @@ class SoftimageUserProps(AbstractUserProps):
 			props[ key ] = self.unescapeValue( value )
 		return props
 	
+	def setHidden(self, key, state):
+		"""
+		Hide the mecinism that stores user props in software that supports it.
+		:param key: The key used to access the user prop
+		:param state: If the item is hidden or shown
+		"""
+		prop = self._nativePointer.Properties(key)
+		if not prop:
+			raise KeyError('%s is not a property' % key)
+		prop.SetCapabilityFlag(constants.siNotInspectable, state)
+		return True
+	
 	@staticmethod
 	def escapeValue(string):
 		"""
