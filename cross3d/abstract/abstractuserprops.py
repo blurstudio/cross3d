@@ -1,12 +1,12 @@
-##
-#	\namespace	blur3d.api.UserProps
+# #
+# 	\namespace	blur3d.api.UserProps
 #
-#	\remarks	The blur3d.api.UserProps package creates an abstract wrapper from a 3d system
-#				to use storing and retreiving custom user props
-#	
-#	\author		mike@blur.com
-#	\author		Blur Studio
-#	\date		05/26/11
+# 	\remarks	The blur3d.api.UserProps package creates an abstract wrapper from a 3d system
+# 				to use storing and retreiving custom user props
+#
+# 	\author		mike@blur.com
+# 	\author		Blur Studio
+# 	\date		05/26/11
 #
 
 import blur3d.api
@@ -24,20 +24,26 @@ class AbstractUserProps(dict):
 	def __init__(self, nativePointer):
 		dict.__init__(self)
 		self._nativePointer = nativePointer
-		
+
 		# Handling and cleaning legacy tags. This is going away soon.
-		if 'BlurTags' in self.keys():
+		# Pulls values from Tags and BlurTags the first time they are encountered
+		# and then immediately deletes them so that they don't continue to overwrite
+		# any values that are set on UserProps.
+		if 'BlurTags' in self.keys() and self['BlurTags']:
 			for key in self['BlurTags']:
 				self[key] = self['BlurTags'][key]
 			scene = blur3d.api.Scene()
 			obj = blur3d.api.SceneObject(scene, nativePointer)
+			self['BlurTags'] = {}
 			if not obj.model().isReferenced():
 				del self['BlurTags']
-		if 'Tags' in self.keys():
+
+		if 'Tags' in self.keys() and self['Tags']:
 			for key in self['Tags']:
 				self[key] = self['Tags'][key]
 			scene = blur3d.api.Scene()
 			obj = blur3d.api.SceneObject(scene, nativePointer)
+			self['Tags'] = {}
 			if not obj.model().isReferenced():
 				del self['Tags']
 
@@ -105,7 +111,7 @@ class AbstractUserProps(dict):
 			line = prefix + key + seperator + unicode(value) + postfix
 			out += line
 		return out
-		
+
 	def updateFromName(self, format=None):
 		name = Name(self._nativePointer.name, format)
 		for element in name.elements():
@@ -116,7 +122,7 @@ class AbstractUserProps(dict):
 					del self[key]
 			else:
 				self[key] = text
-		
+
 	def pop(self, key, default=None):
 		return self.lookupProps().pop(key, default)
 
@@ -196,7 +202,7 @@ class AbstractFileProps(AbstractUserProps):
 		self._dso = None
 		self._closeScheduled = False
 		self._saveScheduled = False
-	
+
 	def __delitem__(self, key):
 		if self.dso().open(self.fileName):
 			self._saveScheduled = True
@@ -206,7 +212,7 @@ class AbstractFileProps(AbstractUserProps):
 			raise KeyError('FileProps does not contain key: %s' % key)
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
-	
+
 	def __getitem__(self, key):
 		if self.dso().open(self.fileName):
 			self._scheduleClose()
@@ -216,7 +222,7 @@ class AbstractFileProps(AbstractUserProps):
 			raise KeyError('FileProps does not contain key: %s' % key)
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
-	
+
 	def __setitem__(self, key, value):
 		if self.dso().open(self.fileName):
 			self._saveScheduled = True
@@ -229,24 +235,24 @@ class AbstractFileProps(AbstractUserProps):
 			self.emitChange()
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
-	
+
 	def __repr__(self):
 		return self.__str__()
-	
+
 	def _close(self):
 		if self._saveScheduled:
 			self._saveScheduled = False
 			self.dso().save()
 		self.dso().close()
 		self._closeScheduled = False
-	
+
 	def _scheduleClose(self, save=False):
 		if save:
 			self._saveScheduled = save
 		if not self._closeScheduled:
 			_QTimer.singleShot(0, self._close)
 			self._closeScheduled = True
-	
+
 	def clear(self):
 		"""
 		Removes all attributes and imedeately saves the changes. There is no QTimer delay.
@@ -258,13 +264,13 @@ class AbstractFileProps(AbstractUserProps):
 			self.emitChange()
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
-	
+
 	def dso(self):
 		if not self._dso:
 			from blurdev.media.dsofile import DSOFile as _DSOFile
 			self._dso = _DSOFile()
 		return self._dso
-	
+
 	def lookupProps(self):
 		if self.dso().open(self.fileName):
 			self._scheduleClose()
@@ -273,7 +279,7 @@ class AbstractFileProps(AbstractUserProps):
 			return ret
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
-	
+
 	def update(self, *args, **kwargs):
 		"""
 		Adds all provided items and imedeately saves the changes. There is no QTimer delay.
