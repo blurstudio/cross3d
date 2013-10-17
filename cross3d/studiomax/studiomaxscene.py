@@ -1063,7 +1063,15 @@ class StudiomaxScene( AbstractScene ):
 				
 				# go through and pull the values
 				for key in nprop.propertyNames():
-					if ( nprop.isCustomProperty(key) ):
+					# The gbufferchannel property should be treated like a
+					# native property, but removing it from the custom property
+					# list breaks myriad other things.  The simple solution is to
+					# allow it to act as both by putting the additional condition
+					# here.  If this were not there any time you unset an altprop
+					# on a layer object ids would revert to a 0 value even if the
+					# user had set them to something else by hand via the Max
+					# interface.
+					if nprop.isCustomProperty(key) and key != 'gbufferchannel':
 						value = get_userprop( obj, key )
 					else:
 						value = obj.property( key )
