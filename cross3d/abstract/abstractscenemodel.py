@@ -43,6 +43,10 @@ class AbstractSceneModel(SceneObject):
 		for nativeGroup in self._nativeGroups(wildcard):
 			groups.append(Group(self._scene, nativeGroup))
 		return groups
+		
+	@abstractmethod
+	def export( self, fileName ):
+		return False
 
 # register the symbol
 api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

@@ -9,6 +9,7 @@
 #	\date		04/04/11
 #
 
+from PySoftimage import xsi
 from win32com.client import constants
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
@@ -31,6 +32,10 @@ class SoftimageSceneModel( AbstractSceneModel ):
 		
 	def isReferenced(self):
 		return self._nativePointer.ModelKind == constants.siModelKind_Reference
+	
+	def export( self, fileName ):
+		xsi.ExportModel( self._nativePointer, fileName, True, False )
+		return True
 	
 # register the symbol
 from blur3d import api
