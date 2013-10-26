@@ -14,6 +14,7 @@ import time
 
 from PySoftimage import xsi
 from blur3d.api import Exceptions
+from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -75,6 +76,10 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			Creates an unpadded JPG file sequence from the viewport for a given range.
 		"""
 		
+		# Treating inputs.
+		if isinstance(frameRange, int):
+			frameRange = FrameRange([frameRange, frameRange])
+			
 		# Collecting data.
 		nativeCamera = self._nativeCamera()
 		firstFrameFileName = fileName.replace('.jpg', '.%d.jpg' % frameRange[0])
@@ -90,10 +95,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		# Storing object states.
 		self._scene.storeState()
 		self.storeState()
-		
-		# Setting the scene range. Apparently if you don't it causes an animation layer issue.
-		self._scene.setAnimationRange(frameRange)
-		
+			
 		# Setting slate.
 		if slate:
 			self.setSlateText( slate )
@@ -136,17 +138,22 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'custominfo' ).Value = False
 		
 		# Checking inputs.
+		initialFrameRange = self._scene.animationRange()
 		if not frameRange:
-			frameRange = self._scene.animationRange()
+			frameRange = initialFrameRange
 		if not resolution:
 			from PyQt4.QtCore import QSize
 			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
 
+		# Setting the scene range. Apparently if you don't it causes an animation layer issue.
+		if not initialFrameRange.contains(frameRange):
+			self._scene.setAnimationRange(frameRange)
+		
 		# Set camera's picture ratio.
 		camera = self.camera()
 		if camera:
-			pictureRatio = float( resolution.width() ) / resolution.height() 
-			camera.setPictureRatio( pictureRatio )
+			pictureRatio = camera.pictureRatio()
+			camera.setPictureRatio(float( resolution.width() ) / resolution.height())
 		
 		fps = self._scene.animationFPS()
 		
@@ -177,7 +184,10 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		self._scene.restoreState()
 		self.restoreState()
 		
-		# If the famouse capture Softimage bug happened we raise a specific error.
+		if camera:
+			camera.setPictureRatio(pictureRatio)
+		
+		# If the famous capture Softimage bug happened we raise a specific error.
 		try:
 			firstFrameEndTime = os.path.getmtime(firstFrameFileName)
 			if not firstFrameStartTime < firstFrameEndTime:
@@ -192,7 +202,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 					return False
 		except os.error:
 			return False
-			
+		
 		return True
 
 	def viewOptions(self):

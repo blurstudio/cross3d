@@ -57,6 +57,11 @@ class FrameRange( list ):
 			return True
 		return False
 		
+	def contains(self,frameRange):
+		if self[0] <= frameRange[0] and self[1] >= frameRange[1]:
+			return True
+		return False
+		
 	def offsets( self, frameRange ): 
 		return FrameRange( [ ( frameRange[0] - self[0] ), ( frameRange[1] - self[1] ) ] )
 				
@@ -103,8 +108,6 @@ class FrameRange( list ):
 			\remarks	Returns the padded range.
 		"""
 		return FrameRange( [ self[0] - padding, self[1] + padding ] )
-		
-		
 		
 	def offset( self, offset ):
 		"""

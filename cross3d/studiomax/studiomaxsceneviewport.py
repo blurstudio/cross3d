@@ -11,6 +11,7 @@
 
 from Py3dsMax import mxs
 from blur3d.api import dispatch
+from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +100,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		'''
 			/option <bool> effects
 		'''
-
+		
+		# Treating inputs.
+		if isinstance(frameRange, int):
+			frameRange = FrameRange([frameRange, frameRange])
+			
 		# collecting what we need
 		import os
 		scene = self._scene
