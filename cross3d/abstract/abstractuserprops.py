@@ -138,7 +138,10 @@ class AbstractUserProps(dict):
 			self.setHidden(key, state)
 
 	def setdefault(self, key, default=None):
-		return self.lookupProps().setdefault(key, default)
+		props = self.lookupProps()
+		if not key in props:
+			self[key] = default
+		return self[key]
 
 	def setHidden(self, key, state):
 		"""
