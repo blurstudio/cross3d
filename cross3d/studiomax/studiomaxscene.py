@@ -1368,6 +1368,7 @@ class StudiomaxScene( AbstractScene ):
 			if options & VisibilityToggleOptions.ToggleFrost:
 				if mcls == Frost:
 					obj.enableViewportMesh = state
+					obj.enableRenderMesh = state
 
 			# Toggle VRayStereoscopic helpers.
 			if options & VisibilityToggleOptions.ToggleVRayStereoscopics:
