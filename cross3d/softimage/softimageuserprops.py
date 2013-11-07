@@ -10,6 +10,7 @@
 #
 
 import re
+import json
 from blur3d import api
 from win32com.client import constants
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
@@ -106,26 +107,29 @@ class SoftimageUserProps(AbstractUserProps):
 			\return		<float>||<int>||<list>||<dict>||<tuple>||<unicode>
 		"""
 		string = unicode(string)
-		string, type = SoftimageUserProps._decodeString(string)
-		if type == float:
+		string, typ = SoftimageUserProps._decodeString(string)
+		if typ == float:
 			return float(string)
-		elif type == int:
+		elif typ == int:
 			return int(string)
-		elif type in (list, dict, tuple):
+		elif typ in (list, dict, tuple):
+			if typ == dict:
+				try:
+					return json.loads( string )
+				except ValueError: pass
 			try:
 				return eval(string)
-			except:
-				return string
+			except: pass
 		return string
 		#return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
 	@staticmethod
 	def _decodeString(string):
-		if re.search('\[.*\]', string):
+		if re.match('\[.*\]', string):
 			return string, list
-		if re.search('{.*}', string):
+		if re.match('{.*}', string):
 			return string, dict
-		if re.search('\(.*\)', string):
+		if re.match('\(.*\)', string):
 			return string, tuple
 		if string.find('.') != -1:
 			try:

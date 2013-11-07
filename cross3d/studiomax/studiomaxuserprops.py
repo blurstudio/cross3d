@@ -14,6 +14,7 @@ from PyQt4.QtCore import QDate, QString
 from datetime import date
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 import re
+import json
 
 class StudiomaxUserProps(AbstractUserProps):
 	def __init__(self, nativePointer):
@@ -79,18 +80,6 @@ class StudiomaxUserProps(AbstractUserProps):
 						continue
 			props[self.unescapeKey(split[0])] = self.unescapeValue(split[1])
 		return props
-
-	@staticmethod
-	def escapeValue(string):
-		"""
-			\remarks	replaces any unstorable characters in value with their html codes
-			\return		<str>
-		"""
-		if isinstance(string, (float, list)):
-			return string
-		if not isinstance(string, (str, unicode, float)):
-			string = unicode(string)
-		return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')
 	
 	@staticmethod
 	def unescapeValue(string):
@@ -99,14 +88,21 @@ class StudiomaxUserProps(AbstractUserProps):
 			\return		<str>
 		"""
 		string = unicode(string)
-		string, type = StudiomaxUserProps._decodeString(string)
-		if type == float:
+		string, typ = StudiomaxUserProps._decodeString(string)
+		string = string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+		if typ == float:
 			return float(string)
-		elif type == int:
+		elif typ == int:
 			return int(string)
-		elif type in (list, dict, tuple):
-			return eval(string)
-		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+		elif typ in (list, dict, tuple):
+			if typ == dict:
+				try:
+					return json.loads( string )
+				except ValueError: pass
+			try:
+				return eval(string)
+			except: pass
+		return string
 	
 	@staticmethod
 	def _decodeString(string):
@@ -117,9 +113,9 @@ class StudiomaxUserProps(AbstractUserProps):
 				return val, float
 			except:
 				pass
-		if re.search('\{.*\}', string):
+		if re.match('\{.*\}', string):
 			return string, dict
-		if re.search('#\(.*\)', string):
+		if re.match('#\(.*\)', string):
 			data = []
 			s = string
 			open, close = StudiomaxUserProps._posCounter(s)
@@ -128,7 +124,7 @@ class StudiomaxUserProps(AbstractUserProps):
 				s = s[:open-2]+'['+s[open:close]+']'+s[close+1:]
 				open, close = StudiomaxUserProps._posCounter(s)
 			return s, list
-		if re.search('\(.*\)', string):
+		if re.match('\(.*\)', string):
 			return string, tuple
 		try:
 			int(string)
