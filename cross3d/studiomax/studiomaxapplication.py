@@ -184,6 +184,14 @@ class StudiomaxApplication(AbstractApplication):
 		self.disconnectCallback('viewportRedraw')
 		return
 	
+	def installDir(self):
+		""" Returns the path to the application's install directory
+		
+		:return: path string
+		:rtyp: str
+		"""
+		return mxs.pathConfig.resolvePathSymbols('$max')
+	
 	def preDeleteObject(self, callback, *args):
 		"""
 			\remarks	Pre-process the object that is going to be deleted.

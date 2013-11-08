@@ -18,7 +18,7 @@
 import os
 
 from blur3d.api.abstract.abstractapplication import AbstractApplication
-from PySoftimage import xsi
+from PySoftimage import xsi, constants
 from blur3d import api
 
 dispatch = None
@@ -104,7 +104,15 @@ class SoftimageApplication(AbstractApplication):
 		job = {'filename': filename}
 		job.update(**kwargs)
 		return xsi.alembic_import_jobs(";".join( [ "=".join([k,str(v)]) for k, v in job.iteritems()] ))
+	
+	def installDir(self):
+		""" Returns the path to the application's install directory
 		
+		:return: path string
+		:rtyp: str
+		"""
+		return xsi.InstallationPath(constants.siFactoryPath)
+	
 	def nameAndVersion( self ):
 		"""
 			\remarks	returns the name and version format needed for Assburner added by John Kosnik

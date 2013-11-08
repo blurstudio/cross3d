@@ -140,6 +140,15 @@ class AbstractApplication(QObject):
 		return False
 	
 	@abstractmethod
+	def installDir(self):
+		""" Returns the path to the application's install directory
+		
+		:return: path string
+		:rtyp: str
+		"""
+		return ''
+	
+	@abstractmethod
 	def name(self):
 		"""
 		Returns the unique name of the software.
