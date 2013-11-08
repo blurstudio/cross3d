@@ -1366,7 +1366,7 @@ class StudiomaxScene( AbstractScene ):
 
 			# Toggle Frost viewport mesh calculation.
 			if options & VisibilityToggleOptions.ToggleFrost:
-				if mcls == Frost:
+				if mcls == Frost or classof(obj.baseObject) == Frost:
 					obj.enableViewportMesh = state
 					obj.enableRenderMesh = state
 
