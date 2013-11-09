@@ -141,11 +141,46 @@ class AbstractApplication(QObject):
 	
 	@abstractmethod
 	def installDir(self):
-		""" Returns the path to the application's install directory
+		""" Returns the path to the current application's install directory.
 		
 		:return: path string
 		:rtyp: str
 		"""
+		import sys
+		return sys.executable
+	
+	def installDirForApplication(self, appName, version=None, language='English'):
+		""" Finds the install path for various software installations. Does not need to be
+		:param appName: The name of the application
+		:param version: The version of the software. Default is None
+		:param language: Optional language that may be required for specific softwares.
+		"""
+		def registryValue(registry, key, value):
+			# Do not want to import _winreg unless it is neccissary
+			import _winreg
+			aReg = _winreg.ConnectRegistry(None, getattr(_winreg, registry))
+			try:
+				regKey = _winreg.OpenKey(aReg, key)
+				return _winreg.QueryValueEx(regKey, value)
+			except WindowsError:
+				pass
+			return ('', 0)
+		
+		if appName == '3ds Max':
+			# map years to version numbers
+			versionForYear = {'2008': '10.0', '2009': '11.0', '2010': '12.0', '2011': '13.0', '2012': '14.0', 
+								'2013': '15.0', '2014': '16.0'}
+			# map languages to ids
+			languageIDs = {'English': ('409', 'en-US', 'ENU'), 'French': ('40C', 'fr-FR', 'FRA'), 'German': ('407', 'de-DE', 'DEU'), 
+							'Japanese': ('411', 'ja-JP', 'JPN'), 'Korean': ('412', 'ko-KR', 'KOR'), 'Simplified Chinese': ('804', 'zh-CN', 'CHS')}
+			version = versionForYear.get(unicode(version), unicode(version))
+			langId = languageIDs.get(language, languageIDs['English'])
+			# Ensure we get a valid version number
+			version = '{}.0'.format(version[:version.find('.')])
+			if float(version) >= 15:
+				return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\3dsMax\{version}'.format(version=version), 'Installdir')[0]
+			else:
+				return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\3dsMax\{version}\MAX-1:{langId}'.format(version=version, langId=langId[0]), 'Installdir')[0]
 		return ''
 	
 	@abstractmethod
