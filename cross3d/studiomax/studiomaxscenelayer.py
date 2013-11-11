@@ -1110,7 +1110,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		
 		return True
 	
-	def setHidden( self, state ):
+	def setHidden( self, state, toggleOptions=None ):
 		"""
 			\remarks	reimplements the AbstractSceneLayer.setHidden method to set the hidden state for this layer
 			\return		<bool> success
@@ -1125,7 +1125,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			mxs.unhide( nativeObjects )
 		
 		# toggle visible rendering options
-		self._scene._toggleNativeVisibleState( nativeObjects )
+		self._scene._toggleNativeVisibleState(nativeObjects, toggleOptions)
 		
 		# update the atmospherics on this layer
 		for atmos in self.atmospherics():

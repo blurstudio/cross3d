@@ -573,15 +573,16 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return self._scene._setNativeSelection(self._nativeObjects())
 
-	def setVisible(self, state):
+	def setVisible(self, state, options=None):
 		"""
 		Set whether or not this object group is visible
 		
 		:param state: bool
+		:param options: :data:`blur3d.constants.VisibilityToggleOptions`
 		:return: bool
 
 		"""
-		return self.setHidden(not state)
+		return self.setHidden(not state, options)
 
 	def unhide(self):
 		"""Unhides the objects on this object group
