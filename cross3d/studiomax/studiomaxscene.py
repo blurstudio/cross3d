@@ -1207,10 +1207,16 @@ class StudiomaxScene( AbstractScene ):
 			
 			# enable undo operations
 			mxs.theHold.EnableUndo()
-			
+
+			# We're not going to do this anymore.  It appears to cause
+			# issues with modifier editing if we flick back and forth
+			# between panels without the user's consent when toggling
+			# layers in Onion.  Right now that's the only place using
+			# the logic in this method, so disabling it is the best
+			# course of action. <jbee>
 			# reset the command panel state
-			mxs.setCommandPanelTaskMode( self._panelState )
-			self._panelState = None
+			# mxs.setCommandPanelTaskMode( self._panelState )
+			# self._panelState = None
 			
 			# allow panel editing
 			mxs.resumeEditing()
@@ -1232,9 +1238,15 @@ class StudiomaxScene( AbstractScene ):
 			mxs.disableSceneRedraw()
 			mxs.theHold.DisableUndo()
 			
+			# We're not going to do this anymore.  It appears to cause
+			# issues with modifier editing if we flick back and forth
+			# between panels without the user's consent when toggling
+			# layers in Onion.  Right now that's the only place using
+			# the logic in this method, so disabling it is the best
+			# course of action. <jbee>
 			# record the command panel state
-			self._panelState = mxs.getCommandPanelTaskMode()
-			mxs.setCommandPanelTaskMode( mxs.pyhelper.namify('create') )
+			# self._panelState = mxs.getCommandPanelTaskMode()
+			# mxs.setCommandPanelTaskMode( mxs.pyhelper.namify('create') )
 	
 	def _toNativeValue( self, pyValue ):
 		"""
