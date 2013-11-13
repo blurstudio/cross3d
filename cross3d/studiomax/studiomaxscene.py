@@ -1219,7 +1219,9 @@ class StudiomaxScene( AbstractScene ):
 			# self._panelState = None
 			
 			# allow panel editing
-			mxs.resumeEditing()
+			# This also appears to cause issues with unrelated modifiers
+			# when toggling layers, same as setting the panel task mode.
+			# mxs.resumeEditing()
 			
 			# enable scene redrawing and refresh the views
 			while ( mxs.isSceneRedrawDisabled() ):
@@ -1232,7 +1234,9 @@ class StudiomaxScene( AbstractScene ):
 			mxs.setQuietMode( True )
 			
 			# disallow panel editing
-			mxs.suspendEditing()
+			# This also appears to cause issues with unrelated modifiers
+			# when toggling layers, same as setting the panel task mode.
+			# mxs.suspendEditing()
 			
 			# disable the scene redrawing
 			mxs.disableSceneRedraw()
