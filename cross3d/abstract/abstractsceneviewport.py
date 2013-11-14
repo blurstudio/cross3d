@@ -60,7 +60,7 @@ class AbstractSceneViewport(QObject):
 		return ''
 
 	@abstractmethod
-	def generatePlayblast(self, fileName, frameRange=None, resolution=None, **options):
+	def generatePlayblast(self, fileName, **options):
 		"""Generates a playblast in the specific path
 		
 		:param filename: path to file
