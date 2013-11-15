@@ -13,12 +13,16 @@ import os
 import math
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
+from blur3d.constants import CameraType
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
 #------------------------------------------------------------------------------------------------------------------------
 
 class StudiomaxSceneCamera( AbstractSceneCamera ):
-
+	
+	_outputTypes = ['Still', 'Movie', 'Video']
+	_whiteBalances = ['Custom', 'Neutral', 'Daylight', 'D75', 'D65', 'D55', 'D50', 'Temperature']
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -28,8 +32,6 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 			\remarks	implements the AbstractSceneCamera.cameraType method to determine what type of camera this instance is
 			\return		<blur3d.api.constants.CameraType>
 		"""
-		from blur3d.constants import CameraType
-		
 		cls = mxs.classof(self._nativePointer)
 		if ( cls in (mxs.FreeCamera,mxs.TargetCamera) ):
 			return CameraType.Standard
@@ -130,6 +132,60 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 			self._nativePointer.film_width = float(width)
 		except AttributeError:
 			pass
+			
+	def outputType(self):
+		return self._outputTypes[self._nativePointer.type] if self.isCameraType(CameraType.VRayPhysical) else ''
+	
+	def setOutputType(self, outputType):
+		if isinstance(outputType, basestring) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.type = self._outputTypes.index(outputType)
+			return True
+		return False
+		
+	def exposureEnabled(self):
+		return self._nativePointer.exposure if self.isCameraType(CameraType.VRayPhysical) else False
+	
+	def setExposureEnabled(self, exposureEnabled):
+		if isinstance(exposureEnabled, (bool, int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.exposure = exposureEnabled
+			return True
+		return False
+	
+	def vignettingEnabled(self):
+		return self._nativePointer.vignetting if self.isCameraType(CameraType.VRayPhysical) else False
+
+	def setVignettingEnabled(self, vignettingEnabled):
+		if isinstance(vignettingEnabled, (bool, int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.vignetting = vignettingEnabled
+			return True
+		return False
+
+	def whiteBalance(self):
+		return self._whiteBalances[self._nativePointer.whiteBalance_preset] if self.isCameraType(CameraType.VRayPhysical) else ''
+
+	def setWhiteBalance(self, whiteBalance):
+		if isinstance(whiteBalance, basestring) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.whiteBalance_preset = self._whiteBalances.index(whiteBalance)
+			return True
+		return False
+
+	def shutterAngle(self):
+		return self._nativePointer.shutter_angle if self.isCameraType(CameraType.VRayPhysical) else 180
+
+	def setShutterAngle(self, shutterAngle):
+		if isinstance(shutterAngle, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.shutter_angle = shutterAngle
+			return True
+		return False
+
+	def shutterOffset(self):
+		return self._nativePointer.shutter_offset if self.isCameraType(CameraType.VRayPhysical) else 0
+
+	def setShutterOffset(self, shutterOffset):
+		if isinstance(shutterOffset, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.shutter_offset = shutterOffset
+			return True
+		return False
 	
 # register the symbol
 from blur3d import api

@@ -28,29 +28,22 @@ class AbstractSceneCamera(SceneObject):
 		super(AbstractSceneCamera, self).__init__(scene, nativeCamera)
 		self._viewOptions = {}
 		
+	def isCameraType(self, cameraType):
+		"""
+			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType. 
+		"""
+		return (self.cameraType() & cameraType) > 0
+
 	@abstractmethod
 	def cameraType(self):
-		"""Return the camera type for this camera instance
-		
-		:return: :data:`blur3d.constants.CameraType`
-		
+		"""
+			Returns the camera type for this camera instance as blur3d.constants.CameraType.
 		"""
 		return 0
 
 	@abstractmethod
 	def filmWidth(self):
 		pass
-
-	def isCameraType(self, cameraType):
-		"""
-		Return whether or not this camera is a kind of the inputed 
-		camera type
-		
-		:param cameraType: :data:`blur3d.constants.CameraType`
-		:rtype: bool
-
-		"""
-		return (self.cameraType() & cameraType) > 0
 
 	@abstractmethod
 	def fov(self, rounded=False):
@@ -98,71 +91,113 @@ class AbstractSceneCamera(SceneObject):
 
 	@abstractmethod
 	def pictureRatio(self):
-		"""Gets the camera's picture ratio.
-		
-		:rtype: float
-			
+		"""
+			Gets the camera's picture ratio.
+			:rtype: float
 		"""
 		return 0.0
+			
+	@abstractmethod
+	def outputType(self):
+		return ''
+	
+	@abstractmethod
+	def setOutputType(self, outputType):
+		return False
+		
+	@abstractmethod
+	def exposureEnabled(self):
+		return False
+	
+	@abstractmethod
+	def setExposureEnabled(self, exposureEnabled):
+		return False
+	
+	@abstractmethod
+	def vignettingEnabled(self):
+		return False
+	
+	@abstractmethod
+	def setVignettingEnabled(self, vignettingEnabled):
+		return False
 
 	@abstractmethod
+	def whiteBalance(self):
+		return ''
+	
+	@abstractmethod
+	def setWhiteBalance(self, whiteBalance):
+		return False
+	
+	@abstractmethod
+	def shutterAngle(self):
+		return 0
+	
+	@abstractmethod
+	def setShutterAngle(self, shutterAngle):
+		return False
+		
+	@abstractmethod
+	def shutterOffset(self):
+		return 0
+	
+	@abstractmethod
+	def setShutterOffset(self, shutterOffset):
+		return False		
+	
+	@abstractmethod
 	def setPictureRatio(self, pictureRatio):
-		"""Sets the camera's picture ratio.
-		
-		:param distance: picture ratio
-		:type distance: float
-		:return: True if successful
-		
+		"""
+			Sets the camera's picture ratio.
+			:param distance: picture ratio
+			:type distance: float
+			:return: True if successful
 		"""
 		return False
 
 	@abstractmethod
 	def farClippingPlane(self):
-		"""Gets the camera's far clipping plane distance.
-		
-		:rtype: float
-		
+		"""
+			Gets the camera's far clipping plane distance.
+			:rtype: float
 		"""
 		return 0
 
 	@abstractmethod
 	def setFarClippingPlane(self, distance):
-		"""Sets the camera's far clipping plane distance.
-		
-		:type distance: float
-		:return: True if successful
-		
+		"""
+			Sets the camera's far clipping plane distance.
+			:type distance: float
+			:return: True if successful
 		"""
 		return False
 
 	@abstractmethod
 	def nearClippingPlane(self):
-		"""Gets the camera's near clipping plane distance.
-		
-		:rtype: float
-			
+		"""
+			Gets the camera's near clipping plane distance.
+			:rtype: float
 		"""
 		return 0
 
 	@abstractmethod
 	def setNearClippingPlane(self, distance):
-		"""Sets the camera's near clipping plane distance.
-		
-		:param distance: picture ratio
-		:type distance: float
-		:return: True if successful
-
+		"""
+			Sets the camera's near clipping plane distance.
+			:param distance: picture ratio
+			:type distance: float
+			:return: True if successful
 		"""
 		return False
 
 	@abstractmethod
 	def generateRender( self, **options ):
 		"""
-			\remarks	renders an image sequence form that camera with the current render settings
-			\param 		path <String>
-			\param 		frameRange <FrameRange>
-			\param 		resolution <QtCore.QSize>
-			\return		<blur3d.api.constants.CameraType>
+			\remarks renders an image sequence form that camera with the current render settings
+			\param path <String>
+			\param frameRange <FrameRange>
+			\param resolution <QtCore.QSize>
+			\return <blur3d.api.constants.CameraType>
 		"""
 		return False
 		

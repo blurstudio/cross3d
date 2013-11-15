@@ -319,7 +319,7 @@ class AbstractSceneObject(SceneWrapper):
 		
 		"""
 		return False
-
+		
 	@abstractmethod
 	def isHidden(self):
 		"""Returns whether or not this object is hidden
@@ -358,6 +358,19 @@ class AbstractSceneObject(SceneWrapper):
 			return SceneLayer(self._scene, nativeLayer)
 		return None
 
+	@abstractmethod
+	def setTransformsLocks(self, position=None, rotation=None, scale=None, manipulation=True, keyability=False):
+		"""
+			Takes True, False, None or a string containing desired axis letters.
+			Uppercase locks, lowercase unlocks, not provided ignores.
+			:param position: Defaults to None.
+			:param rotation: Defaults to None.
+			:param scale: Defaults to None.
+			:param manipulation: Flags if manipulation will be affected.
+			:param keyability: Flags if keyability will be affected. Not implemented.
+		"""
+		return False
+		
 	def material(self):
 		"""
 		Returns the SceneMaterial that this object is using, or none if no 

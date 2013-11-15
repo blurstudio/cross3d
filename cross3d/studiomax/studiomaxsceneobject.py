@@ -311,6 +311,38 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.isselected
 
+	def setTransformsLocks(self, position=None, rotation=None, scale=None, manipulation=True, keyability=False):
+		
+		if manipulation:
+			
+			position = 'XYZ' if position is True else position
+			rotation = 'XYZ' if rotation is True else rotation
+			scale = 'XYZ' if scale is True else scale
+			
+			position = 'xyz' if position is False else position
+			rotation = 'xyz' if rotation is False else rotation
+			scale = 'xyz' if scale is False else scale
+			
+			position = '' if position is None else position
+			rotation = '' if rotation is None else rotation
+			scale = '' if scale is None else scale
+			
+			flags = []
+			initialFlags = mxs.getTransformLockFlags(self._nativePointer)
+			
+			for i, transform in enumerate((position, rotation, scale)):
+				for j, key in enumerate(('x', 'y', 'z')):
+					index = j+3*i
+					if key.upper() in transform:
+						flags.append(index+1)		
+					elif not key in transform:
+						if initialFlags[index]:
+							flags.append(index+1)
+					
+			return mxs.setTransformLockFlags(self._nativePointer, mxs.pyHelper.tobits(flags))
+			
+		return False
+		
 	def setBoxMode( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setBoxMode to set whether this object is in boxMode or not
