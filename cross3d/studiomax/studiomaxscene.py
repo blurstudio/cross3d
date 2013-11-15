@@ -1296,6 +1296,9 @@ class StudiomaxScene( AbstractScene ):
 		VRayIES					= mxs.VRayIES
 		VRayAmbientLight		= mxs.VRayAmbientLight
 		Light_Portal			= mxs.Light_Portal
+		OctaneLight				= mxs.OctaneLight
+		DaylightLight			= mxs.Daylightlight
+		IESLight				= mxs.IESLight
 		XRefObject				= mxs.XRefObject
 		Missing_Light			= mxs.Missing_Light
 		Light					= mxs.Light
@@ -1309,41 +1312,30 @@ class StudiomaxScene( AbstractScene ):
 		Alembic_Mesh_Topology 	= mxs.Alembic_Mesh_Topology
 		
 		for obj in nativeObjects:
-			state 	= not obj.ishidden
-			msuper	= superclassof( obj )
-			mcls 	= classof( obj )
+			state = not obj.ishidden
+			msuper = superclassof(obj)
+			mcls = classof(obj)
 			
-			# toggle lights
-			if ( options & VisibilityToggleOptions.ToggleLights ):
-				if ( msuper == Light ):
-					# update a brazil 2 light
-					if ( mcls == B2_Main_Light ):
+			# Toggle various types of lights.
+			if options & VisibilityToggleOptions.ToggleLights:
+				if msuper == Light:
+					if mcls == B2_Main_Light:
 						obj.base_parameters.enabled_on = state
-					
-					# update vray lights
-					elif ( mcls in (VRaySun,VRayIES,VRayAmbientLight) ):
+					elif mcls in (VRaySun, VRayIES, VRayAmbientLight):
 						obj.enabled = state
-					
-					# update a light portal
-					elif ( mcls == Light_Portal ):
+					elif mcls == Light_Portal:
 						obj.portal_on = state
 						obj.renderable = state
-					
-					# update an xref object
-					elif ( mcls == XRefObject ):
+					elif mcls == XRefObject:
 						obj.actualBaseObject.on = state
 						obj.renderable = state
-					
-					# update a missing light
-					elif ( mcls == Missing_Light ):
+					elif mcls == Missing_Light:
 						print 'Warning: Missing Lights found in the Scene'
-				
-					# update a default light
+					elif mcls in (OctaneLight, DaylightLight, IESLight):
+						obj.enabled = state
 					else:
-						obj.renderable 	= state
-						obj.on 			= state
-					
-					# don't bother processing future checks if this was a light
+						obj.renderable = state
+						obj.on = state
 					continue
 					
 			# toggle fx
