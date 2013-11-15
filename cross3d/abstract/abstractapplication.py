@@ -149,18 +149,23 @@ class AbstractApplication(QObject):
 		import sys
 		return sys.executable
 	
-	def installDirForApplication(self, appName, version=None, language='English'):
+	def installDirForApplication(self, appName, version=None, bit=64, language='English'):
 		""" Finds the install path for various software installations. Does not need to be
 		:param appName: The name of the application
 		:param version: The version of the software. Default is None
+		:param bit: The bit type to query the registry for(32, 64). Default is 64
 		:param language: Optional language that may be required for specific softwares.
 		"""
 		def registryValue(registry, key, value):
 			# Do not want to import _winreg unless it is neccissary
 			import _winreg
 			aReg = _winreg.ConnectRegistry(None, getattr(_winreg, registry))
+			if bit == 32:
+				sam = _winreg.KEY_WOW64_32KEY
+			else:
+				sam = _winreg.KEY_WOW64_64KEY
 			try:
-				regKey = _winreg.OpenKey(aReg, key)
+				regKey = _winreg.OpenKey(aReg, key, 0, _winreg.KEY_READ | sam)
 				return _winreg.QueryValueEx(regKey, value)
 			except WindowsError:
 				pass
