@@ -147,7 +147,8 @@ class AbstractApplication(QObject):
 		:rtyp: str
 		"""
 		import sys
-		return sys.executable
+		import os
+		return os.path.dirnamesys.executable)
 	
 	def installDirForApplication(self, appName, version=None, bit=64, language='English'):
 		""" Finds the install path for various software installations. Does not need to be
