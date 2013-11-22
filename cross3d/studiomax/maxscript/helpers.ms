@@ -162,6 +162,62 @@ global blur3dhelper
 			)
 		),
 
+		function getElementUsingFace obj faceID = (
+			try (
+				return (meshop.getElementsUsingFace obj #(faceID))
+			)
+			catch ()
+		),
+		
+		function getVertsUsingFace obj faceList = (
+			try (
+				return (meshop.getVertsUsingFace obj faceList)
+			)
+			catch ()
+		),
+		
+		function asArray thing = (
+			try (
+				return (thing as array)
+			)
+			catch ()
+		),
+
+		function asBitArray thing = (
+			try (
+				return (thing as bitArray)
+			)
+			catch ()
+		),
+		
+		function asName thing = (
+			try (
+				return (thing as name)
+			)
+			catch()
+		),
+		
+		function setMorpherChannelValue m c v = (
+			try (
+				WM3_MC_SetValue m c (v as float)
+			)
+			catch()
+		),
+		
+		function setAnimate v = (
+			if v then (
+				set animate on
+			)
+			else (
+				set animate off
+			)
+		),
+		
+		function layerNodes l = (
+			l.nodes &theNodes
+			return theNodes
+		),
+		
 		function getLastPositionKeyFrameNumber object = (
 			if object.position.isAnimated do (
 				try (
