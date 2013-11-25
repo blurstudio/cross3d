@@ -1,19 +1,25 @@
 ##
 #	\namespace	blur3d.api.softimage.softimagescene
 #
-#	\remarks	The SoftimageScene class will define all the operations for Softimage scene interaction.  
+#	\remarks	The SoftimageScene class provides the implementation of the AbstractScene class as it applies
+#				to Softimage
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio
-#	\date		04/01/11
+#	\date		04/04/11 
 #
 
-from blur3d   							import pendingdeprecation, constants
-from PySoftimage 						import xsi, xsiFactory
-from blur3d.api.abstract.abstractscene  import AbstractScene
-from blurdev.decorators 				import stopwatch
-
 #------------------------------------------------------------------------------------------------------------------------
+
+import time
+
+from PyQt4.QtGui import QColor
+from PySoftimage import xsi, xsiFactory
+from blurdev.decorators import stopwatch
+from blur3d import pendingdeprecation, constants
+from blur3d.api.abstract.abstractscene import AbstractScene
+from win32com.client.dynamic import Dispatch as dynDispatch
+
 
 class SoftimageScene( AbstractScene ):
 	def __init__( self ):
@@ -23,11 +29,13 @@ class SoftimageScene( AbstractScene ):
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	def _importNativeModel( self, path, name = '' ):
+	def _importNativeModel( self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	implements the AbstractScene._importNativeModel to import and return a model in the scene
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
+		if referenced:
+			return xsi.SICreateRefModel( path, name, resolution, '', loaded, createFile )( 'Value' )
 		return xsi.ImportModel( path, '', '', '', name )( 'Value' )
 		
 	def _removeNativeModels( self, models ):
@@ -268,7 +276,8 @@ class SoftimageScene( AbstractScene ):
 		xsi.FBXExportSelection( True )
 		
 		# Plotting and exporting the FBX File.
-		xsi.PlotAndApplyActions( controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True )
+		if controllers:
+			xsi.PlotAndApplyActions( controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True )
 		xsi.FBXExport( path )
 
 		# Restoring the scene state.
@@ -294,16 +303,20 @@ class SoftimageScene( AbstractScene ):
 				viewports.append( SceneViewport( self, number ) )
 		return viewports
 		
-	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
+	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
 		"""
 			\remarks	implements the AbstractScene._createNativeModel method to return a new Softimage model
 			\param		name			<str>
 			\return		<PySoftimage.xsi.Model> nativeModel
 		"""
+		if referenced:
+			model = xsi.CreateEmptyRefModel('', name)
+			xsi.RemoveRefModelResolution(model, "res1")
+			return  model
 		root = self._nativeRootObject()
-		fact = xsiFactory.CreateObject( 'XSI.Collection' )
+		fact = xsiFactory.CreateObject('XSI.Collection')
 		fact.AddItems(nativeObjects)
-		return root.addModel( fact, name )
+		return root.addModel(fact, name)
 		
 	def _createNativeCamera( self, name = 'Camera', type = 'Standard' ):
 		"""
@@ -390,7 +403,46 @@ class SoftimageScene( AbstractScene ):
 		"""
 		xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Current" ).Value = frame
 		return True
-		
+	
+	def _highlightNativeObjects(self, nativeObjects, color=None, branch=True):
+		color = color or QColor(233,233,0)
+
+		# Saving the selection in order to retrieve it at the end.
+		selection = xsiFactory.CreateObject("XSI.Collection")
+		selection.AddItems(xsi.Selection)
+
+		pref = xsi.Dictionary.GetObject("Preferences")
+		sceneColor = dynDispatch(pref.NestedObjects("Scene Colors"))
+		selColor = sceneColor.Parameters("selcol")
+		inhColor = sceneColor.Parameters("inhcol")
+
+		selColorValue = selColor.Value
+		inhColorValue = inhColor.Value
+
+		r = -color.red() << 16
+		g = color.green() << 16
+		b = color.blue() << 8
+
+		selColor.Value = r | g | b
+		inhColor.Value = r | g | b
+		print "#", r | g | b
+
+		if branch:
+			mode = "BRANCH"
+		else:
+			mode = "ASITIS"
+
+		xsi.SelectObj(nativeObjects, mode)
+		xsi.Refresh()
+		time.sleep(.2)
+		selColor.Value = selColorValue
+		inhColor.Value = inhColorValue
+
+		# Retrieve selection
+		xsi.SelectObj(selection)
+
+		return True
+
 	def clearSelection( self ):
 		"""
 			\remarks	implements AbstractScene.clearSelection method to clear the selection in the scene.
@@ -399,6 +451,21 @@ class SoftimageScene( AbstractScene ):
 		xsi.DeselectAll()
 		return True
 
+	def saveFileAs(self, filename=None):
+		"""
+			\remarks	implements AbstractScene.saveFileAs to save the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
+			\param		filename 	<str>
+			\return		<bool> success
+		"""
+		if not filename:
+			from PyQt4.QtGui import QFileDialog
+			filename = QFileDialog.getSaveFileName(None, 'Save Scene File', '', 'Scene files (*.scn);;All files (*.*)' )
+		
+		if filename:
+			xsi.SaveSceneAs(str(filename))
+			return True
+		return False
+	
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
 		
 		"""

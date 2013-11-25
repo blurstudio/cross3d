@@ -25,7 +25,6 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
 	
 	def __init__( self, scene, viewportID=0 ): 
-		self._state = {}
 		self._scene = scene
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
@@ -182,7 +181,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		
 		# Restoring states.
 		self._scene.restoreState()
-		self.restoreState()
+		self.restoreViewOptions()
 		
 		if camera:
 			camera.setPictureRatio(pictureRatio)

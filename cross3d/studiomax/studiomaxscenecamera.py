@@ -22,6 +22,7 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 	
 	_outputTypes = ['Still', 'Movie', 'Video']
 	_whiteBalances = ['Custom', 'Neutral', 'Daylight', 'D75', 'D65', 'D55', 'D50', 'Temperature']
+	_distortionTypes = ['Quadratic', 'Cubic', 'File', 'Texture']
 	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -186,6 +187,52 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 			self._nativePointer.shutter_offset = shutterOffset
 			return True
 		return False
+
+	def bladesEnabled(self):
+		return self._nativePointer.use_blades if self.isCameraType(CameraType.VRayPhysical) else False
+	
+	def setBladesEnabled(self, bladesEnabled):
+		if self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.use_blades = bladesEnabled
+			return True
+		return False	
+
+	def blades(self):
+		return self._nativePointer.blades_number if self.isCameraType(CameraType.VRayPhysical) else 0
+	
+	def setBlades(self, blades):
+		if isinstance(blades, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.blades_number = int(blades)
+			return True
+		return False
+
+	def anisotropy(self):
+		return self._nativePointer.anisotropy if self.isCameraType(CameraType.VRayPhysical) else False
+	
+	def setAnisotropy(self, anisotropy):
+		if isinstance(anisotropy, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.anisotropy = anisotropy
+			return True
+		return False
+
+	def distortionType(self):
+		return self._distortionTypes[self._nativePointer.distortion_type] if self.isCameraType(CameraType.VRayPhysical) else ''
+	
+	def setDistortionType(self, distortionType):
+		if isinstance(distortionType, basestring) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.distortion_type = self._distortionTypes.index(distortionType)
+			return True
+		return False
+
+	def distortion(self):
+		return self._nativePointer.Distortion if self.isCameraType(CameraType.VRayPhysical) else False
+	
+	def setDistortion(self, distortion):
+		if isinstance(distortion, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+			self._nativePointer.Distortion = distortion
+			return True
+		return False
+
 	
 # register the symbol
 from blur3d import api

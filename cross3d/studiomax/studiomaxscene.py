@@ -374,7 +374,7 @@ class StudiomaxScene( AbstractScene ):
 			return name
 		return ''
 		
-	def _createNativeModel( self, name = 'Model', nativeObjects = [] ):
+	def _createNativeModel( self, name='Model', nativeObjects=[], referenced=False):
 		"""
 			\remarks	implements the AbstractScene._createNativeModel method to return a new Studiomax model
 			\param		name			<str>
@@ -1413,7 +1413,7 @@ class StudiomaxScene( AbstractScene ):
 		"""
 		mxs.selectMore( selection )
 
-	def _importNativeModel( self, path, name = '' ):
+	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	implements the AbstractScene._importNativeModel to import and return a native model from an external file. added by douglas.
 			\return		[ <Py3dsMax.mxs.Object> ] models

@@ -9,10 +9,11 @@
 #	\date		03/15/10
 #
 
+from blur3d import api
+from PyQt4.QtGui import QColor
 from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
 from blur3d.constants import ObjectType
-from blur3d import api
 
 class AbstractSceneObject(SceneWrapper):
 	"""
@@ -195,6 +196,7 @@ class AbstractSceneObject(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	#
 	def getCacheName(self, type):
 		"""return the str of cache name depending on software.
 		"""

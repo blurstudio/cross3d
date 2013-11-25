@@ -143,8 +143,48 @@ class AbstractSceneCamera(SceneObject):
 	
 	@abstractmethod
 	def setShutterOffset(self, shutterOffset):
-		return False		
+		return False	
+
+	@abstractmethod
+	def bladesEnabled(self):
+		return 0
 	
+	@abstractmethod
+	def setBladesEnabled(self, bladesEnabled):
+		return False	
+
+	@abstractmethod
+	def blades(self):
+		return 0
+	
+	@abstractmethod
+	def setBladed(self, blades):
+		return False	
+
+	@abstractmethod
+	def anisotropy(self):
+		return 0
+	
+	@abstractmethod
+	def setAnisotropy(self, anisotropy):
+		return False
+
+	@abstractmethod
+	def distortionType(self):
+		return ''
+	
+	@abstractmethod
+	def setDistortionType(self, distortionType):
+		return False
+
+	@abstractmethod
+	def distortion(self):
+		return 0.0
+	
+	@abstractmethod
+	def setDistortion(self, distortion):
+		return False
+
 	@abstractmethod
 	def setPictureRatio(self, pictureRatio):
 		"""

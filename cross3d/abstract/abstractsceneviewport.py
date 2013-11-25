@@ -10,6 +10,7 @@
 
 from PyQt4.QtCore import QObject
 
+from blur3d import pendingdeprecation
 from blur3d	import abstractmethod
 from blur3d import api
 
@@ -25,7 +26,7 @@ class AbstractSceneViewport(QObject):
 
 		self._scene = scene
 		self.name = ''
-		self._state = {}
+		self._viewOptions = {}
 		self._slateIsActive = False
 		self._slateText = ''
 
@@ -143,12 +144,20 @@ class AbstractSceneViewport(QObject):
 	@abstractmethod
 	def setViewOptions(self, viewOptions):
 		return False
-		
+	
+	@pendingdeprecation('Use restoreViewOptions instead')
 	def restoreState(self):
-		return self.setViewOptions(self._state)
+		return self.restoreViewOptions()
 
+	@pendingdeprecation('Use storeViewOptions instead')
 	def storeState( self ):
-		self._state = self.viewOptions()
+		return self.storeViewOptions()
+
+	def restoreViewOptions(self):
+		return self.setViewOptions(self._viewOptions)
+
+	def storeViewOptions(self):
+		self._viewOptions = self.viewOptions()
 		return True
 		
 	def camera(self):

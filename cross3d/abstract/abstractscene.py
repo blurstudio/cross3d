@@ -163,7 +163,7 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
-	def _createNativeModel(self, name='New Model', nativeObjects=[]):
+	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
 		"""
 			\remarks	creates and returns a new native 3d model with the inputed name and objects
 			\param		name			<str>
@@ -410,12 +410,12 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
-	def _importNativeModel(self, path, name=''):
+	def _importNativeModel(self, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
-		return None
+		return False
 
 	@abstractmethod
 	def _nativeCustomProperty(self, key, default=None):
@@ -636,6 +636,13 @@ class AbstractScene(QObject):
 			\remarks	add the inputed native objects to the selection in the scene. added by douglas
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def _highlightNativeObjects(self, nativeObjects, color=None, branch=True):
+		"""
+			Highlight the provided objects and their children with a specified color.
 		"""
 		return False
 
@@ -1299,14 +1306,17 @@ class AbstractScene(QObject):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial(self, material) for material in self._cachedNativeMaterials(cacheType) if material != None ]
 
-	def importModel(self, path, name=''):
+	def importModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
 			\sa			_importNativeModel
 			\return		<blur3d.api.SceneModel>
 		"""
-		from blur3d.api import SceneModel
-		return SceneModel(self, self._importNativeModel(path, name))
+		nativeModel = self._importNativeModel(path, name, referenced, resolution, load, createFile)
+		if nativeModel:
+			from blur3d.api import SceneModel
+			return SceneModel(self, self._importNativeModel(path, name, referenced, resolution, load, createFile))
+		return None
 
 	def clearMaterialOverride(self, objects):
 		"""
@@ -1373,12 +1383,12 @@ class AbstractScene(QObject):
 			return SceneLayerGroup(self, nativeGroup)
 		return None
 
-	def createModel(self, name='Model', objects=[]):
+	def createModel(self, name='Model', objects=[], referenced=False):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
 		"""
-		nativeModel = self._createNativeModel(name=name, nativeObjects=[ obj.nativePointer() for obj in objects ])
+		nativeModel = self._createNativeModel(name=name, nativeObjects=[obj.nativePointer() for obj in objects], referenced=referenced)
 		if (nativeModel):
 			from blur3d.api import SceneObject
 			return SceneObject(self, nativeModel)
@@ -1690,7 +1700,7 @@ class AbstractScene(QObject):
 		if (nativeMap):
 			return SceneMap(self, nativeMap)
 		return None
-		
+
 	def hideObjects(self, objects, state):
 		"""
 			\remarks	hides the inputed objects based on the given state
@@ -1700,6 +1710,17 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self._hideNativeObjects([ obj.nativePointer() for obj in objects ], state)
+
+	def highlightObjects(self, objects, color=None, branch=True):
+		"""
+			\remarks	Hightlight provided object with provided color.
+			\sa			_highlightNativeObjects
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		color		<QColor>
+			\param		state		<bool>
+			\return		<bool> success
+		"""
+		return self._highlightNativeObjects([obj.nativePointer() for obj in objects], color, branch)
 
 	def isEnvironmentMapOverridden(self):
 		"""

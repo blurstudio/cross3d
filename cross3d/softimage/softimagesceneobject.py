@@ -9,8 +9,11 @@
 #	\date		04/04/11 
 #
 
-from PySoftimage import xsi
+#------------------------------------------------------------------------------------------------------------------------
+
 from blur3d.constants import ObjectType
+from PySoftimage import xsi, xsiFactory
+from win32com.client.dynamic import Dispatch as dynDispatch
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -160,7 +163,7 @@ class SoftimageSceneObject( AbstractSceneObject ):
 		else:
 			print("unsupported cache Type")
 			return None
-			
+
 	def resetTransforms(self, pos=True, rot=True, scl=True):
 		"""
 			Resets the transforms to zero.

@@ -48,5 +48,45 @@ class AbstractSceneModel(SceneObject):
 	def export( self, fileName ):
 		return False
 
+	@abstractmethod
+	def update(self):
+		return False
+
+	@abstractmethod
+	def offloaded(self):
+		return False
+		
+	@abstractmethod
+	def offload(self):
+		return False
+
+	@abstractmethod
+	def addResolution(self, name='', path='', load=False):
+		return False
+
+	@abstractmethod
+	def removeResolution(self, name):
+		return False
+
+	@abstractmethod
+	def resolutionPath(self, name=''):
+		return ''
+
+	@abstractmethod
+	def setResolutionPath(self, path, name=''):
+		return False
+
+	@abstractmethod
+	def setResolution(self, name):
+		return False
+
+	@abstractmethod
+	def resolution(self):
+		return ''
+
+	@abstractmethod
+	def resolutions(self):
+		return []
+
 # register the symbol
 api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

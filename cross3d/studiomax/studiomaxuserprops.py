@@ -106,6 +106,11 @@ class StudiomaxUserProps(AbstractUserProps):
 	
 	@staticmethod
 	def _decodeString(string):
+		try:
+			int(string)
+			return string, int
+		except:
+			pass
 		if string.endswith('d0') or string.find('.'):
 			val = string.rstrip('d0')
 			try:
@@ -126,11 +131,6 @@ class StudiomaxUserProps(AbstractUserProps):
 			return s, list
 		if re.match('\(.*\)', string):
 			return string, tuple
-		try:
-			int(string)
-			return string, int
-		except:
-			pass
 		return string, None
 	
 	@staticmethod
