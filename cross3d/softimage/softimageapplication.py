@@ -134,7 +134,6 @@ class SoftimageApplication(AbstractApplication):
 		return jobType
 		
 	def refresh( self ):
-		print self._blockRefresh
 		if not self._blockRefresh:
 			xsi.SceneRefresh()
 			xsi.Refresh()
