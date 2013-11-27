@@ -40,7 +40,11 @@ class SoftimageUserProps(AbstractUserProps):
 		if not prop:
 			prop = self._nativePointer.AddProperty('UserDataBlob', False, key)
 			prop.SetCapabilityFlag(constants.siNotInspectable, True)
-		prop.Value = value
+		if not value:
+			# For some reason xsi does not let you set a UserDataBlob to a empty string, you have to use the clear method.
+			prop.clear()
+		else:
+			prop.Value = value
 		self.emitChange(key)
 
 	def clear(self):
