@@ -12,6 +12,7 @@
 import re
 import json
 from blur3d import api
+from PyQt4.QtCore import QString
 from win32com.client import constants
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 
@@ -35,7 +36,7 @@ class SoftimageUserProps(AbstractUserProps):
 	
 	def __setitem__(self, key, value):
 		prop = self._nativePointer.Properties(key)
-		if isinstance(value, (list, dict, tuple)):
+		if isinstance(value, (list, dict, tuple, QString)):
 			value = unicode(value)
 		if not prop:
 			prop = self._nativePointer.AddProperty('UserDataBlob', False, key)
