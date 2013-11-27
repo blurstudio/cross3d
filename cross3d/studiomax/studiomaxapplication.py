@@ -253,3 +253,6 @@ class StudiomaxApplication(AbstractApplication):
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Application', StudiomaxApplication)
+
+# Creating a single instance of Application for all code to use.
+api.registerSymbol( 'application', StudiomaxApplication())

@@ -57,9 +57,6 @@ def init():
 	# import the abstract api for default implementations of api
 	import abstract
 	abstract.init()
-	global application
-	application = Application()
-
 
 def registerSymbol(name, value, ifNotFound=False):
 	"""

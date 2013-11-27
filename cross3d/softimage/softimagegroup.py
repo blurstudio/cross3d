@@ -9,6 +9,7 @@
 #
 
 from PySoftimage import xsi
+from blur3d.api import application
 from blur3d.api.abstract.abstractgroup import AbstractGroup
 
 class SoftimageGroup(AbstractGroup):
@@ -34,7 +35,6 @@ class SoftimageGroup(AbstractGroup):
 		return self._groupOptionsOut[ self._nativePointer.selectability.Value ]
 		
 	def toggleHidden(self):
-		from blur3d.api import application
 		hidden = not self._nativePointer.viewvis.Value
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
@@ -42,13 +42,11 @@ class SoftimageGroup(AbstractGroup):
 		return True
 		
 	def toggleFrozen(self):
-		from blur3d.api import application
 		self._nativePointer.selectability = not self._nativePointer.selectability
 		application.refresh()
 		return True
 
 	def setHidden(self, hidden):
-		from blur3d.api import application
 		hidden = self._groupOptionsIn[hidden]
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
@@ -56,7 +54,6 @@ class SoftimageGroup(AbstractGroup):
 		return True
 
 	def setFrozen(self, frozen):
-		from blur3d.api import application
 		self._nativePointer.selectability.Value = self._groupOptionsIn[frozen]
 		application.refresh()
 		return True

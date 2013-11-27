@@ -267,3 +267,6 @@ class AbstractApplication(QObject):
 
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
+
+# Creating a single instance of Application for all code to use.
+api.registerSymbol('application', AbstractApplication(), ifNotFound=True)

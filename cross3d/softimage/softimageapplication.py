@@ -146,3 +146,6 @@ class SoftimageApplication(AbstractApplication):
 		
 # register the symbol
 api.registerSymbol( 'Application', SoftimageApplication)
+
+# Creating a single instance of Application for all code to use.
+api.registerSymbol( 'application', SoftimageApplication())
