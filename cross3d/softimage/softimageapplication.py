@@ -134,9 +134,12 @@ class SoftimageApplication(AbstractApplication):
 		return jobType
 		
 	def refresh( self ):
-		xsi.SceneRefresh()
-		xsi.Refresh()
-		return True
+		print self._blockRefresh
+		if not self._blockRefresh:
+			xsi.SceneRefresh()
+			xsi.Refresh()
+			return True
+		return False
 	
 	def log( self, message ):
 		xsi.LogMessage( message )

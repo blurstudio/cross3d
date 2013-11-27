@@ -38,6 +38,7 @@ class AbstractApplication(QObject):
 	"""
 
 	_instance = None
+	_blockRefresh = False
 
 	def __init__(self):
 		QObject.__init__(self)
@@ -246,12 +247,23 @@ class AbstractApplication(QObject):
 		
 	def closeUndo(self):
 		"""
-		Close the undo context.  This call should always follw a call to
-		openUndo().
+			Close the undo context.  This call should always follw a call to
+			openUndo().
 		"""
 		api.UndoContext.closeUndo()
 	
-	
+	def blockRefresh(self):
+		"""
+			If returns true, the refresh method will not refresh.
+		"""
+		return self._blockRefresh
+
+	def setBlockRefresh(self, blockRefresh):
+		"""
+			If set to true, the refresh method will not refresh.
+		"""
+		self._blockRefresh = blockRefresh
+		return True
 
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)

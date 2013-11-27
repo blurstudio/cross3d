@@ -34,27 +34,31 @@ class SoftimageGroup(AbstractGroup):
 		return self._groupOptionsOut[ self._nativePointer.selectability.Value ]
 		
 	def toggleHidden(self):
+		from blur3d.api import application
 		hidden = not self._nativePointer.viewvis.Value
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
-		xsi.SceneRefresh()
+		application.refresh()
 		return True
 		
 	def toggleFrozen(self):
+		from blur3d.api import application
 		self._nativePointer.selectability = not self._nativePointer.selectability
-		xsi.SceneRefresh()
+		application.refresh()
 		return True
 
 	def setHidden(self, hidden):
+		from blur3d.api import application
 		hidden = self._groupOptionsIn[hidden]
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
-		xsi.SceneRefresh()
+		application.refresh()
 		return True
 
 	def setFrozen(self, frozen):
+		from blur3d.api import application
 		self._nativePointer.selectability.Value = self._groupOptionsIn[frozen]
-		xsi.SceneRefresh()
+		application.refresh()
 		return True
 
 # register the symbol
