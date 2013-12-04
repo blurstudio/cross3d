@@ -3,9 +3,9 @@
 #
 #	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the blur3d system
 #				This class will provide a generic overview structure for all manipulations of 3d objects
-#	
+#
 #	\author		eric@blur.com
-#	\author		Blur Studio 
+#	\author		Blur Studio
 #	\date		03/15/10
 #
 
@@ -14,7 +14,7 @@ from blur3d.api import SceneObject
 from blur3d.constants import ObjectType
 from blur3d import api
 
-class AbstractSceneCamera(SceneObject):	
+class AbstractSceneCamera(SceneObject):
 	"""
 		The AbstractSceneObject class provides the base foundation for the 3d 
 		Object framework for the blur3d system.  This class will provide a 
@@ -27,7 +27,13 @@ class AbstractSceneCamera(SceneObject):
 	def __init__(self, scene, nativeCamera):
 		super(AbstractSceneCamera, self).__init__(scene, nativeCamera)
 		self._viewOptions = {}
-		
+
+	def interest(self):
+		return None
+
+	def setInterest(self, interest):
+		pass
+
 	def isCameraType(self, cameraType):
 		"""
 			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType. 
@@ -48,7 +54,7 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def fov(self, rounded=False):
 		return 0.0
-		
+
 	@abstractmethod
 	def lens(self, filmWidth=None, rounded=False):
 		return 0.0
@@ -96,27 +102,27 @@ class AbstractSceneCamera(SceneObject):
 			:rtype: float
 		"""
 		return 0.0
-			
+
 	@abstractmethod
 	def outputType(self):
 		return ''
-	
+
 	@abstractmethod
 	def setOutputType(self, outputType):
 		return False
-		
+
 	@abstractmethod
 	def exposureEnabled(self):
 		return False
-	
+
 	@abstractmethod
 	def setExposureEnabled(self, exposureEnabled):
 		return False
-	
+
 	@abstractmethod
 	def vignettingEnabled(self):
 		return False
-	
+
 	@abstractmethod
 	def setVignettingEnabled(self, vignettingEnabled):
 		return False
@@ -124,47 +130,47 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def whiteBalance(self):
 		return ''
-	
+
 	@abstractmethod
 	def setWhiteBalance(self, whiteBalance):
 		return False
-	
+
 	@abstractmethod
 	def shutterAngle(self):
 		return 0
-	
+
 	@abstractmethod
 	def setShutterAngle(self, shutterAngle):
 		return False
-		
+
 	@abstractmethod
 	def shutterOffset(self):
 		return 0
-	
+
 	@abstractmethod
 	def setShutterOffset(self, shutterOffset):
-		return False	
+		return False
 
 	@abstractmethod
 	def bladesEnabled(self):
 		return 0
-	
+
 	@abstractmethod
 	def setBladesEnabled(self, bladesEnabled):
-		return False	
+		return False
 
 	@abstractmethod
 	def blades(self):
 		return 0
-	
+
 	@abstractmethod
 	def setBladed(self, blades):
-		return False	
+		return False
 
 	@abstractmethod
 	def anisotropy(self):
 		return 0
-	
+
 	@abstractmethod
 	def setAnisotropy(self, anisotropy):
 		return False
@@ -172,7 +178,7 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def distortionType(self):
 		return ''
-	
+
 	@abstractmethod
 	def setDistortionType(self, distortionType):
 		return False
@@ -180,7 +186,7 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def distortion(self):
 		return 0.0
-	
+
 	@abstractmethod
 	def setDistortion(self, distortion):
 		return False
@@ -231,7 +237,7 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def generateRender( self, **options ):
+	def generateRender(self, **options):
 		"""
 			\remarks renders an image sequence form that camera with the current render settings
 			\param path <String>
@@ -240,11 +246,11 @@ class AbstractSceneCamera(SceneObject):
 			\return <blur3d.api.constants.CameraType>
 		"""
 		return False
-		
+
 	@abstractmethod
 	def viewOptions(self):
 		return {}
-	
+
 	@abstractmethod
 	def setViewOptions(self, viewOptions):
 		return False
