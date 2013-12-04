@@ -262,7 +262,7 @@ class SoftimageSceneObject(AbstractSceneObject):
 		if type == 'surfmsh':
 			return ObjectType.NurbsSurface
 
-		if type == 'crvlist':
+		elif type == 'crvlist':
 			return ObjectType.Curve
 
 		elif type == 'light':
@@ -276,6 +276,9 @@ class SoftimageSceneObject(AbstractSceneObject):
 
 		elif type == '#Group':
 			return ObjectType.Group
+
+		elif type == 'CameraInterest':
+			return ObjectType.CameraInterest
 
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
 
