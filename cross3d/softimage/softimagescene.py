@@ -466,7 +466,7 @@ class SoftimageScene( AbstractScene ):
 			return True
 		return False
 	
-	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Seconds, callback=None):
 		
 		"""
 			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.

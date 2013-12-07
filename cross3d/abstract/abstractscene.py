@@ -1091,7 +1091,7 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
-	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Frames, callback=None):
+	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Seconds, callback=None):
 		"""
 			\remarks	Updates the scene's fps to the provided value and scales existing keys as specified.
 						If you have any code that you need to run after changing the fps and plan to use it in
