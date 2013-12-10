@@ -1315,7 +1315,7 @@ class AbstractScene(QObject):
 		nativeModel = self._importNativeModel(path, name, referenced, resolution, load, createFile)
 		if nativeModel:
 			from blur3d.api import SceneModel
-			return SceneModel(self, self._importNativeModel(path, name, referenced, resolution, load, createFile))
+			return SceneModel(self, nativeModel)
 		return None
 
 	def clearMaterialOverride(self, objects):
