@@ -15,6 +15,11 @@ from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
 #------------------------------------------------------------------------------------------------------------------------
 
 class SoftimageSceneWrapper( AbstractSceneWrapper ):
+	def __eq__(self, other):
+		if isinstance(other, AbstractSceneWrapper):
+			return self.nativePointer().IsEqualTo(other.nativePointer())
+		return False
+	
 	def _nativeProperty( self, key, default = None ):
 		"""
 			\remarks	implements the AbstractSceneWrapper._nativeProperty method to return the value of the property defined by the inputed key

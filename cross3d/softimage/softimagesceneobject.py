@@ -23,10 +23,6 @@ class SoftimageSceneObject(AbstractSceneObject):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-
-	def __eq__(self, other):
-		return self.nativePointer().IsEqualTo(other.nativePointer())
-
 	def _findNativeChild(self, name, recursive=False, parent=None):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChildren method to look up a specific native children for this object
