@@ -8,6 +8,14 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function selectObjectsByNameFilter obj = ( obj.layer == (globalVars.get #FILTERLAYER) ),
+
+		function selectObjectsByNameFromLayer layer = (
+			global FILTERLAYER = layer
+			local userObjs = selectByName title:"Select Objects" buttonText:"Select" filter:( selectObjectsByNameFilter )
+			if ( userObjs != undefined ) then select userObjs
+		),
+
 		function appendToMultiMtl mtl = (
 			current = mtl.materialList.count
 			mtl.materialList.count = (current + 1)
