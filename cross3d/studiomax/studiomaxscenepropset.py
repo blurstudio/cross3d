@@ -214,13 +214,16 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 		"""
 		values = str(valueString).split( '|' )
 		for index, key in enumerate(self._keys):
-			val 	= values[index]
-			cval 	= self._values.get( str(key) )
-			
-			if ( type(cval) == bool ):
-				val = val == '1' or val == 'True'
+			cval = self._values.get( str(key) )
+			try:
+				val = values[index]
+			except IndexError:
+				val = cval
 			else:
-				val = eval(val)
+				if ( type(cval) == bool ):
+					val = val == '1' or val == 'True'
+				else:
+					val = eval(val)
 			
 			self._values[str(key)] = val
 			
