@@ -775,7 +775,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return self.metaData().value('layerGroupNames')
 
-	def _nativeMaterials(self):
+	def _nativeMaterials(self, baseMaterials=False):
 		#get_instances	= mxs.getClassInstances
 		#mclasses 		= mxs.Material.classes
 		#output			= []
