@@ -77,7 +77,6 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 	def setResolution(self, resolution):
 		resolutions = self.resolutions()
-		print '#', self.displayName(), resolutions
 		if resolution in resolutions:
 			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(resolution))
 			if self.resolution() == resolution:
@@ -87,6 +86,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 	def resolution(self):
 		resolutions = self.resolutions()
 		if resolutions:
+			print resolutions, self._nativePointer.Parameters('active_resolution').Value
 			return self.resolutions()[self._nativePointer.Parameters('active_resolution').Value]
 		return ''
 
@@ -96,7 +96,6 @@ class SoftimageSceneModel(AbstractSceneModel):
 			if 'resolutions' in parameter.fullname:
 				resolutions.append(parameter.Value)
 		return resolutions
-
 
 	def export( self, fileName ):
 		xsi.ExportModel( self._nativePointer, fileName, True, False )
