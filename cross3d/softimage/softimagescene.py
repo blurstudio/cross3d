@@ -47,30 +47,32 @@ class SoftimageScene( AbstractScene ):
 		self._removeNativeObjects( models )
 		return True
 		
-	def _setNativeSelection( self, selection ):
+	def _setNativeSelection(self, selection):
 		"""
 			\remarks	implements the AbstractScene._setNativeSelection to select the inputed native objects in the scene
 			\param		nativeObjects	<list> [ <PySoftimage.xsi.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		#import blurdev.debug
-		#watch = blurdev.debug.Stopwatch( 'Total' )
-		#watch.newLap('Setting Selection')
-		xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
-		xsiCollSelection.AddItems( selection )
-		xsi.SelectObj( xsiCollSelection )
-		#watch.stop()
+		if isinstance(selection, basestring):
+			xsi.SelectObj(selection)
+		else:
+			xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
+			xsiCollSelection.AddItems(selection)
+			xsi.SelectObj(xsiCollSelection)
 		return True
 		
-	def _addToNativeSelection( self, selection ):
+	def _addToNativeSelection(self, selection):
 		"""
 			\remarks	implements the AbstractScene._addToNativeSelection to select the inputed native objects in the scene
 			\param		nativeObjects	<list> [ <PySoftimage.xsi.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
-		xsiCollSelection.AddItems( selection )
-		xsi.AddToSelection( selection )
+		if isinstance(selection, basestring):
+			xsi.AddToSelection(selection)
+		else:
+			xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
+			xsiCollSelection.AddItems(selection)
+			xsi.AddToSelection(xsiCollSelection)
 		
 	def _nativeRootObject( self ):
 		"""

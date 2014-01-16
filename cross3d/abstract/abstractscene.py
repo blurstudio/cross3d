@@ -2146,7 +2146,7 @@ class AbstractScene(QObject):
 		if (material):
 			nativeMaterial = material.nativePointer()
 
-		return self._setNativeMaterialOverride([ obj.nativePointer() for obj in objects ], nativeMaterial, options=options, advancedState=advancedState)
+		return self._setNativeMaterialOverride([obj.nativePointer() for obj in objects], nativeMaterial, options=options, advancedState=advancedState)
 
 	def setSelection(self, objects, additive=False):
 		"""
@@ -2154,11 +2154,12 @@ class AbstractScene(QObject):
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
-		if additive:
-			return self.addToSelection(objects)
-		if not isinstance(objects, _collections.Iterable):
-			raise TypeError("Requires a list of blur3d.api.SceneObject's.")
-		return self._setNativeSelection([ obj.nativePointer() for obj in objects ])
+		if isinstance(objects, basestring):
+			return self._addToNativeSelection(objects) if additive else self._setNativeSelection(objects)
+		elif isinstance(objects, _collections.Iterable):
+			nativeObjects = [obj.nativePointer() for obj in objects]
+			return self._addToNativeSelection(nativeObjects) if additive else self._setNativeSelection(nativeObjects)
+		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
 
 	def addToSelection(self, objects):
 		"""
@@ -2166,7 +2167,11 @@ class AbstractScene(QObject):
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
-		return self._addToNativeSelection([ obj.nativePointer() for obj in objects ])
+		if isinstance(objects, basestring):
+			return self._addToNativeSelection(objects)
+		elif isinstance(objects, _collections.Iterable):
+			return self._addToNativeSelection([obj.nativePointer() for obj in objects])
+		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
 
 	def setUpdatesEnabled(self, state):
 		"""

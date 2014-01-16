@@ -1188,6 +1188,8 @@ class StudiomaxScene(AbstractScene):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
+		if isinstance(selection, basestring):
+			selection = self._nativeObjects(wildcard=selection)
 		if (not selection):
 			mxs.clearSelection()
 		else:
@@ -1411,6 +1413,8 @@ class StudiomaxScene(AbstractScene):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
+		if isinstance(selection, basestring):
+			selection = self._nativeObjects(wildcard=selection)
 		mxs.selectMore(selection)
 
 	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
