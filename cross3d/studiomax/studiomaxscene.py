@@ -8,14 +8,17 @@
 #	\date		03/15/10
 #
 
-from blur3d   							import pendingdeprecation, constants
-from blurdev  							import debug
-from Py3dsMax 							import mxs
-from blur3d.api.abstract.abstractscene 	import AbstractScene
+import os
+import re
+import getpass
+
+from blur3d import pendingdeprecation, constants
+from blurdev import debug
+from Py3dsMax import mxs
+from blur3d.api.abstract.abstractscene import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
 from mxscustattribdef import MXSCustAttribDef
-import re
 
 #-----------------------------------------------------------------------------
 
@@ -1503,37 +1506,42 @@ class StudiomaxScene(AbstractScene):
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
 		"""
+		preset = ''
 		initialSelection = self._nativeSelection()
-		initialFrameRange = self.animationRange()
-
-		if frameRange:
-			self.setAnimationRange(frameRange)
+		frameRange = self.animationRange() if not frameRange else frameRange
 
 		self._setNativeSelection(nativeObjects)
 
-		mxs.FBXExporterSetParam('Animation', True)
-		mxs.FBXExporterSetParam('ASCII', False)
-		mxs.FBXExporterSetParam('BakeAnimation', True)
-		mxs.FBXExporterSetParam('BakeFrameStart', frameRange[0])
-		mxs.FBXExporterSetParam('BakeFrameEnd', frameRange[1])
-		mxs.FBXExporterSetParam('BakeFrameStep', 1)
-		mxs.FBXExporterSetParam('BakeResampleAnimation', True)
-		mxs.FBXExporterSetParam('Cameras', True)
-		mxs.FBXExporterSetParam('FileVersion', 'FBX201000')
-		mxs.FBXExporterSetParam('ShowWarning', False)
-		mxs.FBXExporterSetParam('Skin', True)
-		mxs.FBXExporterSetParam('Lights', True)
-		mxs.FBXExporterSetParam('UpAxis', 'Y')
-		mxs.FBXExporterSetParam('FilterKeyReducer', False)
-		#mxs.FBXExporterSetParam( 'PushSettings' )
+		# Generating a user preset file since the mxs.FBXExporterSetParam API does not work.
+		fle = open(os.path.join(os.path.dirname(__file__), '..', '..', 'templates', '3dsmax_fbx_export.templ'))
+		template = fle.read()
+		fle.close()
 
+		user = getpass.getuser()
+		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\2012.1\export\User defined.fbxexportpreset' % user
+		
+		# Storing the old preset.
+		if os.path.exists(presetPath):
+			fle = open(presetPath)
+			preset = fle.read()
+			fle.close()
+
+		fle = open(presetPath, 'w')
+		fle.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
+		fle.close()
+		
 		if showUI:
 			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
 		else:
 			mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True, using='FBXEXP')
 
 		self._setNativeSelection(initialSelection)
-		self.setAnimationRange(initialFrameRange)
+
+		# Restoring the old preset.
+		if preset:
+			fle = open(presetPath, 'w')
+			fle.write(preset)
+			fle.close()
 
 		return True
 
