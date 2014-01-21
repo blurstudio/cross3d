@@ -262,8 +262,10 @@ class AbstractApplication(QObject):
 		"""
 			If set to true, the refresh method will not refresh.
 		"""
-		self._blockRefresh = blockRefresh
-		return True
+		if self._blockRefresh != blockRefresh:
+			self._blockRefresh = blockRefresh
+			return True
+		return False
 
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
