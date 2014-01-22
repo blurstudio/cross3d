@@ -1513,7 +1513,7 @@ class StudiomaxScene(AbstractScene):
 		self._setNativeSelection(nativeObjects)
 
 		# Generating a user preset file since the mxs.FBXExporterSetParam API does not work.
-		fle = open(os.path.join(os.path.dirname(__file__), '..', '..', 'templates', '3dsmax_fbx_export.templ'))
+		fle = open(os.path.join(os.path.dirname(__file__), '..', '..', 'templates', '3dsmax_fbx_export_preset.templ'))
 		template = fle.read()
 		fle.close()
 

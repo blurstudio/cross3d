@@ -8,6 +8,8 @@
 #	\date		03/15/10
 #
 
+import external
+
 def init():
 	
 	# Making sure we can import the layer.

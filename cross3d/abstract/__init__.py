@@ -9,6 +9,8 @@
 #	\date		03/15/10
 #
 
+import external
+
 def init():
 	"""
 	Initializes the original abstract classes, registering them to the api 
