@@ -32,10 +32,13 @@ def _methodNames():
 			ret.append(os.path.normpath(filename).split(os.path.sep)[-2])
 	return ret
 
+def packageName(modname):
+	return 'blur3d.api.%s' % modname
+
 def init():
 	# import any overrides to the abstract symbols
 	for modname in _methodNames():
-		pckg = 'blur3d.api.%s' % modname
+		pckg = packageName(modname)
 
 		# try to import the overrides
 		if _useDebug and (not _modName or modname == _modName):
@@ -67,6 +70,7 @@ def external(appName):
 		raise KeyError('classes does not have a external implementation.')
 	import blur3d.api
 	try:
+		__import__(packageName(appName))
 		return getattr(getattr(getattr(blur3d.api, appName), 'external'), 'External')
 	except AttributeError:
 		return blur3d.api.abstract.external.External
