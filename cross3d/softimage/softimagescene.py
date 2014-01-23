@@ -412,7 +412,6 @@ class SoftimageScene( AbstractScene ):
 		return True
 	
 	def _highlightNativeObjects(self, nativeObjects, color=None, tme=.2, branch=True):
-		color = color or QColor(233,233,0)
 
 		# Saving the selection in order to retrieve it at the end.
 		if self._cache.get('selection') == None:
@@ -427,13 +426,18 @@ class SoftimageScene( AbstractScene ):
 		self._cache['selColorValue'] = selColor.Value
 		self._cache['inhColorValue'] = inhColor.Value
 
-		r = -color.red() << 16
-		g = color.green() << 16
-		b = color.blue() << 8
+		# If a color is provided we use it.
+		if color:
+			color = color or QColor(233,233,0)
+			r = -color.red() << 16
+			g = color.green() << 16
+			b = color.blue() << 8
+			selColor.Value = r | g | b
+			inhColor.Value = r | g | b
 
-		selColor.Value = r | g | b
-		inhColor.Value = r | g | b
-		print "#", r | g | b
+		# Otherwise we use the selection color.
+		else:
+			inhColor.Value = self._cache['selColorValue']
 
 		if branch:
 			mode = "BRANCH"
