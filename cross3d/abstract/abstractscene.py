@@ -640,7 +640,7 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
-	def _highlightNativeObjects(self, nativeObjects, color=None, branch=True):
+	def _highlightNativeObjects(self, nativeObjects, color=None, tme=.2, branch=True):
 		"""
 			Highlight the provided objects and their children with a specified color.
 		"""
@@ -1711,7 +1711,7 @@ class AbstractScene(QObject):
 		"""
 		return self._hideNativeObjects([ obj.nativePointer() for obj in objects ], state)
 
-	def highlightObjects(self, objects, color=None, branch=True):
+	def highlightObjects(self, objects, color=None, tme=.2, branch=True):
 		"""
 			\remarks	Hightlight provided object with provided color.
 			\sa			_highlightNativeObjects
@@ -1720,7 +1720,7 @@ class AbstractScene(QObject):
 			\param		state		<bool>
 			\return		<bool> success
 		"""
-		return self._highlightNativeObjects([obj.nativePointer() for obj in objects], color, branch)
+		return self._highlightNativeObjects([obj.nativePointer() for obj in objects], color, tme, branch)
 
 	def isEnvironmentMapOverridden(self):
 		"""

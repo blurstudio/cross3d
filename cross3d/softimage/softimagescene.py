@@ -14,16 +14,21 @@
 import time
 
 from PyQt4.QtGui import QColor
+from PyQt4.QtCore import QTimer
 from PySoftimage import xsi, xsiFactory
 from blurdev.decorators import stopwatch
+from blur3d.api import application, dispatch
 from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 
-
 class SoftimageScene( AbstractScene ):
+
+	_cache = {}
+
 	def __init__( self ):
 		AbstractScene.__init__( self )
+		self._timer = None
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -338,7 +343,7 @@ class SoftimageScene( AbstractScene ):
 		xsi.ExportModel( nativeModel, path, "", "" )
 		return True
 	
-	def _isolateNativeObjects( self, nativeObjects ):
+	def _isolateNativeObjects(self, nativeObjects):
 		selection = self._nativeSelection()
 		self._setNativeSelection( nativeObjects )
 		xsi.IsolateSelected()
@@ -406,20 +411,21 @@ class SoftimageScene( AbstractScene ):
 		xsi.ActiveProject.Properties( "Play Control" ).Parameters( "Current" ).Value = frame
 		return True
 	
-	def _highlightNativeObjects(self, nativeObjects, color=None, branch=True):
+	def _highlightNativeObjects(self, nativeObjects, color=None, tme=.2, branch=True):
 		color = color or QColor(233,233,0)
 
 		# Saving the selection in order to retrieve it at the end.
-		selection = xsiFactory.CreateObject("XSI.Collection")
-		selection.AddItems(xsi.Selection)
+		if self._cache.get('selection') == None:
+			self._cache['selection'] = xsiFactory.CreateObject("XSI.Collection")
+			self._cache['selection'].AddItems(xsi.Selection)
 
 		pref = xsi.Dictionary.GetObject("Preferences")
 		sceneColor = dynDispatch(pref.NestedObjects("Scene Colors"))
 		selColor = sceneColor.Parameters("selcol")
 		inhColor = sceneColor.Parameters("inhcol")
 
-		selColorValue = selColor.Value
-		inhColorValue = inhColor.Value
+		self._cache['selColorValue'] = selColor.Value
+		self._cache['inhColorValue'] = inhColor.Value
 
 		r = -color.red() << 16
 		g = color.green() << 16
@@ -434,14 +440,34 @@ class SoftimageScene( AbstractScene ):
 		else:
 			mode = "ASITIS"
 
+		dispatch.blockSignals(True)
 		xsi.SelectObj(nativeObjects, mode)
-		xsi.Refresh()
-		time.sleep(.2)
-		selColor.Value = selColorValue
-		inhColor.Value = inhColorValue
+		dispatch.blockSignals(False)
 
-		# Retrieve selection
-		xsi.SelectObj(selection)
+		xsi.Refresh()
+		
+		def callback():
+			sceneColor = dynDispatch(pref.NestedObjects("Scene Colors"))
+
+			# Revert inital colors.
+			sceneColor.Parameters("selcol").Value = self._cache['selColorValue']
+			sceneColor.Parameters("inhcol").Value = self._cache['inhColorValue']
+
+			# Retrieve selection
+			dispatch.blockSignals(True)
+			xsi.SelectObj(self._cache['selection'])
+			dispatch.blockSignals(False)
+
+			# Clearing the cached selection.
+			del self._cache['selection']
+
+		if self._timer == None:
+			self._timer = QTimer(self)
+			self._timer.setSingleShot(True)
+			self._timer.timeout.connect(callback)
+
+		self._timer.stop()
+		self._timer.start(tme*1000)
 
 		return True
 
