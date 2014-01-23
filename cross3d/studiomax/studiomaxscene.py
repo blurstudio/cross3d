@@ -1525,7 +1525,10 @@ class StudiomaxScene(AbstractScene):
 			fle = open(presetPath)
 			preset = fle.read()
 			fle.close()
-
+			
+		if not os.path.isdir(os.path.dirname(presetPath)):
+			os.makedirs(os.path.dirname(presetPath))
+			
 		fle = open(presetPath, 'w')
 		fle.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
 		fle.close()
