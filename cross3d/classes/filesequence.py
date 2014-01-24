@@ -64,7 +64,7 @@ class FileSequence( object ):
 		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 		
 	def nameTokens( self ):
-		regex = re.compile(r'^((?P<extension>[A-Za-z][A-Za-z][A-Za-z]).)((?P<range>(?P<end>[0-9]+)\-(?P<start>[0-9]+))(?P<separator>.))(?P<baseName>[A-Za-z0-9_.]+)$')
+		regex = re.compile(r'^((?P<extension>[A-Za-z][A-Za-z][A-Za-z]).)((?P<range>(?P<end>[0-9]+)\-(?P<start>[0-9]+))(?P<separator>.))(?P<baseName>[A-Za-z0-9_.\-]+)$')
 		match = regex.match( self.name()[::-1] )
 		if match:
 			dict =  match.groupdict()
@@ -83,6 +83,7 @@ class FileSequence( object ):
 		nameSplit = [ self.baseName(), self.extension() ]
 		if rangePlaceHolder is not None:
 			nameSplit.insert( 1, rangePlaceHolder )
+		print self.baseName(), self.extension(), nameSplit
 		return '.'.join( nameSplit )
 
 	def frameRange( self, returnsAsString=False ):
