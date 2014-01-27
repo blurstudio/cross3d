@@ -87,9 +87,11 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return False
 
 	def resolution(self):
-		resolutions = self.resolutions()
+		
+		# If I dont re-initialize a model object it does not return me the right resolutions.
+		resolutions = self._scene.findObject(self.name()).resolutions()
 		if resolutions:
-			return self.resolutions()[self._nativePointer.Parameters('active_resolution').Value]
+			return resolutions[self._nativePointer.Parameters('active_resolution').Value]
 		return ''
 
 	def resolutions(self):
