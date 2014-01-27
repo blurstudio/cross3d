@@ -76,7 +76,10 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return False
 
 	def setResolution(self, resolution):
-		resolutions = self.resolutions()
+
+		# If I dont re-initialize a model object it does not return me the right resolutions.
+		resolutions = self._scene.findObject(self.name()).resolutions()
+		
 		if resolution in resolutions:
 			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(resolution))
 			if self.resolution() == resolution:
@@ -86,7 +89,6 @@ class SoftimageSceneModel(AbstractSceneModel):
 	def resolution(self):
 		resolutions = self.resolutions()
 		if resolutions:
-			print resolutions, self._nativePointer.Parameters('active_resolution').Value
 			return self.resolutions()[self._nativePointer.Parameters('active_resolution').Value]
 		return ''
 
