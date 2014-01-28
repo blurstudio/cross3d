@@ -11,6 +11,7 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
+import sys
 import shutil
 import subprocess
 
@@ -24,22 +25,38 @@ class External(AbstractExternal):
 	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013'}
 
 	@classmethod
-	def runScript(cls, script, version=None, architecture=64, debug=False):
+	def runScript(cls, script, version=None, architecture=64):
 
 		if os.path.exists(script):
 			scriptPath = script
 
 		else:
-			scriptPath = r'C:\temp\softimage_batchscript.py'
+			scriptPath = cls.scriptPath()
 			fle = open(scriptPath, "w")
 			fle.write(script)
 			fle.close()
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe')
-		subprocess.call([binary, '-processing', '-script', scriptPath])
+		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE)
+		
+		# Writing the log file.
+		fle = open(cls.scriptLog(), 'w')
+		fle.write(pipe.stdout.read())
+		fle.close()
 
-		if debug:
-			os.startfile(scriptPath)
+		# Checking the error in the log file.
+		fle = open(cls.scriptLog())
+		content = fle.read()
+
+		return False if 'FATAL' in content else True
+
+	@classmethod
+	def scriptPath(cls):
+		return r'C:\temp\softimage_batchscript.py'
+
+	@classmethod
+	def scriptLog(cls):
+		return r'C:\temp\softimage_batchscript.log'
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64):
