@@ -9,6 +9,8 @@
 #	\date		04/11/10
 #
 
+import os
+
 from Py3dsMax import mxs
 from blur3d.api import dispatch
 from blur3d.api.classes import FrameRange
@@ -106,9 +108,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			frameRange = FrameRange([frameRange, frameRange])
 			
 		# collecting what we need
-		import os
 		scene = self._scene
-		pathSplit = os.path.split( path )
+		pathSplit = os.path.split(path)
 		basePath = pathSplit[0]
 		file = pathSplit[1]
 		fileSplit = file.split( '.' )
@@ -117,6 +118,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		initialRange = scene.animationRange()
 		application = self._scene.application()
 		
+		# Creating folder if does not exist.
+		dirName = os.path.dirname(path)
+		if not os.path.exists(dirName):
+			os.makedirs(dirName)
+
 		# checking inputs
 		if not frameRange:
 			frameRange = initialRange
@@ -174,7 +180,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.pyhelper.setViewportQuadSize( resolution.width(), resolution.height() )
 
 		for frame in range( frameRange[0], frameRange[1] + 1 ):
+			image = None
 			count = count + 1
+
+			# Watching for esc key.
 			if mxs.keyboard.escPressed:
 				completed = False
 				break
@@ -186,16 +195,19 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 					if application.version() != 14:
 						self.slateDraw()	
 
-			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
-			
-			if application.version() == 14 and camera.hasMultiPassEffects() and effects:
-				# Viewport allows to save the picture with multipass effects in Max 2012.
-				image = mxs.viewport.getViewportDib()
-			else:
+				if application.version() == 14 and camera.hasMultiPassEffects() and effects:
+				
+					# Viewport allows to save the picture with multipass effects in Max 2012.
+					image = mxs.viewport.getViewportDib()
+
+			if not image:
 				image = mxs.gw.getViewportDib()
-			
+
+			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
 			image.filename = imagePath
-			mxs.save( image )
+			mxs.save(image)
+
+			# Updating count.
 			if count == 100:
 				mxs.gc()
 				count = 0
