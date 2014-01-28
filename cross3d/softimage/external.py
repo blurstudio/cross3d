@@ -27,11 +27,9 @@ class External(AbstractExternal):
 	def runScript(cls, script, version=None, architecture=64, debug=False):
 
 		if os.path.exists(script):
-			tempScript = False
 			scriptPath = script
 
 		else:
-			tempScript = True
 			scriptPath = r'C:\temp\softimage_batchscript.py'
 			fle = open(scriptPath, "w")
 			fle.write(script)
@@ -42,8 +40,6 @@ class External(AbstractExternal):
 
 		if debug:
 			os.startfile(scriptPath)
-		elif (tempScript):
-			os.remove(scriptPath)
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64):
