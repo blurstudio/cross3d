@@ -25,22 +25,31 @@ class External(AbstractExternal):
 
 	@classmethod
 	def runScript(cls, script, version=None, architecture=64, debug=False):
-		scriptPath = r'C:\temp\batchscript.py'
-		fle = open(scriptPath, "w")
-		fle.write(script)
-		fle.close()
 
-		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch')
+		if os.path.exists(script):
+			tempScript = False
+			scriptPath = script
+
+		else:
+			tempScript = True
+			scriptPath = r'C:\temp\softimage_batchscript.py'
+			fle = open(scriptPath, "w")
+			fle.write(script)
+			fle.close()
+
+		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe')
 		subprocess.call([binary, '-processing', '-script', scriptPath])
 
-		if not debug:
-			os.remove()
+		if debug:
+			os.startfile(scriptPath)
+		elif (tempScript):
+			os.remove(scriptPath)
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64):
 		
 		# Getting the latest version if not provided.
-		version = version or sorted(cls._versionTokens.keys())[0]
+		version = version or sorted(cls._versionTokens.keys())[-1]
 
 		# Getting tokens for the the binary folder path.
 		tokens = {}
