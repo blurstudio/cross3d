@@ -73,12 +73,12 @@ class SoftimageApplication(AbstractApplication):
 		if args:
 			dispatch.objectDeleted.emit(args[0])
 			
-	def version( self ):
+	def version(self, major=True):
 		"""
 			\remarks	Returns the version major of XSI.
 		"""
 		version = xsi.Version()
-		return int( version.split( '.' )[0] )
+		return int(version.split('.')[0]) if major else version
 		
 	def name( self ):
 		return "Softimage"

@@ -11,10 +11,14 @@
 import os
 import re
 import getpass
+import win32con
+import win32api
 
-from blur3d import pendingdeprecation, constants
-from blurdev import debug
 from Py3dsMax import mxs
+from blurdev import debug
+from PyQt4.QtCore import QTimer
+from blur3d.api import application
+from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
@@ -135,6 +139,12 @@ SceneMetaData.register()
 #------------------------------------------------------------------------------------------------------------------------
 
 class StudiomaxScene(AbstractScene):
+
+	# This is the time at which the application FBX export preset was changed by our exportObjectsToFBX method.
+	# It allows use to detect if the preset file was changed in between two exports and make sure we reload the preset if necessary.
+	# After a long and painful research, showing the GUI of the native exporter seems to be the only way to have max load the preset file stored in the user folder.
+	_fbxExportPresetModifiedTime = 0
+
 	def __init__(self):
 		AbstractScene.__init__(self)
 
@@ -1518,26 +1528,50 @@ class StudiomaxScene(AbstractScene):
 		fle.close()
 
 		user = getpass.getuser()
-		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\2012.1\export\User defined.fbxexportpreset' % user
+		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export\User defined.fbxexportpreset' % (user, application.year())
 		
 		# Storing the old preset.
 		if os.path.exists(presetPath):
 			fle = open(presetPath)
 			preset = fle.read()
 			fle.close()
-			
+		
+		# Creating the path to the preset if not existing.
 		if not os.path.isdir(os.path.dirname(presetPath)):
 			os.makedirs(os.path.dirname(presetPath))
-			
+		
+		# Generating the preset from the template.
 		fle = open(presetPath, 'w')
 		fle.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
 		fle.close()
+
+		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
+		if showUI or os.path.getmtime(presetPath) > self._fbxExportPresetModifiedTime + 100:
+
+		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
+			if not showUI:
+
+				# Creating a method that presses enter.
+				def pressEnter():
+					win32api.keybd_event(0x0D, 0x0D, 0, 0)
+					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
 		
-		if showUI:
+				# There will be a prompt for the FBX options.	
+				QTimer.singleShot(200, pressEnter)
+
+				# There might be a second prompt if the file needs to be overwritten.
+				if os.path.exists(path):
+					QTimer.singleShot(400, pressEnter)
+
+			# Exporting showin the UI.
 			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
+
 		else:
+
+			# Calling the FBX exporter without GUI.
 			mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True, using='FBXEXP')
 
+		# Restoring the selection.
 		self._setNativeSelection(initialSelection)
 
 		# Restoring the old preset.
@@ -1545,6 +1579,9 @@ class StudiomaxScene(AbstractScene):
 			fle = open(presetPath, 'w')
 			fle.write(preset)
 			fle.close()
+
+		# Storing the time of the FBX export preset modification.
+		self._fbxExportPresetModifiedTime = os.path.getmtime(presetPath)
 
 		return True
 

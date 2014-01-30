@@ -268,24 +268,28 @@ class SoftimageScene( AbstractScene ):
 		# Setting the selection.
 		self._setNativeSelection( nativeObjects )
 		
-		# Setting the FBX export options.
-		xsi.FBXExportScaleFactor( 1 )
-		xsi.FBXExportGeometries( True )
-		xsi.FBXExportShapes( True )
-		xsi.FBXExportSkins( True )
-		xsi.FBXExportCameras( True )
-		xsi.FBXExportLights( True )
-		xsi.FBXExportDeformerAsSkeleton( False )
-		xsi.FBXExportEmbedMedias( False )
-		xsi.FBXExportAnimation( True )
-		xsi.FBXExportFrameRate( self.animationFPS() )
-		xsi.FBXExportKeepXSIEffectors( True )	
-		xsi.FBXExportSelection( True )
-		
-		# Plotting and exporting the FBX File.
+		# Plotting.
 		if controllers:
-			xsi.PlotAndApplyActions( controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True )
-		xsi.FBXExport( path )
+			xsi.PlotAndApplyActions( controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
+
+		# Setting the FBX export options.
+		xsi.FBXExportScaleFactor(1)
+		xsi.FBXExportGeometries(True)
+		xsi.FBXExportSkins(True)
+		xsi.FBXExportCameras(True)
+		xsi.FBXExportAscii(True)
+		xsi.FBXExportLights(True)
+		xsi.FBXExportAnimation(True)
+		xsi.FBXExportShapes(True)
+		xsi.FBXExportFrameRate(self.animationFPS())
+		xsi.FBXExportEmbedMedias(False)
+		xsi.FBXExportKeepXSIEffectors(False)	
+		xsi.FBXExportGroupAsCache(False)	
+		xsi.FBXExportDeformerAsSkeleton(False)
+		xsi.FBXExportSelection(True)
+
+		# Exporting.
+		xsi.FBXExport(path)
 
 		# Restoring the scene state.
 		xsi.CloseUndo()

@@ -209,13 +209,20 @@ class StudiomaxApplication(AbstractApplication):
 	def name( self ):
 		return "StudioMax"
 		
-	def version( self ):
-		return int( mxs.maxVersion()[0] / 1000 )
+	def version(self, major=True):
+		version = mxs.maxVersion()
+		if major:
+			return int(version[0] / 1000)
+		else:
+			return '.'.join([unicode(token) for token in version])
 	
 	def refresh( self ):
 		mxs.completeRedraw()
 		return True
 		
+	def year(self):
+		return 1998 + self.version()
+
 	def nameAndVersion( self ):
 		version = mxs.maxVersion()
 		jobTypeDic = {
@@ -236,7 +243,7 @@ class StudiomaxApplication(AbstractApplication):
 
 		return jobType
 		
-	def id( self ):
+	def id(self):
 		"""
 			\remarks	implements AbstractScene.softwareId to return a unique version/bits string information that will represent the exact
 									version of the software being run.

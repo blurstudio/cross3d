@@ -122,15 +122,24 @@ class AbstractApplication(QObject):
 		dispatch.objectPostDelete.emit()
 
 	@abstractmethod
-	def version(self):
+	def year(self):
 		"""
-		Returns the version major of the software.
-		
-		:return: version number
-		:rtyp: int
-	
+			Returns the version year of the software.
+			:return: version number
+			:rtyp: int
 		"""
 		return 0
+
+	@abstractmethod
+	def version(self, major=True):
+		"""
+		Returns the version of the software.
+		
+		:return: version number
+		:rtyp: various
+	
+		"""
+		return 0 if major else '0.0.0'
 
 	@abstractmethod
 	def exportAlembic(self, filename, **kwargs):
