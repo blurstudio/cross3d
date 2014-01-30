@@ -9,12 +9,13 @@
 #	\date		04/04/11
 #
 
+import copy
+
 from PySoftimage import xsi
 from win32com.client import constants
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
-#-------------------------------------------------------------------------
-
+#------------------------------------------------------------------------
 
 class SoftimageSceneModel(AbstractSceneModel):
 
@@ -81,9 +82,23 @@ class SoftimageSceneModel(AbstractSceneModel):
 		resolutions = self._scene.findObject(self.name()).resolutions()
 		
 		if resolution in resolutions:
+
+			# Storing the user props that might be compromised when switching the reference model.
+			userProps = self.userProps()
+			oldUserProps = userProps.lookupProps()
+
+			# Setting the resolution.
 			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(resolution))
+
+			# Making sure all the keys that where on the old resolution are re-assigned to the new one.
+			for key in oldUserProps:
+				if oldUserProps.get(key) and not userProps.get(key):
+					userProps[key] = oldUserProps[key]
+
+			# If the resolution did change.
 			if self.resolution() == resolution:
 				return True
+
 		return False
 
 	def resolution(self):
