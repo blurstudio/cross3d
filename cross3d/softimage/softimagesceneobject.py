@@ -67,18 +67,24 @@ class SoftimageSceneObject(AbstractSceneObject):
 			\sa			children
 			\return		<list> [ <PySotimage.xsi.Model> nativeObject, .. ]
 		"""
+		model = None
 		obj = self.nativePointer()
 		ignoreSceneRoot = True
+		
 		if str(obj.Type) == "#model":
 			if ignoreSceneRoot is True and obj.Name == "Scene_Root":
 				model = None
 			else:
 				model = obj
 		else:
-			if ignoreSceneRoot is True and obj.Model.Name == "Scene_Root":
-				model = None
-			else:
-				model = obj.Model
+			try:
+				if ignoreSceneRoot is True and obj.Model.Name == "Scene_Root":
+					model = None
+				else:
+					model = obj.Model
+			except AttributeError:
+				pass
+
 		return model
 
 	#------------------------------------------------------------------------------------------------------------------------
