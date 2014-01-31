@@ -461,7 +461,7 @@ class SoftimageScene( AbstractScene ):
 			sceneColor.Parameters("selcol").Value = self._cache['selColorValue']
 			sceneColor.Parameters("inhcol").Value = self._cache['inhColorValue']
 
-			# Retrieve selection
+			# Retrieve selection.
 			dispatch.blockSignals(True)
 			xsi.SelectObj(self._cache.get('selection', []))
 			dispatch.blockSignals(False)
