@@ -463,7 +463,7 @@ class SoftimageScene( AbstractScene ):
 
 			# Retrieve selection
 			dispatch.blockSignals(True)
-			xsi.SelectObj(self._cache['selection'])
+			xsi.SelectObj(self._cache.get('selection', []))
 			dispatch.blockSignals(False)
 
 			# Clearing the cached selection.
