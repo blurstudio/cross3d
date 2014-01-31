@@ -199,6 +199,8 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 		self._defineProperty( 'VRay_Matte_GI_OtherMattes', 		True, 		custom = True )
 		self._defineProperty( 'VRay_Surface_Priority', 			0, 			custom = True )
 		self._defineProperty( 'VRay_GI_VisibleToGI', 			True, 		custom = True )
+		self._defineProperty( 'VRay_GI_VisibleToReflections',	True,		custom = True )
+		self._defineProperty( 'VRay_GI_VisibleToRefractions',	True,		custom = True )
 
 		# define mr properties
 		self._defineProperty( 'Mr_castModeFGIllum', 			1 )
