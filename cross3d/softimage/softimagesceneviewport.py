@@ -22,9 +22,10 @@ from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 class SoftimageSceneViewport( AbstractSceneViewport ):
 	
 	viewportNames = { 1:'A', 2:'B', 3:'C', 4:'D' }
-	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User' ]
+	sceneCameras = [ 'Top', 'Left', 'Right', 'Bottom', 'User', 'Front' ]
 	
 	def __init__( self, scene, viewportID=0 ): 
+		super(SoftimageSceneViewport, self).__init__(scene, viewportID)
 		self._scene = scene
 		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
 		if viewportID in self.viewportNames:
@@ -38,7 +39,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		
 	def _nativeCamera( self ):
 		cameraName = self.cameraName()
-		
+		print 'CAMNAME', cameraName
 		if cameraName in self.sceneCameras:
 			cameraName = "Views.View%s.%sCamera" % (self.name, cameraName)
 
