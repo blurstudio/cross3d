@@ -39,7 +39,6 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		
 	def _nativeCamera( self ):
 		cameraName = self.cameraName()
-		print 'CAMNAME', cameraName
 		if cameraName in self.sceneCameras:
 			cameraName = "Views.View%s.%sCamera" % (self.name, cameraName)
 
