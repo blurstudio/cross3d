@@ -137,8 +137,6 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 							print 'TRACEBACK: skipping param: {} {}...'.format(prop, param)
 							print traceback.format_exc()
 
-							
-		print 'setting cube'
 		xsi.SetValue('preferences.ViewCube.show', viewOptions.get('viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
 
