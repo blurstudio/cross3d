@@ -10,6 +10,7 @@
 #
 
 import math
+import traceback
 
 from PySoftimage import xsi
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
@@ -130,7 +131,14 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			if prop in [ 'Camera Visibility', 'Camera Display' ]:
 				for param in viewOptions[prop]:
 					if not param in ['hidlincol', 'wrfrmdpthcuecol']:
-						self._nativePointer.Properties(prop).Parameters(param).Value = viewOptions[prop][param]
+						try:
+							self._nativePointer.Properties(prop).Parameters(param).Value = viewOptions[prop][param]
+						except:
+							print 'TRACEBACK: skipping param: {} {}...'.format(prop, param)
+							print traceback.format_exc()
+
+							
+		print 'setting cube'
 		xsi.SetValue('preferences.ViewCube.show', viewOptions.get('viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
 
