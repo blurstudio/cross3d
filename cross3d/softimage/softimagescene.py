@@ -467,7 +467,8 @@ class SoftimageScene( AbstractScene ):
 			dispatch.blockSignals(False)
 
 			# Clearing the cached selection.
-			del self._cache['selection']
+			if 'selection' in self._cache:
+				del self._cache['selection']
 
 		if self._timer == None:
 			self._timer = QTimer(self)
