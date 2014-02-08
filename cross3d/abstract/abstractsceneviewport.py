@@ -61,6 +61,14 @@ class AbstractSceneViewport(QObject):
 		return ''
 
 	@abstractmethod
+	def generateSnapshot(self, fileName, **options):
+		"""
+			Generates an image from the viewport in the specific path.
+			:param filename: path to file
+		"""
+		return False
+
+	@abstractmethod
 	def generatePlayblast(self, fileName, **options):
 		"""Generates a playblast in the specific path
 		

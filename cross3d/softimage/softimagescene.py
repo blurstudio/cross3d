@@ -15,6 +15,7 @@ import time
 
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
+from pywintypes import com_error
 from PySoftimage import xsi, xsiFactory
 from blurdev.decorators import stopwatch
 from blur3d.api import application, dispatch
@@ -59,7 +60,12 @@ class SoftimageScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		if isinstance(selection, basestring):
-			xsi.SelectObj(selection)
+			try:
+				xsi.SelectObj(selection)
+			except com_error:
+				pass
+			finally:
+				return True
 		else:
 			xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
 			xsiCollSelection.AddItems(selection)
@@ -73,7 +79,12 @@ class SoftimageScene( AbstractScene ):
 			\return		<bool> success
 		"""
 		if isinstance(selection, basestring):
-			xsi.AddToSelection(selection)
+			try:
+				xsi.AddToSelection(selection)
+			except com_error:
+				pass
+			finally:
+				return True
 		else:
 			xsiCollSelection = xsiFactory.CreateObject( 'XSI.Collection' )
 			xsiCollSelection.AddItems(selection)

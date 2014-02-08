@@ -70,7 +70,19 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	def cameraName( self ):
 		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False ):
+	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False):
+		
+		"""
+			Creates an unpadded JPG file sequence from the viewport for a given range.
+			TODO: If resolution is not provided use viewport resolution.
+			TODO: Don't have frame number show in the final file name path.
+		"""
+
+		frame = self._scene.currentFrame()
+		return self.generatePlayblast(fileName, frameRange=[frame, frame], resolution=resolution, slate=slate, effects=effects, geometryOnly=geometryOnly, antiAlias=antiAlias)
+
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False):
+		
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
 		"""
