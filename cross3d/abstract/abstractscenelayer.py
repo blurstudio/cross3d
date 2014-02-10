@@ -4,7 +4,7 @@
 #	\remarks	The AbstractSceneLayer provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
 #				to hanel per-application usage
-#	
+#
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		09/08/10
@@ -26,7 +26,7 @@ class AbstractSceneLayer(AbstractContainer):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+
 	@abstractmethod
 	def _nativeAltMaterials(self):
 		"""
@@ -98,9 +98,9 @@ class AbstractSceneLayer(AbstractContainer):
 	#------------------------------------------------------------------------------------------------------------------------
 	def addAltMaterial(self, material):
 		"""
-		Add the inputed material to the list of possible alternate 
+		Add the inputed material to the list of possible alternate
 		materials for this layer
-		
+
 		:param material: :class:`blur3d.api.SceneMaterial`
 
 		"""
@@ -110,9 +110,9 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def addAltPropSet(self, propSet):
 		"""
-		Add the property set to the list of possible alternate property 
+		Add the property set to the list of possible alternate property
 		sets for this layer
-		
+
 		:param propSet: :class:`blur3d.api.ScenePropSet`
 
 		"""
@@ -123,13 +123,13 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def advancedAltMaterialStateAt(self, index):
 		"""
-		Return a mapping for the advanced alternate material status of a 
+		Return a mapping for the advanced alternate material status of a
 		given alternate material slot
-		
+
 		:param index: int
 		:return: A dictionary with the BaseMaterialID as keys with values of
 		         tuples of (SceneMaterial, ignored)
-		         
+
 		         {int baseMaterialId: (:class:`blur3d.api.SceneMaterial` override, bool ignored), .. }
 
 		"""
@@ -178,15 +178,15 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def altMaterialFlags(self):
 		"""Return a list of material duplication flags for this layer
-		
+
 		:return: a list of :data:`blur3d.constants.MaterialDuplicateOptions`'s
-			
+
 		"""
 		return []
 
 	def altMaterialFlagsAt(self, index):
 		"""Return the material flags at the inputed index
-		
+
 		:return: :data:`blur3d.constants.MaterialDuplicateOptions`
 
 		"""
@@ -199,7 +199,7 @@ class AbstractSceneLayer(AbstractContainer):
 		"""Retrive the alternate SceneObjectPropSet at the inputed index
 
 		:return: :class:`blur3d.api.SceneObjectPropSet` or None
-			
+
 		"""
 		propsets = self.altPropSets()
 		if (0 <= index and index < len(propsets)):
@@ -223,13 +223,13 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def defineAltMaterialAt(self, index, material):
 		"""
-		Defines a new material for the inputed index, provided the 
+		Defines a new material for the inputed index, provided the
 		material at that index is not already defined
 
 		:param index: int
 		:param material: :class:`blur3d.api.SceneMaterial`
 		:rtype: bool
-		
+
 		"""
 		existing = self.altMaterialAt(index)
 		if (not existing):
@@ -238,13 +238,13 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def defineAltPropSetAt(self, index, propSet):
 		"""
-		Defines a new property set for the inputed index, provided the 
+		Defines a new property set for the inputed index, provided the
 		property set at that index is not already defined
-		
+
 		:param index: int
 		:param propSet: :class:`blur3d.api.ScenePropSet`
 		:rtype: bool
-		
+
 		"""
 		existing = self.altPropSetAt(index)
 		if (not (existing and existing.isActive())):
@@ -252,17 +252,17 @@ class AbstractSceneLayer(AbstractContainer):
 		return False
 
 	def currentAltMaterialIndex(self):
-		"""Retrieve the index of the currently applied alternate material 
+		"""Retrieve the index of the currently applied alternate material
 		for this layer
 
 		:rtype: int
-		
+
 		"""
 		return self._altMtlIndex
 
 	def currentAltMaterial(self):
 		"""Retrieve the current alt material
-		
+
 		:rtype: :class:`blur3d.api.SceneMaterial`
 
 		"""
@@ -272,13 +272,13 @@ class AbstractSceneLayer(AbstractContainer):
 		"""Retrieve the alternate object property set index
 
 		:rtype: int
-		
+
 		"""
 		return self._altPropIndex
 
 	def currentAltPropSet(self):
 		"""Retrieve the alternate object property set at the inputed index
-		
+
 		:rtype: :class:`blur3d.api.ScenePropSet`
 
 		"""
@@ -286,9 +286,9 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def hasAltMaterialFlagAt(self, index, flag):
 		"""
-		Return whether or not a given material duplication flag is set for 
+		Return whether or not a given material duplication flag is set for
 		the inputed alt material index
-		
+
 		:param index: int
 		:param flag: :data:`blur3d.constants.MaterialDuplicateOptions`
 		:return: found
@@ -303,7 +303,7 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def hasAdvancedAltMaterialStateAt(self, index):
 		"""
-		Return whether or not an advanced state for an alternate material 
+		Return whether or not an advanced state for an alternate material
 		has been defined for the inputed
 
 		"""
@@ -311,7 +311,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def indexOfAltMaterial(self, material):
 		"""Return the index of the inputed material for the current layer
-		
+
 		:param: :class:`blur3d.api.SceneMaterial`
 		:return: index of material, or -1 if not found
 
@@ -324,10 +324,10 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def indexOfAltPropSet(self, propSet):
 		"""Return the index of the inputed property set for the current layer
-		
+
 		:param propSet: :class:`blur3d.api.ScenePropSet`
 		:return: index of material, or -1 if not found
-		
+
 		"""
 		propSets = self.altPropSets()
 		try:
@@ -338,13 +338,13 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def isActive(self):
 		"""Return whether or not this layer is currently active in the scene
-		
+
 		"""
 		return False
 
 	@abstractmethod
 	def isWorldLayer(self):
-		"""Return whether or not this layer is the root world layer of the 
+		"""Return whether or not this layer is the root world layer of the
 		scene
 
 		"""
@@ -352,7 +352,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def isolate(self):
 		"""
-		Reimplements the :meth:`blur3d.api.SceneObjectGroup.isolate` method 
+		Reimplements the :meth:`blur3d.api.SceneObjectGroup.isolate` method
 		to isolate just this layer (hide all other layers)
 
 		"""
@@ -380,7 +380,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def layerGroup(self):
 		"""Return the layer group that this layer belongs to
-		
+
 		:return: :class:`blur3d.api.SceneLayerGroup` or None
 
 		"""
@@ -399,7 +399,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def recordLayerState(self, xml):
 		"""Records the layer's current state to xml
-		
+
 		:param xml: :class:`blurdev.XML.XMLElement`
 
 		"""
@@ -432,7 +432,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def restoreLayerState(self, xml):
 		"""Restore the layer's state from the inputed xml
-		
+
 		:param xml: :class:`blurdev.XML.XMLDocument`
 
 		"""
@@ -469,7 +469,7 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def removeAdvancedAltMaterialStateAt(self, index):
 		"""
-		Remove the advanced alternate material state from the layer at 
+		Remove the advanced alternate material state from the layer at
 		the alternate material index
 
 		"""
@@ -477,7 +477,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def removeAltPropSetAt(self, index):
 		"""
-		Remove the propset at the inputed index from this layer's list of 
+		Remove the propset at the inputed index from this layer's list of
 		alternate property sets
 
 		"""
@@ -495,7 +495,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setAltMaterialAt(self, index, material):
 		"""
-		Sets the alternate material at the inputed index to the given 
+		Sets the alternate material at the inputed index to the given
 		material instance
 
 		"""
@@ -520,9 +520,9 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setAltMaterialFlagAt(self, index, flag, state=True):
 		"""
-		Set whether or not a given material duplication flag is on for the 
+		Set whether or not a given material duplication flag is on for the
 		inputed alt material index
-		
+
 		:param index: int
 		:param flat: :data:`blur3d.constants.MaterialDuplicateOptions`
 		:param state: bool
@@ -541,7 +541,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def setAltMaterialFlagsAt(self, index, flags):
 		"""
 		Set the alternate material flags at the inputed index for this instance
-			
+
 		:param index: int
 		:param flags: :data:`blur3d.constants.MaterialDuplicateOptions`
 
@@ -555,8 +555,8 @@ class AbstractSceneLayer(AbstractContainer):
 	@abstractmethod
 	def setAltMaterialFlags(self, flags):
 		"""Set the alternate material flags for this instance
-		
-		:param flags: list of 
+
+		:param flags: list of
 		              :data:`<blur3d.constants.MaterialDuplicateOptions`'s
 
 		"""
@@ -578,7 +578,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setCurrentAltMaterialIndex(self, index):
 		"""
-		Set the current index for the alternate material, applying the 
+		Set the current index for the alternate material, applying the
 		alternate material when necessary
 
 		"""
@@ -602,7 +602,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setCurrentAltPropSetIndex(self, index):
 		"""
-		Set the current index for the alternate object property set, 
+		Set the current index for the alternate object property set,
 		applyting the set to the objects on this layer when necessary
 
 		"""
@@ -631,7 +631,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setGroupName(self, name):
 		"""
-		Implements the AbstractContainer.groupName method to set the 
+		Implements the AbstractContainer.groupName method to set the
 		group name for this object group instance
 
 		"""
@@ -643,9 +643,9 @@ class AbstractSceneLayer(AbstractContainer):
 	def setMaterialOverride(self, material, options= -1, advancedState=None):
 		"""
 		Overloads the :meth:`blur3d.api.SceneObjectGroup.setMaterialOverride`
-		method to make sure we get recorded alternate properties before 
+		method to make sure we get recorded alternate properties before
 		applying overrides
-		
+
 		:param material: :class:`blur3d.api.SceneMaterial`
 		:param options: :data:`blur3d.constants.MaterialOverrideOptions`
 		:param advancedState: <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
@@ -663,7 +663,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setLayerGroup(self, layerGroup):
 		"""Set the layer group that this layer is associated with
-		
+
 		:param layerGroup: :class:`blur3d.api.SceneLayerGroup` or None
 
 		"""
@@ -685,7 +685,7 @@ class AbstractSceneLayer(AbstractContainer):
 		"""
 		Set a mapping for the advanced alternate material status of a given
 		alternate material slot
-		
+
 		:param index: int
 		:param altMaterialState: <dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
 
@@ -694,7 +694,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setWireColor(self, color):
 		"""Set the wire color for this layer
-		
+
 		:param color: :class:`PyQt4.QtGui.QColor`
 
 		"""
@@ -702,9 +702,9 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def wireColor(self):
 		"""Return the wire color for this layer
-		
+
 		:rtype: :class:`PyQt4.QtGui.QColor`
-		
+
 		"""
 		clr = self._nativeWireColor()
 		if (clr):
@@ -716,7 +716,7 @@ class AbstractSceneLayer(AbstractContainer):
 	@staticmethod
 	def fromXml(scene, xml):
 		"""Create a new layer from the inputed xml data
-		
+
 		:param xml: :class:`blurdev.XML.XMLElement`
 
 		"""
