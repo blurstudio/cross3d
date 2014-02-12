@@ -4,7 +4,7 @@
 #	\remarks	The AbstractSceneLayerGroup provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
 #				to hanel per-application usage
-#	
+#
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		09/08/10
@@ -63,7 +63,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 
 	def addLayers(self, layers):
 		"""Add the layers to this layer group
-		
+
 		:param layers: list of :class:`blur3d.api.SceneLayer`'s
 
 		"""
@@ -109,7 +109,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 
 	def layers(self):
 		"""Returns the SceneLayer's that are associated with this layer
-		
+
 		:return: list of :class:`blur3d.api.SceneLayer`'s
 
 		"""
@@ -118,9 +118,9 @@ class AbstractSceneLayerGroup(SceneWrapper):
 
 	def objects(self):
 		"""Return a list of the objects that are part of this layer group
-		
+
 		:return: list of :class:`blur3d.api.SceneObject`'s
-			
+
 		"""
 		from blur3d.api import SceneObject
 		return [ SceneObject(self._scene, obj) for obj in self._nativeObjects() ]
@@ -128,13 +128,13 @@ class AbstractSceneLayerGroup(SceneWrapper):
 	@abstractmethod
 	def remove(self, removeLayers=False, removeObjects=False):
 		"""Remove the layer from the scene (layers included when desired)
-		
-		:param removeLayers: If true, the layers in the layer group should 
-		                     be removed from the scene, otherwise only the 
+
+		:param removeLayers: If true, the layers in the layer group should
+		                     be removed from the scene, otherwise only the
 		                     layer group should be removed
 		:type removeLayers: bool
-		:param removeObjects: If removeLayers is true, when removeObjects 
-		                      is true, the objects on the layers in the 
+		:param removeObjects: If removeLayers is true, when removeObjects
+		                      is true, the objects on the layers in the
 							  layer group should be removed from the scene
 
 		"""
@@ -142,7 +142,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 
 	def scene(self):
 		"""Return the scene instance that this layer is a member of
-		
+
 		:return: :class:`blur3d.api.Scene`
 
 		"""
@@ -191,6 +191,14 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		for layer in self.layers():
 			layer.setSelected(state)
 		return True
+
+	@abstractmethod
+	def sortLayers(self, key=None):
+		"""
+		Sorts the layers within the group.  The layers will be sorted
+		alphabetically unless specified otherwise by a key.
+		"""
+		return False
 
 	def unhide(self):
 		"""Unhides the layers in this layer group
