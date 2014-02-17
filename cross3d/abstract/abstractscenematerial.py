@@ -14,10 +14,11 @@ from blur3d import api
 
 
 class AbstractSceneMaterial(SceneWrapper):
-	iconCache = {}
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	@abstractmethod
 	def _nativeSubmaterials(self):
 		"""
@@ -29,20 +30,13 @@ class AbstractSceneMaterial(SceneWrapper):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+
 	@abstractmethod
 	def edit(self):
 		"""Allow the user to edit the material
 
 		"""
 		return False
-
-	def icon(self):
-		"""Return the icon for this material type
-		
-		:rtype: :class:`PyQt4.QtGui.QIcon`
-		
-		"""
-		return AbstractSceneMaterial.cachedIcon(self.materialType())
 
 	def materialType(self):
 		"""Return the material type for this material instance
@@ -62,28 +56,6 @@ class AbstractSceneMaterial(SceneWrapper):
 		from blur3d.api import SceneMaterial
 		subMtls = [s for s in self._nativeSubmaterials() if s]
 		return [ SceneMaterial(self._scene, mtl) for mtl in subMtls ]
-
-	@staticmethod
-	def cachedIcon(materialType):
-		icon = AbstractSceneMaterial.iconCache.get(materialType)
-
-		# return a cached icon
-		if (icon):
-			return icon
-
-		# create an icon cache
-		from blur3d.constants 	import MaterialType
-
-		# create a default icon
-		if (materialType & MaterialType.Generic):
-			iconfile = 'img/materials/default.png'
-
-		# create the QIcon
-		import blur3d
-		from PyQt4.QtGui 		import QIcon
-		icon = QIcon(blur3d.resourcePath(iconfile))
-		AbstractSceneMaterial.iconCache[ materialType ] = icon
-		return icon
 
 	@staticmethod
 	def fromXml(scene, xml):

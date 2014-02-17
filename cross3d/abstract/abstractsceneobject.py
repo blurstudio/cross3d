@@ -16,13 +16,13 @@ from blur3d.api import SceneWrapper
 from blur3d.constants import ObjectType
 
 class AbstractSceneObject(SceneWrapper):
+
 	"""
-	The SceneObject class provides the base foundation for the 3d 
-	Object framework for the blur3d system.  This class will provide a 
-	generic overview structure for all manipulations of 3d objects
+		The SceneObject class provides the base foundation for the 3d 
+		Object framework for the blur3d system.  This class will provide a 
+		generic overview structure for all manipulations of 3d objects
 	"""
 
-	iconCache = {}
 	_objectType = ObjectType.Generic
 	_subClasses = {}
 
@@ -299,14 +299,6 @@ class AbstractSceneObject(SceneWrapper):
 
 		"""
 		return self.setHidden(True)
-
-	def icon(self):
-		"""Returns the icon associated with this object type
-		
-		:return: :class:`PyQt4.QtGui.QIcon`
-		
-		"""
-		return self.cachedIcon(self.objectType())
 
 	@abstractmethod
 	def isBoxMode(self):
@@ -641,43 +633,6 @@ class AbstractSceneObject(SceneWrapper):
 		for subclass in cls.__subclasses__():
 				cls._subclasses(subclass, classes, True)
 		return classes
-
-	@staticmethod
-	def cachedIcon(objectType):
-		icon = AbstractSceneObject.iconCache.get(objectType)
-
-		# return a cached icon
-		if (icon):
-			return icon
-
-		# create an icon cache
-
-		# create a light icon
-		if (objectType & ObjectType.Light):
-			iconfile = 'img/objects/light.png'
-
-		# create a camera icon
-		elif (objectType & ObjectType.Camera):
-			iconfile = 'img/objects/camera.png'
-
-		# create a model icon
-		elif (objectType & ObjectType.Model):
-			iconfile = 'img/objects/model.png'
-
-		# create a geometry icon
-		elif (objectType & ObjectType.Geometry):
-			iconfile = 'img/objects/geometry.png'
-
-		# create a default icon
-		else:
-			iconfile = 'img/objects/default.png'
-
-		# create the QIcon
-		import blur3d
-		from PyQt4.QtGui 		import QIcon
-		icon = QIcon(blur3d.resourcePath(iconfile))
-		AbstractSceneObject.iconCache[ objectType ] = icon
-		return icon
 
 	@staticmethod
 	def fromXml(scene, xml):
