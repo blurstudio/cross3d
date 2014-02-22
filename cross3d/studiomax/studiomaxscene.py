@@ -1529,17 +1529,17 @@ class StudiomaxScene(AbstractScene):
 
 		user = getpass.getuser()
 		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export\User defined.fbxexportpreset' % (user, application.year())
-		
+
 		# Storing the old preset.
 		if os.path.exists(presetPath):
 			fle = open(presetPath)
 			preset = fle.read()
 			fle.close()
-		
+
 		# Creating the path to the preset if not existing.
 		if not os.path.isdir(os.path.dirname(presetPath)):
 			os.makedirs(os.path.dirname(presetPath))
-		
+
 		# Generating the preset from the template.
 		fle = open(presetPath, 'w')
 		fle.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
@@ -1555,8 +1555,8 @@ class StudiomaxScene(AbstractScene):
 				def pressEnter():
 					win32api.keybd_event(0x0D, 0x0D, 0, 0)
 					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
-		
-				# There will be a prompt for the FBX options.	
+
+				# There will be a prompt for the FBX options.
 				QTimer.singleShot(200, pressEnter)
 
 				# There might be a second prompt if the file needs to be overwritten.
@@ -1699,7 +1699,7 @@ class StudiomaxScene(AbstractScene):
 					layer = getLayerFromName(attr.lnm)
 
 				# remove the layer reference
-				if (not layer):
+				if layer:
 					rem_attr(root, i + 1)
 
 	def closeRenderSceneDialog(self):
@@ -1822,7 +1822,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		if (not self._metaData):
 			# cleanup existing data
-			self.cleanMetaData()
+			# self.cleanMetaData()
 
 			data = SceneMetaData.find(mxs.globaltracks)
 			if (data):
