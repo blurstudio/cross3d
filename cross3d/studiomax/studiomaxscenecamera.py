@@ -28,6 +28,59 @@ class StudiomaxSceneCamera( AbstractSceneCamera ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	def animateTurntable(self, objects=[], startFrame=0, endFrame=100):
+		"""
+			\remarks	Animates the camera around (and properly framing) the given object(s).
+			\return		N/A
+		"""
+		if not objects:
+			return
+		objects = [o.nativePointer() for o in objects]
+		cam = self.nativePointer()
+		helper = mxs.blur3dhelper.turntableHelperBuilder(
+			self.nativePointer(),
+			startFrame,
+			endFrame,
+		)
+		# Create an aggregate bounding box for all of our
+		# objects so we know how "big" this stuff is, all
+		# inclusive.
+		from blur3d.lib import cartesian
+		aggBBox = None
+		for obj in objects:
+			p1, p2 = mxs.nodeLocalBoundingBox(obj)
+			oBBox = cartesian.BoundingBox(
+				cartesian.Point.newFromMaxPoint(p1),
+				cartesian.Point.newFromMaxPoint(p2),
+			)
+			if not aggBBox:
+				aggBBox = oBBox
+			else:
+				aggBBox = cartesian.BoundingBox.union(
+					aggBBox,
+					oBBox,
+				)
+		# A bounding sphere conveniently gives us a center point.
+		center, radius = aggBBox.boundingSphere()
+		helper.pos = center.maxPoint()
+		# Stick a target object at the center of the objects and
+		# rotate it 360 degrees across our frame range, then link
+		# the camera to that via a constraint.
+		link = mxs.Link_Constraint()
+		link.addTarget(helper, 0)
+		cam.controller = link
+		self.targetObject().nativePointer().pos = center.maxPoint()
+		cam.specify_fov = True
+		cam.film_width = 36.0
+		cam.fov = 40.0
+		aspect = float(mxs.renderers.current.image_aspect)
+		fovAngle = cartesian.radians(cam.fov)
+		axisLength = aggBBox.length(aggBBox.maximumExtent())
+		from math import sin, sqrt
+		hypoLength = ((axisLength) / sin(fovAngle / 2.0))
+		distance = sqrt((hypoLength * hypoLength) - ((axisLength / 2.0) * (axisLength / 2.0)))
+		cam.pos = (cam.pos + mxs.point3(0, -distance, 0))
+
 	def cameraType( self ):
 		"""
 			\remarks	implements the AbstractSceneCamera.cameraType method to determine what type of camera this instance is

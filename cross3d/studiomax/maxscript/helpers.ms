@@ -8,6 +8,18 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function turntableHelperBuilder cam startFrame endFrame = (
+			helper = (dummy name:"TurntableHelper")
+			numFrames = (endFrame - startFrame)
+			mult = ((360.0 / numFrames) as string)
+			fStart = (startFrame as string)
+			fEnd = (endFrame as string)
+			expr = "degToRad (" + mult + " * (F - " + fStart + "))"
+			helper.rotation.z_rotation.controller = Float_Script()
+			helper.rotation.z_rotation.controller.script = expr
+			helper
+		),
+
 		function selectObjectsByNameFilter obj = ( obj.layer == (globalVars.get #FILTERLAYER) ),
 
 		function selectObjectsByNameFromLayer layer = (

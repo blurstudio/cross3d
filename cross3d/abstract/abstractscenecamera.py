@@ -24,9 +24,13 @@ class AbstractSceneCamera(SceneObject):
 
 	_objectType = ObjectType.Camera
 
-	def __init__(self, scene, nativeCamera):
+	def __init__(self, scene, nativeCamera, targetObject=None):
 		super(AbstractSceneCamera, self).__init__(scene, nativeCamera)
 		self._viewOptions = {}
+		self._targetObject = targetObject
+
+	def targetObject(self):
+		return self._targetObject
 
 	def interest(self):
 		return None
@@ -39,6 +43,13 @@ class AbstractSceneCamera(SceneObject):
 			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType. 
 		"""
 		return (self.cameraType() & cameraType) > 0
+
+	@abstractmethod
+	def animateTurntable(self, objects=[], startFrame=1, endFrame=100):
+		"""
+			Orbits the camera around the given object(s).
+		"""
+		pass
 
 	@abstractmethod
 	def cameraType(self):

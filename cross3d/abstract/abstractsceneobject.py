@@ -30,7 +30,7 @@ class AbstractSceneObject(SceneWrapper):
 		SceneWrapper.__init__(self, scene, nativeObject)
 		self._objectType = self._typeOfNativeObject(nativeObject)
 
-	def __new__(cls, scene, nativeObject):
+	def __new__(cls, scene, nativeObject, *args, **kwargs):
 		"""
 			\remarks	acts as a factory to return the right type of scene object
 			\return		<variant> SceneObject

@@ -185,9 +185,18 @@ class AbstractScene(QObject):
 	@abstractmethod
 	def _createNativeRenderer(self, rendererType):
 		"""
-			\remaks		creates a new native renderer based on the inputed renderer type for this scene
+			\remarks	creates a new native renderer based on the inputed renderer type for this scene
 			\param		rendererType	<blur3d.constants.RendererType>
 			\return		<variant> nativeRenderer || None
+		"""
+		return None
+
+	@abstractmethod
+	def _createNativeTargetObject(self, name='Camera.Target'):
+		"""
+			\remarks	creates a new target object
+			\param		name <str>
+			\return 	<variant> nativeObject || None
 		"""
 		return None
 
@@ -1394,16 +1403,52 @@ class AbstractScene(QObject):
 			return SceneObject(self, nativeModel)
 		return None
 
-	def createCamera(self, name='Camera', type='Standard'):
+	def createCamera(self, name='Camera', type='Standard', targetObject=None):
 		"""
 			\remarks	creates a new camera with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
 		"""
-		nativeCamera = self._createNativeCamera(name, type)
+		if targetObject:
+			nativeCamera = self._createNativeCamera(
+				name=name,
+				type=type,
+				targetObject=targetObject.nativePointer(),
+			)
+		else:
+			nativeCamera = self._createNativeCamera(name, type)
 		if (nativeCamera):
 			from blur3d.api import SceneCamera
-			return SceneCamera(self, nativeCamera)
+			return SceneCamera(self, nativeCamera, targetObject=targetObject)
 		return None
+
+	def createTurntableCamera(self, name='TurntableCamera', objects=[], type='V-Ray', startFrame=0, endFrame=100):
+		"""
+			\remarks	creates a new camera that rotates around the given objects
+			\return		<blur3d.api.SceneCamera> || None
+		"""
+		tName = '{base}.Target'.format(base=name)
+		nativeTarget = self._createNativeTargetObject(name=tName)
+		if nativeTarget:
+			from blur3d.api import SceneObject
+			target = SceneObject(self, nativeTarget)
+			camera = self.createCamera(
+				name=name,
+				type=type,
+				targetObject=target,
+			)
+		else:
+			camera = self.createCamera(
+				name=name,
+				type=type,
+			)
+		if not camera:
+			return None
+		camera.animateTurntable(
+			objects=objects,
+			startFrame=startFrame,
+			endFrame=endFrame,
+		)
+		return camera
 
 	def createSubmitter(self, submitType):
 		"""
