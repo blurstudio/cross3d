@@ -37,7 +37,7 @@ class External(AbstractExternal):
 			fle.close()
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe')
-		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE)
+		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		
 		# Writing the log file.
 		fle = open(cls.scriptLog(), 'w')
