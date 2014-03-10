@@ -2086,6 +2086,12 @@ class StudiomaxScene(AbstractScene):
 		mxs.renderPixelAspect = pixelAspect
 		return True
 
+	def setSilentMode(self, switch):
+		mxs.setSilentMode(switch)
+		
+	def silentMode(self):
+		return mxs.silentMode()
+
 	def renderPixelAspect(self,):
 		"""
 			\remarks	returns the render pixel aspect of the scene
