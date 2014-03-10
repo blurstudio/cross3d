@@ -1901,7 +1901,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if silent:
-			mxs.resetMaxFile(mxs.pyhelper.namify('#noPrompt'))
+			mxs.resetMaxFile(mxs.pyhelper.namify('noPrompt'))
 		else:
 			mxs.resetMaxFile()
 		return True
