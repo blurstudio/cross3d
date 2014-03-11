@@ -1521,7 +1521,7 @@ class StudiomaxScene(AbstractScene):
 			return True
 		return False
 
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
@@ -1563,6 +1563,7 @@ class StudiomaxScene(AbstractScene):
 
 				# Creating a method that presses enter.
 				def pressEnter():
+					print 'CALLED CALLBACK'
 					win32api.keybd_event(0x0D, 0x0D, 0, 0)
 					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
 
