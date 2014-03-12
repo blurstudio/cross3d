@@ -12,6 +12,7 @@ import glob
 import os
 import re
 import getpass
+import traceback
 import win32con
 import win32api
 import win32gui
@@ -1601,7 +1602,8 @@ class StudiomaxScene(AbstractScene):
 					
 			except OSError:
 				# Ignore write permission errors, we can't do anything about them right now.
-				pass
+				traceback.print_exc()
+				
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or (preset_paths and os.path.getmtime(preset_paths[0]) > self._fbxExportPresetModifiedTime + 100):
@@ -1642,7 +1644,7 @@ class StudiomaxScene(AbstractScene):
 					
 			except OSError:
 				# Ignore write permission errors, we can't do anything about them right now.
-				pass
+				traceback.print_exc()
 				
 
 		# Storing the time of the FBX export preset modification.
