@@ -8,6 +8,7 @@
 #	\date		03/15/10
 #
 
+import glob
 import os
 import re
 import getpass
@@ -1524,9 +1525,26 @@ class StudiomaxScene(AbstractScene):
 
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
 		"""
-			\remarks	exports a given set of objects as FBX.
-			\return		<bool> success
+		Exports a given set of objects as FBX.
+		
+		:returns bool: Success
+		
 		"""
+		# Note on the hack implemented below:
+		# -----------------------------------
+		# In max, the FBX import/export settings API is broken. To get around
+		# this issue, we take advantage of the fact that the FBX plugin saves
+		# it's settings as a preset file in the user's directory. We have a 
+		# template of the desired settings file and we overwrite the existing
+		# user settings file (making sure to cache the existing preset so that
+		# we can restore it afterwards).  After that settings file is written,
+		# we have to make sure the FBX plugin GUI opens for the settings to
+		# take effect. Because this would would block scripts, we use win32
+		# to click "Enter" on any of the GUI's brought up by the FBX plugin.
+		# Also, regardless of the frame range set in the export settings,
+		# the plugin will use the current animation range, so we have to set
+		# and then restore the animation range to the desired range as well.
+		
 		preset = ''
 		initialSelection = self._nativeSelection()
 		initialFrameRange = self.animationRange()
@@ -1535,29 +1553,58 @@ class StudiomaxScene(AbstractScene):
 		self.setAnimationRange(frameRange)
 		self._setNativeSelection(nativeObjects)
 
-		# Generating a user preset file since the mxs.FBXExporterSetParam API does not work.
 		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'templates', '3dsmax_fbx_export_preset.templ'))
 		with open(script_path, 'r') as f:
 			template = f.read()
 
-		user = getpass.getuser()
-		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export\User defined.fbxexportpreset' % (user, application.year())
+		# In some cases, presets are being written to a different user folder
+		# than the currently logged in user.  We will overwrite ALL user 
+		# settings preferences to make sure the settings are applied.  They 
+		# will all be restored afterwards.
+		cur_user = getpass.getuser()
+		preset_paths = []
+		user_root = r'C:\Users'
+		users = os.listdir(user_root)
+				
+		# Add the primary User preset file to the list to be written.
+		preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
+		primary_preset_path = os.path.join(preset_dir, 'User defined.fbxexportpreset')
+		preset_paths.append(primary_preset_path)
+		
+		# Find all other preset files that could possibly be loaded.
+		for user in users:
+			preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (user, application.year())
+			user_preset_paths = glob.glob(os.path.join(preset_dir, '*.fbxexportpreset'))
+			preset_paths.extend(user_preset_paths)
+		
+		# Strip out duplicates
+		preset_paths = list(set(preset_paths))
+		
+		# Cache the current presets and overwrite them.
+		cached_presets = {}
+		for preset_path in preset_paths:
+			# Read the current presets and cache them to restore later
+			if os.path.isfile(preset_path):
+				with open(preset_path, 'r') as f:
+					preset = f.read()
+					cached_presets[preset_path] = preset
 
-		# Storing the old preset.
-		if os.path.exists(presetPath):
-			with open(presetPath, 'r') as f:
-				preset = f.read()
-
-		# Creating the path to the preset if not existing.
-		if not os.path.isdir(os.path.dirname(presetPath)):
-			os.makedirs(os.path.dirname(presetPath))
-
-		# Generating the preset from the template.
-		with open(presetPath, 'w') as f:
-			f.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
+			preset = template.format(user=user, start=frameRange[0], end=frameRange[1])
+			
+			try:
+				# Creating the path to the preset if not existing.
+				if not os.path.isdir(os.path.dirname(preset_path)):
+					os.makedirs(os.path.dirname(preset_path))
+	
+				with open(preset_path, 'w') as f:
+					f.write(preset)
+					
+			except OSError:
+				# Ignore write permission errors, we can't do anything about them right now.
+				pass
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
-		if showUI or os.path.getmtime(presetPath) > self._fbxExportPresetModifiedTime + 100:
+		if showUI or (preset_paths and os.path.getmtime(preset_paths[0]) > self._fbxExportPresetModifiedTime + 100):
 
 		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
 			if not showUI:
@@ -1573,30 +1620,37 @@ class StudiomaxScene(AbstractScene):
 				# There might be a second prompt if the file needs to be overwritten.
 				if os.path.exists(path):
 					QTimer.singleShot(400, pressEnter)
-
+				
 			# Exporting showin the UI.
 			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
 
 		else:
-
 			# Calling the FBX exporter without GUI.
 			mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True, using='FBXEXP')
+
+		# Restoring the frame range.
+		self.setAnimationRange(initialFrameRange)
 
 		# Restoring the selection.
 		self._setNativeSelection(initialSelection)
 
 		# Restoring the old preset.
-		if preset:
-			with open(presetPath, 'r') as f:
-				preset = f.read()
-
-		# Restoring initial range.
-		self.setAnimationRange(initialFrameRange)
+		for preset_path, preset in cached_presets.iteritems():
+			try:
+				with open(preset_path, 'w') as f:
+					f.write(preset)
+					
+			except OSError:
+				# Ignore write permission errors, we can't do anything about them right now.
+				pass
+				
 
 		# Storing the time of the FBX export preset modification.
-		self._fbxExportPresetModifiedTime = os.path.getmtime(presetPath)
+		if preset_paths:
+			self._fbxExportPresetModifiedTime = os.path.getmtime(preset_paths[0])
 
 		return True
+
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
