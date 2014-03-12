@@ -1522,99 +1522,17 @@ class StudiomaxScene(AbstractScene):
 			return True
 		return False
 
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False):
-		"""
-		exports a given set of objects as FBX.
-
-		"""
-		preset = ''
-		initialSelection = self._nativeSelection()
-		frameRange = self.animationRange() if not frameRange else frameRange
-
-		self._setNativeSelection(nativeObjects)
-
-		mxs.pluginManager.loadClass(mxs.FbxExporter)
-
-
-		# Generating a user preset file since the mxs.FBXExporterSetParam API does not work.
-		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'templates', '3dsmax_fbx_export_preset.templ'))
-		with open(script_path, 'r') as f:
-			template = f.read()
-
-		user = getpass.getuser()
-		presetPath = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export\User defined.fbxexportpreset' % (user, application.year())
-
-		# Storing the old preset.
-		if os.path.exists(presetPath):
-			with open(presetPath, 'r') as f:
-				preset = f.read()
-
-		# Creating the path to the preset if not existing.
-		if not os.path.isdir(os.path.dirname(presetPath)):
-			os.makedirs(os.path.dirname(presetPath))
-
-		# Generating the preset from the template.
-		with open(presetPath, 'w') as f:
-			f.write(template.format(user=user, start=frameRange[0], end=frameRange[1]))
-
-		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
-		if False and showUI or os.path.getmtime(presetPath) > self._fbxExportPresetModifiedTime + 100:
-
-		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
-			if not showUI:
-
-				# Creating a method that presses enter.
-				def pressEnter():
-					print 'CALLED CALLBACK'
-					win32api.keybd_event(0x0D, 0x0D, 0, 0)
-					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
-
-				# There will be a prompt for the FBX options.
-				QTimer.singleShot(200, pressEnter)
-
-				# There might be a second prompt if the file needs to be overwritten.
-				if os.path.exists(path):
-					QTimer.singleShot(400, pressEnter)
-				
-				# There might be a dialog for errors.
-				def maybePressEnter():
-					title = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-					if 'error' in title.lower():
-						pressEnter()
-						
-				QTimer.singleShot(5000, maybePressEnter)
-
-			# Exporting showin the UI.
-			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
-
-		else:
-
-			# Calling the FBX exporter without GUI.
-			mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True, using='FBXEXP')
-
-		# Restoring the selection.
-		self._setNativeSelection(initialSelection)
-
-		# Restoring the old preset.
-		if preset:
-			with open(presetPath, 'w') as f:
-				f.write(preset)
-
-		# Storing the time of the FBX export preset modification.
-		self._fbxExportPresetModifiedTime = os.path.getmtime(presetPath)
-
-		return True
-
-
-	def _exportNativeObjectsToFBX_orig(self, nativeObjects, path, frameRange=None, showUI=True):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
 		"""
 		preset = ''
 		initialSelection = self._nativeSelection()
-		frameRange = self.animationRange() if not frameRange else frameRange
-
+		initialFrameRange = self.animationRange()
+		frameRange = initialFrameRange if not frameRange else frameRange
+		
+		self.setAnimationRange(frameRange)
 		self._setNativeSelection(nativeObjects)
 
 		# Generating a user preset file since the mxs.FBXExporterSetParam API does not work.
@@ -1641,20 +1559,20 @@ class StudiomaxScene(AbstractScene):
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or os.path.getmtime(presetPath) > self._fbxExportPresetModifiedTime + 100:
 
-#		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
-#			if not showUI:
-#
-#				# Creating a method that presses enter.
-#				def pressEnter():
-#					win32api.keybd_event(0x0D, 0x0D, 0, 0)
-#					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
-#
-#				# There will be a prompt for the FBX options.
-#				QTimer.singleShot(200, pressEnter)
-#
-#				# There might be a second prompt if the file needs to be overwritten.
-#				if os.path.exists(path):
-#					QTimer.singleShot(400, pressEnter)
+		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
+			if not showUI:
+
+				# Creating a method that presses enter.
+				def pressEnter():
+					win32api.keybd_event(0x0D, 0x0D, 0, 0)
+					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
+
+				# There will be a prompt for the FBX options.
+				QTimer.singleShot(200, pressEnter)
+
+				# There might be a second prompt if the file needs to be overwritten.
+				if os.path.exists(path):
+					QTimer.singleShot(400, pressEnter)
 
 			# Exporting showin the UI.
 			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
@@ -1669,8 +1587,11 @@ class StudiomaxScene(AbstractScene):
 
 		# Restoring the old preset.
 		if preset:
-			with open(presetPath, 'w') as f:
+			with open(presetPath, 'r') as f:
 				preset = f.read()
+
+		# Restoring initial range.
+		self.setAnimationRange(initialFrameRange)
 
 		# Storing the time of the FBX export preset modification.
 		self._fbxExportPresetModifiedTime = os.path.getmtime(presetPath)
