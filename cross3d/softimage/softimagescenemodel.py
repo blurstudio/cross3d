@@ -55,7 +55,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return False
 
 	def resolutionsPaths(self):
-		return [self.resolutionPath(resolution) for resolution in self.resolutions()]
+		return [self.resolutionPath(resolution) for resolution in self.resolutions() if resolution != 'Offloaded']
 
 	def resolutionPath(self, resolution=''):
 		if self.isReferenced():
