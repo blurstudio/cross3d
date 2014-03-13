@@ -50,6 +50,11 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 	def removeResolution(self, name):
 		if self.isReferenced():
+
+			# Softimage does not allow to remove active resolutions.
+			if self.resolution() == name:
+				self.offload()
+				
 			xsi.RemoveRefModelResolution(self._nativePointer, name)
 			return True
 		return False
