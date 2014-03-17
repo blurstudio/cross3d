@@ -266,7 +266,7 @@ class SoftimageScene(AbstractScene):
 				for axis in 'xyz':
 					controllerGlobal = transformsGlobal.Parameters(transform + axis)
 					controllerLocal = transformsLocal.Parameters(transform + axis)
-					if controllerGlobal.IsAnimated() or controllerLocal.isAnimated():
+					if (controllerGlobal and controllerGlobal.IsAnimated()) or (controllerLocal and controllerLocal.isAnimated()):
 						controllers.append(controllerLocal)
 
 		# Storing all the stuff we will be doing.
