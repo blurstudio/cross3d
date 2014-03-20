@@ -92,10 +92,16 @@ class FileSequence( object ):
 		return FrameRange( [ self.start(), self.end() ] ) 
 
 	def start( self ):
-		return int( self.nameToken( 'start' ) )
+		try:
+			return int( self.nameToken( 'start' ) )
+		except ValueError:
+			return 0
 
 	def end( self ):
-		return int( self.nameToken( 'end' ) )
+		try:
+			return int( self.nameToken( 'end' ) )
+		except ValueError:
+			return 0
 
 	def extension( self ):
 		return self.nameToken( 'extension' )
