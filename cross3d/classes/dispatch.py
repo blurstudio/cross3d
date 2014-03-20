@@ -152,7 +152,10 @@ class Dispatch(QObject):
 		"""
 		if (hasattr(self, signal) and type(getattr(self, signal)).__name__ == 'pyqtBoundSignal'):
 			if not signal in self._functionSignals:
-				getattr(self, signal).disconnect(function)
+				try:
+					getattr(self, signal).disconnect(function)
+				except TypeError:
+					pass
 			# remove the signal from the connections list
 			if signal in self._connections:
 				if function in self._connections[signal]:
