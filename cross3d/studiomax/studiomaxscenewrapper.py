@@ -115,7 +115,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
-		return str( self._nativePointer.name )
+		return self._nativePointer.name
 		
 	def setDisplayName( self, name ):
 		"""
@@ -136,7 +136,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\param		key		<str>
 			\return		<bool> found
 		"""
-		key = str(key)
+		key = unicode(key)
 		return mxs.isProperty( self._nativePointer, key ) or mxs.hasProperty( self._nativePointer, key )
 	
 	
@@ -146,7 +146,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 						can access
 			\return		<list> [ <str> propname, .. ]
 		"""
-		return [ str(propname) for propname in mxs.getPropNames( self._nativePointer ) ]
+		return [ unicode(propname) for propname in mxs.getPropNames( self._nativePointer ) ]
 	
 # register the symbol
 from blur3d import api
