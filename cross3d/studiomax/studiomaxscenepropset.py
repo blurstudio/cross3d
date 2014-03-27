@@ -224,11 +224,9 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 			else:
 				if ( type(cval) == bool ):
 					val = val == '1' or val == 'True'
-				else:
+				elif val != 'undefined':
 					val = eval(val)
-			
 			self._values[str(key)] = val
-			
 		return True
 		
 	def _valueString( self ):
