@@ -625,7 +625,10 @@ class SoftimageScene(AbstractScene):
 	
 	def snapKeysToNearestFrames(self):
 		for curve in [fcv for fcv in xsi.FindObjects(None, "{E2A86051-F669-11D1-8D60-080036F3CC02}") if not fcv.Locked]:
-			curve.SnapToNearestFrame()
+			try:
+				curve.SnapToNearestFrame()
+			except:
+				pass
 		return True
 
 	def setRotation(self, objects, axes, relative=False):
