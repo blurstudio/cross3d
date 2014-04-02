@@ -16,10 +16,10 @@ import time
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
-from PySoftimage import xsi, xsiFactory
 from blurdev.decorators import stopwatch
 from blur3d.api import application, dispatch
 from blur3d import pendingdeprecation, constants
+from PySoftimage import xsi, xsiFactory, constants as siConstants
 from blur3d.api.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 
@@ -525,17 +525,29 @@ class SoftimageScene(AbstractScene):
 			\param		callback	<funciton>					Code called after the fps is changed.
 			\return		<bool> success
 		"""
-		playControl = xsi.ActiveProject.Properties('Play Control')
-		# Only update the change timing if it needs to change
-		current = playControl.Parameters('KeepFrameTiming').Value
-		if current and changeType == constants.FPSChangeType.Seconds:
-			playControl.Parameters('KeepFrameTiming').Value = 0 # seconds
-		elif not current and changeType == constants.FPSChangeType.Frames:
-			playControl.Parameters('KeepFrameTiming').Value = 1 # frames
-		playControl.Parameters('Format').Value = 11 # switch to custom format 
-		playControl.Parameters('Rate').Value = fps
-		if callback:
-			callback()
+
+		# Storing the ratio of the fps changed.
+		ratio = fps / self.animationFPS()
+		if ratio != 1.0:
+
+			playControl = xsi.ActiveProject.Properties('Play Control')
+			# Only update the change timing if it needs to change
+			current = playControl.Parameters('KeepFrameTiming').Value
+			if current and changeType == constants.FPSChangeType.Seconds:
+				playControl.Parameters('KeepFrameTiming').Value = 0 # seconds
+			elif not current and changeType == constants.FPSChangeType.Frames:
+				playControl.Parameters('KeepFrameTiming').Value = 1 # frames
+			playControl.Parameters('Format').Value = 11 # switch to custom format 
+			playControl.Parameters('Rate').Value = fps
+
+			if changeType == constants.FPSChangeType.Seconds:
+
+				# Also converting the current scene range.
+				self.setAnimationRange(self.animationRange().multiply(ratio))
+
+			if callback:
+				callback()
+
 		return True
 
 	def storeState(self):
@@ -612,13 +624,8 @@ class SoftimageScene(AbstractScene):
 		return True
 	
 	def snapKeysToNearestFrames(self):
-		collection = xsiFactory.CreateObject("XSI.Collection")
-		collection.AddItems(self._nativeObjects())
-		parameters = collection.FindObjectsByMarkingAndCapabilities(None, 2048)
-		for parameter in parameters :
-			curves = [source for source in parameter.Sources if source.Type == 20] 
-			for curve in curves:
-				curve.SnapToNearestFrame()
+		for curve in [fcv for fcv in xsi.FindObjects(None, "{E2A86051-F669-11D1-8D60-080036F3CC02}") if not fcv.Locked]:
+			curve.SnapToNearestFrame()
 		return True
 
 	def setRotation(self, objects, axes, relative=False):
