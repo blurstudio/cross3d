@@ -98,7 +98,7 @@ class FrameRange( list ):
 			None
 
 	def multiply(self, scalar):
-		return FrameRange([self[0] * scalar, self[1] * scalar])
+		return FrameRange([round(self[0] * scalar), round(self[1] * scalar)])
 			
 	def merge( self, frameRange ):
 		"""

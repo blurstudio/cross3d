@@ -611,6 +611,16 @@ class SoftimageScene(AbstractScene):
 		xsi.SetValue("Passes.RenderOptions.ImageHeight", height)
 		return True
 	
+	def snapKeysToNearestFrames(self):
+		collection = xsiFactory.CreateObject("XSI.Collection")
+		collection.AddItems(self._nativeObjects())
+		parameters = collection.FindObjectsByMarkingAndCapabilities(None, 2048)
+		for parameter in parameters :
+			curves = [source for source in parameter.Sources if source.Type == 20] 
+			for curve in curves:
+				curve.SnapToNearestFrame()
+		return True
+
 	def setRotation(self, objects, axes, relative=False):
 		"""
 		Rotates the provided objects in the scene

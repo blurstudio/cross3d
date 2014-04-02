@@ -1174,6 +1174,13 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
+
+	@abstractmethod
+	def snapKeysToNearestFrames(self):
+		"""
+			Snaps all keyframes to the nearest frame.
+		"""
+		return False
 		
 	@abstractmethod
 	def setRenderFrameRange(self, frameRange):
