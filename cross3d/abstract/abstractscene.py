@@ -699,6 +699,24 @@ class AbstractScene(QObject):
 		"""
 		return None
 
+	def _findUniqueName(self, name, names, incFormat='{name}{count:03}', sanityCount=9999999):
+		"""
+		A generic method to find a unique name in a given set of names.
+		:param name: The name to search for in the scene
+		:param names: The set of strings to check for a unique name
+		:param incFormat: Used to increment the name. Defaults to '{name}{count:03}'
+		:param sanityCount: Used to prevent a runaway while loop. Allows you to increase the maximum number of
+							objects above 9,999,999 if you really need that.
+		"""
+		count = 0
+		ret = name
+		while ret in names:
+			count += 1
+			ret = incFormat.format(name=name, count=count)
+			if sanityCount and count > sanityCount:
+				raise Exception('Unable to find a unique name in {} tries, try a diffrent format.'.format(sanityCount))
+		return ret
+
 	@abstractmethod
 	def _currentNativeRenderPass(self):
 		"""
@@ -1710,6 +1728,18 @@ class AbstractScene(QObject):
 				from blur3d.api import SceneMap
 				return SceneMap(self, nativeMap)
 			return None
+
+	def findUniqueObjectName(self, name, incFormat='{name}{count:03}', sanityCount=9999999):
+		"""
+		Checks the names of the objects in the scene for duplicate names and returns a unique name.lower
+		:param name: The name to search for in the scene
+		:param incFormat: Used to increment the name. Defaults to '{name}{count:03}'
+		:param sanityCount: Used to prevent a runaway while loop. Allows you to increase the maximum number of
+							objects above 9,999,999 if you really need that.
+		"""
+		objects = self.objects(wildcard='{}*'.format(name))
+		names = set([o.name() for o in objects])
+		return self._findUniqueName(name, names, incFormat=incFormat, sanityCount=sanityCount)
 
 	def fxs(self):
 		"""
