@@ -235,7 +235,8 @@ class StudiomaxApplication(AbstractApplication):
 				'11000': "Max2009",
 				'12000': "Max2010",
 				'14000': "Max2012",
-				'default': "Max2012"}
+				'16000': "Max2014",
+				'default': "Max2014"}
 		if jobTypeDic.has_key(str(version[0])):
 			jobType = jobTypeDic[str(version[0])]
 		else:
