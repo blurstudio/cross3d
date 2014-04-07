@@ -1568,7 +1568,11 @@ class StudiomaxScene(AbstractScene):
 		users = os.listdir(user_root)
 				
 		# Add the primary User preset file to the list to be written.
-		preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
+		if application.version() > 14:
+			preset_dir = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax%(year)i_X64\Presets\%(year)i.0.1\export' % {'user': cur_user, 'year':application.year()}
+		else:
+			preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
+			
 		primary_preset_path = os.path.join(preset_dir, 'User defined.fbxexportpreset')
 		preset_paths.append(primary_preset_path)
 		
