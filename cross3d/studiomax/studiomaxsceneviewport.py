@@ -192,10 +192,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			if camera:
 				if camera.hasMultiPassEffects() and effects:
 					camera.renderMultiPassEffects()
-					if application.version() != 14:
+					if application.version() < 14:
 						self.slateDraw()	
 
-				if application.version() == 14 and camera.hasMultiPassEffects() and effects:
+				if application.version() >= 14 and camera.hasMultiPassEffects() and effects:
 				
 					# Viewport allows to save the picture with multipass effects in Max 2012.
 					image = mxs.viewport.getViewportDib()
