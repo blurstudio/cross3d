@@ -1510,7 +1510,13 @@ class StudiomaxScene(AbstractScene):
 	def _isolateNativeObjects(self, nativeObjects):
 		selection = self._nativeSelection()
 		self._setNativeSelection(nativeObjects)
-		mxs.macros.run('Tools', 'Isolate_Selection')
+		if self.application().nameAndVersion() == 'Max2014':
+			if nativeObjects:
+				mxs.IsolateSelection.EnterIsolateSelectionMode()
+			else:
+				mxs.IsolateSelection.ExitIsolateSelectionMode()
+		else:
+			mxs.macros.run('Tools', 'Isolate_Selection')
 		self._setNativeSelection(selection)
 		return True
 
@@ -1519,9 +1525,14 @@ class StudiomaxScene(AbstractScene):
 			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
 			\return		<bool>
 		"""
-		if mxs.Iso2lations == True:
-			mxs.Iso2Roll.C2Iso.changed(False)
+		if self.application().nameAndVersion() == 'Max2014':
+			mxs.IsolateSelection.ExitIsolateSelectionMode()
+			self.update()
 			return True
+		else:
+			if mxs.Iso2lations == True:
+				mxs.Iso2Roll.C2Iso.changed(False)
+				return True
 		return False
 
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
@@ -1612,7 +1623,7 @@ class StudiomaxScene(AbstractScene):
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or (preset_paths and os.path.getmtime(preset_paths[0]) > self._fbxExportPresetModifiedTime + 100):
 
-		 	# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
+			# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
 			if not showUI:
 
 				# Creating a method that presses enter.
