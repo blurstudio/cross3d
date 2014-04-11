@@ -14,6 +14,7 @@ import os
 import sys
 import shutil
 import subprocess
+import xml.etree.cElementTree as ET
 
 from blur3d.api.abstract.external import External as AbstractExternal
 
@@ -23,6 +24,18 @@ class External(AbstractExternal):
 
 	_architectureTokens = {64: r'Program Files', 32: r'Program Files (x86)'}
 	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013'}
+
+	@classmethod
+	def getFileVersion(cls, filepath):
+		"""
+		Reads the xsi version of an xsi file from the associated scntoc. 
+		"""
+		scntoc_path = filepath + 'toc'
+		if os.path.isfile(scntoc_path):
+			tree = ET.parse(scntoc_path)
+			root = tree.getroot()
+			return root.get('xsi_version')
+		return None
 
 	@classmethod
 	def runScript(cls, script, version=None, architecture=64):

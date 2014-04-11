@@ -5,6 +5,7 @@ import shutil
 import subprocess
 
 from blur3d.api.abstract.external import External as AbstractExternal
+from blurdev.media import dsofile
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +14,22 @@ class External(AbstractExternal):
 	_architectureTokens = {64: r'_x64', 32: r''}
 	_versionTokens = {2012: r'Max2012'}
 
+	@classmethod
+	def getFileVersion(cls, filepath):
+		"""
+		Reads the max version that a max file was saved with from a custom 
+		dso property added to the file when it is saved from max.
+		"""
+		dso = dsofile.DSOFile()
+		try:
+			dso.open(filepath)
+			saved_as_version = dso.customProperty('SavedAsVersion')
+			if saved_as_version:
+				return saved_as_version.value()
+		except:
+			raise
+		return None
+	
 	@classmethod
 	def runScript(cls, script, version=None, architecture=64):
 
