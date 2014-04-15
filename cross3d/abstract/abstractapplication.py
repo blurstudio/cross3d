@@ -197,6 +197,10 @@ class AbstractApplication(QObject):
 				return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\3dsMax\{version}'.format(version=version), 'Installdir')[0]
 			else:
 				return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\3dsMax\{version}\MAX-1:{langId}'.format(version=version, langId=langId[0]), 'Installdir')[0]
+		elif appName == 'MotionBuilder':
+			return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\MotionBuilder\{version}'.format(version=version), 'InstallPath')[0]
+		elif appName == 'Softimage':
+			return registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\Softimage\InstallPaths', unicode(version))[0]
 		return ''
 	
 	@abstractmethod
