@@ -83,7 +83,8 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return False
 
 	def setResolution(self, resolution):
-
+		# handles qstrings
+		resolution = unicode(resolution)
 		# If I dont re-initialize a model object it does not return me the right resolutions.
 		resolutions = self._scene.findObject(self.name()).resolutions()
 		for res in resolutions:
