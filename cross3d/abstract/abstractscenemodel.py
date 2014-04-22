@@ -45,7 +45,7 @@ class AbstractSceneModel(SceneObject):
 		return groups
 		
 	@abstractmethod
-	def export( self, fileName ):
+	def export(self, fileName):
 		return False
 
 	@abstractmethod
@@ -87,6 +87,11 @@ class AbstractSceneModel(SceneObject):
 	@abstractmethod
 	def resolutions(self):
 		return []
+	
+	@abstractmethod
+	def addAnimationClip(self, path, name=None):
+		return False
+	
 
 # register the symbol
 api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

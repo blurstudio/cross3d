@@ -9,6 +9,7 @@
 #	\date		04/04/11
 #
 
+import os
 import copy
 
 from PySoftimage import xsi
@@ -85,15 +86,19 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 		# If I dont re-initialize a model object it does not return me the right resolutions.
 		resolutions = self._scene.findObject(self.name()).resolutions()
+		for res in resolutions:
+			
+			# Handles cases sensitivity (crappy, but needed because resolution
+			# names often come from filenames).
+			if res.lower() != resolution.lower():
+				continue
 		
-		if resolution in resolutions:
-
 			# Storing the user props that might be compromised when switching the reference model.
 			userProps = self.userProps()
 			oldUserProps = userProps.lookupProps()
 
 			# Setting the resolution.
-			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(resolution))
+			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(res))
 
 			# Making sure all the keys that where on the old resolution are re-assigned to the new one.
 			for key in oldUserProps:
@@ -101,7 +106,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 					userProps[key] = oldUserProps[key]
 
 			# If the resolution did change.
-			if self.resolution() == resolution:
+			if self.resolution() == res:
 				return True
 
 		return False
@@ -123,13 +128,59 @@ class SoftimageSceneModel(AbstractSceneModel):
 				resolutions.append(parameter.Value)
 		return resolutions
 
-	def export( self, fileName ):
-		xsi.ExportModel( self._nativePointer, fileName, True, False )
+	def export(self, fileName):
+		xsi.ExportModel(self._nativePointer, fileName, True, False)
 		return True
 	
-	def export( self, fileName ):
-		xsi.ExportModel( self._nativePointer, fileName, True, False )
+	def export(self, fileName):
+		xsi.ExportModel(self._nativePointer, fileName, True, False)
 		return True
+	
+	def addAnimationClip(self, path, name=None):
+		native_model = self.nativePointer()
+		native_mixer = native_model.mixer
+		
+		base_track_name = 'BlurAnimTrack'
+		
+		if name is None:
+			name = os.path.basename(path).replace('.', '_') + '_Clip'
+
+		# Each clip should be loaded onto its own track.
+		# Look at the mixer on the Asset to find an empty track, or create a new
+		# empty track to add the clip to.
+		
+		# If an asset doesn't have a mixer, it means it doesn't have any tracks
+		# either. Create a new track, which will create the mixer.
+		if not native_mixer:
+			track_name = '{}0'.format(base_track_name)
+			native_track = xsi.AddTrack(native_model, '', 0, track_name)
+			native_mixer = native_model.mixer
+			
+		# If a mixer does exist, uses sequential numbering to create a new track,
+		# or if that track already exists, test if it's empty.
+		else:
+			i = 0
+			native_track = None
+			while native_track is None or native_track.clips.count > 0:
+				track_name = '{}{}'.format(base_track_name, i)
+				native_track = native_mixer.tracks(track_name)
+				if not native_track:
+					native_track = xsi.AddTrack(native_model, native_model, 0, track_name)
+					break
+				i += 1
+				
+		# Adding clips is a 2-step process.  First, import the animation as an
+		# Action.  Then create an "instance" of that animation as a Clip on one
+		# of the tracks (a single action can be added as a clip to multiple tracks
+		# on multiple assets).
+		# Also, by Convention, clips should be offset to their start frame. This 
+		# will be true unless Layout changes the way they export things.
+		native_action = xsi.ImportAction(native_model, path, 0)
+		native_clip = xsi.AddClip(native_model, native_action, "", native_track.FullName, native_action.FrameStart.Value, name)
+		
+		#TODO: wrap native clip (no specific blur3d object for it yet) and return it.
+		return True
+	
 	
 # register the symbol
 from blur3d import api
