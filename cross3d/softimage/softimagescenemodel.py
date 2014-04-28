@@ -12,8 +12,9 @@
 import os
 import copy
 
-from PySoftimage import xsi
+from PySoftimage import xsi, xsiFactory
 from win32com.client import constants
+from blurdev.decorators import pendingdeprecation
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 #------------------------------------------------------------------------
@@ -137,7 +138,49 @@ class SoftimageSceneModel(AbstractSceneModel):
 		xsi.ExportModel(self._nativePointer, fileName, True, False)
 		return True
 	
+	@pendingdeprecation('Use loadAnimation instead with mixer flag true.')
 	def addAnimationClip(self, path, name=None):
+		self.loadAnimationInMixer(self, path, name)
+
+	def storePose(self, name='', objects=[]):
+		if not objects:
+			objects = self.objects()
+
+		controllers = xsiFactory.CreateObject('XSI.Collection')
+		controllers.AddItems([obj.nativePointer() for obj in objects])
+		parameters = controllers.FindObjectsByMarkingAndCapabilities( None, 2048 )
+
+		# Creating the action.
+		return xsi.SIStoreAction(self._nativePointer, parameters, 1, False, '', '', '', '', True)
+
+	def storeAnimation(self, name='', objects=[]):
+		if not objects:
+			objects = self.objects()
+
+		controllers = xsiFactory.CreateObject('XSI.Collection')
+		controllers.AddItems([obj.nativePointer() for obj in objects])
+		parameters = controllers.FindObjectsByMarkingAndCapabilities( None, 2048 )
+
+		# Creating the action.
+		return xsi.SIStoreAction(self._nativePointer, parameters, 2, name, False, '', '', '', '', True)
+
+	def savePose(self, basePath, name='', objects=[]):
+		xsi.ExportAction(self.storePose(name, objects), os.path.join(basePath, name + '.eani'))
+		return True
+
+	def saveAnimation(self, basePath, name='', objects=[]):
+		xsi.ExportAction(self.storeAnimation(name, objects), os.path.join(basePath, name + '.eani'))
+		return True
+
+	def loadPose(self, path):
+		self.loadAnimation(path)
+		# TODO: Set key if auto-key is on for relevant objects.
+
+	def loadAnimation(self, path):
+		if os.path.exists(path):
+			xsi.ImportActionAndApply(self._nativePointer, path)
+
+	def loadAnimationInMixer(self, path, name=None):
 		native_model = self.nativePointer()
 		native_mixer = native_model.mixer
 		
@@ -181,8 +224,31 @@ class SoftimageSceneModel(AbstractSceneModel):
 		
 		#TODO: wrap native clip (no specific blur3d object for it yet) and return it.
 		return True
-	
-	
+
+	def matchPose(self, model, objects=[]):
+
+		action = model.storeAnimation('Match', objects)
+		xsi.ApplyAction(action, self._nativePointer)
+
+		# TODO:
+		# For each object make a global match transform from this model to the target model.
+		# Set keys if auto-key is on.
+
+		return True
+
+	def matchAnimation(self, model, objects=[]):
+
+		action = model.storeAnimation('Match', objects)
+		print model, action, self._nativePointer
+		xsi.ApplyAction(action, self._nativePointer)
+
+		# TODO:
+		# Get a list of frames with keys for the provided objects.
+		# For each frame make a global match transform from this model to the target model.
+		# Set keys if auto-key is on.
+
+		return True
+
 # register the symbol
 from blur3d import api
 api.registerSymbol('SceneModel', SoftimageSceneModel)

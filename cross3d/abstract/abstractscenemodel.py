@@ -9,10 +9,11 @@
 #	\date		04/05/10 
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneObject, Group
-from blur3d.constants import ObjectType
 from blur3d import api
+from blur3d import abstractmethod
+from blur3d.constants import ObjectType
+from blur3d.api import SceneObject, Group
+from blurdev.decorators import pendingdeprecation
 
 class AbstractSceneModel(SceneObject):
 	"""
@@ -89,9 +90,37 @@ class AbstractSceneModel(SceneObject):
 		return []
 	
 	@abstractmethod
+	@pendingdeprecation('Use loadAnimationInMixer instead')
 	def addAnimationClip(self, path, name=None):
 		return False
-	
+
+	@abstractmethod
+	def savePose(self, basePath, name='', objects=[]):
+		return False
+
+	@abstractmethod
+	def saveAnimation(self, basePath, name='', objects=[]):
+		return False
+
+	@abstractmethod
+	def loadPose(self, path):
+		return False
+
+	@abstractmethod
+	def loadAnimation(self, path):
+		return False
+
+	@abstractmethod
+	def loadAnimationInMixer(self, path, name=''):
+		return False
+
+	@abstractmethod
+	def matchPose(self, model, objects=[]):
+		return False
+
+	@abstractmethod
+	def matchAnimation(self, model, objects=[]):
+		return False
 
 # register the symbol
 api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)
