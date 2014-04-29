@@ -262,7 +262,7 @@ class SoftimageSceneObject(AbstractSceneObject):
 			return ObjectType.Geometry
 
 		if type == 'surfmsh':
-			return ObjectType.NurbsSurfaceP
+			return ObjectType.NurbsSurface
 
 		elif type == 'crvlist':
 			return ObjectType.Curve
