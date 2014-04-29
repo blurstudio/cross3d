@@ -107,7 +107,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			name, setDisplayName, setName
 			\return		<str> name
 		"""
-		return self._nativePointer.name.split( '.' )[-1]
+		return self.name().split( '.' )[-1]
 
 	def name( self ):
 		"""
@@ -115,6 +115,10 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
+		if not self._nativePointer:
+			return ''
+		if not mxs.isProperty(self._nativePointer, 'name'):
+			return ''
 		return self._nativePointer.name
 		
 	def setDisplayName( self, name ):
