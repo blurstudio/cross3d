@@ -1916,6 +1916,10 @@ class AbstractScene(QObject):
 		"""
 		return self._objects(False, wildcard, type)
 
+	@abstractmethod
+	def objectsKeyedFrames(self, objects, start=None, end=None):
+		return []
+
 	def recordLayerState(self, xml):
 		"""
 			\remarks	records the layer state to XML text

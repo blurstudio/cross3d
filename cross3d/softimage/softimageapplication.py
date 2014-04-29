@@ -65,7 +65,10 @@ class SoftimageApplication(AbstractApplication):
 			if self._objectsConnectedCount < 1:
 				xsi.Blur3d_enableValueChanged(False)
 		return
-	
+
+	def autokey(self):
+		return xsi.Preferences.GetPreferenceValue("animation.autokey")
+
 	def preDeleteObject(self, *args):
 		"""
 			\remarks	XSI does not emit pre and post signals, so just emit the delete signal

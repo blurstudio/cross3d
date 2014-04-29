@@ -142,6 +142,10 @@ class AbstractApplication(QObject):
 		return 0 if major else '0.0.0'
 
 	@abstractmethod
+	def autokey(self):
+		return False
+
+	@abstractmethod
 	def exportAlembic(self, filename, **kwargs):
 		return False
 	

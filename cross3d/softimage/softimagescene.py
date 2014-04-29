@@ -19,7 +19,7 @@ from pywintypes import com_error
 from blurdev.decorators import stopwatch
 from blur3d.api import application, dispatch
 from blur3d import pendingdeprecation, constants
-from PySoftimage import xsi, xsiFactory, constants as siConstants
+from PySoftimage import xsi, xsiFactory
 from blur3d.api.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 
@@ -417,6 +417,12 @@ class SoftimageScene(AbstractScene):
 			\return		<int>
 		"""
 		return int(xsi.ActiveProject.Properties("Play Control").Parameters("Current").Value)
+
+	def objectsKeyedFrames(self, objects, start=None, end=None):
+		frames = []
+		for obj in objects:
+			frames += obj.keyedFrames(start, end)
+		return sorted(list(set(frames)))
 
 	def setCurrentFrame(self, frame):
 		"""

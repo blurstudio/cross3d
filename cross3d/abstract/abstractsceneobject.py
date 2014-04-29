@@ -460,6 +460,10 @@ class AbstractSceneObject(SceneWrapper):
 			Set keys on the object parameters.
 		"""
 		return False
+
+	@abstractmethod
+	def keyedFrames(self, start=None, end=None):
+		return []
 		
 	def setLayer(self, layer):
 		"""Sets the layer for this object to the inputed SceneLayer

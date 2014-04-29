@@ -12,7 +12,7 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 from blur3d.constants import ObjectType
-from PySoftimage import xsi, xsiFactory
+from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 from win32com.client.dynamic import Dispatch as dynDispatch
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
@@ -262,7 +262,7 @@ class SoftimageSceneObject(AbstractSceneObject):
 			return ObjectType.Geometry
 
 		if type == 'surfmsh':
-			return ObjectType.NurbsSurface
+			return ObjectType.NurbsSurfaceP
 
 		elif type == 'crvlist':
 			return ObjectType.Curve
@@ -283,6 +283,36 @@ class SoftimageSceneObject(AbstractSceneObject):
 			return ObjectType.CameraInterest
 
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
+
+	def keyedFrames(self, start=None, end=None):		
+		
+		# Collecting the transform parameters with animation.
+		parameters = []
+		transformsGlobal = self._nativePointer.Kinematics.Global
+		transformsLocal = self._nativePointer.Kinematics.Local
+		for transform in [ 'pos', 'rot', 'scl' ]:
+			for axis in 'xyz':
+				parameterGlobal = transformsGlobal.Parameters(transform + axis)
+				parameterLocal = transformsLocal.Parameters(transform + axis)
+				if (parameterGlobal and parameterGlobal.IsAnimated(xsiConstants.siFCurveSource)) or (parameterLocal and parameterLocal.isAnimated(xsiConstants.siFCurveSource)):
+					parameters.append(parameterLocal)
+
+		# Collecting all curves for this parameters.
+		curves = []
+		for parameter in parameters:
+		    for source in parameter.Sources:
+		    	if source.Type == 20:
+		     		curves.append(source)
+
+		# Collecting all frames with keys for these curves.
+		frames = set()
+		for curve in curves:
+			for key in curve.Keys:
+				frames.add(key.Time) 
+		
+		frames = list(frames)
+		frames = filter(lambda a: (start is None or start-1E-6 <= a) and (end is None or a <= end+1E-6), frames)
+		return sorted(frames)
 
 # register the symbol
 from blur3d import api
