@@ -189,8 +189,10 @@ class AbstractSceneViewport(QObject):
 		"""
 		if type(camera) == str or type(camera) == unicode:
 			cam = camera
-		else:
+		elif camera:
 			cam = camera.nativePointer()
+		else:
+			cam = None
 		return self._setNativeCamera(cam)
 
 
