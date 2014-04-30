@@ -163,7 +163,14 @@ global blur3dhelper
 					)
 					if sourceClass == VRayPhysicalCamera and targetClass == freecamera do (
 						target.mpassEffect.focalDepth = source.focus_distance
-						target.fov = source.fov
+						if source.specify_fov == on then (
+							target.fov = source.fov
+						)
+						else (
+							-- If the fov is not specified specifically then we have
+							-- to compute it from the focal length and film gate width.
+							target.fov = (((atan (source.film_width / 2.0 / source.focal_length)) * 2.0) * 2.0)
+						)
 					)
 				)
 			)
