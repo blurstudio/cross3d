@@ -1219,7 +1219,10 @@ class StudiomaxScene(AbstractScene):
 		if (not selection):
 			mxs.clearSelection()
 		else:
-			mxs.select(selection)
+			# Just make sure that we don't have any none types in
+			# the given list, as that will cause a nasty RuntimeError
+			# from Max.
+			mxs.select([o for o in selection if o])
 		return True
 
 	def _setNativeUpdatesEnabled(self, state):
