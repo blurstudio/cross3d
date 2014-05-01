@@ -1,6 +1,6 @@
 /*!
 	helpers.ms
-	
+
 	this file defines a struct of methods designed to help out the python integration
 	for methods that are not easily transferrable to python
 */
@@ -51,12 +51,12 @@ global blur3dhelper
 			pcMods = #()
 			for i = 1 to mods.count do
 				if classOf mods[i] == Point_Cache do
-					append PCMods mods[i] 	
+					append PCMods mods[i]
 			for i = 1 to pcMods.count do (
 				if state != pcMods[i].enabled do (
-					if ( not state and _blurPointCache.canDisablePCObject obj ) then 	
+					if ( not state and _blurPointCache.canDisablePCObject obj ) then
 						pcMods[i].enabled = false
-					else 																
+					else
 						pcMods[i].enabled = true
 				)
 			)
@@ -79,7 +79,7 @@ global blur3dhelper
 			)
 			found
 		),
-	
+
 		function hasVisibleReference obj = (
 			local found = false
 			if ( obj != undefined ) do (
@@ -97,7 +97,7 @@ global blur3dhelper
 			)
 			found
 		),
-	
+
 		function canDisableTMController ctrl = (
 			local objs = refs.dependentNodes ctrl
 			local success = true
@@ -123,7 +123,7 @@ global blur3dhelper
 		function toggleSubDyn subDyn state = (
 			subDyn.on = state
 		),
-	
+
 		function toggleTransformCache obj state = (
 			if ( isproperty obj #controller and classof obj.controller == transform_cache ) do (
 				if ( obj.controller.enabled != state ) do (
@@ -195,14 +195,14 @@ global blur3dhelper
 			)
 			catch ()
 		),
-		
+
 		function getVertsUsingFace obj faceList = (
 			try (
 				return (meshop.getVertsUsingFace obj faceList)
 			)
 			catch ()
 		),
-		
+
 		function asArray thing = (
 			try (
 				return (thing as array)
@@ -216,21 +216,21 @@ global blur3dhelper
 			)
 			catch ()
 		),
-		
+
 		function asName thing = (
 			try (
 				return (thing as name)
 			)
 			catch()
 		),
-		
+
 		function setMorpherChannelValue m c v = (
 			try (
 				WM3_MC_SetValue m c (v as float)
 			)
 			catch()
 		),
-		
+
 		function setAnimate v = (
 			if v then (
 				set animate on
@@ -239,12 +239,12 @@ global blur3dhelper
 				set animate off
 			)
 		),
-		
+
 		function layerNodes l = (
 			l.nodes &theNodes
 			return theNodes
 		),
-		
+
 		function getLastPositionKeyFrameNumber object = (
 			if object.position.isAnimated do (
 				try (
@@ -259,6 +259,10 @@ global blur3dhelper
 			local subdyns = #()
 			subdyns = for sub = 1 to object.numsubs collect object[sub]
 			subdyns
+		),
+
+		function setCommandPanelToMod = (
+			setCommandPanelTaskMode #modify
 		)
 	)
 
