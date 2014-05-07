@@ -2285,6 +2285,13 @@ class StudiomaxScene(AbstractScene):
 		"""
 		mxs.execute('max undo')
 		return True
+	
+	def userProps(self):
+		"""Returns the FileProps object associated with this file
+		:return; :class:`blur3d.api.FileProps`
+		"""
+		from blur3d.api import FileProps
+		return FileProps()
 
 # register the symbol
 from blur3d import api

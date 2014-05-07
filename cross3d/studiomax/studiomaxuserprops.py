@@ -157,7 +157,7 @@ class StudiomaxFileProps(AbstractFileProps):
 	def __new__(cls, fileName=''):
 		# if a filename is passed in don't use the StudiomaxFileProps class, it is intended 
 		# to read a file props from the open scene file using native maxscript calls.
-		if fileName and os.path.exists(fileName):
+		if fileName:
 			return AbstractFileProps(fileName=fileName)
 		return super(StudiomaxFileProps, cls).__new__(cls)
 	
