@@ -11,6 +11,7 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
+from blur3d.api import application
 from blur3d.constants import ObjectType
 from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 from win32com.client.dynamic import Dispatch as dynDispatch
@@ -200,6 +201,31 @@ class SoftimageSceneObject(AbstractSceneObject):
 		"""
 		self._nativePointer.Properties('Visibility').Parameters('viewvis').SetValue(not state)
 		self._nativePointer.Properties('Visibility').Parameters('rendvis').SetValue(not state)
+		return True
+
+	def matchTransforms(self, obj, position=True, rotation=True, scale=True):
+		"""
+			Currently the auto-key support is a bit lite, but it should cover most of the cases.
+		"""
+
+		if position:
+			self._nativePointer.Kinematics.Global.Parameters('posx').Value = obj.nativePointer().Kinematics.Global.Parameters('posx').Value
+			self._nativePointer.Kinematics.Global.Parameters('posy').Value = obj.nativePointer().Kinematics.Global.Parameters('posy').Value
+			self._nativePointer.Kinematics.Global.Parameters('posz').Value = obj.nativePointer().Kinematics.Global.Parameters('posz').Value
+
+		if rotation:
+			self._nativePointer.Kinematics.Global.Parameters('rotx').Value = obj.nativePointer().Kinematics.Global.Parameters('rotx').Value
+			self._nativePointer.Kinematics.Global.Parameters('roty').Value = obj.nativePointer().Kinematics.Global.Parameters('roty').Value
+			self._nativePointer.Kinematics.Global.Parameters('rotz').Value = obj.nativePointer().Kinematics.Global.Parameters('rotz').Value
+
+		if scale:
+			self._nativePointer.Kinematics.Global.Parameters('sclx').Value = obj.nativePointer().Kinematics.Global.Parameters('sclx').Value
+			self._nativePointer.Kinematics.Global.Parameters('scly').Value = obj.nativePointer().Kinematics.Global.Parameters('scly').Value
+			self._nativePointer.Kinematics.Global.Parameters('sclz').Value = obj.nativePointer().Kinematics.Global.Parameters('sclz').Value
+
+		if application.autokey():
+			self.key()
+
 		return True
 
 	def key(self, target='keyable'):

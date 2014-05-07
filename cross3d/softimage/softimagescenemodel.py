@@ -12,10 +12,14 @@
 import os
 import copy
 
-from PySoftimage import xsi, xsiFactory
+from blur3d.api import application
+from win32com.client import Dispatch
 from win32com.client import constants
+from PySoftimage import xsi, xsiFactory
 from blurdev.decorators import pendingdeprecation
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
+
+xsiUIToolkit = Dispatch("XSI.UIToolkit")
 
 #------------------------------------------------------------------------
 
@@ -230,22 +234,48 @@ class SoftimageSceneModel(AbstractSceneModel):
 		action = model.storeAnimation('Match', objects)
 		xsi.ApplyAction(action, self._nativePointer)
 
-		# TODO:
-		# For each object make a global match transform from this model to the target model.
-		# Set keys if auto-key is on.
+		for obj in objects:
+			objectToMatch = self.findChild(obj.displayName(), recursive=True)
+			if objectToMatch:
+				objectToMatch.matchTransforms(obj)
 
 		return True
 
 	def matchAnimation(self, model, objects=[]):
 
 		action = model.storeAnimation('Match', objects)
-		print model, action, self._nativePointer
 		xsi.ApplyAction(action, self._nativePointer)
+		frames =  self._scene.objectsKeyedFrames(objects)
 
-		# TODO:
-		# Get a list of frames with keys for the provided objects.
-		# For each frame make a global match transform from this model to the target model.
-		# Set keys if auto-key is on.
+		progressBar = xsiUIToolkit.ProgressBar
+		progressBar.Caption = 'Matching...'
+		progressBar.Maximum = len(frames)
+		progressBar.Step = 1
+		progressBar.Visible = True
+		progressBar.CancelEnabled = False
+
+		# Constraining the controllers.
+		objectsToMatch = []
+		for obj in objects:
+			objectToMatch = self.findChild(obj.displayName(), recursive=True)
+			if objectToMatch:
+				objectsToMatch.append(objectToMatch)
+				objectToMatch.nativePointer().Kinematics.AddConstraint("Pose", obj.nativePointer(), False)
+
+		for frame in frames:
+
+			self._scene.setCurrentFrame(frame)
+			application.refresh()
+		
+			for obj in objectsToMatch:
+				obj.key()
+
+			progressBar.Increment()
+
+		progressBar.Visible = False
+
+		# Removing the constaints.
+		xsi.RemoveCnsType("Pose", [obj.nativePointer() for obj in objectsToMatch]);
 
 		return True
 

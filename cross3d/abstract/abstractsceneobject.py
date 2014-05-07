@@ -288,15 +288,19 @@ class AbstractSceneObject(SceneWrapper):
 			return SceneObject(self._scene, nativeChild)
 		return None
 
-	def freeze(self):
-		"""Freezes/locks this item
+	@abstractmethod
+	def matchTransforms(self, obj, position=True, rotation=True, scale=True):
+		return False
 
+	def freeze(self):
+		"""
+			Freezes/locks this item
 		"""
 		return self.setFrozen(True)
 
 	def hide(self):
-		"""Hides the object in the scene
-
+		"""
+			Hides the object in the scene
 		"""
 		return self.setHidden(True)
 
