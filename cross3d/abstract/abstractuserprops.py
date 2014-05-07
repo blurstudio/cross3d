@@ -200,11 +200,11 @@ class AbstractUserProps(dict):
 
 class AbstractFileProps(AbstractUserProps):
 	def __init__(self, fileName=''):
-		super(AbstractFileProps, self).__init__(None)
-		self.fileName = fileName
 		self._dso = None
+		self.fileName = fileName
 		self._closeScheduled = False
 		self._saveScheduled = False
+		super(AbstractFileProps, self).__init__(None)
 
 	def __delitem__(self, key):
 		if self.dso().open(self.fileName):
@@ -275,6 +275,7 @@ class AbstractFileProps(AbstractUserProps):
 		return self._dso
 
 	def lookupProps(self):
+		dso = self.dso()
 		if self.dso().open(self.fileName):
 			self._scheduleClose()
 			ret = {}

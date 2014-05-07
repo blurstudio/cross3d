@@ -13,6 +13,7 @@ from Py3dsMax import mxs
 from PyQt4.QtCore import QDate, QString
 from datetime import date
 from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
+import os
 import re
 import json
 
@@ -153,7 +154,19 @@ class StudiomaxUserProps(AbstractUserProps):
 		return openPos, pos
 
 class StudiomaxFileProps(AbstractFileProps):
+	def __new__(cls, fileName=''):
+		# if a filename is passed in don't use the StudiomaxFileProps class, it is intended 
+		# to read a file props from the open scene file using native maxscript calls.
+		if fileName and os.path.exists(fileName):
+			return AbstractFileProps(fileName=fileName)
+		return super(StudiomaxFileProps, cls).__new__(cls)
+	
 	def __init__(self, fileName=''):
+		""" Read the custom properties of the currently open scene. If you provide a filename it
+		will read the properties of that file, not the currently open file.
+		:param fileName: If a valid file path is provided read the file props of that file instead
+		of the currently open file using dsofile.dll. Defaults to a empty string.
+		"""
 		self.customName = mxs.pyhelper.namify('custom')
 		super(StudiomaxFileProps, self).__init__(None)
 	
