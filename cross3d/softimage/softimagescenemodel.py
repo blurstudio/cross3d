@@ -121,9 +121,13 @@ class SoftimageSceneModel(AbstractSceneModel):
 		if self.isReferenced():
 
 			# If I dont re-initialize a model object it does not return me the right resolutions.
-			resolutions = self._scene.findObject(self.name()).resolutions()
-			if resolutions:
-				return resolutions[self._nativePointer.Parameters('active_resolution').Value]
+			obj = self._scene.findObject(self.name())
+			if obj:
+				resolutions = obj.resolutions()
+				if resolutions:
+					active_res = obj._nativePointer.Parameters('active_resolution')
+					if active_res is not None:
+						return resolutions[active_res.Value]
 				
 		return ''
 
@@ -248,7 +252,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 		action = model.storeAnimation('Match', objects)
 		xsi.ApplyAction(action, self._nativePointer)
-		frames =  self._scene.objectsKeyedFrames(objects)
+		frames = self._scene.objectsKeyedFrames(objects)
 
 		progressBar = xsiUIToolkit.ProgressBar
 		progressBar.Caption = 'Matching...'
