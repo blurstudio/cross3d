@@ -93,7 +93,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 		# If I dont re-initialize a model object it does not return me the right resolutions.
 		resolutions = self._scene.findObject(self.name()).resolutions()
 		for res in resolutions:
-			
+						
 			# Handles cases sensitivity (crappy, but needed because resolution
 			# names often come from filenames).
 			if res.lower() != resolution.lower():
@@ -129,9 +129,12 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 	def resolutions(self):
 		resolutions = []
-		for parameter in self._nativePointer.Parameters:
-			if 'resolutions' in parameter.fullname:
-				resolutions.append(parameter.Value)
+		# Resolutions don't always return correctly if the object isn't re-initialized
+		obj = self._scene.findObject(self.name())
+		if obj:
+			for parameter in obj._nativePointer.Parameters:
+				if 'resolutions' in parameter.fullname:
+					resolutions.append(parameter.Value)
 		return resolutions
 
 	def export(self, fileName):
@@ -152,7 +155,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 		controllers = xsiFactory.CreateObject('XSI.Collection')
 		controllers.AddItems([obj.nativePointer() for obj in objects])
-		parameters = controllers.FindObjectsByMarkingAndCapabilities( None, 2048 )
+		parameters = controllers.FindObjectsByMarkingAndCapabilities(None, 2048)
 
 		# Creating the action.
 		return xsi.SIStoreAction(self._nativePointer, parameters, 1, False, '', '', '', '', True)
@@ -163,7 +166,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 
 		controllers = xsiFactory.CreateObject('XSI.Collection')
 		controllers.AddItems([obj.nativePointer() for obj in objects])
-		parameters = controllers.FindObjectsByMarkingAndCapabilities( None, 2048 )
+		parameters = controllers.FindObjectsByMarkingAndCapabilities(None, 2048)
 
 		# Creating the action.
 		return xsi.SIStoreAction(self._nativePointer, parameters, 2, name, False, '', '', '', '', True)
