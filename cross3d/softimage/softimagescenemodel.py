@@ -151,7 +151,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 	
 	@pendingdeprecation('Use loadAnimation instead with mixer flag true.')
 	def addAnimationClip(self, path, name=None):
-		self.loadAnimationInMixer(self, path, name)
+		self.loadAnimationInMixer(path, name)
 
 	def storePose(self, name='', objects=[]):
 		if not objects:
