@@ -104,7 +104,9 @@ class SoftimageSceneModel(AbstractSceneModel):
 			oldUserProps = userProps.lookupProps()
 
 			# Setting the resolution.
+			xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 13, "")
 			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(res))
+			xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 15, "")
 
 			# Making sure all the keys that where on the old resolution are re-assigned to the new one.
 			for key in oldUserProps:
