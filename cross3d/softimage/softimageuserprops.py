@@ -32,12 +32,10 @@ class SoftimageUserProps(AbstractUserProps):
 	
 	def __getitem__(self, key):
 		return self.unescapeValue(self._nativePointer.Properties(key).Value)
-		#return self.lookupProps()[key]
 	
 	def __setitem__(self, key, value):
 		prop = self._nativePointer.Properties(key)
-		if isinstance(value, (list, dict, tuple, QString)):
-			value = unicode(value)
+		value = json.dumps(value)
 		if not prop:
 			prop = self._nativePointer.AddProperty('UserDataBlob', False, key)
 			prop.SetCapabilityFlag(constants.siNotInspectable, True)
@@ -100,8 +98,7 @@ class SoftimageUserProps(AbstractUserProps):
 			\return		<str>
 		"""
 		if not isinstance(string, (str, unicode)):
-			string = unicode(string)
-		#return string.replace('\r\n', '&#13;&#10;').replace('\n', '&#10;').replace('\r', '&#13;')		
+			string = unicode(string)		
 		return string
 	
 	@staticmethod
@@ -112,21 +109,18 @@ class SoftimageUserProps(AbstractUserProps):
 			\return		<float>||<int>||<list>||<dict>||<tuple>||<unicode>
 		"""
 		string = unicode(string)
+		try:
+			return json.loads( string )
+		except ValueError:
+			pass
 		string, typ = SoftimageUserProps._decodeString(string)
 		if typ == float:
 			return float(string)
 		elif typ == int:
 			return int(string)
 		elif typ in (list, dict, tuple):
-			if typ == dict:
-				try:
-					return json.loads( string )
-				except ValueError: pass
-			try:
-				return eval(string)
-			except: pass
+			return eval(string)
 		return string
-		#return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 	
 	@staticmethod
 	def _decodeString(string):
