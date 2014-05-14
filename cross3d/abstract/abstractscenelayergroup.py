@@ -67,7 +67,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		:param layers: list of :class:`blur3d.api.SceneLayer`'s
 
 		"""
-		return self._addNativeLayers([ layer.nativeLayer() for layer in layers ])
+		return self._addNativeLayers([ layer.nativePointer() for layer in layers ])
 
 	def deselect(self):
 		"""Deselects the layers on this layer from the scene
