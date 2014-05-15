@@ -258,13 +258,22 @@ class AbstractFileProps(AbstractUserProps):
 
 	def clear(self):
 		"""
-		Removes all attributes and imedeately saves the changes. There is no QTimer delay.
+		Removes all attributes and immediately saves the changes. There is no QTimer delay.
 		"""
 		if self.dso().open(self.fileName):
 			self.dso().clear()
 			self._saveScheduled = True
 			self._close()
 			self.emitChange()
+		else:
+			raise blur3d.api.Exceptions.FileNotDSO
+
+	def close(self):
+		"""
+		Immediately closes the connection to the file.
+		"""
+		if self.dso().open(self.fileName):
+			self._close()
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
 
