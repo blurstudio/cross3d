@@ -50,7 +50,10 @@ class SoftimageScene(AbstractScene):
 			\param		models [ <PySoftimage.xsi.Model>, ... ]
 			\return		<bool> success
 		"""
+		undo = xsi.GetValue("preferences.General.undo")
+		xsi.SetValue("preferences.General.undo", 0, "")
 		self._removeNativeObjects(models)
+		xsi.SetValue("preferences.General.undo", undo, "")
 		return True
 		
 	def _setNativeSelection(self, selection):
@@ -102,10 +105,7 @@ class SoftimageScene(AbstractScene):
 			\remarks	implements the AbstractScene._removeNativeObjects method to return the native root of the scene
 			\return		<bool> success
 		"""
-		branchCode = "B:"
-		names = []
-		for obj in nativeObjects:
-			names.append(branchCode + obj.FullName)
+		names = ["B:" + obj.FullName for obj in nativeObjects]
 		xsi.DeleteObj(",".join(names))
 		return True
 
