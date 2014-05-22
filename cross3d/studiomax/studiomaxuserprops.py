@@ -121,6 +121,8 @@ class StudiomaxUserProps(AbstractUserProps):
 				pass
 		if re.match('\{.*\}', string):
 			return string, dict
+		if re.match('\[.*\]', string):
+			return string, list
 		if re.match('#\(.*\)', string):
 			data = []
 			s = string
