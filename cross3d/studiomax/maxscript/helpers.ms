@@ -137,6 +137,50 @@ global blur3dhelper
 			)
 		),
 
+		function getPositionController object axis:undefined = (
+			axisOrder = #("x", "y", "z")
+			controller = object.pos.controller
+			XYZControllers = getXYZControllers controller
+			if axis != undefined then (
+				aIndex = findItem axisOrder axis
+				if aIndex == 0 then (
+					return controller
+				)
+				return XYZControllers[aIndex]
+			)
+			return controller
+		),
+
+		function setPositionController object controller = (
+			object.pos.controller = controller
+		),
+
+		function getRotationController object axis:undefined = (
+			axisOrder = #("x", "y", "z")
+			controller = object.rotation.controller
+			XYZControllers = getXYZControllers controller
+			if axis != undefined then (
+				aIndex = findItem axisOrder axis
+				if aIndex == 0 then(
+					return controller
+				)
+				return XYZControllers[aIndex]
+			)
+			return controller
+		),
+
+		function setRotationController object controller = (
+			object.rotation.controller = controller
+		),
+
+		function getScaleController object = (
+			return object.scale.controller
+		),
+
+		function setScaleController object controller = (
+			object.scale.controller = controller
+		),
+
 		function getTransformController object = (
 			return object.transform.controller
 		),
@@ -263,6 +307,13 @@ global blur3dhelper
 
 		function setCommandPanelToMod = (
 			setCommandPanelTaskMode #modify
+		),
+
+		function setKeyAtTime controller value curTime = (
+			with animate on (
+				key = addNewKey controller curTime
+				key.value = value
+			)
 		)
 	)
 
