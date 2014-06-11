@@ -673,13 +673,13 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 		if ( self._altPropCache == None ):
 			from blur3d.api import SceneObjectPropSet
-
 			cache 			= []
 			data 			= self.metaData()
 			altPropValues	= list(data.value('altPropValues'))
 			altPropUsages	= list(data.value('altPropUsages'))
 			altPropIds		= list(data.value('altPropIds'))
 			scene			= self._scene
+			processed		= []
 
 			for i in range(len(altPropValues)):
 				# If, for some reason, we have a mismatch between the number
@@ -688,14 +688,19 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				if (i + 1) > len(altPropIds):
 					altPropIds.append(mxs.blurUtil.genUniqueId())
 					data.setValue('altPropIds', altPropIds)
+				# This is unusual, but there seem to be rare cases of layer
+				# metadata being polluted with multiple entries for a propset.
+				# This results in strange behavior in Onion, so we're just
+				# going to filter out the dups here. <jbee>
+				if altPropIds[i] in processed:
+					continue
 				altProp = SceneObjectPropSet( scene, None )
 				altProp.setUniqueId( altPropIds[i] )
 				altProp._setValueString( altPropValues[i] )
 				altProp._setActiveString( altPropUsages[i] )
 				cache.append(altProp)
-
+				processed.append(altProp.uniqueId())
 			self._altPropCache = cache
-
 		return self._altPropCache
 
 	def hasAdvancedAltMaterialStateAt( self, index ):
