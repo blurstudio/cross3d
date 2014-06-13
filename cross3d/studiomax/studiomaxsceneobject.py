@@ -276,7 +276,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\sa			N/A
 			\return		<Py3dsMax.mxs.Object>
 		"""
-		cloneObject = mxs.pyhelper.cloneobjects([self._nativePointer])
+		cloneObject = mxs.blur3dhelper.cloneObjects([self._nativePointer], expandHierarchy=True)
 		return self.__class__(self.scene(), cloneObject[0])
 
 	def isBoxMode( self ):

@@ -1743,6 +1743,19 @@ class StudiomaxScene(AbstractScene):
 		r = mxs.animationRange
 		return FrameRange((int(r.start), int(r.end)))
 
+	def cloneObjects(self, objects, cloneHierarchy=False, cloneType=constants.CloneType.Copy):
+		""" Duplicates the provided objects, optionally keeping the heierarchy.
+		:param objects: A list of objects to clone
+		:param cloneHierarchy: Duplicate parent child structure in clones. Defaults to False
+		:param cloneType: Create clones as copy, instance, etc. Defaults to Copy.
+		..seealso:: modules `blur3d.constants.CloneType`
+		"""
+		cloneObjects = mxs.blur3dhelper.cloneObjects([obj.nativePointer() for obj in objects], 
+								expandHierarchy=cloneHierarchy, 
+								cloneType=mxs.pyhelper.namify(constants.CloneType.labelByValue(cloneType)))
+		from blur3d.api import SceneObject
+		return [ SceneObject(self, obj) for obj in cloneObjects ]
+
 	def checkForSave(self):
 		"""
 			\remarks	implements AbstractScene.checkForSave method to prompt the user to save and continue, returning false on a user cancel

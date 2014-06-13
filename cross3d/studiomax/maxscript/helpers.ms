@@ -314,6 +314,12 @@ global blur3dhelper
 				key = addNewKey controller curTime
 				key.value = value
 			)
+		),
+		
+		function cloneObjects objects expandHierarchy:false cloneType:#copy = (
+			local clones = #()
+			maxOps.cloneNodes objects newNodes:&clones expandHierarchy:expandHierarchy cloneType:cloneType
+			clones
 		)
 	)
 

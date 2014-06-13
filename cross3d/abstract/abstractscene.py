@@ -887,6 +887,16 @@ class AbstractScene(QObject):
 		return 0.0
 
 	@abstractmethod
+	def cloneObjects(self, objects, cloneHierarchy=False, cloneType=constants.CloneType.Copy):
+		""" Duplicates the provided objects, optionally keeping the heierarchy.
+		:param objects: A list of objects to clone
+		:param cloneHierarchy: Duplicate parent child structure in clones. Defaults to False
+		:param cloneType: Create clones as copy, instance, etc. Defaults to Copy.
+		..seealso:: modules `blur3d.constants.CloneType`
+		"""
+		return []
+
+	@abstractmethod
 	def currentFrame(self):
 		"""
 			\remarks	returns the current frame
