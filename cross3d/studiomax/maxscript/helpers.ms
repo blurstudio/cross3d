@@ -315,11 +315,13 @@ global blur3dhelper
 				key.value = value
 			)
 		),
-		
 		function cloneObjects objects expandHierarchy:false cloneType:#copy = (
 			local clones = #()
 			maxOps.cloneNodes objects newNodes:&clones expandHierarchy:expandHierarchy cloneType:cloneType
 			clones
+		),
+		function maxQuickRender = (
+			max quick render
 		)
 	)
 
