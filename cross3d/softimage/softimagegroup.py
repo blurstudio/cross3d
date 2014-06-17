@@ -46,7 +46,7 @@ class SoftimageGroup(AbstractGroup):
 		application.refresh()
 		return True
 
-	def setHidden(self, hidden):
+	def setHidden(self, hidden, options=None):
 		hidden = self._groupOptionsIn[hidden]
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
