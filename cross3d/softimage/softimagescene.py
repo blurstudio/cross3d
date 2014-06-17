@@ -565,7 +565,8 @@ class SoftimageScene(AbstractScene):
 		self._state['rangeIn'] = playControl.Parameters("In").Value
 		self._state['rangeOut'] = playControl.Parameters("Out").Value
 		self._state['rangeGlobalIn'] = playControl.Parameters("GlobalIn").Value
-		self._state['rangeGlobalOut'] = playControl.Parameters("GlobalOut").Value
+		self._state['rangeGlobalOut']= playControl.Parameters("GlobalOut").Value
+		self._state['loop'] = playControl.Parameters("Loop").Value
 		return True
 	
 	def renderSize(self):
@@ -586,6 +587,7 @@ class SoftimageScene(AbstractScene):
 		playControl.Parameters("Out").Value = self._state.get('rangeOut', 100)
 		playControl.Parameters("GlobalIn").Value = self._state.get('rangeGlobalIn', 0)
 		playControl.Parameters("GlobalOut").Value = self._state.get('rangeGlobalOut', 100)
+		playControl.Parameters("Loop").Value = self._state.get('loop', False)
 		return True
 
 	def reset(self, silent=False):
