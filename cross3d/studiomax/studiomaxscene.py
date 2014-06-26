@@ -2189,6 +2189,13 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return mxs.renderPixelAspect
 
+	def renderOutputPath(self):
+		"""
+			\remarks	return the render output file path for the scene
+			\return		<str>
+		"""
+		return mxs.rendOutputFilename
+
 	def setRenderMissingFramesOnly(self, renderMissingFramesOnly):
 		"""
 			\remarks	sets if the renderer is rendering missing frames only.
