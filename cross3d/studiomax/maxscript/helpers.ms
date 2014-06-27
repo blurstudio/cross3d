@@ -8,6 +8,38 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function getScreenSpaceBoundingBoxes nodes = (
+			currentSelection = (selection as array)
+			view = viewport.activeViewport
+			gw.setTransform (matrix3 1)
+			transPoint = gw.hTransPoint
+			rects = #()
+			for node in nodes do (
+				if (isKindOf node GeometryClass) do (
+					local bmin = [1e9,1e9,0], bmax = [-1e9,-1e9,0]
+					select node
+					mesh = snapshotasmesh node
+					for v=1 to mesh.numverts do
+					(
+						vp = transPoint (GetVert mesh v)
+						if vp.x < bmin.x do bmin.x = vp.x
+						if vp.x > bmax.x do bmax.x = vp.x
+						if vp.y < bmin.y do bmin.y = vp.y
+						if vp.y > bmax.y do bmax.y = vp.y
+					)
+					free mesh
+					w = (bmax.x - bmin.x) as integer
+					h = (bmax.y - bmin.y) as integer
+					pMin = point2 ((bmin.x as float) / (gw.getWinSizeX() as float)) ((bmin.y as float) / (gw.getWinSizeY() as float))
+					pMax = point2 ((bmax.x as float) / (gw.getWinSizeX() as float)) ((bmax.y as float) / (gw.getWinSizeY() as float))
+					bbox = #(pMin, pMax)
+					append rects #(node, bbox)
+				)
+			)
+			select currentSelection
+			rects
+		),
+
 		function turntableHelperBuilder cam startFrame endFrame = (
 			helper = (dummy name:"TurntableHelper")
 			numFrames = (endFrame - startFrame)
