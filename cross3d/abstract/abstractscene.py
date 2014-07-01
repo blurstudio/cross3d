@@ -1167,7 +1167,7 @@ class AbstractScene(QObject):
 		return False
 		
 	@abstractmethod
-	def setAnimationRange(self, animationRange):
+	def setAnimationRange(self, animationRange, globalRange=None):
 		"""
 			\remarks	return the start and end frames for the animation range for the scene
 			\param		animationRange 	<tuple> ( <int> start, <int> end )

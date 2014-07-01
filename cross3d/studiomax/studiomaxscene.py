@@ -2091,7 +2091,7 @@ class StudiomaxScene(AbstractScene):
 			callback()
 		return False
 
-	def setAnimationRange(self, animationRange):
+	def setAnimationRange(self, animationRange, globalRange=None):
 		"""
 			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
 			\param		animationRange	<tuple> ( <int> start, <int> end )

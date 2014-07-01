@@ -599,17 +599,20 @@ class SoftimageScene(AbstractScene):
 		xsi.NewScene('', prompt)
 		return True
 			
-	def setAnimationRange(self, animationRange):
+	def setAnimationRange(self, animationRange, globalRange=None):
 		"""
 			\remarks	implements AbstractScene.setAnimationRange method to set the current start and end frame for animation
 			\param		animationRange	<tuple> ( <int> start, <int> end )
 			\return		<bool> success
 		"""
+		if not globalRange:
+			globalRange = animationRange
+			
 		playControl = xsi.ActiveProject.Properties("Play Control")
 		playControl.Parameters("In").Value = animationRange[0]
 		playControl.Parameters("Out").Value = animationRange[1]
-		playControl.Parameters("GlobalIn").Value = animationRange[0]
-		playControl.Parameters("GlobalOut").Value = animationRange[1]
+		playControl.Parameters("GlobalIn").Value = globalRange[0]
+		playControl.Parameters("GlobalOut").Value = globalRange[1]
 		return True
 	
 	def setRenderSize(self, size):
