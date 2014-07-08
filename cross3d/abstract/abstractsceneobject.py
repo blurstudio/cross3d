@@ -526,7 +526,6 @@ class AbstractSceneObject(SceneWrapper):
 	def setRotation(self, axes, relative=False):
 		"""
 		Rotates the provided objects in the scene
-		:param objects: Rotate these objects
 		:param axes: A list with a length of 3 floats representing x, y, z
 		:param relative: Apply the rotation as relative or absolute. Absolute by default.
 		"""
