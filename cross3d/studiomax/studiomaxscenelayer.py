@@ -356,7 +356,9 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\sa			objects
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
-		return mxs.pyhelper.getLayerNodes( self._nativePointer )
+		layerNodes = mxs.pyhelper.getLayerNodes(self._nativePointer)
+		layerNodes.reverse()
+		return layerNodes
 
 	def _nativeMaterials(self, baseMaterials=False):
 		"""
