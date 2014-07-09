@@ -50,10 +50,18 @@ class SoftimageScene(AbstractScene):
 			\param		models [ <PySoftimage.xsi.Model>, ... ]
 			\return		<bool> success
 		"""
-		undo = xsi.GetValue("preferences.General.undo")
-		xsi.SetValue("preferences.General.undo", 0, "")
-		self._removeNativeObjects(models)
-		xsi.SetValue("preferences.General.undo", undo, "")
+		class _DisableUndo(object):
+			def __init__(self):
+				self._undo = 600
+
+			def __enter__(self):
+				self._undo = xsi.GetValue("preferences.General.undo")
+				xsi.SetValue("preferences.General.undo", 0, "")
+
+			def __exit__(self, exc_type, exc_value, traceback):
+				xsi.SetValue("preferences.General.undo", self._undo, "")
+		with _DisableUndo():
+			self._removeNativeObjects(models)
 		return True
 		
 	def _setNativeSelection(self, selection):
