@@ -114,6 +114,12 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		#self._nativePointer.Parameters( 'near' ).Value = distance
 		return True
 
+	def clippingEnabled(self):
+		return self.userProps().setdefault('clipping_enabled', True)
+		
+	def setClippingEnabled(self, state):
+		self.userProps()['clipping_enabled'] = state
+
 	def viewOptions(self):
 		viewOptions = {'Camera Visibility': {}, 'Camera Display': {}}
 
@@ -139,6 +145,10 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		xsi.SetValue('preferences.ViewCube.show', viewOptions.get('viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
+
+	def isVrayCam(self):
+		return False
+
 
 # register the symbol
 from blur3d import api

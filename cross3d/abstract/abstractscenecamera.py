@@ -246,6 +246,14 @@ class AbstractSceneCamera(SceneObject):
 			:return: True if successful
 		"""
 		return False
+	
+	@abstractmethod
+	def clippingEnabled(self):
+		return False
+	
+	@abstractmethod
+	def setClippingEnabled(self, state):
+		return
 
 	@abstractmethod
 	def generateRender(self, **options):
@@ -265,6 +273,14 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def setViewOptions(self, viewOptions):
 		return False
+	
+	@abstractmethod
+	def isVrayCam(self):
+		""" 
+		Returns True if this is a vray camera, False otherwise. 
+		"""
+		return False
+
 
 # register the symbol
 api.registerSymbol('SceneCamera', AbstractSceneCamera, ifNotFound=True)

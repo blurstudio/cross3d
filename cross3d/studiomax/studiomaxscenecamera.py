@@ -293,6 +293,21 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 		self._nativePointer.whiteBalance_preset = preset
 		return True
 
+	def clippingEnabled(self):
+		if self.isVrayCam():
+			return self.nativePointer().clip_on		
+		else:
+			return self.nativePointer().clipManually
+		
+	def setClippingEnabled(self, state):
+		if self.isVrayCam():
+			self.nativePointer().clip_on = state
+		else:
+			self.nativePointer().clipManually = state
+	
+	def isVrayCam(self):
+		return unicode(mxs.classOf(self.nativePointer())).lower().startswith('vray')
+		
 	
 # register the symbol
 from blur3d import api
