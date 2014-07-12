@@ -2240,6 +2240,29 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return setattr(mxs, str(key), self._toNativeValue(value))
 
+	def setRotation(self, objects, axes, relative=False):
+		"""
+		Rotates the provided objects in the scene
+		:param objects: Rotate these objects
+		:param axes: A list with a length of 3 floats representing x, y, z
+		:param relative: Apply the rotation as relative or absolute. Absolute by default.
+		"""
+		# Compensate for the axes order
+		axes = (axes[2], axes[0], axes[1])
+		if relative:
+			mxs.rotate([obj.nativePointer() for obj in objects], mxs.eulerangles(*axes))
+		else:
+			# Max makes this difficult
+			for obj in objects:
+				nobj = obj.nativePointer()
+				oldPos = nobj.pos
+				oldScale = nobj.scale
+				nobj.transform = mxs.matrix3(1)
+				nobj.rotation = mxs.eulerangles(*axes)
+				nobj.scale = oldScale
+				nobj.pos = oldPos
+		return True
+
 	def setTimeControlPlay(self, switch, fromStart=False):
 		if switch:
 			if fromStart:
