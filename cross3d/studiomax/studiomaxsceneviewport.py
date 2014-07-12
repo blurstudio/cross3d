@@ -98,7 +98,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, antiAlias=False, fileExtension='jpg' ):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, antiAlias=False ):
 		'''
 			/option <bool> effects
 		'''
@@ -116,6 +116,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		fileName = '.'.join( fileSplit[:-1] )
 		initialRange = scene.animationRange()
 		application = self._scene.application()
+		fileExtension = os.path.splitext(path)[1].strip('.')
 		
 		# Creating folder if does not exist.
 		dirName = os.path.dirname(path)
