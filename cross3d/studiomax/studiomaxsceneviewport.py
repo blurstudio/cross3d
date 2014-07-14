@@ -12,7 +12,7 @@
 import os
 
 from Py3dsMax import mxs
-from blur3d.api import dispatch
+from blur3d.api import dispatch, application
 from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
@@ -98,7 +98,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, antiAlias=False ):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		'''
 			/option <bool> effects
 		'''
@@ -109,14 +109,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			
 		# collecting what we need
 		scene = self._scene
-		pathSplit = os.path.split(path)
-		basePath = pathSplit[0]
-		file = pathSplit[1]
-		fileSplit = file.split( '.' )
+		basePath, fn = os.path.split(path)
+		fileSplit = fn.split( '.' )
 		fileName = '.'.join( fileSplit[:-1] )
 		initialRange = scene.animationRange()
-		application = self._scene.application()
-		fileExtension = os.path.splitext(path)[1].strip('.')
+		fileExtension = fileSplit[-1]
 		
 		# Creating folder if does not exist.
 		dirName = os.path.dirname(path)
@@ -203,7 +200,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			if not image:
 				image = mxs.gw.getViewportDib()
 
-			imagePath = os.path.join( basePath, '.'.join( [ fileName, str( frame ), fileExtension ] ) )
+			imagePath = pathFormat.format(basePath=basePath, fileName=fileName, frame=frame, ext=fileExtension)
 			image.filename = imagePath
 			mxs.save(image)
 

@@ -10,6 +10,7 @@
 #
 
 import os
+import re
 import time
 
 from PySoftimage import xsi
@@ -70,7 +71,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	def cameraName( self ):
 		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
 
-	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False):
+	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
@@ -79,9 +80,9 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		"""
 
 		frame = self._scene.currentFrame()
-		return self.generatePlayblast(fileName, frameRange=[frame, frame], resolution=resolution, slate=slate, effects=effects, geometryOnly=geometryOnly, antiAlias=antiAlias)
+		return self.generatePlayblast(fileName, frameRange=[frame, frame], resolution=resolution, slate=slate, effects=effects, geometryOnly=geometryOnly, antiAlias=antiAlias, pathFormat=pathFormat)
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
@@ -93,8 +94,34 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			
 		# Collecting data.
 		nativeCamera = self._nativeCamera()
-		firstFrameFileName = fileName.replace('.jpg', '.%d.jpg' % frameRange[0])
-		lastFrameFileName = fileName.replace('.jpg', '.%d.jpg' % frameRange[1])
+		def genImagePath(frame=None):
+			basePath, fn = os.path.split(fileName)
+			pf = pathFormat
+			# Deal with xsi's special number padding format
+			if frame == None:
+				filen = '(fn)'
+				ext = '(ext)'
+				# Remove any number specific formatting so we can insert a simple # for each padding digit
+				pf = re.sub(r'{frame:[^}]*', r'{frame', pf)
+				padding = re.findall(r'{frame:(\d+)', pathFormat)
+				if padding:
+					frameNo = '#' * int(padding[0])
+				else:
+					frameNo = '#'
+			else:
+				fileSplit = fn.split('.')
+				filen = '.'.join(fileSplit[:-1])
+				ext = fileSplit[-1]
+				frameNo = frame
+			out = pf.format(basePath=basePath, fileName=filen, frame=frameNo, ext=ext)
+			index = pathFormat.find('{ext}')
+			if frame == None and index > 0 and pathFormat[index-1] == '.':
+				# strip out the file extension dot
+				fileSplit = out.split('.')
+				out = '.'.join(fileSplit[:-1]) + fileSplit[-1]
+			return out
+		firstFrameFileName = genImagePath(frameRange[0])
+		lastFrameFileName = genImagePath(frameRange[1])
 		
 		try:
 			firstFrameStartTime = os.path.getmtime(firstFrameFileName)
@@ -171,7 +198,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		viewportCapture = xsi.Dictionary.GetObject( 'ViewportCapture' ).NestedObjects
 		
 		viewportCapture( 'File Name' ).Value = fileName
-		viewportCapture( 'Padding' ).Value = '(fn).#(ext)'
+		viewportCapture( 'Padding' ).Value = os.path.basename(genImagePath())
 		viewportCapture( 'Width' ).Value = resolution.width()
 		viewportCapture( 'Height' ).Value = resolution.height()
 		viewportCapture( 'Scale Factor' ).Value = 1
