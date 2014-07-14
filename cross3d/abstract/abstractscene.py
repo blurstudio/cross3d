@@ -886,6 +886,25 @@ class AbstractScene(QObject):
 		"""
 		return 0.0
 
+	def centerOfObjects(self, objs):
+		""" Calculates the center of the bounding boxes of the provided list of SceneObjects
+		:param objs: A list of SceneObjects
+		:return: A blur3d.lib.cartesian.Point object
+		"""
+		from blur3d.lib.cartesian import BoundingBox
+		aggregateBBox = None
+		for obj in objs:
+			# We don't care what the bbox coordinates are relative to,
+			# so using an identity matrix is fine.
+			if aggregateBBox:
+				aggregateBBox = BoundingBox.union(
+					aggregateBBox,
+					obj.boundingBox()
+				)
+			else:
+				aggregateBBox = obj.boundingBox()
+		return aggregateBBox.boundingSphere()[0]
+
 	@abstractmethod
 	def cloneObjects(self, objects, cloneHierarchy=False, cloneType=constants.CloneType.Copy):
 		""" Duplicates the provided objects, optionally keeping the heierarchy.

@@ -197,6 +197,12 @@ class AbstractSceneObject(SceneWrapper):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 	#
+	@abstractmethod
+	def boundingBox(self):
+		""" Returns a blur3d.lib.cartesian.BoundingBox object representing the bounding box of the SceneObject.
+		"""
+		return False
+	
 	def getCacheName(self, type):
 		"""return the str of cache name depending on software.
 		"""

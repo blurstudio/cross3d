@@ -270,6 +270,13 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	def boundingBox(self):
+		""" Returns a blur3d.lib.cartesian.BoundingBox object representing the bounding box of the SceneObject.
+		"""
+		from blur3d.lib.cartesian import BoundingBox, Point
+		p1, p2 = mxs.nodeGetBoundingBox(self.nativePointer(), mxs.matrix3(1))
+		return BoundingBox(Point.newFromMaxPoint(p1), Point.newFromMaxPoint(p2))
+
 	def clone( self ):
 		"""
 			\remarks	implements the AbstractSceneobject.clone to make a clone of this object in the scene
