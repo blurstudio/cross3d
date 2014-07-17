@@ -59,7 +59,10 @@ class SoftimageSceneObject(AbstractSceneObject):
 			\param		<PySoftimage.xsi.Object> nativeObject || None
 			\return		<bool> success
 		"""
-		xsi.Application.ParentObj(nativeParent, self._nativePointer)
+		if nativeParent is None:
+			xsi.Application.Cutobj(self._nativePointer)
+		else:
+			xsi.Application.ParentObj(nativeParent, self._nativePointer)
 		return True
 
 	def _nativeModel(self):
