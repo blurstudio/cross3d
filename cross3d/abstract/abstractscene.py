@@ -948,6 +948,12 @@ class AbstractScene(QObject):
 		"""
 		from blur3d.api import FrameRange
 		return FrameRange()
+	
+	@abstractmethod
+	def globalRange(self):
+		""" Returns a FrameRange of the global start and end range. """
+		from blur3d.api import FrameRange
+		return FrameRange()
 
 	@abstractmethod
 	def checkForSave(self):

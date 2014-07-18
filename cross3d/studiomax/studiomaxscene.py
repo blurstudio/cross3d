@@ -1742,6 +1742,9 @@ class StudiomaxScene(AbstractScene):
 		from blur3d.api import FrameRange
 		r = mxs.animationRange
 		return FrameRange((int(r.start), int(r.end)))
+	
+	def globalRange(self):
+		return self.animationRange()
 
 	def cloneObjects(self, objects, cloneHierarchy=False, cloneType=constants.CloneType.Copy):
 		""" Duplicates the provided objects, optionally keeping the heierarchy.
