@@ -115,7 +115,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		return True
 
 	def clippingEnabled(self):
-		return self.userProps().setdefault('clipping_enabled', True)
+		return self.userProps().setdefault('clipping_enabled', False)
 		
 	def setClippingEnabled(self, state):
 		self.userProps()['clipping_enabled'] = state
