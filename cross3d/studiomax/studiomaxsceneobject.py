@@ -270,6 +270,9 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	def isDeleted(self):
+		return (str(self._nativePointer) == '<Deleted scene node>')
+
 	def boundingBox(self):
 		""" Returns a blur3d.lib.cartesian.BoundingBox object representing the bounding box of the SceneObject.
 		"""

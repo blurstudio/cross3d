@@ -616,6 +616,12 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		return False
 
+	def isDeleted(sef):
+		"""
+		Returns True if the native object has been deleted.
+		"""
+		return False
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------

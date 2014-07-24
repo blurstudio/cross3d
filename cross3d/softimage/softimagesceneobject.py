@@ -95,6 +95,9 @@ class SoftimageSceneObject(AbstractSceneObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	def isDeleted(self):
+		return (self._nativePointer.Parent is None)
+
 	def getCacheName(self, type):
 		typeDic = {	"Pc":".pc2",
 					"Tmc":".tmc",
