@@ -26,6 +26,12 @@ class AbstractSceneWrapper(object):
 		if (isinstance(other, AbstractSceneWrapper)):
 			return other._nativePointer == self._nativePointer
 		return False
+	
+	def __hash__(self):
+		""" Returns self.uniqueId()
+		NOTE: If uniqueId is not implemented for a software implemenation all objects will have a hash of 0
+		"""
+		return self.uniqueId()
 
 	def __init__(self, scene, nativePointer=None):
 		"""
