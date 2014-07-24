@@ -2073,7 +2073,7 @@ class AbstractScene(QObject):
 			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
 			\return		<bool> success
 		"""
-		return self._removeNativeObjects([ obj.nativePointer() for obj in objects ])
+		return self._removeNativeObjects([ obj.nativePointer() for obj in objects if not obj.isDeleted()])
 
 	def renameObjects(self, objects, names, display=True):
 		"""
