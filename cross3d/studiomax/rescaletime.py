@@ -45,7 +45,6 @@ class RescaleTime(QObject):
 	def warningDialog(self, parent, title='FPS', msg='Adjusting frame rate,\n please wait...'):
 		from blurdev.gui import Window
 		from PyQt4.QtGui import QLabel
-		from PyQt4.QtCore import QTimer
 		self.uiWarningWND = Window()
 		self.uiWarningWND.setWindowTitle(title)
 		x,y,w,h = GetWindowRect(parent)
@@ -285,53 +284,3 @@ class RescaleTime(QObject):
 			if self.uiWarningWND:
 				QTimer.singleShot(1000, self.uiWarningWND.close)
 		self.useTimers = False
-
-	@staticmethod
-	def qtMirror(tcDlg, classType=None, parentWindows=False):
-		"""
-		A conviencence function that duplicates the geometry of a window as a PyQt dialog.
-		You can use this to figure out what window is what button.
-		:param classType: If a string is provided, this will only reproduce widgets with that className.
-		:param parentWindows: Reproduce the parent child structure of tcDialog. Defaults to False as this
-							tends to break the click functionality of the buttons.
-		:returns: The Qt reproduction of tcDlg as a QDialog
-		"""
-		from PyQt4.QtGui import QDialog, QPushButton
-		hwnds = []
-		EnumChildWindows(tcDlg, RescaleTime.EnumWindowsProc, hwnds)
-		stack = [tcDlg]
-		dlg = QDialog()
-		dlgRect = GetWindowRect(tcDlg)
-		dlgRect = QRect(QPoint(dlgRect[0], dlgRect[1]), QPoint(dlgRect[2], dlgRect[3]))
-		dlg.setGeometry(dlgRect)
-		shwnd = None
-		widgets = {}
-		for hwnd in hwnds:
-			while len(stack) > 1 and GetParent(hwnd) != stack[-1]:
-				del stack[-1]
-			className = GetClassName(hwnd)
-			if classType != None and className != classType:
-				continue
-			rect = GetWindowRect(hwnd)
-			btn = QPushButton('%s(%i)' % (GetWindowText(hwnd), hwnd), dlg)
-			btn.setObjectName(unicode(hwnd))
-			btn.setGeometry(QRect(dlg.mapFromGlobal(QPoint(rect[0], rect[1])), dlg.mapFromGlobal(QPoint(rect[2], rect[3]))))
-			btn.clicked.connect(btn.lower)
-			btn.setToolTip('%i, %s, %s, %0.2f, %0.2f, %0.2f, %0.2f' % (hwnd, GetWindowText(hwnd), className, rect[0], rect[1], rect[2], rect[3]))
-			widgets[hwnd] = btn
-#			print '\t'*len(stack), btn.toolTip()
-			stack.append(hwnd)
-		# parent buttons
-		if parentWindows:
-			for hwnd in hwnds:
-				btn = widgets.get(hwnd)
-				if btn:
-					parent = GetParent(hwnd)
-					if parent in widgets:
-						pos = dlg.mapToGlobal(btn.pos())
-						p = widgets.get(parent)
-						if p:
-							btn.setParent(p)
-							btn.move(p.mapFromGlobal(pos))
-							btn.show()
-		return dlg
