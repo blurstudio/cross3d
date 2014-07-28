@@ -43,6 +43,79 @@ class AbstractSceneCamera(SceneObject):
 			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType. 
 		"""
 		return (self.cameraType() & cameraType) > 0
+	
+	def originalFilmWidth(self, storeWidth=False):
+		""" Returns the original Film width stored in userProps as 'overscanOrigFilmWidth'. If this is not
+		set it returns the cameras current filmWidth.
+		:param storeWidth: If the original width is not stored in userProps, store it before returning. Defaults to False
+		"""
+		originalFilmGate = self.userProps().get('overscanOrigFilmWidth')
+		if originalFilmGate == None:
+			originalFilmGate = self.filmWidth()
+			if storeWidth:
+				self.setOriginalFilmWidth(originalFilmGate)
+		return originalFilmGate
+
+	def setOriginalFilmWidth(self, width):
+		""" Store the film width on the cameras userProps as 'overscanOrigFilmWidth'.
+		:param width: the film width to store as the original value
+		"""
+		self.userProps()['overscanOrigFilmWidth'] = width
+
+	def overscan(self, stored=True):
+		""" Returns the current overscan value of the camera.
+		:param stored: If false calculates the current overscan instead of returning the stored value. This is not the default 
+					because the stored value is truncated so the value can not be guaranteed. Defaults to True
+		"""
+		if stored:
+			ret = self.userProps().get('overscanValue')
+			if ret != None:
+				return ret
+		return ((self.filmWidth()/self.originalFilmWidth()) - 1) * 100.0
+
+	def setOverscan(self, overscan):
+		""" Stores the overscan value in the cameras userProps as 'overscanValue' and adjusts the camera's
+		filmWidth.
+		:param overscan: The ammount of overscan applied to the cameras film width
+		"""
+		self.userProps()['overscanValue'] = overscan
+		self.setFilmWidth(self.originalFilmWidth(storeWidth=True) * (1.0 + (overscan / 100.0)))
+
+	def overscanRenderSize(self, size=None, storeSize=False, overscan=None):
+		""" Returns the render size for the camera's overscan value. Uses self.originalRenderSize if size is
+		not provided.
+		:param size: None or a two item array that is multiplied by the camera overscan. Defaults to None.
+		:param storeSize: If the original render size is not stored in userProps, store it before returning it. Defaults to False.
+		:param overscan: Override the camera overscan value.
+		:return: [width, height] The overscan render size.
+		..seealso:: modules `originalRenderSize`
+		"""
+		if overscan == None:
+			overscan = self.overscan()
+		mult = (1.0 + (overscan / 100.0))
+		if size == None:
+			size = self.originalRenderSize()
+		if storeSize:
+			self.setOriginalRenderSize(size)
+		return [s * mult for s in size[:2]]
+
+	def originalRenderSize(self, storeSize=False):
+		""" Returns the pre-overscan render size stored on in the cameras userProps under 'overscanOrigRenderSize'.
+		:param storeSize: If the user prop doesn't exist yet, call self.setOriginalRenderSize with the scene's current render size
+		:returns: [width, height] The original render size of the scene.
+		"""
+		size = self.userProps().get('overscanOrigRenderSize')
+		if size == None:
+			size = self._scene.renderSize()
+			size = (size.width(), size.height())
+			if storeSize:
+				self.setOriginalRenderSize(size)
+		return size
+	
+	def setOriginalRenderSize(self, size):
+		""" Store the render size used for calculating 
+		"""
+		self.userProps()['overscanOrigRenderSize'] = size
 
 	@abstractmethod
 	def animateTurntable(self, objects=[], startFrame=1, endFrame=100):
