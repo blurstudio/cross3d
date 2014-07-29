@@ -10,6 +10,7 @@
 
 from Py3dsMax 												import mxs
 from blur3d.api.abstract.abstractsceneanimationcontroller	import AbstractSceneAnimationController
+#from blur3d.api.abstract.abstractsceneanimationkey import AbstractSceneAnimationKey
 
 class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +44,28 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		if ( controllerType == ControllerType.Bezier_Float ):
 			return mxs.Bezier_Float()
 		return None
+	
+	def _setNativeKeyAt(self, time, nativeKey):
+		"""
+			\remarks	set the key at the inputed time to the given native key
+			\param		time		<float>
+			\param		nativeKey	<variant>
+			\return		<bool> success
+		"""
+		key = self.keyAt(time)
+		if nativeKey == None:
+			# remove the key if it exists
+			if key:
+				index = mxs.getKeyIndex(self._nativePointer, time)
+				# index is 1 based, zero indecates that the key was not found.
+				if index != 0:
+					return mxs.deleteKey(self._nativePointer, index)
+		elif not key:
+			# Create the key so we can set the value
+			key = self._createNativeKeyAt(time)
+			if not key:
+				return False
+		return key.setValue(nativeKey)
 		
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
