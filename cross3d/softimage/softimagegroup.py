@@ -58,6 +58,9 @@ class SoftimageGroup(AbstractGroup):
 		application.refresh()
 		return True
 
+	def name(self):
+		return self._nativePointer.FullName
+
 # register the symbol
 from blur3d import api
 api.registerSymbol('Group', SoftimageGroup)

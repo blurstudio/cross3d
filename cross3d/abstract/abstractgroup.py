@@ -18,7 +18,37 @@ class AbstractGroup(AbstractContainer):
 		SceneObject's as a singular group
 	"""
 	
-	pass
+	@abstractmethod	
+	def _nativeObjects(self):
+		return []
+	
+	@abstractmethod	
+	def isHidden(self):
+		return False
+
+	@abstractmethod	
+	def isFrozen(self):
+		return False
+	
+	@abstractmethod		
+	def toggleHidden(self):
+		return False
+		
+	@abstractmethod	
+	def toggleFrozen(self):
+		return False
+
+	@abstractmethod	
+	def setHidden(self, hidden, options=None):
+		return False
+
+	@abstractmethod	
+	def setFrozen(self, frozen):
+		return False
+
+	@abstractmethod	
+	def name(self):
+		return ''
 
 # register the symbol
 api.registerSymbol('Group', AbstractGroup, ifNotFound=True)
