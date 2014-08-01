@@ -9,6 +9,8 @@
 # 	\date		05/26/11
 #
 
+import re
+import json
 import blur3d.api
 from blur3d.naming import Name
 from PyQt4.QtCore import QTimer as _QTimer
@@ -194,9 +196,69 @@ class AbstractUserProps(dict):
 		Replaces any html codes with their associated unstorable characters
 
 		"""
-		if not isinstance(string, (str, unicode)):
-			string = unicode(string)
-		return string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
+		string = unicode(string)
+		try:
+			return json.loads( string )
+		except ValueError:
+			pass
+		string, typ = AbstractUserProps._decodeString(string)
+		if typ == float:
+			return float(string)
+		elif typ == int:
+			return int(string)
+		elif typ in (list, dict, tuple, bool):
+			return eval(string)
+		return string
+	
+	@staticmethod
+	def _decodeString(string):
+		try:
+			int(string)
+			return string, int
+		except:
+			pass
+		if string.find('.') != -1:
+			try:
+				float(string)
+				return string, float
+			except:
+				pass
+		if string in ('True', 'False'):
+			return string, bool
+		if re.match('{.*}', string):
+			return string, dict
+		if re.match('\[.*\]', string):
+			return string, list
+		if re.match('#\(.*\)', string):
+			data = []
+			s = string
+			sOpen, close = AbstractUserProps._posCounter(s)
+			while (sOpen != -1 or close != -1):
+				s = s[:sOpen-2]+'['+s[sOpen:close]+']'+s[close+1:]
+				sOpen, close = AbstractUserProps._posCounter(s)
+			return s, list
+		if re.match('\(.*\)', string):
+			return string, tuple
+		return string, None
+	
+	@staticmethod
+	def _posCounter(string, opening = '#(', closing = ')'):
+		openBr = 0
+		openPos = 0
+		found = False
+		for pos in range(0, len(string)):
+			if string[pos-2:pos] == opening:
+				openBr += 1
+				if not found:
+					openPos = pos
+					found = True
+			elif string[pos] == closing:
+				openBr -= 1
+			if found and not openBr:
+				break
+		else:
+			return -1,-1
+		return openPos, pos
 
 class AbstractFileProps(AbstractUserProps):
 	def __init__(self, fileName=''):
@@ -221,7 +283,7 @@ class AbstractFileProps(AbstractUserProps):
 			self._scheduleClose()
 			out = self.dso().customProperty(key)
 			if out:
-				return out.value()
+				return self.unescapeValue(out.value())
 			raise KeyError('FileProps does not contain key: %s' % key)
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO
@@ -288,7 +350,7 @@ class AbstractFileProps(AbstractUserProps):
 		if self.dso().open(self.fileName):
 			self._scheduleClose()
 			ret = {}
-			[ret.update({prop.name(): prop.value()}) for prop in self.dso().customProperties()]
+			[ret.update({prop.name(): self.unescapeValue(prop.value())}) for prop in self.dso().customProperties()]
 			return ret
 		else:
 			raise blur3d.api.Exceptions.FileNotDSO

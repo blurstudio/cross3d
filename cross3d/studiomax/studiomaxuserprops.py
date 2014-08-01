@@ -89,13 +89,13 @@ class StudiomaxUserProps(AbstractUserProps):
 			\return		<str>
 		"""
 		string = unicode(string)
-		string, typ = StudiomaxUserProps._decodeString(string)
+		string, typ = AbstractUserProps._decodeString(string)
 		string = string.replace('&#13;&#10;', '\r\n').replace('&#10;', '\n').replace('&#13;', '\r')
 		if typ == float:
 			return float(string)
 		elif typ == int:
 			return int(string)
-		elif typ in (list, dict, tuple):
+		elif typ in (list, dict, tuple, bool):
 			if typ == dict:
 				try:
 					return json.loads( string )
@@ -104,56 +104,6 @@ class StudiomaxUserProps(AbstractUserProps):
 				return eval(string)
 			except: pass
 		return string
-	
-	@staticmethod
-	def _decodeString(string):
-		try:
-			int(string)
-			return string, int
-		except:
-			pass
-		if string.endswith('d0') or string.find('.'):
-			val = string.rstrip('d0')
-			try:
-				float(val)
-				return val, float
-			except:
-				pass
-		if re.match('\{.*\}', string):
-			return string, dict
-		if re.match('\[.*\]', string):
-			return string, list
-		if re.match('#\(.*\)', string):
-			data = []
-			s = string
-			open, close = StudiomaxUserProps._posCounter(s)
-			while (open != -1 or close != -1):
-				#if open and close < len(string):
-				s = s[:open-2]+'['+s[open:close]+']'+s[close+1:]
-				open, close = StudiomaxUserProps._posCounter(s)
-			return s, list
-		if re.match('\(.*\)', string):
-			return string, tuple
-		return string, None
-	
-	@staticmethod
-	def _posCounter(string, opening = '#(', closing = ')'):
-		openBr = 0
-		openPos = 0
-		found = False
-		for pos in range(0, len(string)):
-			if string[pos-2:pos] == opening:
-				openBr += 1
-				if not found:
-					openPos = pos
-					found = True
-			elif string[pos] == closing:
-				openBr -= 1
-			if found and not openBr:
-				break
-		else:
-			return -1,-1
-		return openPos, pos
 
 class StudiomaxFileProps(AbstractFileProps):
 	def __new__(cls, fileName=''):

@@ -35,7 +35,11 @@ class SoftimageUserProps(AbstractUserProps):
 	
 	def __setitem__(self, key, value):
 		prop = self._nativePointer.Properties(key)
-		value = json.dumps(value)
+		if type(value) == tuple:
+			# json.dumps encodes tuple's as lists
+			value = unicode(value)
+		else:
+			value = json.dumps(value)
 		if not prop:
 			prop = self._nativePointer.AddProperty('UserDataBlob', False, key)
 			prop.SetCapabilityFlag(constants.siNotInspectable, True)
@@ -113,35 +117,14 @@ class SoftimageUserProps(AbstractUserProps):
 			return json.loads( string )
 		except ValueError:
 			pass
-		string, typ = SoftimageUserProps._decodeString(string)
+		string, typ = AbstractUserProps._decodeString(string)
 		if typ == float:
 			return float(string)
 		elif typ == int:
 			return int(string)
-		elif typ in (list, dict, tuple):
+		elif typ in (list, dict, tuple, bool):
 			return eval(string)
 		return string
-	
-	@staticmethod
-	def _decodeString(string):
-		if re.match('\[.*\]', string):
-			return string, list
-		if re.match('{.*}', string):
-			return string, dict
-		if re.match('\(.*\)', string):
-			return string, tuple
-		if string.find('.') != -1:
-			try:
-				float(string)
-				return string, float
-			except:
-				pass
-		try:
-			int(string)
-			return string, int
-		except:
-			pass
-		return string, None
 
 class SoftimageFileProps(SoftimageUserProps):
 	def __init__(self, nativePointer):
