@@ -99,11 +99,13 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 			\remarks	Returns the film_width of the camera.
 			\return		film_width (float)
 		"""
-		try:
-			fw = self._nativePointer.film_width
-		except AttributeError:
-			return None
-		return fw
+		width = None
+		if self.isVrayCam():
+			try:
+				width = self._nativePointer.film_width
+			except AttributeError:
+				pass
+		return width
 		
 	def fov(self, rounded=False):
 		"""
@@ -182,10 +184,11 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 			\param		width <float>
 			\return		n/a
 		"""
-		try:
-			self._nativePointer.film_width = float(width)
-		except AttributeError:
-			pass
+		if self.isVrayCam():
+			try:
+				self._nativePointer.film_width = float(width)
+			except AttributeError:
+				pass
 			
 	def outputType(self):
 		return self._outputTypes[self._nativePointer.type] if self.isCameraType(CameraType.VRayPhysical) else ''
