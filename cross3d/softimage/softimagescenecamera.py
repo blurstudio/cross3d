@@ -48,7 +48,8 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			\return		film_width (float)
 		"""
 		width = self._nativePointer.projplanewidth.Value
-		return width / 0.039370
+		# XSI uses inches, convert inches to mm 1in / 25.4mm
+		return width * 25.4
 
 	def setFilmWidth(self, width):
 		"""
@@ -56,7 +57,27 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			\param		width <float>
 			\return		n/a
 		"""
-		self._nativePointer.projplanewidth.Value = width * 0.039370
+		# XSI uses inches, convert inches to mm 1in / 25.4mm
+		self._nativePointer.projplanewidth.Value = width / 25.4
+		return True
+
+	def filmHeight(self):
+		"""
+			\remarks	Returns the film_height of the camera in mm.
+			\return		film_width (float)
+		"""
+		height = self._nativePointer.projplaneheight.Value
+		# XSI uses inches, convert inches to mm 1in / 25.4mm
+		return height * 25.4
+
+	def setFilmHeight(self, height):
+		"""
+			\remarks	Sets the film_height value for the camera.
+			\param		width <float>
+			\return		n/a
+		"""
+		# XSI uses inches, convert inches to mm 1in / 25.4mm
+		self._nativePointer.projplaneheight.Value = width / 25.4
 		return True
 
 	def lens(self, filmWidth=None, rounded=False):
