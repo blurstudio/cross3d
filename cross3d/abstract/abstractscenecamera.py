@@ -134,6 +134,14 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def filmWidth(self):
 		pass
+	
+	@abstractmethod
+	def filmHeight(self):
+		return None
+
+	@abstractmethod
+	def setFilmHeight(self, height):
+		pass
 
 	@abstractmethod
 	def fov(self, rounded=False):
