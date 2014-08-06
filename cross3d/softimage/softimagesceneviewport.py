@@ -28,7 +28,13 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	def __init__( self, scene, viewportID=0 ): 
 		super(SoftimageSceneViewport, self).__init__(scene, viewportID)
 		self._scene = scene
-		self.viewportManager = xsi.Desktop.ActiveLayout.Views( 'vm' )
+		
+		for view in xsi.Desktop.ActiveLayout.Views:
+			if view.type == "View Manager":
+				self.viewportManager = view
+		
+		assert self.viewportManager, 'There is no viewport in your current Softimage layout.'
+
 		if viewportID in self.viewportNames:
 			self.name = self.viewportNames[ viewportID ]
 		else:
