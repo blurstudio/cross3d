@@ -28,7 +28,8 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 			\param		default		<variant>	(auto-converted from the application's native value)
 			\return		<variant>
 		"""
-		return xsi.GetValue( '%s.%s' % (self._nativePointer.name, key) )
+		return self._nativePointer.Properties[key]
+#		return xsi.GetValue( '%s.%s' % (self._nativePointer.fullname, key) )
 	
 	def _setNativeProperty( self, key, nativeValue ):
 		"""
@@ -38,7 +39,7 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 			\param		value	<variant>	(pre-converted to the application's native value)
 			\retrun		<bool> success
 		"""
-		xsi.SetValue( '%s.%s' % (self._nativePointer.name, key), nativeValue )
+		xsi.SetValue('%s.%s' % (self._nativePointer.fullname, key), nativeValue)
 		return True
 
 	def setDisplayName( self, name ):
@@ -57,6 +58,14 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 	
 	def displayName( self ):
 		return self._nativePointer.Name
+	
+	def propertyNames(self):
+		return [prop.name for prop in self._nativePointer.Properties]
+	
+	def hasProperty(self, key):
+		return (key in self.propertyNames())
+	
+	
 
 # register the symbol
 from blur3d import api
