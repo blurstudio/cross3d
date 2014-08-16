@@ -19,7 +19,7 @@ global blur3dhelper
 			transPoint = gw.hTransPoint
 			local bmin = [1e9,1e9,0], bmax = [-1e9,-1e9,0]
 			for node in nodes do (
-				if (isKindOf node GeometryClass) do (
+				if (superClassOf node) == GeometryClass do (
 					select node
 					mesh = snapshotasmesh node
 					for v=1 to mesh.numverts do
@@ -31,8 +31,6 @@ global blur3dhelper
 						if vp.y > bmax.y do bmax.y = vp.y
 					)
 					free mesh
-					w = (bmax.x - bmin.x) as integer
-					h = (bmax.y - bmin.y) as integer
 				)
 			)
 			pMin = point2 ((bmin.x as float) / (gw.getWinSizeX() as float)) ((bmin.y as float) / (gw.getWinSizeY() as float))
