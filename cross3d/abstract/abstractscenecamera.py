@@ -24,13 +24,13 @@ class AbstractSceneCamera(SceneObject):
 
 	_objectType = ObjectType.Camera
 
-	def __init__(self, scene, nativeCamera, targetObject=None):
+	def __init__(self, scene, nativeCamera, target=None):
 		super(AbstractSceneCamera, self).__init__(scene, nativeCamera)
 		self._viewOptions = {}
-		self._targetObject = targetObject
+		self._target = target
 
-	def targetObject(self):
-		return self._targetObject
+	def target(self):
+		return self._target
 
 	def interest(self):
 		return None

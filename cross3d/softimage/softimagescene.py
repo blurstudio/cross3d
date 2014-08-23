@@ -348,14 +348,21 @@ class SoftimageScene(AbstractScene):
 		fact.AddItems(nativeObjects)
 		return root.addModel(fact, name)
 		
-	def _createNativeCamera(self, name='Camera', type='Standard'):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
 		"""
 			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage camera
 			\param		name			<str>
 			\return		<PySoftimage.xsi.Camera> nativeCamera
 		"""
 		root = self._nativeRootObject()
-		return root.addCamera('Camera', name)
+		camera = root.addCamera('Camera', name)
+		if not target:
+			target = self._findNativeObject( name + 'Interest')
+			self._removeNativeObjects([target])
+		else:
+			target = self._findNativeObject( name + 'Interest')
+			target.Name = '_'.join([name, 'Target'])
+		return camera
 		
 	def _exportNativeModel(self, nativeModel, path):
 		"""

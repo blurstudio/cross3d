@@ -69,7 +69,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 		link = mxs.Link_Constraint()
 		link.addTarget(helper, 0)
 		cam.controller = link
-		self.targetObject().nativePointer().pos = center.maxPoint()
+		self.target().nativePointer().pos = center.maxPoint()
 		cam.specify_fov = True
 		cam.film_width = 36.0
 		cam.fov = 40.0
