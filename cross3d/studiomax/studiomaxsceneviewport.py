@@ -10,6 +10,7 @@
 #
 
 import os
+import time 
 
 from Py3dsMax import mxs
 from blur3d.api import dispatch, application
@@ -176,6 +177,16 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		
 		mxs.pyhelper.setViewportQuadSize( resolution.width(), resolution.height() )
 
+		# Figuring out if we use Nitrous viewport.
+		nitrous = not mxs.gw.GetDriverString()
+
+		# If the viewport is using Nitrous.
+		if nitrous and camera.hasMultiPassEffects() and effects:
+
+			# TODO: Make sure we store and activate progressive rendering state.
+			pass
+			
+		# For each frame.	
 		for frame in range( frameRange[0], frameRange[1] + 1 ):
 			image = None
 			count = count + 1
@@ -185,16 +196,27 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 				completed = False
 				break
 			scene.setCurrentFrame( frame )
-			
+
 			if camera:
+
+				# If multi-pass effects are active.
 				if camera.hasMultiPassEffects() and effects:
-					camera.renderMultiPassEffects()
-					if application.version() < 14:
+
+					# If we use a Nitrous viewport, we compute the depth of field the new way.
+					if nitrous:
+						while not mxs.NitrousGraphicsManager.isProgressiveRenderingFinished():
+							mxs.NitrousGraphicsManager.progressiveRendering()
+
+					# Otherwise we compute it the old way by using the API method.
+					else:
+						camera.renderMultiPassEffects()
+
+					# Text overlays are only supported until Max 2011.
+					if application.version() <= 13:
 						self.slateDraw()	
 
+				# For Max 2012 and above only the viewport object allows to save the picture with multipass effects.
 				if application.version() >= 14 and camera.hasMultiPassEffects() and effects:
-				
-					# Viewport allows to save the picture with multipass effects in Max 2012.
 					image = mxs.viewport.getViewportDib()
 
 			if not image:
@@ -209,10 +231,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 				mxs.gc()
 				count = 0
 		
-		# restoring the scene
-		scene.setAnimationRange( initialRange )
+		# Restoring scene settings.
+		scene.setAnimationRange(initialRange)
 		
-		# restoring viewport settings
+		# Restoring viewport settings.
 		self._name = mxs.viewport.activeViewport
 		self.slateClear()	
 		scene.setSelection( initialSelection )
@@ -229,7 +251,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		mxs.viewport.setGridVisibility( self._name, initialGridVisibility )
 		mxs.pyhelper.setViewportQuadSize( viewSize[0], viewSize[1] )
 		self.setSlateIsActive( False )
-		
+
+		# Restoring Nitrous settings.
+		if nitrous and camera.hasMultiPassEffects() and effects:
+
+			# TODO: Restore progressive rendering state.
+			pass
+			
 		if initialViewNumber != 1:
 			mxs.execute( 'max tool maximize' )
 
