@@ -28,7 +28,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			mxs.viewport.activeViewport = viewportID
 
 		self._scene = scene
-		self._name = mxs.viewport.activeViewport	
+		self._nativePointer = mxs.viewport
+		self._name = self._nativePointer.activeViewport	
 		self._slateIsActive = False
 		self._slateText = ''
 
@@ -72,6 +73,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 	def setSafeFrameIsActive( self, active ):
 		mxs.displaySafeFrames = active
 		return True
+
+	def createCamera(self, name='Camera', type='Standard'):
+		camera = self._scene.createCamera(name, type)
+		nativeCamera = camera.nativePointer()
+		nativeCamera.fov = self._nativePointer.getFOV()
+		nativeCamera.transform = mxs.InverseHighPrecision(self._nativePointer.getTM())
+		return camera
 
 	def safeFrameSize( self ):
 		scene = self._scene
@@ -177,8 +185,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		
 		mxs.pyhelper.setViewportQuadSize( resolution.width(), resolution.height() )
 
-		# Figuring out if we use Nitrous viewport.
-		nitrous = not mxs.gw.GetDriverString()
+		# Figuring out if we use Nitrous only supported from Max 2013.
+		nitrous = not mxs.gw.GetDriverString() and application.version >= 15
 
 		# If the viewport is using Nitrous.
 		if nitrous and camera.hasMultiPassEffects() and effects:
