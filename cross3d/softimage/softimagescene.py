@@ -357,11 +357,15 @@ class SoftimageScene(AbstractScene):
 		root = self._nativeRootObject()
 		camera = root.addCamera('Camera', name)
 		if not target:
-			target = self._findNativeObject( name + 'Interest')
+			target = self._findNativeObject('CameraInterest')
 			self._removeNativeObjects([target])
 		else:
-			target = self._findNativeObject( name + 'Interest')
+			target = self._findNativeObject('CameraInterest')
 			target.Name = '_'.join([name, 'Target'])
+
+		# Setting rotation order to ZXY. By default it's pretty bad.
+		camera.Parameters('rotorder').Value = 4
+
 		return camera
 		
 	def _exportNativeModel(self, nativeModel, path):

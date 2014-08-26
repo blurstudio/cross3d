@@ -29,6 +29,7 @@ class AbstractSceneObject(SceneWrapper):
 	def __init__(self, scene, nativeObject):
 		SceneWrapper.__init__(self, scene, nativeObject)
 		self._objectType = self._typeOfNativeObject(nativeObject)
+		self._parameters = {}
 
 	def __new__(cls, scene, nativeObject, *args, **kwargs):
 		"""
@@ -598,6 +599,14 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		return False
 
+	@abstractmethod
+	def parameters(self):
+		return {}
+
+	@abstractmethod
+	def setParameters(self, parameters):
+		return False
+
 	def model(self):
 		"""Returns the model this object belongs to.
 		
@@ -621,6 +630,13 @@ class AbstractSceneObject(SceneWrapper):
 		Returns True if the native object has been deleted.
 		"""
 		return False
+
+	def storeParameters(self):
+		self._parameters = self.parameters()
+		return True
+
+	def restoreParameters(self):
+		return self.setParameters(self._parameters)
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods

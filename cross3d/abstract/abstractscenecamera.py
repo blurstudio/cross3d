@@ -358,10 +358,28 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def isVrayCam(self):
 		""" 
-		Returns True if this is a vray camera, False otherwise. 
+			Returns True if this is a vray camera, False otherwise. 
 		"""
 		return False
 
+	def matchCamera(self, camera):
+		"""
+			Match this camera to another one.
+		"""
+		return False
+
+	def restoreViewOptions(self):
+		"""
+			Stores this camera view options.
+		"""
+		return self.setViewOptions(self._viewOptions)
+
+	def storeViewOptions(self):
+		"""
+			Restores previously stored view options.
+		"""
+		self._viewOptions = self.viewOptions()
+		return True
 
 # register the symbol
 api.registerSymbol('SceneCamera', AbstractSceneCamera, ifNotFound=True)

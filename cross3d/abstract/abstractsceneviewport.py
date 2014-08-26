@@ -29,6 +29,7 @@ class AbstractSceneViewport(QObject):
 		self._viewOptions = {}
 		self._slateIsActive = False
 		self._slateText = ''
+		self._nativePointer = None
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -59,6 +60,13 @@ class AbstractSceneViewport(QObject):
 
 		"""
 		return ''
+
+	@abstractmethod
+	def createCamera(self):
+		"""
+			Creates a camera that matches that viewport.
+		"""
+		return None
 
 	@abstractmethod
 	def generateSnapshot(self, fileName, **options):
@@ -161,13 +169,16 @@ class AbstractSceneViewport(QObject):
 	def storeState( self ):
 		return self.storeViewOptions()
 
+	def nativePointer(self):
+		return self._nativePointer
+		
 	def restoreViewOptions(self):
 		return self.setViewOptions(self._viewOptions)
-
+		
 	def storeViewOptions(self):
 		self._viewOptions = self.viewOptions()
 		return True
-		
+
 	def camera(self):
 		"""Return the viewport's camera
 		

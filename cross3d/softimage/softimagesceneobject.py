@@ -176,6 +176,21 @@ class SoftimageSceneObject(AbstractSceneObject):
 			print("unsupported cache Type")
 			return None
 
+	def parameters(self):
+		parameters = {}
+		for parameter in self._nativePointer.Parameters:
+			parameters[parameter.ScriptName] = parameter.Value
+		return parameters
+
+	def setParameters(self, parameters):
+		for key, value in parameters.iteritems():
+			try:
+				print key, value
+				self._nativePointer.Parameters(key).Value = value
+			except:
+				print 'TRACEBACK: skipping param: {} {}...'.format(key, value)
+				print traceback.format_exc()
+
 	def resetTransforms(self, pos=True, rot=True, scl=True):
 		"""
 			Resets the transforms to zero.

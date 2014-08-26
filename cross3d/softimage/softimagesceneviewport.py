@@ -40,6 +40,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		else:
 			self.name = self.viewportManager.GetAttributeValue( 'focusedviewport' )
 
+		self._nativePointer = self.viewportManager()
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +78,11 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 
 	def cameraName( self ):
 		return self.viewportManager.getAttributeValue( 'activecamera:' + self.name )
+
+	def createCamera(self, name='Camera', type='Standard'):
+		camera = self._scene.createCamera(name, type)
+		camera.matchCamera(self.camera())
+		return camera
 
 	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		

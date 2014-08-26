@@ -34,13 +34,22 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			self._nativePointer.Interest = interest.nativePointer()
 
 	def fov(self, rounded=False):
-		#TODO: (brendana 9/3/13) should this take account keys and current frame?
+		#TODO: (brendana 9/3/13) should this take account keys and current frame? (dougl 8/26/14) Current frame!
 		param_name = '{}.camera.fov'.format(self._nativePointer.FullName)
 		prop = xsi.Dictionary.GetObject(param_name)
 		fov = prop.Value
 		if rounded:
 			return int(round(fov))
 		return fov
+
+	def matchCamera(self, camera):
+		"""
+			Match this camera to another one.
+		"""
+		self.setParameters(camera.parameters())
+		self.setViewOptions(camera.viewOptions())
+		self.matchTransforms(camera)
+		return True
 
 	def filmWidth(self):
 		"""
@@ -166,6 +175,8 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		xsi.SetValue('preferences.ViewCube.show', viewOptions.get('viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
+
+
 
 	def isVrayCam(self):
 		return False
