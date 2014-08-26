@@ -24,7 +24,7 @@ from blur3d.api.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 
 	_architectureTokens = {64: r'Program Files', 32: r'Program Files (x86)'}
-	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013', 12: r'Softimage 2014'}
+	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013', 12: r'Softimage 2014', 13: r'Softimage 2015'}
 
 	@classmethod
 	def getFileVersion(cls, filepath):
@@ -76,15 +76,30 @@ class External(AbstractExternal):
 	def binariesPath(cls, version=None, architecture=64):
 		
 		# Getting the latest version if not provided.
-		version = version or sorted(cls._versionTokens.keys())[-1]
+		versions = [version] if version else sorted(cls._versionTokens.keys())
 
 		# Getting tokens for the the binary folder path.
 		tokens = {}
 		tokens['architecture'] = cls._architectureTokens.get(architecture)
-		tokens['version'] = cls._versionTokens.get(version)
+		
+		if tokens['architecture']:
+			for version in reversed(versions):
+				tokens['version'] = cls._versionTokens.get(version)
 
-		if tokens['architecture'] and tokens['version']:
-			path = glob.glob(r'C:\{architecture}\Autodesk\{version}*'.format(**tokens))[-1]
-			return os.path.join(path, 'Application', 'bin')
-		else:
-			raise Exception('Invalid version or architecture.')
+				if tokens['version']:
+					servicePacks = glob.glob(r'C:\{architecture}\Autodesk\{version}*'.format(**tokens))
+
+					print servicePacks
+					for servicePack in reversed(servicePacks):
+
+						path = os.path.join(servicePack, 'Application', 'bin')
+						binary = os.path.join(path, 'xsibatch.exe')
+
+						if os.path.exists(binary):
+							return path
+						else:
+							continue
+
+			raise Exception('No valid binary found for Softimage. Makes sure it is installed in the expected directory.')
+
+		raise Exception('Invalid version or architecture.')
