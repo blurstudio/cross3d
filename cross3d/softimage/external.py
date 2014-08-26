@@ -12,6 +12,7 @@
 
 import os
 import sys
+import glob
 import shutil
 import subprocess
 import xml.etree.cElementTree as ET
@@ -23,7 +24,7 @@ from blur3d.api.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 
 	_architectureTokens = {64: r'Program Files', 32: r'Program Files (x86)'}
-	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013'}
+	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013', 12: r'Softimage 2014'}
 
 	@classmethod
 	def getFileVersion(cls, filepath):
@@ -83,7 +84,7 @@ class External(AbstractExternal):
 		tokens['version'] = cls._versionTokens.get(version)
 
 		if tokens['architecture'] and tokens['version']:
-			return r'C:\{architecture}\Autodesk\{version}\Application\bin'.format(**tokens)
-
+			path = glob.glob(r'C:\{architecture}\Autodesk\{version}*'.format(**tokens))[-1]
+			return os.path.join(path, 'Application', 'bin')
 		else:
 			raise Exception('Invalid version or architecture.')
