@@ -380,6 +380,13 @@ class SoftimageScene(AbstractScene):
 		self._setNativeSelection(selection)
 		return True
 	
+	def _unisolate(self):
+		r"""
+			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
+			\return		<bool>
+		"""
+		xsi.IsolateAll()
+	
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
