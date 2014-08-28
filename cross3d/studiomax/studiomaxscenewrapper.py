@@ -107,7 +107,13 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			name, setDisplayName, setName
 			\return		<str> name
 		"""
-		return self.name().split( '.' )[-1]
+
+		# This is to handle our virtual implementation of models in Max.
+		name = self.name()
+		split = name.split('.')
+		if len(split) == 2:
+			return split[1]
+		return name
 
 	def name( self ):
 		"""

@@ -50,6 +50,10 @@ class AbstractSceneModel(SceneObject):
 		return False
 
 	@abstractmethod
+	def resolutionsPaths(self):
+		return []
+
+	@abstractmethod
 	def update(self):
 		return False
 

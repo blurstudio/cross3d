@@ -28,7 +28,11 @@ class AbstractSceneObject(SceneWrapper):
 
 	def __init__(self, scene, nativeObject):
 		SceneWrapper.__init__(self, scene, nativeObject)
-		self._objectType = self._typeOfNativeObject(nativeObject)
+
+		# This is for further type definition for generic objects we did not implement in the API.
+		if self._objectType & ObjectType.Generic:
+			self._objectType = self._typeOfNativeObject(nativeObject)
+
 		self._parameters = {}
 
 	def __new__(cls, scene, nativeObject, *args, **kwargs):
@@ -41,10 +45,15 @@ class AbstractSceneObject(SceneWrapper):
 				if not c._objectType == ObjectType.Generic:
 					cls._subClasses[ c._objectType ] = c
 
-		sceneObjectType = cls._typeOfNativeObject(nativeObject)
+		# Handling our virtual implementation of Max models.
+		split = nativeObject.name.split('.')
+		if len(split) == 2 and split[1] == 'Model':
+			sceneObjectType = ObjectType.Model
+		else:
+			sceneObjectType = cls._typeOfNativeObject(nativeObject)
 			
 		if sceneObjectType in cls._subClasses:
-			c = cls._subClasses[ sceneObjectType ]
+			c = cls._subClasses[sceneObjectType]
 			return SceneWrapper.__new__(c)
 		return SceneWrapper.__new__(cls)
 

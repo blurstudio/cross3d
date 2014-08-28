@@ -14,8 +14,32 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 #------------------------------------------------------------------------------------------------------------------------
 
 class StudiomaxSceneModel( AbstractSceneModel ):
-	pass
-		
+
+	def displayName(self):
+		return self._nativePointer.name.split('.')[0]
+
+	def setDisplayName(self, displayName):
+		for obj in self.objects():
+			nativePointer = obj.nativePointer()
+			nativePointer.name = nativePointer.name.replace(self.displayName(), displayName)
+		self._nativePointer.name = '.'.join([displayName, 'Model'])
+		return True
+
+	def objects(self, wildcard='*', type=''):
+		output = []
+		objects = self._scene.objects(wildcard='%s.%s' % (self.displayName(), wildcard), type=type)
+		for obj in objects:
+			if not obj.name() == self.name():
+				output.append(obj)
+		return output
+
+	def setResolution(self, resolution):
+		self.userProps()['resolution'] = resolution
+		return True
+
+	def resolution(self):
+		return self.userProps().get('resolution', '')
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneModel', StudiomaxSceneModel )

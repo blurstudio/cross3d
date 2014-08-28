@@ -209,7 +209,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 				# If multi-pass effects are active.
 				if camera.hasMultiPassEffects() and effects:
-
+					
 					# If we use a Nitrous viewport, we compute the depth of field the new way.
 					if nitrous:
 						while not mxs.NitrousGraphicsManager.isProgressiveRenderingFinished():

@@ -8,14 +8,14 @@
 #	\date		03/15/10
 #
 
-import glob
 import os
 import re
+import glob
 import getpass
-import traceback
 import win32con
 import win32api
 import win32gui
+import traceback
 
 from Py3dsMax import mxs
 from blurdev import debug
@@ -358,6 +358,21 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 
+	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
+		name = 'Model' if not name else name
+		output = mxs.Point(cross=False, name='.'.join([name, 'Model']))
+		# modelsRoot = self._findNativeObject('Models')
+		# if not modelsRoot:
+		# 	modelsRoot = mxs.Point(name='Models')
+		# output.parent = modelsRoot
+		if nativeObjects:
+			for nativeObject in nativeObjects:
+				nativeObject.parent = output
+				nativeObject.name = '.'.join([name, nativeObject.name])
+		nativeObjects.append(output)
+		# self._createNativeLayer(name, nativeObjects)
+		return output
+
 	def _createNativeLayer(self, name, nativeObjects=[]):
 		"""
 			\remarks	implements the AbstractScene._createNativeLayer method to return a new Studiomax layer
@@ -389,26 +404,6 @@ class StudiomaxScene(AbstractScene):
 			self.metaData().setValue('layerGroupStates', states)
 			return name
 		return ''
-
-	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
-		"""
-			\remarks	implements the AbstractScene._createNativeModel method to return a new Studiomax model
-			\param		name			<str>
-			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
-			\return		<Py3dsMax.mxs.Object> nativeObject || None
-		"""
-		output = mxs.Point(name=name)
-		modelsRoot = self._findNativeObject('Models')
-		if not modelsRoot:
-			modelsRoot = mxs.Point(name='Models')
-		output.parent = modelsRoot
-		if (nativeObjects):
-			for nativeObject in nativeObjects:
-				nativeObject.parent = output
-				nativeObject.name = '.'.join([ name, nativeObject.name ])
-		nativeObjects.append(output)
-		self._createNativeLayer(name, nativeObjects)
-		return output
 
 	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
 		"""
@@ -1452,33 +1447,21 @@ class StudiomaxScene(AbstractScene):
 			\return		[ <Py3dsMax.mxs.Object> ] models
 		"""
 
-		modelsRoot = self.findObject('Models')
+		# modelsRoot = self.findObject('Models')
 
-		import os
-		modelName = os.path.split(path)[1].split('.')[0]
-		objectNames = mxs.getMaxFileObjectNames(path)
-		toMerge = []
-		if 'Models' in objectNames:
-			if not modelsRoot:
-				toMerge.append('Models')
+		if os.path.exists(path):
+			model = None
+			modelName = os.path.splitext(os.path.split(path)[1])[0]
+			objectNames = mxs.getMaxFileObjectNames(path)
+			mxs.mergeMAXFile(path, objectNames, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
 
-			if modelName in objectNames:
-				toMerge.append(modelName)
-				for objectName in objectNames:
-					if (modelName + '.') in objectName:
-						toMerge.append(objectName)
-				mxs.mergeMAXFile(path, toMerge, mxs.pyhelper.namify('neverReparent'))
-			model = self._findNativeObject(modelName)
-			modelsRoot = self._findNativeObject('Models')
-			if name:
-				for objectName in toMerge:
-					obj = self._findNativeObject(objectName)
-					newName = obj.name.replace(modelName, name)
-					obj.name = newName
-			model.parent = modelsRoot
+			for name in objectNames:
+				obj = self._findNativeObject(name)
+				if not model and name == 'Model':
+					model =obj
+				obj.name = '.'.join([modelName, name])
 			return model
-		else:
-			return None
+		raise Exception('Model file does not exist.')
 
 	@pendingdeprecation
 	def _nativeModels(self):
@@ -1498,16 +1481,14 @@ class StudiomaxScene(AbstractScene):
 			\param		models [ <PySoftimage.xsi.Model>, ... ]
 			\return		<bool> success
 		"""
-		import fnmatch
 		toRemove = []
-		objects = self._nativeObjects()
+
 		for model in models:
-			toRemove.append(model)
-			name = model.name
-			for obj in objects:
-				if fnmatch.fnmatch(obj.name, '.'.join([ name, '*' ])):
-					toRemove.append(obj)
+			toRemove += [model]
+			toRemove += self._nativeObjects(wildcard='.'.join([model.name.split('.')[0], '*']))
+
 		self._removeNativeObjects(toRemove)
+		application.refresh()
 		return True
 
 	def _isolateNativeObjects(self, nativeObjects):

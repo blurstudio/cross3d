@@ -1530,20 +1530,6 @@ class AbstractScene(QObject):
 			return SceneCamera(self, nativeCamera)
 		return None
 
-	@pendingdeprecation('Use blur3d.pipe.cinematic.api.Scene.element().')
-	def currentElement(self):
-		"""
-			\remarks	return the trax element that is currently loaded based on the filename of this scene
-			\warning	this method requires Blur's trax asset tracking system to be installed to work
-			\return		<trax.api.data.Element> || None
-		"""
-		try:
-			import trax
-		except:
-			print 'The trax asset tracking system is not installed'
-			return None
-		return trax.api.findElementByPath(self.currentFileName())
-
 	def currentLayerState(self):
 		"""
 			\remarks	records the current layer state to xml and returns the string
