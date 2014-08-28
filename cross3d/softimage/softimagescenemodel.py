@@ -119,7 +119,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 				if self.resolution() == res:
 					return True
 		else:
-			self.userProps('resolution') = resolution
+			self.userProps()['resolution'] = resolution
 
 		return False
 
