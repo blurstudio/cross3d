@@ -364,7 +364,7 @@ class SoftimageScene(AbstractScene):
 			target.Name = '_'.join([name, 'Target'])
 
 		# Setting rotation order to ZXY. By default it's pretty bad.
-		camera.Parameters('rotorder').Value = 4
+		# camera.Parameters('rotorder').Value = 4
 
 		return camera
 		
