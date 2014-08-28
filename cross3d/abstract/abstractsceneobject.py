@@ -45,12 +45,7 @@ class AbstractSceneObject(SceneWrapper):
 				if not c._objectType == ObjectType.Generic:
 					cls._subClasses[ c._objectType ] = c
 
-		# Handling our virtual implementation of Max models.
-		split = nativeObject.name.split('.')
-		if len(split) == 2 and split[1] == 'Model':
-			sceneObjectType = ObjectType.Model
-		else:
-			sceneObjectType = cls._typeOfNativeObject(nativeObject)
+		sceneObjectType = cls._typeOfNativeObject(nativeObject)
 			
 		if sceneObjectType in cls._subClasses:
 			c = cls._subClasses[sceneObjectType]

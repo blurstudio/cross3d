@@ -20,6 +20,7 @@ import traceback
 from Py3dsMax import mxs
 from blurdev import debug
 from PyQt4.QtCore import QTimer
+from blur3d.api import UserProps
 from blur3d.api import application
 from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
@@ -360,17 +361,15 @@ class StudiomaxScene(AbstractScene):
 
 	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
 		name = 'Model' if not name else name
-		output = mxs.Point(cross=False, name='.'.join([name, 'Model']))
-		# modelsRoot = self._findNativeObject('Models')
-		# if not modelsRoot:
-		# 	modelsRoot = mxs.Point(name='Models')
-		# output.parent = modelsRoot
+		output = mxs.Point(cross=False, name=name)
+		userProps = UserProps(output)
+		userProps['model'] = True
+
 		if nativeObjects:
 			for nativeObject in nativeObjects:
 				nativeObject.parent = output
 				nativeObject.name = '.'.join([name, nativeObject.name])
 		nativeObjects.append(output)
-		# self._createNativeLayer(name, nativeObjects)
 		return output
 
 	def _createNativeLayer(self, name, nativeObjects=[]):
@@ -1446,9 +1445,6 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._importNativeModel to import and return a native model from an external file. added by douglas.
 			\return		[ <Py3dsMax.mxs.Object> ] models
 		"""
-
-		# modelsRoot = self.findObject('Models')
-
 		if os.path.exists(path):
 			model = None
 			modelName = os.path.splitext(os.path.split(path)[1])[0]
@@ -1458,8 +1454,10 @@ class StudiomaxScene(AbstractScene):
 			for name in objectNames:
 				obj = self._findNativeObject(name)
 				if not model and name == 'Model':
-					model =obj
-				obj.name = '.'.join([modelName, name])
+					model = obj
+					model.name = modelName
+				else:
+					obj.name = '.'.join([modelName, name])
 			return model
 		raise Exception('Model file does not exist.')
 

@@ -15,23 +15,16 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 class StudiomaxSceneModel( AbstractSceneModel ):
 
-	def displayName(self):
-		return self._nativePointer.name.split('.')[0]
-
 	def setDisplayName(self, displayName):
 		for obj in self.objects():
 			nativePointer = obj.nativePointer()
 			nativePointer.name = nativePointer.name.replace(self.displayName(), displayName)
-		self._nativePointer.name = '.'.join([displayName, 'Model'])
+		self._nativePointer.name = displayName
 		return True
 
 	def objects(self, wildcard='*', type=''):
-		output = []
 		objects = self._scene.objects(wildcard='%s.%s' % (self.displayName(), wildcard), type=type)
-		for obj in objects:
-			if not obj.name() == self.name():
-				output.append(obj)
-		return output
+		return objects
 
 	def setResolution(self, resolution):
 		self.userProps()['resolution'] = resolution

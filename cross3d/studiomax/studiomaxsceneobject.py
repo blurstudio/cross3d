@@ -10,6 +10,7 @@
 #
 
 from Py3dsMax import mxs
+from blur3d.api import UserProps
 from blur3d.constants import ObjectType
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
@@ -27,8 +28,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
-	def  _nativeType(self):
+
+	def _nativeType(self):
 		"""
 			\remarks	implements the AbstractSceneObject._findNativeChild method as a convinance function to return class 
 			information as  string
@@ -405,15 +406,22 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	#------------------------------------------------------------------------------------------------------------------------
 	
 	@staticmethod
-	def _typeOfNativeObject( nativeObject ):
+	def _typeOfNativeObject(nativeObject):
 		"""
 			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
 			\param		<Py3dsMax.mxs.Object> nativeObject || None
 			\return		<bool> success
 		"""
-		output = 	_nativeObjectTypes.get( str( mxs.classOf( nativeObject ) ), 
-					_nativeObjectTypes.get( str( mxs.superClassOf( nativeObject ) ),
-					AbstractSceneObject._typeOfNativeObject( nativeObject ) ) )
+
+		# Checking for model.
+		if mxs.classOf(nativeObject) == mxs.Point: 
+			userProps = UserProps(nativeObject)
+			if 'model' in userProps:
+				return ObjectType.Model
+
+		output = 	_nativeObjectTypes.get(str(mxs.classOf(nativeObject)), 
+					_nativeObjectTypes.get(str(mxs.superClassOf(nativeObject)),
+					AbstractSceneObject._typeOfNativeObject(nativeObject)))
 		return output
 
 # register the symbol

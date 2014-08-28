@@ -88,34 +88,38 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return False
 
 	def setResolution(self, resolution):
-		# handles qstrings
-		resolution = unicode(resolution)
-		# If I dont re-initialize a model object it does not return me the right resolutions.
-		resolutions = self._scene.findObject(self.name()).resolutions()
-		for res in resolutions:
-						
-			# Handles cases sensitivity (crappy, but needed because resolution
-			# names often come from filenames).
-			if res.lower() != resolution.lower():
-				continue
-		
-			# Storing the user props that might be compromised when switching the reference model.
-			userProps = self.userProps()
-			oldUserProps = userProps.lookupProps()
 
-			# Setting the resolution.
-			xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 13, "")
-			xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(res))
-			xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 15, "")
+		if self.isReferenced():
+			# handles qstrings
+			resolution = unicode(resolution)
+			# If I dont re-initialize a model object it does not return me the right resolutions.
+			resolutions = self._scene.findObject(self.name()).resolutions()
+			for res in resolutions:
+							
+				# Handles cases sensitivity (crappy, but needed because resolution
+				# names often come from filenames).
+				if res.lower() != resolution.lower():
+					continue
+			
+				# Storing the user props that might be compromised when switching the reference model.
+				userProps = self.userProps()
+				oldUserProps = userProps.lookupProps()
 
-			# Making sure all the keys that where on the old resolution are re-assigned to the new one.
-			for key in oldUserProps:
-				if oldUserProps.get(key) and not userProps.get(key):
-					userProps[key] = oldUserProps[key]
+				# Setting the resolution.
+				xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 13, "")
+				xsi.SetResolutionOfRefModels(self._nativePointer, resolutions.index(res))
+				xsi.SetValue("%s.Delta.persist_mixer_modifications"%self._nativePointer.FullName, 15, "")
 
-			# If the resolution did change.
-			if self.resolution() == res:
-				return True
+				# Making sure all the keys that where on the old resolution are re-assigned to the new one.
+				for key in oldUserProps:
+					if oldUserProps.get(key) and not userProps.get(key):
+						userProps[key] = oldUserProps[key]
+
+				# If the resolution did change.
+				if self.resolution() == res:
+					return True
+		else:
+			self.userProps('resolution') = resolution
 
 		return False
 
@@ -131,7 +135,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 					if active_res is not None:
 						return resolutions[active_res.Value]
 				
-		return ''
+		return self.userProps().get('resolution', '')
 
 	def resolutions(self):
 		resolutions = []
