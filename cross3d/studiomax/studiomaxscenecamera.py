@@ -14,6 +14,7 @@ import math
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
 from blur3d.constants import CameraType
+import blur3d.api
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -310,7 +311,25 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 	
 	def isVrayCam(self):
 		return unicode(mxs.classOf(self.nativePointer())).lower().startswith('vray')
-		
+	
+	def interest(self):
+		if self._nativePointer.Target:
+			return blur3d.api.SceneObject(self._scene, self._nativePointer.Target)
+		return None
+	
+	def setInterest(self, interest):
+		if interest:
+			self._nativePointer.Target = interest.nativePointer()
+			self._nativePointer.Targeted = True
+		else:
+			self._nativePointer.Targeted = False
+			
+			# Delete any orphaned targets for this camera.
+			target = mxs.findObject(self._nativePointer.name + '.Target')
+			while target:
+				mxs.delete(target)
+				target = mxs.findObject(self._nativePointer.name + '.Target')
+				
 	
 # register the symbol
 from blur3d import api
