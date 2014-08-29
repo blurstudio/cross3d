@@ -854,11 +854,13 @@ class StudiomaxScene(AbstractScene):
 
 		# Processing the wildcard.
 		if wildcard:
-			expression = wildcard.replace('*', '.+').strip('.+') + '$'
+			expression = wildcard.replace('*', '.+')
+			if not expression[-1] == '$':
+				expression += '$'
 			holder = []
-			for object in objects:
-				if re.findall(expression, object.name, flags=re.I):
-					holder.append(object)
+			for obj in objects:
+				if re.match(expression, obj.name, flags=re.I):
+					holder.append(obj)
 			ret = holder
 
 		else:
