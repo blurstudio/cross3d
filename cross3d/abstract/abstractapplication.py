@@ -208,6 +208,10 @@ class AbstractApplication(QObject):
 		return ''
 	
 	@abstractmethod
+	def nameSpaceSeparator(self):
+		return ''
+
+	@abstractmethod
 	def name(self):
 		"""
 		Returns the unique name of the software.
@@ -228,6 +232,14 @@ class AbstractApplication(QObject):
 		:rtype: str
 		
 		"""
+		return ''
+
+	@abstractmethod
+	def sceneFileExtension(self):
+		return ''
+
+	@abstractmethod
+	def modelFileExtension(self):
 		return ''
 
 	@abstractmethod

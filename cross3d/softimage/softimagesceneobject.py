@@ -21,6 +21,20 @@ from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 
 class SoftimageSceneObject(AbstractSceneObject):
 
+	_nativeToAbstractObjectType = { 'light'         : ObjectType.Light,
+									'camera'        : ObjectType.Camera,
+									'Thinking'      : ObjectType.Particle | ObjectType.Thinking,
+									'PF_Source'     : ObjectType.Particle,
+									'FumeFX'		: ObjectType.FumeFX,
+									'polymsh' 		: ObjectType.Geometry,
+									'surfmsh'		: ObjectType.NurbsSurface,
+									'crvlist'		: ObjectType.Curve,
+									'#model'		: ObjectType.Model,
+									'#Group'		: ObjectType.Group,
+									'CameraInterest': ObjectType.CameraInterest }
+
+	_abstractToNativeObjectType = dict((v,k) for k, v in _nativeToAbstractObjectType.iteritems())
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -267,6 +281,26 @@ class SoftimageSceneObject(AbstractSceneObject):
 		return trans.posx.Value, trans.posy.Value, trans.posz.Value
 
 	#------------------------------------------------------------------------------------------------------------------------
+	# 												class methods
+	#------------------------------------------------------------------------------------------------------------------------
+
+	@classmethod
+	def _typeOfNativeObject(cls, nativeObject):
+		"""
+			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
+			\param		<PySoftimage.xsi.Object> nativeObject || None
+			\return		<bool> success
+		"""
+
+		type = nativeObject.Type
+		abstractType = cls._nativeToAbstractObjectType.get(type)
+
+		if abstractType == None:
+			return AbstractSceneObject._typeOfNativeObject(nativeObject)
+			
+		return abstractType
+
+	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
 
@@ -294,42 +328,6 @@ class SoftimageSceneObject(AbstractSceneObject):
 		else:
 			return None
 		return AbstractSceneObject._nativeTypeOfObjectType(objectType)
-
-	@staticmethod
-	def _typeOfNativeObject(nativeObject):
-		"""
-			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
-			\param		<PySoftimage.xsi.Object> nativeObject || None
-			\return		<bool> success
-		"""
-
-		type = nativeObject.Type
-
-		if type in 'polymsh':
-			return ObjectType.Geometry
-
-		if type == 'surfmsh':
-			return ObjectType.NurbsSurface
-
-		elif type == 'crvlist':
-			return ObjectType.Curve
-
-		elif type == 'light':
-			return ObjectType.Light
-
-		elif type == 'camera':
-			return ObjectType.Camera
-
-		elif type == '#model':
-			return ObjectType.Model
-
-		elif type == '#Group':
-			return ObjectType.Group
-
-		elif type == 'CameraInterest':
-			return ObjectType.CameraInterest
-
-		return AbstractSceneObject._typeOfNativeObject(nativeObject)
 
 	def keyedFrames(self, start=None, end=None):		
 		

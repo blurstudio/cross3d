@@ -75,7 +75,10 @@ class SoftimageApplication(AbstractApplication):
 		"""
 		if args:
 			dispatch.objectDeleted.emit(args[0])
-			
+
+	def nameSpaceSeparator(self):
+		return '.'
+
 	def version(self, major=True):
 		"""
 			\remarks	Returns the version major of XSI.
@@ -145,7 +148,12 @@ class SoftimageApplication(AbstractApplication):
 	
 	def log( self, message ):
 		xsi.LogMessage( message )
-		
+
+	def sceneFileExtension(self):
+		return 'scn'
+
+	def modelFileExtension(self):
+		return 'emdl'
 		
 # register the symbol
 api.registerSymbol( 'Application', SoftimageApplication)

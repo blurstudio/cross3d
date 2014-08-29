@@ -643,6 +643,19 @@ class AbstractSceneObject(SceneWrapper):
 		return self.setParameters(self._parameters)
 
 	#------------------------------------------------------------------------------------------------------------------------
+	# 												class methods
+	#------------------------------------------------------------------------------------------------------------------------
+	#
+	@classmethod
+	def _typeOfNativeObject(cls, nativeObject):
+		"""
+			\remarks	[virtual]	returns the ObjectType of the nativeObject applied
+			\param		<variant> nativeObject || None
+			\return		<bool> success
+		"""
+		return ObjectType.Generic
+
+	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
 
@@ -654,16 +667,6 @@ class AbstractSceneObject(SceneWrapper):
 			\return		<bool> success
 		"""
 		return None
-
-
-	@staticmethod
-	def _typeOfNativeObject(nativeObject):
-		"""
-			\remarks	[virtual]	returns the ObjectType of the nativeObject applied
-			\param		<variant> nativeObject || None
-			\return		<bool> success
-		"""
-		return ObjectType.Generic
 
 	@staticmethod
 	def _subclasses(cls, classes=[], includeClass=False):

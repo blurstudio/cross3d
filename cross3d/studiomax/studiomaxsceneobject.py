@@ -13,15 +13,18 @@ from Py3dsMax import mxs
 from blur3d.api import UserProps
 from blur3d.constants import ObjectType
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
-
-_nativeObjectTypes = { 	'light'         : ObjectType.Light,
-						'camera'        : ObjectType.Camera,
-						'Thinking'      : ObjectType.Particle | ObjectType.Thinking,
-						'PF_Source'     : ObjectType.Particle,
-						'FumeFX'		: ObjectType.FumeFX,
-						'GeometryClass' : ObjectType.Geometry }
-							
+						
 class StudiomaxSceneObject( AbstractSceneObject ):
+
+	_nativeToAbstractObjectType = { 'light'         : ObjectType.Light,
+									'camera'        : ObjectType.Camera,
+									'Thinking'      : ObjectType.Particle | ObjectType.Thinking,
+									'PF_Source'     : ObjectType.Particle,
+									'FumeFX'		: ObjectType.FumeFX,
+									'GeometryClass' : ObjectType.Geometry }
+
+	_abstractToNativeObjectType = dict((v,k) for k, v in _nativeToAbstractObjectType.iteritems())
+
 	AppDataAltMtlIndex		= 1108
 	AppDataAltPropIndex 	= 1110
 	
@@ -405,8 +408,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
 	
-	@staticmethod
-	def _typeOfNativeObject(nativeObject):
+	@classmethod
+	def _typeOfNativeObject(cls, nativeObject):
 		"""
 			\remarks	reimplements the AbstractSceneObject._typeOfNativeObject method to returns the ObjectType of the nativeObject applied
 			\param		<Py3dsMax.mxs.Object> nativeObject || None
@@ -419,8 +422,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			if 'model' in userProps:
 				return ObjectType.Model
 
-		output = 	_nativeObjectTypes.get(str(mxs.classOf(nativeObject)), 
-					_nativeObjectTypes.get(str(mxs.superClassOf(nativeObject)),
+		output = 	cls._nativeToAbstractObjectType.get(str(mxs.classOf(nativeObject)), 
+					cls._nativeToAbstractObjectType.get(str(mxs.superClassOf(nativeObject)),
 					AbstractSceneObject._typeOfNativeObject(nativeObject)))
 		return output
 

@@ -129,14 +129,16 @@ class SoftimageScene(AbstractScene):
 				models.append(obj)
 		return models
 	
-	def _nativeObjects(self, getsFromSelection=False, wildcard=''):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
+
+		# TODO: Needs to be severely optimzed.
+		# nativeType = SceneObject._abstractToNativeObjectType.get(type)
+
 		if getsFromSelection:
-#			objects = xsiFactory.CreateObject( 'XSI.Collection' )
-#			objects.AddItems( objects )
 			if wildcard:
 				import re
 				expression = wildcard.replace('*', '.+').strip('.+')
@@ -144,12 +146,21 @@ class SoftimageScene(AbstractScene):
 				for obj in xsi.Selection:
 					if re.findall(expression, obj.FullName, flags=re.I):
 						output.append(obj)
-				return output
+				objects = output
 			else:
 				objects = [ obj for obj in xsi.Selection ]
 		else:
 			root = self._nativeRootObject()
 			objects = root.FindChildren(wildcard, '', '', True)
+
+		if type:
+			holder = []
+			from blur3d.api import SceneObject
+			for obj in objects:
+				if SceneObject._typeOfNativeObject(obj) == type:
+					holder.append(obj)
+			objects = holder
+
 		return objects
 		
 	def _nativeSelection(self, wildcard=''):

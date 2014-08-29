@@ -9,6 +9,7 @@
 #	\date		06/27/11
 #
 
+from blur3d.api import application
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -22,16 +23,28 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 		self._nativePointer.name = displayName
 		return True
 
-	def objects(self, wildcard='*', type=''):
-		objects = self._scene.objects(wildcard='%s.%s' % (self.displayName(), wildcard), type=type)
-		return objects
-
 	def setResolution(self, resolution):
 		self.userProps()['resolution'] = resolution
 		return True
 
 	def resolution(self):
 		return self.userProps().get('resolution', '')
+
+	def export(self, filename):
+		name = self.displayName()
+		objects = self._nativeObjects()
+
+		# Removing the name space.
+		for obj in objects:
+			obj.name = obj.name.replace(name + '.', '')
+		self._nativePointer.name = 'Model'
+
+		self._scene._exportNativeObjects(objects + [self._nativePointer], filename)
+
+		# Restoring the name space.
+		for obj in objects:
+			obj.name = '.'.join([name, obj.name])
+		self._nativePointer.name = name
 
 # register the symbol
 from blur3d import api

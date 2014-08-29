@@ -11,6 +11,7 @@
 
 from blur3d import api
 from blur3d import abstractmethod
+from blur3d.api import application
 from blur3d.constants import ObjectType
 from blur3d.api import SceneObject, Group
 from blurdev.decorators import pendingdeprecation
@@ -36,8 +37,14 @@ class AbstractSceneModel(SceneObject):
 	def isReferenced(self):
 		return False
 		
-	def objects(self, wildcard='', type=''):
-		return self.children(recursive=True, wildcard=wildcard, type=type)
+	def objects(self, wildcard='*', type=''):
+		return [SceneObject(self._scene, nativeObject) for nativeObject in self._nativeObjects(wildcard=wildcard, type=type)]
+
+	def _nativeObjects(self, wildcard='*', type=''):
+
+		# Adding model name space to wildcard.
+		wildcard = '%s%s%s' % (self.displayName(), application.nameSpaceSeparator(), wildcard)
+		return self._scene._nativeObjects(wildcard=wildcard, type=type)
 
 	def groups(self, wildcard='*'):
 		groups = []
@@ -125,6 +132,10 @@ class AbstractSceneModel(SceneObject):
 	@abstractmethod
 	def matchAnimation(self, model, objects=[]):
 		return False
+
+	def findObject(self, displayName='', uniqueId=0):
+		name = '.'.join([self.displayName(), displayName])
+		return self._scene.findObject(name, uniqueId)
 
 # register the symbol
 api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

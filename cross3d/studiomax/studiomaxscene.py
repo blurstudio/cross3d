@@ -838,23 +838,41 @@ class StudiomaxScene(AbstractScene):
 
 		return output
 
-	def _nativeObjects(self, getsFromSelection=False, wildcard=''):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
+		
+		# TODO: Needs to be severely optimzed.
+		# nativeType = SceneObject._abstractToNativeObjectType.get(type)
+
 		if getsFromSelection:
 			objects = mxs.selection
 		else:
 			objects = mxs.objects
+
+		# Processing the wildcard.
 		if wildcard:
-			expression = wildcard.replace('*', '.+').strip('.+')
-			output = []
+			expression = wildcard.replace('*', '.+').strip('.+') + '$'
+			holder = []
 			for object in objects:
 				if re.findall(expression, object.name, flags=re.I):
-					output.append(object)
-			return output
-		return objects
+					holder.append(object)
+			ret = holder
+
+		else:
+			ret = objects
+
+		if type:
+			holder = []
+			from blur3d.api import SceneObject
+			for obj in ret:
+				if SceneObject._typeOfNativeObject(obj) == type:
+					holder.append(obj)
+			ret = holder
+
+		return ret
 
 	def _nativeSelection(self, wildcard=''):
 		return self._nativeObjects(getsFromSelection=True, wildcard=wildcard)

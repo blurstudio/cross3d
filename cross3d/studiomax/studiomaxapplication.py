@@ -223,6 +223,15 @@ class StudiomaxApplication(AbstractApplication):
 	def year(self):
 		return 1998 + self.version()
 
+	def nameSpaceSeparator(self):
+		return '.'
+
+	def sceneFileExtension(self):
+		return 'max'
+
+	def modelFileExtension(self):
+		return self.sceneFileExtension()
+
 	def nameAndVersion( self ):
 		version = mxs.maxVersion()
 		jobTypeDic = {

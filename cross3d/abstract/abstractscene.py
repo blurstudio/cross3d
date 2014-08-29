@@ -497,7 +497,7 @@ class AbstractScene(QObject):
 		return []
 
 	@abstractmethod
-	def _nativeObjects(self, getsFromSelection=False, wildcard=''):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
 		"""
 			\remarks	returns the native objects from the scene
 			\param		wildcard <string>
@@ -1893,15 +1893,7 @@ class AbstractScene(QObject):
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
 		from blur3d.api import SceneObject
-		objects = [ SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard) ]
-		if type:
-			output = []
-			for obj in objects:
-				if obj.objectType() & type:
-					output.append(obj)
-			return output
-		else:
-			return objects
+		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type)]
 
 	def saveMaterialsToLibrary(self, filename=''):
 		"""
@@ -2474,6 +2466,7 @@ class AbstractScene(QObject):
 		"""
 		return False
 
+	@pendingdeprecation('Use Model.export method instead')
 	def exportModel(self, model, path):
 		"""
 			\remarks	exports a specified model to a specific path
