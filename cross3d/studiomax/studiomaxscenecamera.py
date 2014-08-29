@@ -319,10 +319,13 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 	
 	def setInterest(self, interest):
 		if interest:
-			self._nativePointer.Target = interest.nativePointer()
-			self._nativePointer.Targeted = True
+			if mxs.isproperty(self._nativePointer, "target"):
+				self._nativePointer.Target = interest.nativePointer()
+			if mxs.isproperty(self._nativePointer, 'targeted'):
+				self._nativePointer.Targeted = True
 		else:
-			self._nativePointer.Targeted = False
+			if mxs.isproperty(self._nativePointer, "targeted"):
+				self._nativePointer.Targeted = False
 			
 			# Delete any orphaned targets for this camera.
 			target = mxs.findObject(self._nativePointer.name + '.Target')
