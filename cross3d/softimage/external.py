@@ -1,7 +1,9 @@
 ##
 # 	\namespace	blur3d.api.softimage.external
 #
-#	\remarks	[desc::commented]
+#	\remarks	This class can be used even outside of softimage. It gives you info on where
+#				softimage is installed, and allows you to run scripts in softimage.
+#				To Access this class use: blur3d.api.external('softimage')
 #
 # 	\author		dougl@blur.com
 # 	\author		Blur Studio
@@ -11,9 +13,7 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
-import sys
-import glob
-import shutil
+#import glob
 import subprocess
 import xml.etree.cElementTree as ET
 
@@ -22,9 +22,6 @@ from blur3d.api.abstract.external import External as AbstractExternal
 #------------------------------------------------------------------------------------------------------------------------
 
 class External(AbstractExternal):
-
-	_architectureTokens = {64: r'Program Files', 32: r'Program Files (x86)'}
-	_versionTokens = {10: r'Softimage 2012', 11: r'Softimage 2013', 12: r'Softimage 2014', 13: r'Softimage 2015'}
 
 	@classmethod
 	def getFileVersion(cls, filepath):
@@ -73,33 +70,14 @@ class External(AbstractExternal):
 		return r'C:\temp\softimage_batchscript.log'
 
 	@classmethod
-	def binariesPath(cls, version=None, architecture=64):
-		
-		# Getting the latest version if not provided.
-		versions = [version] if version else sorted(cls._versionTokens.keys())
-
-		# Getting tokens for the the binary folder path.
-		tokens = {}
-		tokens['architecture'] = cls._architectureTokens.get(architecture)
-		
-		if tokens['architecture']:
-			for version in reversed(versions):
-				tokens['version'] = cls._versionTokens.get(version)
-
-				if tokens['version']:
-					servicePacks = glob.glob(r'C:\{architecture}\Autodesk\{version}*'.format(**tokens))
-
-					print servicePacks
-					for servicePack in reversed(servicePacks):
-
-						path = os.path.join(servicePack, 'Application', 'bin')
-						binary = os.path.join(path, 'xsibatch.exe')
-
-						if os.path.exists(binary):
-							return path
-						else:
-							continue
-
-			raise Exception('No valid binary found for Softimage. Makes sure it is installed in the expected directory.')
-
-		raise Exception('Invalid version or architecture.')
+	def binariesPath(cls, version=None, architecture=64, language='English'):
+		""" Finds the install path for various software installations. Does not need to be
+		:param version: The version of the software. Default is None
+		:param architecture: The bit type to query the registry for(32, 64). Default is 64
+		:param language: Optional language that may be required for specific softwares.
+		"""
+		ret = cls._registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\Softimage\InstallPaths', unicode(version), architecture)[0]
+		# If the version is not installed this will return '.', we want to return False.
+		if ret:
+			return os.path.normpath(ret)
+		return False

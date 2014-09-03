@@ -13,6 +13,8 @@ from blurdev import relativePath
 
 StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
 
+import external
+
 def init():
 	
 	# Making sure we can import the layer.
