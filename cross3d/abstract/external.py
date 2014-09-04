@@ -91,6 +91,20 @@ class External(QObject):
 		return ret
 	
 	@classmethod
+	def _listRegKeys(cls, registry, key, architecture=64):
+		import _winreg
+		regKey = cls._getRegKey(registry, key, architecture=architecture)
+		index = 0
+		ret = []
+		while True:
+			try:
+				ret.append(_winreg.EnumKey(regKey, index))
+				index += 1
+			except WindowsError:
+				break
+		return ret
+	
+	@classmethod
 	def _registryValue(cls, registry, key, value_name, architecture=64):
 		""" Returns the value of the provided registry key's value name.
 		:param registry: The registry to look in. 'HKEY_LOCAL_MACHINE' for example
