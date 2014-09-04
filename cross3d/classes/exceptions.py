@@ -35,3 +35,13 @@ class Exceptions:
 			Exception Raised if unable to change the FPS
 		"""
 		pass
+	
+	class SoftwareNotInstalled(Blur3DException):
+		""" Exception rased if unable to find the software version.
+		"""
+		def __init__(self, name, version='', architecture=64, language='English'):
+			if version:
+				version = ' {}'.format(version)
+			self.message = '{name}{version} {arch}Bit not installed for {language}.'.format(
+					name=name, version=version, arch=architecture, language=language)
+			super(Exceptions.SoftwareNotInstalled, self).__init__(self.message)

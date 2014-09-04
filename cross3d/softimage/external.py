@@ -13,15 +13,19 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
-#import glob
 import subprocess
 import xml.etree.cElementTree as ET
 
+from blur3d.api import Exceptions
 from blur3d.api.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
 
 class External(AbstractExternal):
+	# In case the software is installed but not used don't find it when not passing in a version
+	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_SOFTIMAGE', '2015').split(','))
+	# map years to version numbers
+	_yearForVersion = {'8': '2010', '9': '2011', '10': '2012', '11': '2013', '12': '2014', '13': '2015'}
 
 	@classmethod
 	def getFileVersion(cls, filepath):
@@ -71,13 +75,30 @@ class External(AbstractExternal):
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):
-		""" Finds the install path for various software installations. Does not need to be
+		""" Finds the install path for various software installations. If version is None, the default
+		it will return the latest installed version of the software. Raises blur3d.api.Exceptions.SoftwareNotInstalled
+		if the software is not installed.
 		:param version: The version of the software. Default is None
 		:param architecture: The bit type to query the registry for(32, 64). Default is 64
 		:param language: Optional language that may be required for specific softwares.
 		"""
-		ret = cls._registryValue('HKEY_LOCAL_MACHINE', r'Software\Autodesk\Softimage\InstallPaths', unicode(version), architecture)[0]
+		hive = 'HKEY_LOCAL_MACHINE'
+		hkey = r'Software\Autodesk\Softimage\InstallPaths'
+		ret = None
+		if version == None:
+			# Find the latest version
+			versions = cls._listRegKeyValues(hive, hkey, architecture=architecture)
+			for version in sorted(versions, key= lambda i: i[0], reverse=True):
+				if version[0] not in cls._ignoredVersions:
+					ret = version[1]
+					break
+		else:
+			version = cls._yearForVersion.get(unicode(version), version)
+			try:
+				ret = cls._registryValue(hive, hkey, unicode(version), architecture)[0]
+			except WindowsError:
+				raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.
 		if ret:
 			return os.path.normpath(ret)
-		return False
+		raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
