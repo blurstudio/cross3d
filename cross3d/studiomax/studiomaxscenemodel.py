@@ -46,6 +46,12 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 			obj.name = '.'.join([name, obj.name])
 		self._nativePointer.name = name
 
+	def _nativeGroups(self, wildcard='*'):
+		"""
+			For groups in Max we return native layers instead since they do not exist.
+		"""
+		return self._scene._nativeLayers('.'.join([self.displayName(), wildcard]))
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneModel', StudiomaxSceneModel )

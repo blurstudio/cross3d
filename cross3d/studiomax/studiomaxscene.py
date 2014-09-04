@@ -778,7 +778,7 @@ class StudiomaxScene(AbstractScene):
 
 		return fxInstances
 
-	def _nativeLayers(self):
+	def _nativeLayers(self, wildcard=''):
 		"""
 			\remarks	implements the AbstractScene._nativeLayers method to return a list of the native layers in this scene
 			\return		<list> [ <Py3dsMax.mxs.Layer> nativeLayer, .. ]
@@ -786,7 +786,23 @@ class StudiomaxScene(AbstractScene):
 		layerManager 	 = mxs.layerManager
 		count 			 = layerManager.count
 		getLayer 		 = layerManager.getLayer
-		return [ getLayer(i) for i in range(count) ]
+		layers = [ getLayer(i) for i in range(count) ]
+
+		if wildcard:
+
+			# This will replace any "*" into ".+" therefore converting basic star based wildcards into a regular expression.
+			expression = re.sub(r'(?<!\\)\*', r'.*', wildcard)
+			if not expression[-1] == '$':
+				expression += '$'
+
+			holder = []
+			for layer in layers:
+				if re.match(expression, layer.name, re.I):
+					holder.append(layer)
+			return holder
+
+		else:
+			return layers
 
 	def _nativeLayerGroups(self):
 		"""
@@ -854,7 +870,9 @@ class StudiomaxScene(AbstractScene):
 
 		# Processing the wildcard.
 		if wildcard:
-			expression = wildcard.replace('*', '.+')
+
+			# This will replace any "*" into ".+" therefore converting basic star based wildcards into a regular expression.
+			expression = re.sub(r'(?<!\\)\*', r'.*', wildcard)
 			if not expression[-1] == '$':
 				expression += '$'
 			holder = []

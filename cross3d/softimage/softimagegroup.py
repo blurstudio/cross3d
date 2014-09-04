@@ -13,8 +13,10 @@ from blur3d.api import application
 from blur3d.api.abstract.abstractgroup import AbstractGroup
 
 class SoftimageGroup(AbstractGroup):
+
 	"""
-		The SoftimageSceneObjectGroup class provides an interface for working with Softimage groups.
+		This class provide an interface for Softimage's native groups.
+		Native groups in Softimage are explorable and non-transformable objects scene objects as members.
 	"""
 	
 	_groupOptionsIn = {0:2, 1:0, 2:1}
@@ -26,7 +28,7 @@ class SoftimageGroup(AbstractGroup):
 			\sa			objects
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
-		return self._nativeGroup.Members
+		return self._nativePointer.Members
 		
 	def isHidden(self):
 		return self._groupOptionsOut[ self._nativePointer.viewvis.Value ]

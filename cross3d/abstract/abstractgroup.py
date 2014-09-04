@@ -13,9 +13,10 @@ from abstractcontainer import AbstractContainer
 from blur3d import api
 
 class AbstractGroup(AbstractContainer):
+
 	"""
-		The SceneObjectGroup class provides an interface for working on sets of 
-		SceneObject's as a singular group
+		A group is an object that allows to manipulate several objects at once.
+		When it's possible a group has a native equivalent. See the various implementations for details.
 	"""
 	
 	@abstractmethod	

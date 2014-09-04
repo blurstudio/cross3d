@@ -135,7 +135,7 @@ class SoftimageScene(AbstractScene):
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
 		"""
 
-		# TODO: Needs to be severely optimzed.
+		# TODO: Needs to be severely optimzed. Make sure we can use regular expression for wildcard.
 		# nativeType = SceneObject._abstractToNativeObjectType.get(type)
 
 		if getsFromSelection:

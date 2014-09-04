@@ -1841,14 +1841,14 @@ class AbstractScene(QObject):
 		"""
 		return self._isolateNativeObjects([ obj.nativePointer() for obj in objects ])
 
-	def layers(self):
+	def layers(self, wildcard=''):
 		"""
 			\remarks	collects all the layers in the scene and returns them
 			\sa			createLayer, findLayer
 			\return		<list> [ <blur3d.api.SceneLayer>, .. ]
 		"""
 		from blur3d.api import SceneLayer
-		return [ SceneLayer(self, nativeLayer) for nativeLayer in self._nativeLayers() ]
+		return [ SceneLayer(self, nativeLayer) for nativeLayer in self._nativeLayers(wildcard) ]
 
 	def layerGroups(self):
 		"""

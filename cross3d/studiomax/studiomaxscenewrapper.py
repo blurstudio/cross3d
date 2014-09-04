@@ -108,7 +108,7 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\return		<str> name
 		"""
 
-		# This is to handle our virtual implementation of models in Max.
+		# This handles our virtual implementation of models in Max. The dot is considered as a model namespace across the API.
 		name = self.name()
 		split = name.split('.')
 		if len(split) == 2:

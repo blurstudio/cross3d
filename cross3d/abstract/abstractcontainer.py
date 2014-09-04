@@ -15,10 +15,8 @@ from blur3d import api
 
 class AbstractContainer(SceneWrapper):
 	"""
-		The SceneObjectGroup class provides an interface for working on sets of 
-		SceneObject's as a singular group
+		The SceneObjectGroup class provides an interface for working on sets of SceneObject's as a singular group.
 	"""
-
 	def __init__(self, scene, nativeGroup):
 		SceneWrapper.__init__(self, scene, nativeGroup)
 
