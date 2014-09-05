@@ -1375,6 +1375,10 @@ class AbstractScene(QObject):
 		from blur3d.api import SceneMaterial
 		return [ SceneMaterial(self, material) for material in self._cachedNativeMaterials(cacheType) if material != None ]
 
+	@abstractmethod
+	def importFBX(self, path, **kwargs):
+		return False
+
 	def importModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	import and return a model in the scene. added by douglas

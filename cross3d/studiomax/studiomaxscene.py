@@ -860,8 +860,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
 		
-		# TODO: Needs to be severely optimzed.
-		# nativeType = SceneObject._abstractToNativeObjectType.get(type)
+		# TODO: Needs to be severely optimzed. Using "nativeType = SceneObject._abstractToNativeObjectType.get(type)".
 
 		if getsFromSelection:
 			objects = mxs.selection
@@ -1478,6 +1477,34 @@ class StudiomaxScene(AbstractScene):
 			selection = self._nativeObjects(wildcard=selection)
 		mxs.selectMore(selection)
 
+	def importFBX(self, path, **kwargs):
+
+		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
+
+		args = { "animation":True, 
+				 "cameras":True,
+				 "lights":True,
+				 "envelopes":True,
+				 "forceNormEnvelope":False,
+				 "keepXSIEffectors":True,
+				 "skeletonsAsNulls":True,
+				 "scaleFactor":1.0,
+				 "fillTimeline":True,
+				 'scaleConversion': False,
+				 'converUnit': 'cm' }
+
+		args.update(kwargs)
+
+		mxs.FbxImporterSetParam("ResetImport")
+		mxs.FbxImporterSetParam("Animation", arg['animation'])
+		mxs.FbxImporterSetParam("ScaleConversion", arg['scaleConversion'])
+		mxs.FbxImporterSetParam("ConvertUnit", arg['converUnit'])
+		mxs.FbxImporterSetParam("ScaleFactor", arg['scaleFactor'])
+		
+		mxs.importfile(path, mxs.pyhelper.namify("noPrompt"))
+
+		return True
+
 	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	implements the AbstractScene._importNativeModel to import and return a native model from an external file. added by douglas.
@@ -1585,7 +1612,7 @@ class StudiomaxScene(AbstractScene):
 		self.setAnimationRange(frameRange)
 		self._setNativeSelection(nativeObjects)
 
-		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'templates', '3dsmax_fbx_export_preset.templ'))
+		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'templates', 'studiomax_fbx_export_preset.templ'))
 		with open(script_path, 'r') as f:
 			template = f.read()
 

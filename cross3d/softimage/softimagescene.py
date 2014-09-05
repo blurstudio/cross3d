@@ -269,7 +269,7 @@ class SoftimageScene(AbstractScene):
 		renderPass = xsi.CreatePass("", displayName)("Value")
 		self.setSilentMode(False)
 		return renderPass
-		
+	
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
@@ -423,7 +423,46 @@ class SoftimageScene(AbstractScene):
 		"""
 		xsi.OpenScene(filename, confirm)
 		return False
+	
+	def importFBX(self, path, **kwargs):
+
+		args = { "animation":True, 
+				 "cameras":True,
+				 "lights":True,
+				 "envelopes":True,
+				 "forceNormEnvelope":False,
+				 "keepXSIEffectors":True,
+				 "skeletonsAsNulls":True,
+				 "scaleFactor":1.0,
+				 "fillTimeline":True,
+				 'scaleConversion': False,
+				 'converUnit': 'cm' }
+
+		args.update( kwargs )
+
+		xsi.FBXImportAnimation( args["animation"] ) 
+		xsi.FBXImportCameras( args["cameras"] ) 
+		xsi.FBXImportLights( args["lights"] ) 
+		xsi.FBXImportSetEnvelopes( args["envelopes"] ) 
+		xsi.FBXImportForceNormEnvelope( args["forceNormEnvelope"] ) 
+		xsi.FBXImportKeepXSIEffectors( args["keepXSIEffectors"] ) 
+		xsi.FBXImportSkeletonsAsNulls( args["skeletonsAsNulls"] ) 
+
+		xsi.FBXImport("options" )
+		xsi.SetValue("ImportFBXOptions.ImportFrameRate", args["frameRate"] )
+		xsi.SetValue("ImportFBXOptions.ImportFillTimeline", args["fillTimeline"] )
+
+		models = [model.FullName for model in xsi.ActiveSceneRoot.FindChildren2( "*", c.siModelType )]
 		
+		xsi.FBXImport(path)
+
+		for model in xsi.ActiveSceneRoot.FindChildren2( "*", c.siModelType ):
+			if model.FullName not in models:
+				from blur3d.api import SceneModel
+				return SceneModel(model)
+
+		return False
+
 	def animationRange(self):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
