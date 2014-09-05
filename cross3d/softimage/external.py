@@ -100,5 +100,5 @@ class External(AbstractExternal):
 				raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.
 		if ret:
-			return os.path.normpath(ret)
+			return os.path.join(os.path.normpath(ret), 'Application', 'bin')
 		raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
