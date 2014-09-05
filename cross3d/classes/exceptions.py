@@ -42,6 +42,6 @@ class Exceptions:
 		def __init__(self, name, version='', architecture=64, language='English'):
 			if version:
 				version = ' {}'.format(version)
-			self.message = '{name}{version} {arch}Bit not installed for {language}.'.format(
+			self.message = '{name} {version} {arch}-bit not installed for {language}.'.format(
 					name=name, version=version, arch=architecture, language=language)
 			super(Exceptions.SoftwareNotInstalled, self).__init__(self.message)
