@@ -96,19 +96,25 @@ class External(AbstractExternal):
 		"""
 		langId = cls._languageIDs.get(language, cls._languageIDs['English'])
 		hive = 'HKEY_LOCAL_MACHINE'
-		nulVersion = version == None
 		# Ensure we get a valid version number
-		version = unicode(version)
 		version = cls._versionForYear.get(unicode(version), version)
-		if nulVersion:
+		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = cls._listRegKeys(hive, cls._hkeyBase)
+			versions = set(cls._listRegKeys(hive, cls._hkeyBase, architecture=architecture))
 			# Years to ignore isnt very useful, convert them to version numbers ('14.0').
 			# This allows the environment variable to remain the same for all of the software implemntations
 			ignoredVersions = set(['{}.0'.format(cls._versionForYear[year]) for year in cls._ignoredVersions if year in cls._versionForYear])
 			for v in sorted(versions, reverse=True):
-				if v not in ignoredVersions:
+				if v in versions and v not in ignoredVersions:
 					version = v.replace('.0', '')
+					# Ignore all keys that don't store Installdir info.
+					hkey = cls._getHkey(version, langId)
+					try:
+						ret = cls._registryValue(hive, hkey, 'Installdir', architecture)[0]
+						if not ret:
+							continue
+					except WindowsError:
+						continue
 					break
 		dispVersion = cls._yearForVersion.get(unicode(version), version)
 		hkey = cls._getHkey(version, langId)

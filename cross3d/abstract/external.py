@@ -84,24 +84,26 @@ class External(QObject):
 		"""
 		import _winreg
 		regKey = cls._getRegKey(registry, key, architecture=architecture)
-		subKeys, valueCount, modified = _winreg.QueryInfoKey(regKey)
 		ret = []
-		for index in range(valueCount):
-			ret.append(_winreg.EnumValue(regKey, index))
+		if regKey:
+			subKeys, valueCount, modified = _winreg.QueryInfoKey(regKey)
+			for index in range(valueCount):
+				ret.append(_winreg.EnumValue(regKey, index))
 		return ret
 	
 	@classmethod
 	def _listRegKeys(cls, registry, key, architecture=64):
 		import _winreg
 		regKey = cls._getRegKey(registry, key, architecture=architecture)
-		index = 0
 		ret = []
-		while True:
-			try:
-				ret.append(_winreg.EnumKey(regKey, index))
-				index += 1
-			except WindowsError:
-				break
+		if regKey:
+			index = 0
+			while True:
+				try:
+					ret.append(_winreg.EnumKey(regKey, index))
+					index += 1
+				except WindowsError:
+					break
 		return ret
 	
 	@classmethod
