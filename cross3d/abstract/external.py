@@ -12,6 +12,7 @@
 
 from PyQt4.QtCore import QObject
 from blur3d import abstractmethod
+from blur3d.constants import ScriptLanguage
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ class External(QObject):
 	
 	@classmethod
 	@abstractmethod
-	def runScript(cls, script, version=None, architecture=64):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
 		return False
 	
 	@classmethod

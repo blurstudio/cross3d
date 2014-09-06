@@ -17,6 +17,7 @@ import subprocess
 import xml.etree.cElementTree as ET
 
 from blur3d.api import Exceptions
+from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -40,7 +41,7 @@ class External(AbstractExternal):
 		return None
 
 	@classmethod
-	def runScript(cls, script, version=None, architecture=64):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
 
 		if os.path.exists(script):
 			scriptPath = script
@@ -54,7 +55,7 @@ class External(AbstractExternal):
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe')
 		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		
-		# Writing the log file.
+		# TODO: Currently the logging is done in a blocking way. Would be nice to not have to block.
 		fle = open(cls.scriptLog(), 'w')
 		fle.write(pipe.stdout.read())
 		fle.close()

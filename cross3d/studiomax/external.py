@@ -14,6 +14,7 @@ import os
 import subprocess
 
 from blur3d.api import Exceptions
+from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -48,24 +49,29 @@ class External(AbstractExternal):
 		return None
 	
 	@classmethod
-	def runScript(cls, script, version=None, architecture=64):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
 
 		if os.path.exists(script):
 			scriptPath = script
 
 		else:
 			scriptPath = cls.scriptPath()
-			fle = open(scriptPath, "w")
-			fle.write(script)
-			fle.close()
+			with open(scriptPath, "w") as fle:
+				fle.write(script)
+
+		if language == ScriptLanguage.Python:
+			scriptTemplate = os.path.join(os.path.dirname(__file__), 'templates', 'external_python_script.mstempl')
+
+			with open(scriptTemplate) as fle:
+				script = fle.read().format(scriptPath =scriptPath, debug=debug)
+			
+			scriptPath = os.path.splitext(cls.scriptPath())[0] + '.ms'
+
+			with open(scriptPath, "w") as fle:
+				fle.write(script)
 
 		binary = os.path.join(cls.binariesPath(version, architecture), '3dsmax.exe')
-		process = subprocess.Popen([binary, '-U', 'MAXScript', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-		
-		# Writing the log file.
-		fle = open(cls.scriptLog(), 'w')
-		fle.write(process.stdout.read())
-		fle.close()
+		process = subprocess.Popen([binary, '-U', 'MAXScript', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
 		# Checking the error in the log file.
 		fle = open(cls.scriptLog())

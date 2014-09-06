@@ -1612,7 +1612,7 @@ class StudiomaxScene(AbstractScene):
 		self.setAnimationRange(frameRange)
 		self._setNativeSelection(nativeObjects)
 
-		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'templates', 'studiomax_fbx_export_preset.templ'))
+		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'fbx_export_preset.pytempl'))
 		with open(script_path, 'r') as f:
 			template = f.read()
 
