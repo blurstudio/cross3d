@@ -19,7 +19,7 @@ from pywintypes import com_error
 from blurdev.decorators import stopwatch
 from blur3d.api import application, dispatch
 from blur3d import pendingdeprecation, constants
-from PySoftimage import xsi, xsiFactory
+from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 from blur3d.api.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 
@@ -433,6 +433,7 @@ class SoftimageScene(AbstractScene):
 				 "forceNormEnvelope":False,
 				 "keepXSIEffectors":True,
 				 "skeletonsAsNulls":True,
+				 "frameRate":True,
 				 "scaleFactor":1.0,
 				 "fillTimeline":True,
 				 'scaleConversion': False,
@@ -452,14 +453,14 @@ class SoftimageScene(AbstractScene):
 		xsi.SetValue("ImportFBXOptions.ImportFrameRate", args["frameRate"] )
 		xsi.SetValue("ImportFBXOptions.ImportFillTimeline", args["fillTimeline"] )
 
-		models = [model.FullName for model in xsi.ActiveSceneRoot.FindChildren2( "*", c.siModelType )]
+		models = [model.FullName for model in xsi.ActiveSceneRoot.FindChildren2( "*", xsiConstants.siModelType )]
 		
 		xsi.FBXImport(path)
 
-		for model in xsi.ActiveSceneRoot.FindChildren2( "*", c.siModelType ):
+		for model in xsi.ActiveSceneRoot.FindChildren2( "*", xsiConstants.siModelType ):
 			if model.FullName not in models:
 				from blur3d.api import SceneModel
-				return SceneModel(model)
+				return SceneModel(self, model)
 
 		return False
 
@@ -677,8 +678,7 @@ class SoftimageScene(AbstractScene):
 			\remarks	implements AbstractScene.reset to reset this scene for all the data and in the application
 			\return		<bool> success
 		"""
-		prompt = not silent
-		xsi.NewScene('', prompt)
+		xsi.NewScene('', not silent)
 		return True
 			
 	def setAnimationRange(self, animationRange, globalRange=None):

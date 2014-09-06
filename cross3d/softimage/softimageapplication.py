@@ -76,6 +76,9 @@ class SoftimageApplication(AbstractApplication):
 		if args:
 			dispatch.objectDeleted.emit(args[0])
 
+	def animationClipExtension(self):
+		return 'eani'
+
 	def nameSpaceSeparator(self):
 		return '.'
 

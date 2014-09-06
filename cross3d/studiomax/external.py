@@ -15,7 +15,6 @@ import subprocess
 
 from blur3d.api import Exceptions
 from blur3d.api.abstract.external import External as AbstractExternal
-from blurdev.media import dsofile
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -31,9 +30,13 @@ class External(AbstractExternal):
 	@classmethod
 	def getFileVersion(cls, filepath):
 		"""
-		Reads the max version that a max file was saved with from a custom 
-		dso property added to the file when it is saved from max.
+			Reads the max version that a max file was saved with from a custom 
+			dso property added to the file when it is saved from max.
 		"""
+
+		# TODO: This was move here, otherwise this top import causes an error in MotionBuilder.
+		from blurdev.media import dsofile
+
 		dso = dsofile.DSOFile()
 		try:
 			dso.open(filepath)

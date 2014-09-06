@@ -192,6 +192,10 @@ class AbstractApplication(QObject):
 		return ''
 
 	@abstractmethod
+	def animationClipExtension(self):
+		return ''
+
+	@abstractmethod
 	def sceneFileExtension(self):
 		return ''
 

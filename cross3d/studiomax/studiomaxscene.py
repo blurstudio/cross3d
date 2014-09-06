@@ -1496,10 +1496,10 @@ class StudiomaxScene(AbstractScene):
 		args.update(kwargs)
 
 		mxs.FbxImporterSetParam("ResetImport")
-		mxs.FbxImporterSetParam("Animation", arg['animation'])
-		mxs.FbxImporterSetParam("ScaleConversion", arg['scaleConversion'])
-		mxs.FbxImporterSetParam("ConvertUnit", arg['converUnit'])
-		mxs.FbxImporterSetParam("ScaleFactor", arg['scaleFactor'])
+		mxs.FbxImporterSetParam("Animation", args['animation'])
+		mxs.FbxImporterSetParam("ScaleConversion", args['scaleConversion'])
+		mxs.FbxImporterSetParam("ConvertUnit", args['converUnit'])
+		mxs.FbxImporterSetParam("ScaleFactor", args['scaleFactor'])
 		
 		mxs.importfile(path, mxs.pyhelper.namify("noPrompt"))
 

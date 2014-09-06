@@ -184,6 +184,11 @@ class StudiomaxApplication(AbstractApplication):
 		self.disconnectCallback('viewportRedraw')
 		return
 	
+	def log(self, message):
+		# TODO: Can't seem to access the native log message.
+		print message
+		return True
+
 	def installDir(self):
 		""" Returns the path to the application's install directory
 		
@@ -226,6 +231,9 @@ class StudiomaxApplication(AbstractApplication):
 	def nameSpaceSeparator(self):
 		return '.'
 
+	def animationClipExtension(self):
+		return 'bip'
+		
 	def sceneFileExtension(self):
 		return 'max'
 
