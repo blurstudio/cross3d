@@ -325,6 +325,25 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.isselected
 
+	def transformLocks(self, manipulation=True, keyability=False):
+		""" Returns a dictionary of position, rotation and scale values. This dictionary
+		can be passed to setTransformsLocks.
+		:param manipulation: Flags if manipulation will be affected. Defaults to True.
+		:param keyability: Flags if keyability will be affected. Defaults to False. (Not implemented.)
+		"""
+		ret = {'position': 'xyz', 'rotation': 'xyz', 'scale': 'xyz'}
+		if manipulation:
+			# in python BitArrays appear to be zero indexed
+			keys = {0: ('position', 'x'), 1: ('position', 'y'), 2: ('position', 'z'),
+				3: ('rotation', 'x'), 4: ('rotation', 'y'), 5: ('rotation', 'z'),
+				6: ('scale', 'x'), 7: ('scale', 'y'), 8: ('scale', 'z'), }
+			for index, value in enumerate(mxs.getTransformLockFlags(self._nativePointer)):
+				if value:
+					name, axis = keys[index]
+					ret[name] = ret[name].replace(axis, axis.upper())
+			return ret
+		return False
+
 	def setTransformsLocks(self, position=None, rotation=None, scale=None, manipulation=True, keyability=False):
 		
 		if manipulation:

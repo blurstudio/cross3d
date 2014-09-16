@@ -368,6 +368,15 @@ class AbstractSceneObject(SceneWrapper):
 		return None
 
 	@abstractmethod
+	def transformLocks(self, manipulation=True, keyability=False):
+		""" Returns a dictionary of position, rotation and scale values. This dictionary
+		can be passed to setTransformsLocks.
+		:param manipulation: Flags if manipulation will be affected. Defaults to True.
+		:param keyability: Flags if keyability will be affected. Defaults to False. (Not implemented.)
+		"""
+		return {'position': 'xyz', 'rotation': 'xyz', 'scale': 'xyz'}
+
+	@abstractmethod
 	def setTransformsLocks(self, position=None, rotation=None, scale=None, manipulation=True, keyability=False):
 		"""
 			Takes True, False, None or a string containing desired axis letters.
