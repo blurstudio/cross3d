@@ -12,12 +12,11 @@ the method.  All @abstractmethod methods MUST be implemented in a subclass.
 
 """
 
-
+from contextlib import contextmanager
 
 from PyQt4.QtCore import QObject
 from blur3d import abstractmethod
 from blur3d import api
-
 
 dispatch = None
 
@@ -214,7 +213,7 @@ class AbstractApplication(QObject):
 		return ''
 		
 	@abstractmethod
-	def log( self, message ):
+	def log(self, message):
 		pass
 	
 	def undoContext(self, name):
@@ -242,6 +241,13 @@ class AbstractApplication(QObject):
 		"""
 		api.UndoContext.closeUndo()
 	
+	@contextmanager
+	def blockRefreshContext(self, blockRefresh=True):
+		orig_blockRefresh = self.blockRefresh()
+		self.setBlockRefresh(blockRefresh)
+		yield
+		self.setBlockRefresh(orig_blockRefresh)
+		
 	def blockRefresh(self):
 		"""
 			If returns true, the refresh method will not refresh.
