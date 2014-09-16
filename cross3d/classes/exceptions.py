@@ -45,3 +45,9 @@ class Exceptions:
 			self.message = '{name} {version} {arch}-bit not installed for {language}.'.format(
 					name=name, version=version, arch=architecture, language=language)
 			super(Exceptions.SoftwareNotInstalled, self).__init__(self.message)
+
+	class SignalAlreadyConnected(Blur3DException):
+		""" Exception rased if a signal is already connected.
+		"""
+		pass
+
