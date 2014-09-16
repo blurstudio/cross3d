@@ -1,0 +1,13 @@
+SetQuietMode true
+
+function runScript frame = (
+	
+	pymax.run @"{scriptPath}"
+	if not {debug} then quitMAX #noPrompt
+						
+)
+
+runScript 1
+
+
+
