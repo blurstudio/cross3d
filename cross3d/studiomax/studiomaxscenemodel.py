@@ -9,7 +9,7 @@
 #	\date		06/27/11
 #
 
-from blur3d.api import application
+from blur3d.api import application, dispatch
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -17,9 +17,18 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 class StudiomaxSceneModel( AbstractSceneModel ):
 
 	def setDisplayName(self, displayName):
+
+		# Renaming model objects.
 		for obj in self.objects():
 			nativePointer = obj.nativePointer()
 			nativePointer.name = nativePointer.name.replace(self.displayName(), displayName)
+
+		# Renaming model layers.
+		for group in self.groups():
+			nativePointer = group.nativePointer()
+			nativePointer.setName(nativePointer.name.replace(self.displayName(), displayName))
+
+		# Renaming model.
 		self._nativePointer.name = displayName
 		return True
 
@@ -33,18 +42,37 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 	def export(self, filename):
 		name = self.displayName()
 		objects = self._nativeObjects()
+		groups = self._nativeGroups()
 
-		# Removing the name space.
+		# Removing the name space on objects.
 		for obj in objects:
 			obj.name = obj.name.replace(name + '.', '')
+
+		# Removing the name space on layers.
+		for group in groups:
+			group.setName(group.name.replace(name, 'Model'))
+
+		# Removing the name space on model.
 		self._nativePointer.name = 'Model'
 
+		# ExportNativeObjects call will trigger sceneSaveFinished and scene data is invalid until the name space is restored.
+		dispatch.blockSignals(True)
 		self._scene._exportNativeObjects(objects + [self._nativePointer], filename)
+		dispatch.blockSignals(False)
 
-		# Restoring the name space.
+		# Restoring the name space on objects.
 		for obj in objects:
 			obj.name = '.'.join([name, obj.name])
+
+		# Restoring the name space on layers.
+		for group in groups:
+			group.setName(group.name.replace('Model', name))
+
+		# Restoring the name space on model.
 		self._nativePointer.name = name
+
+		# Running the delayed sceneSaveFinished signal.
+		dispatch.dispatch('sceneSaveFinished', self._scene.currentFileName())
 
 	def _nativeGroups(self, wildcard='*'):
 		"""

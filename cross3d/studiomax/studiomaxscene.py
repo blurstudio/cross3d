@@ -1516,6 +1516,7 @@ class StudiomaxScene(AbstractScene):
 			objectNames = mxs.getMaxFileObjectNames(path)
 			mxs.mergeMAXFile(path, objectNames, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
 
+			# Adding name space to objects.
 			for name in objectNames:
 				obj = self._findNativeObject(name)
 				if not model and name == 'Model':
@@ -1523,6 +1524,13 @@ class StudiomaxScene(AbstractScene):
 					model.name = modelName
 				else:
 					obj.name = '.'.join([modelName, name])
+
+			# Adding name space to layers.
+			for layer in self.layers():
+				if 'Model.' in layer.name():
+					nativePointer = layer.nativePointer()
+					nativePointer.setName(nativePointer.name.replace('Model', modelName))
+
 			return model
 		raise Exception('Model file does not exist.')
 
