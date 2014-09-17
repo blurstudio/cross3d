@@ -33,6 +33,9 @@ class MotionBuilderScene( AbstractScene ):
 			return self._fbapp.FileSave(unicode(filename).encode('utf8'))
 		return False
 
+	def retarget(self, inputRigPath, inputAnimationPath, outputRigPath, outputAnimationPath):
+		return False
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Scene', MotionBuilderScene )

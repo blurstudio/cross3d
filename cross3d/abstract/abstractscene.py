@@ -2470,6 +2470,10 @@ class AbstractScene(QObject):
 		"""
 		return False
 
+	@abstractmethod
+	def retarget(self, inputRigPath, inputAnimationPath, outputRigPath, outputAnimationPath):
+		return False
+
 	@pendingdeprecation('Use Model.export method instead')
 	def exportModel(self, model, path):
 		"""
