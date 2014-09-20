@@ -104,27 +104,6 @@ class SoftimageUserProps(AbstractUserProps):
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)		
 		return string
-	
-	@staticmethod
-	def unescapeValue(string):
-		"""
-			\remarks	replaces any html codes with their associated unstorable characters
-						does not pickle/unpickle data.
-			\return		<float>||<int>||<list>||<dict>||<tuple>||<unicode>
-		"""
-		string = unicode(string)
-		try:
-			return json.loads( string )
-		except ValueError:
-			pass
-		string, typ = AbstractUserProps._decodeString(string)
-		if typ == float:
-			return float(string)
-		elif typ == int:
-			return int(string)
-		elif typ in (list, dict, tuple, bool):
-			return eval(string)
-		return string
 
 class SoftimageFileProps(SoftimageUserProps):
 	def __init__(self, nativePointer):
