@@ -36,6 +36,10 @@ class MayaSceneObject( AbstractSceneObject ):
 		else:
 			_nativeToAbstractObjectType[native] = abstract
 	
+	def __init__(self, scene, nativeObject):
+		nativeObject = self._asMOBject(nativeObject)
+		super(MayaSceneObject, self).__init__( scene, nativeObject)
+	
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
@@ -46,6 +50,9 @@ class MayaSceneObject( AbstractSceneObject ):
 			\param		<Py3dsMax.mxs.Object> nativeObject || None
 			\return		<bool> success
 		"""
+		# Make sure the nativeObject is a OpenMaya.MObject
+		# TODO: Move this into a blur3d private function the __new__ factory can call.
+		nativeObject = cls._asMOBject(nativeObject)
 		apiType = nativeObject.apiType()
 		if apiType == om.MFn.kTransform:
 			apiType = cls._getShapeNode(nativeObject).apiType()
