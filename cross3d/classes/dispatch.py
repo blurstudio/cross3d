@@ -122,7 +122,7 @@ class Dispatch(QObject):
 		"""
 		# only connect the callbacks if a application actually requests them
 		if not self._isConnected:
-			self._isConnected = blur3d.api.Application().connect()
+			self._isConnected = blur3d.api.application.connect()
 			# Listen for changes to the blurdev environment, ie switching between beta, gold, or local
 			blurdev.core.aboutToClearPaths.connect(self.disconnectSignals)
 		# connect the signal
