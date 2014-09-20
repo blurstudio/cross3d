@@ -1981,11 +1981,17 @@ class StudiomaxScene(AbstractScene):
 
 			data = SceneMetaData.find(mxs.globaltracks)
 			if (data):
-				version = round(data.value('version'), 2)
-				# determine if we need to upgrade
-				if (version < SceneMetaData.version):
-					# update the data
-					print 'update the data', data.value('version'), SceneMetaData.version
+				# In the event that the version key isn't stored, there's no
+				# reason to let that cause issues.  We'll just skip the version
+				# check in that instance.  This should be exceedingly rare.
+				try:
+					version = round(data.value('version'), 2)
+					# determine if we need to upgrade
+					if (version < SceneMetaData.version):
+						# update the data
+						print 'update the data', data.value('version'), SceneMetaData.version
+				except RuntimeError:
+					pass
 			else:
 				# create the main data
 				data = SceneMetaData.createUnique(mxs.globaltracks)
