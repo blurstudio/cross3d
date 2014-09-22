@@ -809,7 +809,12 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeLayerGroups method to return a list of the native layer groups in this scene
 			\return		<list> [ <str> nativeLayerGroup, .. ]
 		"""
-		return self.metaData().value('layerGroupNames')
+		# If there's no metadata value for group names, then there are
+		# no layer groups.
+		try:
+			return self.metaData().value('layerGroupNames')
+		except RuntimeError:
+			return []
 
 	def _nativeMaterials(self, baseMaterials=False):
 		#get_instances	= mxs.getClassInstances
