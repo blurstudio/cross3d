@@ -1519,7 +1519,7 @@ class StudiomaxScene(AbstractScene):
 			model = None
 			modelName = os.path.splitext(os.path.split(path)[1])[0]
 			objectNames = mxs.getMaxFileObjectNames(path)
-			mxs.mergeMAXFile(path, objectNames, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
+			mxs.mergeMAXFile(path, objectNames, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True, missingDLLsAction=mxs.pyhelper.namify('logmsg'))
 
 			# Adding name space to objects.
 			for name in objectNames:
