@@ -24,7 +24,10 @@ class MayaUserProps(AbstractUserProps):
 	
 	def keys(self):
 		# Only show user defined keys
-		return cmds.listAttr(api.SceneWrapper._MObjName(self._nativePointer), userDefined=True)
+		out = cmds.listAttr(api.SceneWrapper._MObjName(self._nativePointer), userDefined=True)
+		if out:
+			return out
+		return []
 		# Note: I was unable to find a way to identify userDefined keys in the following method
 		# so I used the maya.cmds method. If possible this finish this method and replace the 
 		# above code.

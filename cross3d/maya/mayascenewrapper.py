@@ -1,5 +1,6 @@
 import re
 import maya.OpenMaya as om
+import maya.cmds as cmds
 from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
 
 class MayaSceneWrapper( AbstractSceneWrapper ):
@@ -62,7 +63,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			# MCH 09/17/14 # TODO Evaluate if this is a valid default?
 			dataType = om.MFnData.kAny
 		if shortName == None:
-			shortName = cls._normalizeAttributeShortName(name)
+			shortName = cls._normalizeAttributeShortName(name, uniqueOnObj=mObj)
 		depNode = om.MFnDependencyNode(mObj)
 		sAttr = om.MFnTypedAttribute()
 		if False: #if default:
@@ -112,16 +113,24 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return re.sub(r'\W', '', name)
 	
 	@classmethod
-	def _normalizeAttributeShortName(cls, name):
+	def _normalizeAttributeShortName(cls, name, uniqueOnObj=None):
 		""" Creates a shortName for the provided attribute name by calling MayaSceneWrapper._normalizeAttributeName.
 		It then adds the first character to any capital letters in the rest of the name. The name is then lowercased.
+		If uniqueOnObj is provided with a object, it will ensure the returned attribute name is 
+		unique by attaching a 3 digit padded number to it. It will be the lowest available number.
 		:param name: The string used to generate the short name.
+		:param uniqueOnObj: Ensure the name is unque. Defaults to None.
 		:return: string
 		"""
 		name = cls._normalizeAttributeName(name)
 		if len(name):
 			name = name[0] + re.sub(r'[a-z]', '', name[1:])
-		return name.lower()
+		name = name.lower()
+		if uniqueOnObj:
+			# Ensure a uniqe object name by adding a value to the number
+			names = set(cmds.listAttr(cls._MObjName(uniqueOnObj), shortNames=True))
+			name = api.Scene._findUniqueName(name, names, incFormat='{name}{count}')
+		return name
 	
 	@classmethod
 	def _setAttribute(cls, mObj, name, value):

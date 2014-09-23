@@ -699,7 +699,8 @@ class AbstractScene(QObject):
 		"""
 		return None
 
-	def _findUniqueName(self, name, names, incFormat='{name}{count:03}', sanityCount=9999999):
+	@classmethod
+	def _findUniqueName(cls, name, names, incFormat='{name}{count:03}', sanityCount=9999999):
 		"""
 		A generic method to find a unique name in a given set of names.
 		:param name: The name to search for in the scene
