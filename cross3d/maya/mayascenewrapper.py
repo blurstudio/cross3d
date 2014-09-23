@@ -19,12 +19,45 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return obj
 	
 	@classmethod
+	def _getAttributeDataType(cls, data):
+		""" Returns the OpenMaya.MFnData id for the given object. Returns OpenMaya.MFnData.kInvalid
+		if the object type could not be identified.
+		:param data: the object to get the data type of
+		:return: int value for the dataType
+		"""
+		dataType = om.MFnData.kInvalid
+		if isinstance(data, basestring):
+			dataType = om.MFnData.kString
+		elif isinstance(value, float):
+			dataType = om.MFnData.kFloatArray
+		elif isinstance(value, int):
+			dataType = om.MFnData.kIntArray
+		# TODO: add support for other types
+		return dataType
+	
+	@classmethod
 	def _createAttribute(cls, mObj, name, dataType=None, shortName=None, default=None):
+		""" Create a attribute on the provided object. Returns the attribute name and shortName. You 
+		should provide dataType or default when calling this method so a valid dataType is selected. 
+		MayaSceneWrapper._normalizeAttributeName is called on name to ensure it is storing the 
+		attribute with a valid attribute name. If shortName is not provided, the name will have 
+		MayaSceneWrapper._normalizeAttributeShortName called on it.
+		:param mObj: The OpenMaya.MObject to create the attribute on
+		:param name: The name used to access the attribute
+		:param dataType: The type of data to store in the attribute. Defaults to None.
+		:param shortName: The shortName used by scripting. Defaults to None.
+		:param default: The default value assigned to the attribute. Defaults to None.
+		:return: (name, short name) Because the attribute name and shortName are normalized, this
+					returns the actual names used for attribute names.
+		"""
 		name = cls._normalizeAttributeName(name)
 		if dataType == None and default != None:
-			if isinstance(default, basestring):
-				dataType = om.MFnData.kString
-			# TODO: add support for other types
+			dataType == cls._getAttributeDataType(default)
+			if dataType == om.MFnData.kInvalid:
+				# No vaid dataType was found, default to None so we can handle it diffrently
+				dataType == None
+				from blurdev import debug
+				debug.debugMsg('Unable To determine the attribute type.\n{}'.format(str(default)))
 		if dataType == None:
 			# MCH 09/17/14 # TODO Evaluate if this is a valid default?
 			dataType = om.MFnData.kAny
@@ -38,9 +71,16 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		else:
 			attr = sAttr.create(name, shortName, dataType)
 		depNode.addAttribute(attr)
+		return name, shortName
 	
 	@classmethod
 	def _getAttribute(cls, mObj, name):
+		""" For the given OpenMaya.MObject and attribute name return the pythonic value stored on 
+		the attribute.
+		:param mObj: The OpenMaya.MObject
+		:param name: The attribute name to return the value of
+		:return: Python value stored on the attribute
+		"""
 		plug = cls._getPlug(mObj, name)
 		# OpenMaya doesn't provide a QObject.toPyObject like function, but pymel does.
 		import pymel.core
@@ -85,6 +125,14 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 	
 	@classmethod
 	def _setAttribute(cls, mObj, name, value):
+		""" Stores a pythonic value as a attribute on the provided object. This does not call
+		MayaSceneWrapper._normalizeAttributeName, so make sure you have a valid attribute name.
+		This does not create the attribute, so make sure it is created first.
+		Note: Only string, float and int dataType's are currently supported.
+		:param mObj: A OpenMaya.MObject to set the attribute value to
+		:param name: The name of the attribute to store the value in
+		:param value: The value to store in the attribute
+		"""
 		plug = cls._getPlug(mObj, name)
 		if isinstance(value, basestring):
 			plug.setString(value)
