@@ -859,7 +859,7 @@ class StudiomaxScene(AbstractScene):
 
 		return output
 
-	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
@@ -888,11 +888,11 @@ class StudiomaxScene(AbstractScene):
 		else:
 			ret = objects
 
-		if type:
+		if objectType:
 			holder = []
 			from blur3d.api import SceneObject
 			for obj in ret:
-				if SceneObject._typeOfNativeObject(obj) == type:
+				if SceneObject._typeOfNativeObject(obj) == objectType:
 					holder.append(obj)
 			ret = holder
 

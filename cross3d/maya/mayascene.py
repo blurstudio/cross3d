@@ -124,14 +124,14 @@ class MayaScene(AbstractScene):
 			selection_iter.next()
 	
 	@classmethod
-	def _objectsOfMTypeIter(cls, objType):
-		""" Maya Helper that returns a iterator of maya objects filtered by objType.
-		:param objType: A enum value used to identify objects.
+	def _objectsOfMTypeIter(cls, objectType):
+		""" Maya Helper that returns a iterator of maya objects filtered by objectType.
+		:param objectType: A enum value used to identify objects.
 		.. seeAlso.. SceneObject._abstractToNativeObjectType
 		"""
-		if not isinstance(objType, (tuple, list)):
-			objType = [objType]
-		for oType in objType:
+		if not isinstance(objectType, (tuple, list)):
+			objectType = [objectType]
+		for oType in objectType:
 			# Create iterator traverse all camera nodes
 			oIter = om.MItDependencyNodes(oType)
 			# Loop though iterator objects
@@ -167,13 +167,10 @@ class MayaScene(AbstractScene):
 			debug.debugMsg('MayaScene._findNativeObject not implemented for uniqueId yet.')
 		return output
 
-	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			:return: list [<Py3dsMax.mxs.Object> nativeObject, ..]
 		"""
-		# TODO: replace type with objType. Using builtin python variables is bad and needs to be removed
-		objType = type
-#		print 'type', type
 		if wildcard:
 			# Maya uses pipes as seperators, so escape them so they are not treated as or's
 			expression = re.sub(r'(?<!\\)\|', r'\|', wildcard)
@@ -188,21 +185,21 @@ class MayaScene(AbstractScene):
 		regex = re.compile(expression, flags=re.I)
 		if getsFromSelection:
 			objects = self._selectionIter()
-			if objType != 0 or wildcard:
+			if objectType != 0 or wildcard:
 				ret = []
 				for obj in objects:
-					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objType == objType
+					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
 					wildcardCheck = regex.match(api.SceneObject._MObjName(obj))
-#					print api.SceneObject._typeOfNativeObject(obj) & objType,  api.SceneObject._typeOfNativeObject(obj), objType, '----', typeCheck, wildcardCheck, api.SceneObject._MObjName(obj)
+#					print api.SceneObject._typeOfNativeObject(obj) & objectType,  api.SceneObject._typeOfNativeObject(obj), objectType, '----', typeCheck, wildcardCheck, api.SceneObject._MObjName(obj)
 					if typeCheck and wildcardCheck:
 						ret.append(obj)
 				objects = ret
 		else:
-			if objType == 0:
+			if objectType == 0:
 				# If a type was not provided, use the Generic type aka OpenMaya.MFn.kDagNode
-				objType = ObjectType.Generic
+				objectType = ObjectType.Generic
 			# Get a list of objects by type from Maya
-			mType = api.SceneObject._abstractToNativeObjectType[objType]
+			mType = api.SceneObject._abstractToNativeObjectType[objectType]
 			objects = self._objectsOfMTypeIter(mType)
 			# If a wildcard was provided, filter results that don't match from the type objects
 			if wildcard:

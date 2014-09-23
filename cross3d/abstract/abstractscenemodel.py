@@ -44,7 +44,7 @@ class AbstractSceneModel(SceneObject):
 
 		# Adding model name space to wildcard.
 		wildcard = '%s%s%s' % (self.displayName(), application.nameSpaceSeparator(), wildcard)
-		return self._scene._nativeObjects(wildcard=wildcard, type=type)
+		return self._scene._nativeObjects(wildcard=wildcard, objectType=type)
 
 	def groups(self, wildcard='*'):
 		groups = []

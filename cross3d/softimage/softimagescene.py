@@ -129,7 +129,7 @@ class SoftimageScene(AbstractScene):
 				models.append(obj)
 		return models
 	
-	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		"""
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <PySoftimage.xsi.X3DObject> nativeObject, .. ] || None
@@ -153,11 +153,11 @@ class SoftimageScene(AbstractScene):
 			root = self._nativeRootObject()
 			objects = root.FindChildren(wildcard, '', '', True)
 
-		if type:
+		if objectType:
 			holder = []
 			from blur3d.api import SceneObject
 			for obj in objects:
-				if SceneObject._typeOfNativeObject(obj) == type:
+				if SceneObject._typeOfNativeObject(obj) == objectType:
 					holder.append(obj)
 			objects = holder
 

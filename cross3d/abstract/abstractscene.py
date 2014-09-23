@@ -497,11 +497,11 @@ class AbstractScene(QObject):
 		return []
 
 	@abstractmethod
-	def _nativeObjects(self, getsFromSelection=False, wildcard='', type=0):
-		"""
-			\remarks	returns the native objects from the scene
-			\param		wildcard <string>
-			\return		<list> [ <variant> nativeObject, .. ]
+	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
+		""" Returns the native objects from the scene
+			:param wildcard: <string>
+			:param objectType: blur3d.constants.ObjectType
+			:return: <list> [ <variant> nativeObject, .. ]
 		"""
 		return []
 
