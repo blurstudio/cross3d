@@ -76,6 +76,10 @@ class AbstractApplication(QObject):
 		return True
 
 	@abstractmethod
+	def allowedCharacters(self):
+		return ''
+
+	@abstractmethod
 	def connectCallback(self, signal):
 		"""
 		Connects a single callback. This allows blur3d to only have to

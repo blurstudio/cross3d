@@ -129,6 +129,9 @@ class StudiomaxApplication(AbstractApplication):
 				script = _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS % { 'function':connDef.function, 'signal': blurdevSignal }
 			mxs.callbacks.addScript( _n(connDef.callback), script, id = _n('blur3dcallbacks') )
 	
+	def allowedCharacters(self):
+		return 'A-Za-z0-9_. /+*<>=|-'
+
 	def connect(self):
 		"""
 			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object

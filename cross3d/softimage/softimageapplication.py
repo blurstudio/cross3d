@@ -89,6 +89,9 @@ class SoftimageApplication(AbstractApplication):
 		version = xsi.Version()
 		return int(version.split('.')[0]) if major else version
 		
+	def allowedCharacters(self):
+		return 'A-Za-z0-9_-'
+
 	def name( self ):
 		return "Softimage"
 		
