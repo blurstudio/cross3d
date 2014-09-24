@@ -325,6 +325,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		return self._nativePointer.isselected
 
+	def key(self, target='keyable'):
+		"""
+			Set keys on the object parameters.
+		"""
+		mxs.addNewKey(self._nativePointer.controller, mxs.currentTime)
+
 	def transformLocks(self, manipulation=True, keyability=False):
 		""" Returns a dictionary of position, rotation and scale values. This dictionary
 		can be passed to setTransformsLocks.
