@@ -9,8 +9,9 @@
 #	\date		03/15/10
 #
 
-from Py3dsMax									import mxs
-from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
+from Py3dsMax import mxs
+from blur3d.api import UserProps
+from blur3d.api.abstract.abstractscenewrapper import AbstractSceneWrapper
 
 class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -108,11 +109,18 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\return		<str> name
 		"""
 
-		# This handles our virtual implementation of models in Max. The dot is considered as a model namespace across the API.
-		name = self.name()
+		# This handles our virtual implementation of models in Max. A name with a dot is considered as a model namespace across the API.
+		name = self._nativePointer.name
 		split = name.split('.')
+
+		# If we find a corresponding model we return the name after the dot.
 		if len(split) == 2:
-			return split[1]
+			model = self._scene._findNativeObject(split[0])
+			if model and UserProps(model).get('model'):
+				print 'returning', split[1]
+				return split[1]
+
+		# Otherwise we just return the name.
 		return name
 
 	def name( self ):
@@ -121,10 +129,6 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
-		if not self._nativePointer:
-			return ''
-		if not mxs.isProperty(self._nativePointer, 'name'):
-			return ''
 		return self._nativePointer.name
 		
 	def setDisplayName( self, name ):
@@ -134,9 +138,18 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			\param		name	<str>
 			\return		<bool> success
 		"""
-		splt 		= self._nativePointer.name.split( '.' )
-		splt[-1] 	= unicode(name)
-		self._nativePointer.name = '.'.join( splt )
+
+		# This handles our virtual implementation of models in Max. A name with a dot is considered as a model namespace across the API.
+		split = self._nativePointer.name.split( '.' )
+
+		# If we find a corresponding model we just set the name after the dot.
+		if len(split) == 2:
+			model = self._scene._findNativeObject(split[0])
+			if model and UserProps(model).get('model'):
+				split[-1] = unicode(name)
+				name = '.'.join(split)
+
+		self._nativePointer.name = name
 		return True
 		
 	def hasProperty( self, key ):
