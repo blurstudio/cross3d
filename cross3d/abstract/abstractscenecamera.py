@@ -13,6 +13,7 @@ from blur3d	import abstractmethod
 from blur3d.api import SceneObject
 from blur3d.constants import ObjectType
 from blur3d import api
+import math
 
 class AbstractSceneCamera(SceneObject):
 	"""
@@ -118,6 +119,10 @@ class AbstractSceneCamera(SceneObject):
 		self.userProps()['overscanOrigRenderSize'] = size
 
 	@abstractmethod
+	def _nativeFocalLength(self):
+		return 0.0
+
+	@abstractmethod
 	def animateTurntable(self, objects=[], startFrame=1, endFrame=100):
 		"""
 			Orbits the camera around the given object(s).
@@ -147,9 +152,15 @@ class AbstractSceneCamera(SceneObject):
 	def fov(self, rounded=False):
 		return 0.0
 
-	@abstractmethod
 	def lens(self, filmWidth=None, rounded=False):
-		return 0.0
+		if filmWidth:
+			fov = math.radians(self.fov())
+			lens = (0.5 * float(filmWidth)) / math.tan(fov / 2.0)
+		else:
+			lens = self._nativeFocalLength()
+		if rounded:
+			return int(round(lens))
+		return lens
 
 	@abstractmethod
 	def setFilmWidth(self, width):

@@ -10,7 +10,6 @@
 #
 
 import os
-import math
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
 from blur3d.constants import CameraType
@@ -118,20 +117,9 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 			return int(round(fov))
 		return fov
 		
-	def lens(self, filmWidth=None, rounded=False):
-		"""
-			\remarks	returns the current lens of the camera.
-			\return		<float>
-		"""
-		if filmWidth:
-			fov = math.radians(self.fov())
-			lens = (0.5 * float(filmWidth)) / math.tan(fov / 2.0)
-		else:
-			lens = mxs.cameraFOV.FOVtoMM(self.nativePointer().fov)
-		if rounded:
-			return int(round(lens))
-		return lens
-		
+	def _nativeFocalLength(self):
+		return mxs.cameraFOV.FOVtoMM(self.nativePointer().fov)
+	
 	def hasMultiPassEffects(self):
 		"""
 			\remarks	returns whether multipass effects are active on this camera

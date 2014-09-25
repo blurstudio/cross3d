@@ -9,7 +9,6 @@
 #	\date		03/15/10
 #
 
-import math
 import traceback
 
 from PySoftimage import xsi
@@ -89,15 +88,8 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		self._nativePointer.projplaneheight.Value = width / 25.4
 		return True
 
-	def lens(self, filmWidth=None, rounded=False):
-		if filmWidth:
-			fov = math.radians(self.fov())
-			lens = (0.5 * float(filmWidth)) / math.tan(fov / 2.0)
-		else:
-			lens = xsi.GetValue(self.name() + '.camera.projplanedist')
-		if rounded:
-			return int(round(lens))
-		return lens
+	def _nativeFocalLength(self):
+		return xsi.GetValue(self.name() + '.camera.projplanedist')
 
 	def setLens(self, value):
 		self._nativePointer.Parameters('projplanedist').Value = value
