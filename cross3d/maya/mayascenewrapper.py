@@ -177,15 +177,16 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param nativeObject: The OpenMaya.MObject to get the shape node of
 		:return: OpenMaya.MObject
 		"""
-		path = om.MDagPath.getAPathTo(nativeObject)
-		numShapes = om.MScriptUtil()
-		numShapes.createFromInt(0)
-		numShapesPtr = numShapes.asUintPtr()
-		path.numberOfShapesDirectlyBelow(numShapesPtr)
-		if om.MScriptUtil(numShapesPtr).asUint():
-			# TODO: Should this return the last shape, instead of the first?
-			path.extendToShapeDirectlyBelow(0)
-			return path.node()
+		if nativeObject.apiType() == om.MFn.kTransform:
+			path = om.MDagPath.getAPathTo(nativeObject)
+			numShapes = om.MScriptUtil()
+			numShapes.createFromInt(0)
+			numShapesPtr = numShapes.asUintPtr()
+			path.numberOfShapesDirectlyBelow(numShapesPtr)
+			if om.MScriptUtil(numShapesPtr).asUint():
+				# TODO: Should this return the last shape, instead of the first?
+				path.extendToShapeDirectlyBelow(0)
+				return path.node()
 		return nativeObject
 	
 	@classmethod

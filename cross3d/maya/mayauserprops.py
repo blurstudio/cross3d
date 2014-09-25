@@ -28,6 +28,7 @@ class MayaUserProps(AbstractUserProps):
 		if out:
 			return out
 		return []
+		# http://forums.cgsociety.org/showthread.php?t=888612
 		# Note: I was unable to find a way to identify userDefined keys in the following method
 		# so I used the maya.cmds method. If possible this finish this method and replace the 
 		# above code.

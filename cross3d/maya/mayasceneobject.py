@@ -37,8 +37,23 @@ class MayaSceneObject( AbstractSceneObject ):
 			_nativeToAbstractObjectType[native] = abstract
 	
 	def __init__(self, scene, nativeObject):
-		nativeObject = self._asMOBject(nativeObject)
-		super(MayaSceneObject, self).__init__( scene, nativeObject)
+		""" MayaSceneObject's should always have the shape node stored in _nativePointer
+		MayaSceneObject's should have the transform node stored in _nativeTransform
+		A transform can have multiple shape nodes, as children, but a shape node can only
+		have a single transform as its parent. If you init this class with a transform node
+		it will automaticly convert the native pointer to the first shape node. If you init
+		this class with a shape node it will use that shape node as the native pointer.
+		
+		TODO: When we want to add support for swaping shape nodes they should be implemented
+		as self.setTransform(SceneObject). This will update the _nativeTransform for self and
+		prevent needing to create a new SceneObject.
+		"""
+		# Make sure the nativeObject is a OpenMaya.MObject, and that its a shape node.
+		mObj = self._asMOBject(nativeObject)
+		nativeObject = self._getShapeNode(mObj)
+		super(MayaSceneObject, self).__init__(scene, nativeObject)
+		# store the transform node so we can access it later
+		self._nativeTransform = self._getTransformNode(mObj)
 	
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
@@ -59,6 +74,17 @@ class MayaSceneObject( AbstractSceneObject ):
 		if apiType in cls._nativeToAbstractObjectType:
 			return cls._nativeToAbstractObjectType[apiType]
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
+	
+	#--------------------------------------------------------------------------------
+	#							blur3d public methods
+	#--------------------------------------------------------------------------------
+	def displayName(self):
+		""" Returns the display name for object. This does not include parent structure """
+		return self._MObjName(self._nativeTransform, False)
+
+	def name(self):
+		""" Return the full name of this object, including parent structure """
+		return self._MObjName(self._nativeTransform, True)
 
 # register the symbol
 from blur3d import api
