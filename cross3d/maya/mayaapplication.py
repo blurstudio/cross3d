@@ -34,7 +34,10 @@ class MayaApplication(AbstractApplication):
 		import __main__
 		__main__.shit = clientData
 		print 'selectionChanged', clientData
-	
+
+	def animationClipExtension(self):
+		return self.sceneFileExtension()
+		
 	def connectCallback(self, signal):
 		"""
 		Connects a single callback. This allows blur3d to only have to
@@ -99,7 +102,13 @@ class MayaApplication(AbstractApplication):
 	
 	def name(self):
 		return "Maya"
-	
+
+	def nameSpaceSeparator(self):
+		return ':'
+
+	def sceneFileExtension(self):
+		return 'ma'
+
 	def version(self):
 		return int(cmds.about(version=True))
 	
