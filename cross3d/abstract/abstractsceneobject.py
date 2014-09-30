@@ -565,7 +565,6 @@ class AbstractSceneObject(SceneWrapper):
 		:param color: :class:`PyQt4.QtGui.QColor`
 
 		"""
-		from PyQt4.QtGui import QColor
 		return self._setNativeWireColor(self._scene._toNativeValue(QColor(color)))
 
 	def translate(self, axes, relative=False):
