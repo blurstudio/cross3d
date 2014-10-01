@@ -7,7 +7,7 @@ class MayaUserProps(AbstractUserProps):
 	# MCH 09/30/14 Dev Note:  If it is possible to store metadata without changing selection
 	# in the way used in MayaFileProps, This class should be re-implemented to store data that
 	# way. Currently I can't figure out how to do that without wrighting a plugin, so MayaUserProps
-	# stores its data as attributes
+	# stores its data as OpenMaya.MObject attributes.
 	def __contains__(self, key):
 		return api.SceneWrapper._hasAttribute(self._nativePointer, key)
 	
