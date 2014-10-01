@@ -4,6 +4,10 @@ from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFi
 from blur3d import api
 
 class MayaUserProps(AbstractUserProps):
+	# MCH 09/30/14 Dev Note:  If it is possible to store metadata without changing selection
+	# in the way used in MayaFileProps, This class should be re-implemented to store data that
+	# way. Currently I can't figure out how to do that without wrighting a plugin, so MayaUserProps
+	# stores its data as attributes
 	def __contains__(self, key):
 		return api.SceneWrapper._hasAttribute(self._nativePointer, key)
 	
@@ -80,7 +84,86 @@ class MayaUserProps(AbstractUserProps):
 		return api.SceneWrapper._normalizeAttributeName(string)
 
 class MayaFileProps(MayaUserProps):
-	pass
+	def _hasStruct(self):
+		return cmds.dataStructure(name=self._structureName, query=True)
+	
+	def _hasMetaDataChannel(self):
+		return cmds.hasMetadata(scene=True, channelName=self._channelName, asList=True)
+	
+	def __contains__(self, key):
+		# if the structure is not defined the key is not stored and hasMetadata will error out
+		if not self._hasStruct():
+			return False
+		return key in cmds.hasMetadata(scene=True, streamName=self._blur3dStream, asList=True)
+	
+	def __delitem__(self, key):
+		if not key in self:
+			raise KeyError('{} is not stored in FileProps'.format(key))
+		cmds.editMetadata(streamName=self._blur3dStream, index=key, scene=True, remove=True)
+	
+	def __getitem__(self, key):
+		if not key in self:
+			raise KeyError('{} is not stored in FileProps'.format(key))
+		# Returns a list of values. Return the first item in the list
+		ret = cmds.getMetadata(
+				streamName=self._blur3dStream, 
+				memberName=self._memberName, 
+				channelName=self._channelName, 
+				index=key, 
+				indexType=self._indexType, 
+				scene=True)
+		# they mostly return a list, mostly
+		if isinstance(ret, list):
+			# return the first value, this takes care of the ocational return value of None
+			ret = ret[0]
+		return self.unescapeValue(ret)
+	
+	def __iter__(self):
+		return iter(self.keys())
+	
+	def __setitem__(self, key, value):
+		if not self._hasStruct():
+			cmds.dataStructure(
+					format='raw', 
+					asString='name={}:string=Blur3dValue'.format(self._structureName))
+		# Note: Make sure the metadata channel exists
+		cmds.addMetadata(
+				structure=self._structureName, 
+				streamName=self._blur3dStream, 
+				channelName=self._channelName, 
+				indexType=self._indexType, 
+				scene=True)
+		# Store the metadata
+		cmds.editMetadata(
+				streamName=self._blur3dStream, 
+				memberName=self._memberName, 
+				index=key, 
+				stringValue=self.escapeValue(value), 
+				scene=True)
+		# Notify listening slots about the change
+		self.emitChange()
+	
+	def __init__(self, fileName=''):
+		# These values are passed to various maya.cmds calls to retreive/set data
+		self._structureName = 'Blur3dMetaData'
+		self._blur3dStream = 'MetaBlur3d'
+		self._memberName = 'Blur3dValue'
+		self._channelName = 'Blur3dChannel'
+		self._indexType = 'string'
+		super(MayaFileProps, self).__init__(None)
+	
+	def clear(self):
+		for key in self:
+			del self[key]
+	
+	def keys(self):
+		if not self._hasStruct() or not self._hasMetaDataChannel():
+			return []
+		out = cmds.hasMetadata(scene=True, streamName=self._blur3dStream, asList=True)
+		# Our stream name is always listed in hasMetadata, so remove it
+		if self._blur3dStream in out:
+			out.remove(self._blur3dStream)
+		return out
 
 # register the symbol
 from blur3d import api
