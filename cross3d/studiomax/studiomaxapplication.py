@@ -235,7 +235,7 @@ class StudiomaxApplication(AbstractApplication):
 		return '.'
 
 	def animationClipExtension(self):
-		return 'bip'
+		return 'xaf'
 		
 	def sceneFileExtension(self):
 		return 'max'

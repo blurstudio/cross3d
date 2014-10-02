@@ -1517,7 +1517,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		if os.path.exists(path):
 			model = None
-			modelName = os.path.splitext(os.path.split(path)[1])[0]
+			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
 			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
 			mxs.mergeMAXFile(path, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
 
