@@ -216,6 +216,31 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return dagPath.partialPathName()
 	
 	#--------------------------------------------------------------------------------
+	#							blur3d private methods
+	#--------------------------------------------------------------------------------
+	def _nativeProperty(self, key, default=None):
+		"""
+			\remarks	return the value of the property defined by the inputed key
+			\sa			hasProperty, setProperty, _nativeProperty, AbstractScene._fromNativeValue
+			\param		key			<str>
+			\param		default		<variant>	(auto-converted from the application's native value)
+			\return		<variant>
+		"""
+		ret = cmds.getAttr("{name}.{key}".format(name=self.name(), key=key))
+		return ret
+		return default
+
+	def _setNativeProperty(self, key, nativeValue):
+		"""
+			\remarks	set the value of the property defined by the inputed key
+			\sa			hasProperty, property, setProperty, AbstractScene._toNativeValue
+			\param		key		<str>
+			\param		value	<variant>	(pre-converted to the application's native value)
+			\retrun		<bool> success
+		"""
+		cmds.setAttr("{name}.{key}".format(name=self.name(), key=key), nativeValue)
+	
+	#--------------------------------------------------------------------------------
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
 	def displayName(self):
