@@ -308,6 +308,32 @@ class MayaScene(AbstractScene):
 			:return: The current File name as a string
 		"""
 		return cmds.file(query=True, sceneName=True)
+	
+	def renderSize(self):
+		""" Return the render output size for the scene
+			:return: <QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		width = cmds.getAttr('defaultResolution.width')
+		height = cmds.getAttr('defaultResolution.height')
+		return QSize(width, height)
+	
+	def setRenderSize(self, size):
+		""" Set the render output size for the scene
+			:param size: <QSize>
+		"""
+		from PyQt4.QtCore import QSize
+		if isinstance(size, QSize):
+			width = size.width()
+			height = size.height()
+		elif isinstance(size, list):
+			if len(size) < 2:
+				raise TypeError('You must provide a width and a height when setting the render size using a list')
+			width = size[0]
+			height = size[1]
+		cmds.setAttr('defaultResolution.width', width)
+		cmds.setAttr('defaultResolution.height', height)
+		return True
 
 # register the symbol
 api.registerSymbol('Scene', MayaScene)

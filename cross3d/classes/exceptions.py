@@ -51,3 +51,7 @@ class Exceptions:
 		"""
 		pass
 
+	class FileFormatNotSupported(Blur3DException):
+		""" Exception raised if you try to save a file in a unsuported file format
+		"""
+		pass

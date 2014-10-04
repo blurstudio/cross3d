@@ -22,3 +22,4 @@ def init():
 	import mayascenewrapper
 	import mayasceneobject
 	import mayascenecamera
+	import mayasceneviewport
