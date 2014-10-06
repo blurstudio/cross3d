@@ -62,7 +62,7 @@ class AbstractSceneViewport(QObject):
 		return ''
 
 	@abstractmethod
-	def createCamera(self):
+	def createCamera(self, name='Camera', type='Standard'):
 		"""
 			Creates a camera that matches that viewport.
 		"""

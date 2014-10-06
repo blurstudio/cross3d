@@ -115,10 +115,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Set overscan to 1.0
 			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'overscan'), 'overscan', 1.0)
 			# generate playblast
-			print fileName, frameRange
-			print cmds.playblast(width=resolution.width(), height=resolution.height(), startTime=frameRange.start(), endTime=frameRange.end(), 
+			cmds.playblast(width=resolution.width(), height=resolution.height(), startTime=frameRange.start(), endTime=frameRange.end(), 
 							percent=100, filename=fileName, showOrnaments=False, format=playblastFormat, 
-							compression=compression, quality=quality, viewer=True)
+							compression=compression, quality=quality, viewer=False)
 		if overscanLocked:
 			# relock overscan
 			cmds.setAttr("{name}.overscan".format(name=name), lock=True)
