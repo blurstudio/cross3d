@@ -35,7 +35,6 @@ class MayaSceneViewport(AbstractSceneViewport):
 	#									Private Methods
 	#--------------------------------------------------------------------------------
 	def _nativeCamera(self):
-		blurdev.debug.debugObject(self._nativeCamera, 'using active view. specific view is not implemented yet')
 		undocumentedPythonFunctionRequirement = om.MDagPath()
 		self._nativePointer.getCamera(undocumentedPythonFunctionRequirement)
 		return undocumentedPythonFunctionRequirement.node()
@@ -51,7 +50,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 	
 	def createCamera(self, name='Camera', type='Standard'):
 		""" Creates a camera that matches that viewport. """
-		return None
+		camera = self._scene.createCamera(name, type)
+		blurdev.debug.debugObject(self.createCamera, 'Matching the current camera is not supported currently')
+		return camera
 	
 	def generatePlayblast(
 				self, 

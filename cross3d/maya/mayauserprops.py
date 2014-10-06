@@ -28,7 +28,7 @@ class MayaUserProps(AbstractUserProps):
 	
 	def keys(self):
 		# Only show user defined keys
-		out = cmds.listAttr(api.SceneWrapper._MObjName(self._nativePointer), userDefined=True)
+		out = cmds.listAttr(api.SceneWrapper._mObjName(self._nativePointer), userDefined=True)
 		if out:
 			return out
 		return []

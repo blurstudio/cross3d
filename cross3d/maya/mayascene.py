@@ -145,6 +145,22 @@ class MayaScene(AbstractScene):
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
 
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
+		""" Implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
+			:param name: <str>
+			:return: <variant> nativeCamera || None
+		"""
+		if type == 'V-Ray':
+			debug.debugObject(self._createNativeCamera, 'V-Ray cameras are not supported currently')
+			return None
+		else:
+			if target != None:
+				debug.debugObject(self._createNativeCamera, 'Target not supported currently.')
+			tform, shape = cmds.camera()
+			nativeCamera = api.SceneWrapper._asMOBject(shape)
+		cmds.rename(tform, name)
+		return nativeCamera
+
 	def _findNativeObject(self, name='', uniqueId=0):
 		""" Looks up a native object based on the inputed name or uniqueId. If name is provided
 		it will find the object by the name, if uniqueId is provided it will look up the item by
@@ -165,7 +181,7 @@ class MayaScene(AbstractScene):
 				output = obj
 				found = True
 		if not found and uniqueId:
-			debug.debugMsg('MayaScene._findNativeObject not implemented for uniqueId yet.')
+			debug.debugObject(self._findNativeObject, 'uniqueId not implemented yet.')
 		return output
 
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
@@ -190,8 +206,8 @@ class MayaScene(AbstractScene):
 				ret = []
 				for obj in objects:
 					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
-					wildcardCheck = regex.match(api.SceneObject._MObjName(obj))
-#					print api.SceneObject._typeOfNativeObject(obj) & objectType,  api.SceneObject._typeOfNativeObject(obj), objectType, '----', typeCheck, wildcardCheck, api.SceneObject._MObjName(obj)
+					wildcardCheck = regex.match(api.SceneObject._mObjName(obj))
+#					print api.SceneObject._typeOfNativeObject(obj) & objectType,  api.SceneObject._typeOfNativeObject(obj), objectType, '----', typeCheck, wildcardCheck, api.SceneObject._mObjName(obj)
 					if typeCheck and wildcardCheck:
 						ret.append(obj)
 				objects = ret
@@ -206,7 +222,7 @@ class MayaScene(AbstractScene):
 			if wildcard:
 				ret = []
 				for obj in objects:
-					if regex.match(api.SceneObject._MObjName(obj)):
+					if regex.match(api.SceneObject._mObjName(obj)):
 						ret.append(obj)
 				objects = ret
 		return objects

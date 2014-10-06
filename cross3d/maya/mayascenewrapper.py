@@ -128,7 +128,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		name = name.lower()
 		if uniqueOnObj:
 			# Ensure a uniqe object name by adding a value to the number
-			names = set(cmds.listAttr(cls._MObjName(uniqueOnObj), shortNames=True))
+			names = set(cmds.listAttr(cls._mObjName(uniqueOnObj), shortNames=True))
 			name = api.Scene._findUniqueName(name, names, incFormat='{name}{count}')
 		return name
 	
@@ -206,7 +206,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return nativeObject
 	
 	@classmethod
-	def _MObjName(cls, nativeObject, fullName=True):
+	def _mObjName(cls, nativeObject, fullName=True):
 		""" A Maya Helper that returns the name of a object, because OpenMaya can't 
 		expose the name in a single call.
 		:param nativeObject: The OpenMaya.MObject to get the name of
@@ -248,11 +248,11 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 	#--------------------------------------------------------------------------------
 	def displayName(self):
 		""" Returns the display name for object. This does not include parent structure """
-		return self._MObjName(self._nativePointer, False)
+		return self._mObjName(self._nativePointer, False)
 
 	def name(self):
 		""" Return the full name of this object, including parent structure """
-		return self._MObjName(self._nativePointer, True)
+		return self._mObjName(self._nativePointer, True)
 	
 # register the symbol
 from blur3d import api

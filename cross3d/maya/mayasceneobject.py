@@ -80,11 +80,11 @@ class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	def displayName(self):
 		""" Returns the display name for object. This does not include parent structure """
-		return self._MObjName(self._nativeTransform, False)
+		return self._mObjName(self._nativeTransform, False)
 
 	def name(self):
 		""" Return the full name of this object, including parent structure """
-		return self._MObjName(self._nativeTransform, True)
+		return self._mObjName(self._nativeTransform, True)
 
 # register the symbol
 from blur3d import api
