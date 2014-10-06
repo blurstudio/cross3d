@@ -196,6 +196,9 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param nativeObject: The OpenMaya.MObject to get the transform node of
 		:return: OpenMaya.MObject
 		"""
+		if nativeObject.apiType() == om.MFn.kWorld:
+			# The world node doesn't play well with the getting transform code
+			return nativeObject
 		path = om.MDagPath.getAPathTo(nativeObject)
 		newPointer = path.transform()
 		if newPointer != nativeObject:

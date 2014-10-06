@@ -5,6 +5,7 @@ import blurdev
 import maya.cmds as cmds
 import maya.OpenMaya as om
 import maya.OpenMayaUI as omUI
+from blur3d import api
 from blur3d.api import Exceptions
 from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
@@ -20,14 +21,23 @@ class MayaSceneViewport(AbstractSceneViewport):
 	_validPlayblastFormats = ['gif', 'si', 'rla', 'tif', 'tifu', 'sgi', 'als', 'maya', 'jpg', 
 			'eps', 'cin', 'yuv', 'tga', 'bmp', 'psd', 'png', 'dds', 'psdLayered', 'avi', 'mov']
 	
+	def __init__( self, scene, viewportID=None ): 
+		super(MayaSceneViewport, self).__init__(scene, viewportID)
+		
+		if viewportID == None:
+			self._nativePointer = omUI.M3dView.active3dView()
+		else:
+			self._nativePointer = omUI.M3dView()
+			omUI.M3dView.get3dView(viewportID, self._nativePointer)
+		self._name = self.camera().displayName()
+	
 	#--------------------------------------------------------------------------------
 	#									Private Methods
 	#--------------------------------------------------------------------------------
 	def _nativeCamera(self):
 		blurdev.debug.debugObject(self._nativeCamera, 'using active view. specific view is not implemented yet')
-		view = omUI.M3dView.active3dView()
 		undocumentedPythonFunctionRequirement = om.MDagPath()
-		view.getCamera(undocumentedPythonFunctionRequirement)
+		self._nativePointer.getCamera(undocumentedPythonFunctionRequirement)
 		return undocumentedPythonFunctionRequirement.node()
 		
 	def _setNativeCamera( self, nativeCamera ):
@@ -35,6 +45,14 @@ class MayaSceneViewport(AbstractSceneViewport):
 	#--------------------------------------------------------------------------------
 	#									Public Methods
 	#--------------------------------------------------------------------------------
+	def cameraName(self):
+		""" Return the viewport's camera name """
+		return self.camera().displayName()
+	
+	def createCamera(self, name='Camera', type='Standard'):
+		""" Creates a camera that matches that viewport. """
+		return None
+	
 	def generatePlayblast(
 				self, 
 				fileName, 
@@ -137,5 +155,4 @@ class MayaSceneViewport(AbstractSceneViewport):
 		return True
 
 # register the symbol
-from blur3d import api
 api.registerSymbol('SceneViewport', MayaSceneViewport)

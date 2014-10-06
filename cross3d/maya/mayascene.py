@@ -14,6 +14,7 @@ import re
 from collections import OrderedDict
 import maya.cmds as cmds
 import maya.OpenMaya as om
+import maya.OpenMayaUI as omUI
 import maya.OpenMayaAnim as oma
 
 from blur3d import pendingdeprecation, constants
@@ -210,6 +211,25 @@ class MayaScene(AbstractScene):
 				objects = ret
 		return objects
 
+	def _nativeRootObject(self):
+		""" Implements the AbstractScene._nativeRootObject to return the native root object of the scene
+			:return: <Py3dsMax.mxs.Object> nativeObject || None
+		"""
+		for node in self._objectsOfMTypeIter(om.MFn.kWorld):
+			# There should only be a single world node
+			return node
+		return None
+
+	def _objects(self, getsFromSelection=False, wildcard='', type=0):
+		""" Returns a list of all the objects in the scene wrapped as api objects
+			:param: getsFromSelection <bool>
+			:param: wildcard <string>
+			:param: type <blur3d.constants.ObjectType>
+			:return: <list> [ <blur3d.api.Variant>, .. ]
+		"""
+		from blur3d.api import SceneObject
+		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type) if obj.apiType() != om.MFn.kWorld]
+
 	def _setNativeSelection(self, selection):
 		""" Select the inputed native objects in the scene
 			:param selection: <list> [ <PySoftimage.xsi.Object> nativeObject, .. ] || MSelectionList || str || unicode
@@ -238,6 +258,10 @@ class MayaScene(AbstractScene):
 				selection = tempList
 			om.MGlobal.setActiveSelectionList(selection)
 		return True
+
+	#--------------------------------------------------------------------------------
+	#							blur3d public methods
+	#--------------------------------------------------------------------------------
 
 	def animationFPS(self):
 		""" Return the current frames per second rate.
@@ -334,6 +358,15 @@ class MayaScene(AbstractScene):
 		cmds.setAttr('defaultResolution.width', width)
 		cmds.setAttr('defaultResolution.height', height)
 		return True
+	
+	def viewports(self):
+		""" Returns all the visible viewports
+			:return: [<blur3d.api.SceneViewport>, ...]
+		"""
+		out = []
+		for index in range(omUI.M3dView.numberOf3dViews()):
+			out.append(api.SceneViewport(self, index))
+		return out
 
 # register the symbol
 api.registerSymbol('Scene', MayaScene)
