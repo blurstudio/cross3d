@@ -77,7 +77,7 @@ class MayaApplication(AbstractApplication):
 			if signal in self._callbackMap:
 				raise api.Exceptions.SignalAlreadyConnected('This signal is already connected. The new connection was not made.')
 			else:
-				print 'connectCallback', signal
+#				print 'connectCallback', signal
 				self._callbackMap[signal] = addCallback(msg, funct, signal)
 	
 	def disconnectCallback(self, signal):
@@ -87,7 +87,7 @@ class MayaApplication(AbstractApplication):
 		"""
 		if signal in self._callbackMap:
 			callback = self._callbackMap.pop(signal)
-			print 'disconnectCallback', signal
+#			print 'disconnectCallback', signal
 			MMessage.removeCallback(callback)
 
 	def disconnect(self):

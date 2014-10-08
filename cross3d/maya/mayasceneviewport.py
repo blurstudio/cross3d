@@ -39,8 +39,10 @@ class MayaSceneViewport(AbstractSceneViewport):
 		self._nativePointer.getCamera(undocumentedPythonFunctionRequirement)
 		return undocumentedPythonFunctionRequirement.node()
 		
-	def _setNativeCamera( self, nativeCamera ):
-		return False
+	def _setNativeCamera(self, nativeCamera):
+		dagPath = om.MDagPath.getAPathTo(nativeCamera)
+		self._nativePointer.setCamera(dagPath)
+		return True
 	#--------------------------------------------------------------------------------
 	#									Public Methods
 	#--------------------------------------------------------------------------------

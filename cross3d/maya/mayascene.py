@@ -255,6 +255,13 @@ class MayaScene(AbstractScene):
 		from blur3d.api import SceneObject
 		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type) if obj.apiType() != om.MFn.kWorld]
 
+	def _nativeRefresh(self):
+		""" Refreshes the contents of the current scene
+			:sa: setUpdatesEnabled, update
+			:return: <bool> success
+		"""
+		return self.viewport().nativePointer().refresh(True, False)
+
 	def _setNativeSelection(self, selection):
 		""" Select the inputed native objects in the scene
 			:param selection: <list> [ <PySoftimage.xsi.Object> nativeObject, .. ] || MSelectionList || str || unicode
