@@ -51,7 +51,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 	def createCamera(self, name='Camera', type='Standard'):
 		""" Creates a camera that matches that viewport. """
 		camera = self._scene.createCamera(name, type)
-		blurdev.debug.debugObject(self.createCamera, 'Matching the current camera is not supported currently')
+		camera.matchCamera(self.camera())
 		return camera
 	
 	def generatePlayblast(
