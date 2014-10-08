@@ -184,6 +184,15 @@ class MayaScene(AbstractScene):
 			debug.debugObject(self._findNativeObject, 'uniqueId not implemented yet.')
 		return output
 
+	def _fromNativeValue(self, nativeValue):
+		""" Converts the inputed value from a native value from whatever application we're in
+			:param nativeValue: <variant>
+			:return:<variant>
+		"""
+		# by default, we assume all conversions have already occurred
+		# Re-implented to shut-up the abstractmethod warning
+		return nativeValue
+
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			:return: list [<Py3dsMax.mxs.Object> nativeObject, ..]

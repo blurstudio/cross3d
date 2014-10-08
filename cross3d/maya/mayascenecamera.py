@@ -8,20 +8,20 @@ class MayaSceneCamera(AbstractSceneCamera):
 		super(MayaSceneCamera, self).__init__(scene, nativeCamera, target)
 		# Convert the nativePointer to a OpenMaya.mFnCamera object so we get access to
 		# all of its special goodness.
-		self._nativePointer = om.MFnCamera(self._nativePointer)
+		self._nativeTypePointer = om.MFnCamera(self._nativePointer)
 	
 	def farClippingPlane(self):
-		return self._nativePointer.farClippingPlane()
+		return self._nativeTypePointer.farClippingPlane()
 
 	def setFarClippingPlane(self, distance):
-		self._nativePointer.setFarClippingPlane(distance)
+		self._nativeTypePointer.setFarClippingPlane(distance)
 		return True
 
 	def nearClippingPlane(self):
-		return self._nativePointer.nearClippingPlane()
+		return self._nativeTypePointer.nearClippingPlane()
 
 	def setNearClippingPlane(self, distance):
-		self._nativePointer.setNearClippingPlane(distance)
+		self._nativeTypePointer.setNearClippingPlane(distance)
 		return True
 	
 	def filmWidth(self):
@@ -29,7 +29,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 			:return: film_width (float)
 		"""
 		# Maya uses inches, convert inches to mm. 1in / 25.4mm
-		return self._nativePointer.horizontalFilmAperture() * 25.4
+		return self._nativeTypePointer.horizontalFilmAperture() * 25.4
 
 	def setFilmWidth(self, width):
 		""" Sets the film_width value for the camera.
@@ -37,7 +37,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 			:return: True
 		"""
 		# Maya uses inches, convert inches to mm. 1in / 25.4mm
-		self._nativePointer.setHorizontalFilmAperture(width / 25.4)
+		self._nativeTypePointer.setHorizontalFilmAperture(width / 25.4)
 		return True
 #
 	def filmHeight(self):
@@ -45,7 +45,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 			:return: film_width (float)
 		"""
 		# Maya uses inches, convert inches to mm. 1in / 25.4mm
-		return self._nativePointer.verticalFilmAperture() * 25.4
+		return self._nativeTypePointer.verticalFilmAperture() * 25.4
 
 	def setFilmHeight(self, height):
 		""" Sets the film_height value for the camera.
@@ -53,26 +53,33 @@ class MayaSceneCamera(AbstractSceneCamera):
 			:return: True
 		"""
 		# Maya uses inches, convert inches to mm. 1in / 25.4mm
-		self._nativePointer.setVerticalFilmAperture(height / 25.4)
+		self._nativeTypePointer.setVerticalFilmAperture(height / 25.4)
 		return True
 	
 	def fov(self, rounded=False):
-		fov = math.degrees(self._nativePointer.horizontalFieldOfView())
+		fov = math.degrees(self._nativeTypePointer.horizontalFieldOfView())
 		if rounded:
 			return int(round(fov))
 		return fov
 	
 	def _nativeFocalLength(self):
-		return self._nativePointer.focalLength()
+		return self._nativeTypePointer.focalLength()
 	
 	def setLens(self, value):
-		self._nativePointer.setFocalLength(value)
+		self._nativeTypePointer.setFocalLength(value)
+	
+	def matchCamera(self, camera):
+		""" Match this camera to another one. """
+		self.setParameters(camera.parameters())
+		self.setViewOptions(camera.viewOptions())
+		self.matchTransforms(camera)
+		return True
 	
 	def pictureRatio(self):
-		return self._nativePointer.aspectRatio()
+		return self._nativeTypePointer.aspectRatio()
 
 	def setPictureRatio(self, pictureRatio):
-		self._nativePointer.setAspectRatio(pictureRatio)
+		self._nativeTypePointer.setAspectRatio(pictureRatio)
 		return True
 	
 # register the symbol

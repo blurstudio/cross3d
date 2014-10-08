@@ -1,7 +1,8 @@
 import re
+import itertools
 import maya.OpenMaya as om
 import maya.cmds as cmds
-from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
+from blur3d.api.abstract.abstractscenewrapper import AbstractSceneWrapper
 
 class MayaSceneWrapper( AbstractSceneWrapper ):
 	#--------------------------------------------------------------------------------
@@ -241,7 +242,26 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			\param		value	<variant>	(pre-converted to the application's native value)
 			\retrun		<bool> success
 		"""
-		cmds.setAttr("{name}.{key}".format(name=self.name(), key=key), nativeValue)
+		attrId = "{name}.{key}".format(name=self.name(), key=key)
+		# MCH 10/07/14 HACK: This seems brittle as hell, and will probably will cause problems later
+		# also, we will probably run into cases where we will need to pass kwargs to set the proper variable
+		if isinstance(nativeValue, (list, tuple)):
+			# This may not work in all cases, but based on the documentation, you have to pass a flat
+			# args list to setattr.
+			cmds.setAttr(attrId, *list(itertools.chain(*nativeValue)))
+#			# for the test cases I've found so far, cmds.getAttr returns [(value, value, value)].
+#			# This can not be passed to setAttr, and must be stripped to a flat args list.
+#			if isinstance(nativeValue[0], (list, tuple)):
+#				value = nativeValue[0]
+#			cmds.setAttr(attrId, *value)
+			return
+		cmds.setAttr(attrId, nativeValue)
+	
+	def propertyNames(self):
+		""" Return a list of the property names linked to this instance
+		:return: list of names
+		"""
+		return cmds.listAttr(self.name(), settable=True, output=True)
 	
 	#--------------------------------------------------------------------------------
 	#							blur3d public methods
@@ -253,6 +273,13 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 	def name(self):
 		""" Return the full name of this object, including parent structure """
 		return self._mObjName(self._nativePointer, True)
+
+	def setDisplayName(self, name):
+		""" Set the display name for this wrapper instance to the inputed 
+		name - if not reimplemented, then it will set the object's actual 
+		name to the inputed name
+		"""
+		cmds.rename(self.name(), name)
 	
 # register the symbol
 from blur3d import api

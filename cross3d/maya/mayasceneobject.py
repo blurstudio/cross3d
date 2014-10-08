@@ -1,5 +1,7 @@
 import maya.OpenMaya as om
+import maya.cmds as cmds
 from blur3d.constants import ObjectType
+from blur3d.api import application
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
 class MayaSceneObject( AbstractSceneObject ):
@@ -52,6 +54,9 @@ class MayaSceneObject( AbstractSceneObject ):
 		mObj = self._asMOBject(nativeObject)
 		nativeObject = self._getShapeNode(mObj)
 		super(MayaSceneObject, self).__init__(scene, nativeObject)
+		# _nativeTypePointer stores the specific MFn* object representation of MObject this is
+		# used mostly by subclasses of SceneObject
+		self._nativeTypePointer = mObj
 		# store the transform node so we can access it later
 		self._nativeTransform = self._getTransformNode(mObj)
 	
@@ -85,6 +90,52 @@ class MayaSceneObject( AbstractSceneObject ):
 	def name(self):
 		""" Return the full name of this object, including parent structure """
 		return self._mObjName(self._nativeTransform, True)
+	
+	def matchTransforms(self, obj, position=True, rotation=True, scale=True):
+		""" Currently the auto-key support is a bit lite, but it should cover most of the cases. """
+		srcName = obj.name()
+		destName = self._mObjName(self._nativeTransform)
+		def copyAttr(attrName):
+			value = cmds.getAttr('{name}.{attrName}'.format(name=srcName, attrName=attrName))
+			cmds.setAttr('{name}.{attrName}'.format(name=destName, attrName=attrName), value)
+		
+		if position:
+			copyAttr('translateX')
+			copyAttr('translateY')
+			copyAttr('translateZ')
+		if rotation:
+			copyAttr('rotateX')
+			copyAttr('rotateY')
+			copyAttr('rotateZ')
+		if scale:
+			copyAttr('scaleX')
+			copyAttr('scaleY')
+			copyAttr('scaleZ')
+
+		if application.autokey():
+			self.key()
+		return True
+	
+	def parameters(self):
+		name = self._mObjName(self._nativePointer)
+		parameters = {}
+		for attrName in self.propertyNames():
+			if attrName not in set([u'translateX', u'translateY', u'translateZ', u'rotateX', u'rotateY', u'rotateZ', u'scaleX', u'scaleY', u'scaleZ']):
+				try:
+					parameters[attrName] = self.property(attrName)
+				except ValueError:
+					pass
+		return parameters
+	
+	def setParameters(self, parameters):
+		name = self._mObjName(self._nativePointer)
+		for key, value in parameters.iteritems():
+			try:
+				self.setProperty(key, value)
+			except:
+				print 'TRACEBACK: skipping param: {} {}...'.format(key, value)
+				import traceback
+				print traceback.format_exc()
 
 # register the symbol
 from blur3d import api
