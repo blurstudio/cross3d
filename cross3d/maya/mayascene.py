@@ -12,6 +12,7 @@
 
 import re
 from collections import OrderedDict
+import collections as _collections
 import maya.cmds as cmds
 import maya.OpenMaya as om
 import maya.OpenMayaUI as omUI
@@ -390,6 +391,19 @@ class MayaScene(AbstractScene):
 		cmds.setAttr('defaultResolution.width', width)
 		cmds.setAttr('defaultResolution.height', height)
 		return True
+	
+	def setSelection(self, objects, additive=False):
+		""" Selects the inputed objects in the scene
+			:param objects: <list> [ <blur3d.api.SceneObject>, .. ]
+			:return: <bool> success
+		"""
+		if isinstance(objects, basestring):
+			return self._addToNativeSelection(objects) if additive else self._setNativeSelection(objects)
+		elif isinstance(objects, _collections.Iterable):
+			# Note: This is passing the transform object not the nativePointer
+			nativeObjects = [obj._nativeTransform for obj in objects]
+			return self._addToNativeSelection(nativeObjects) if additive else self._setNativeSelection(nativeObjects)
+		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
 	
 	def viewports(self):
 		""" Returns all the visible viewports

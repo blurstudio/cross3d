@@ -9,7 +9,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 		# Convert the nativePointer to a OpenMaya.mFnCamera object so we get access to
 		# all of its special goodness.
 		self._nativeTypePointer = om.MFnCamera(self._nativePointer)
-	
+
 	def farClippingPlane(self):
 		return self._nativeTypePointer.farClippingPlane()
 
@@ -39,7 +39,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 		# Maya uses inches, convert inches to mm. 1in / 25.4mm
 		self._nativeTypePointer.setHorizontalFilmAperture(width / 25.4)
 		return True
-#
+
 	def filmHeight(self):
 		""" Returns the film_height of the camera in mm.
 			:return: film_width (float)
