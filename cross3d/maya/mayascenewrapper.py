@@ -230,7 +230,8 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			\param		default		<variant>	(auto-converted from the application's native value)
 			\return		<variant>
 		"""
-		ret = cmds.getAttr("{name}.{key}".format(name=self.name(), key=key))
+		name = self._mObjName(self._nativePointer, True)
+		ret = cmds.getAttr("{name}.{key}".format(name=name, key=key))
 		return ret
 		return default
 
@@ -242,7 +243,8 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			\param		value	<variant>	(pre-converted to the application's native value)
 			\retrun		<bool> success
 		"""
-		attrId = "{name}.{key}".format(name=self.name(), key=key)
+		name = self._mObjName(self._nativePointer, True)
+		attrId = "{name}.{key}".format(name=name, key=key)
 		# MCH 10/07/14 HACK: This seems brittle as hell, and will probably will cause problems later
 		# also, we will probably run into cases where we will need to pass kwargs to set the proper variable
 		if isinstance(nativeValue, (list, tuple)):
@@ -261,7 +263,8 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		""" Return a list of the property names linked to this instance
 		:return: list of names
 		"""
-		return cmds.listAttr(self.name(), settable=True, output=True)
+		name = self._mObjName(self._nativePointer, True)
+		return cmds.listAttr(name, settable=True, output=True)
 	
 	#--------------------------------------------------------------------------------
 	#							blur3d public methods
