@@ -588,7 +588,7 @@ class StudiomaxScene(AbstractScene):
 		else:
 			mxs.unfreeze(nativeObjects)
 		# this does not seem to update the viewports so call scene update
-		self.update()
+		application.refresh()
 		return True
 
 	def _hideNativeObjects(self, nativeObjects, state):
@@ -603,7 +603,7 @@ class StudiomaxScene(AbstractScene):
 		else:
 			mxs.unhide(nativeObjects)
 		# this does not seem to update the viewports so call scene update
-		self.update()
+		application.refresh()
 		return True
 
 	def _fromNativeValue(self, nativeValue):
@@ -1587,7 +1587,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		if self.application().nameAndVersion() == 'Max2014':
 			mxs.IsolateSelection.ExitIsolateSelectionMode()
-			self.update()
+			application.refresh()
 			return True
 		else:
 			if mxs.Iso2lations == True:
@@ -2083,7 +2083,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		selection = mxs.selectByName()
 		mxs.select(selection)
-		self.update()
+		application.refresh()
 		return self.selection()
 
 	def saveFileAs(self, filename=''):

@@ -224,9 +224,11 @@ class StudiomaxApplication(AbstractApplication):
 		else:
 			return '.'.join([unicode(token) for token in version])
 	
-	def refresh( self ):
-		mxs.completeRedraw()
-		return True
+	def refresh(self):
+		if not self._blockRefresh:
+			mxs.completeRedraw()
+			return True
+		return False
 		
 	def year(self):
 		return 1998 + self.version()

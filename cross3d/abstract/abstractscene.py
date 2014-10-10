@@ -453,6 +453,7 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
+	@pendingdeprecation('Use application.refresh')
 	def _nativeRefresh(self):
 		"""
 			\remarks	refreshes the contents of the current scene
@@ -2334,6 +2335,7 @@ class AbstractScene(QObject):
 		"""
 		return False
 
+	@pendingdeprecation('Use application.refresh')
 	def update(self):
 		"""
 			\remarks	refreshes the current scene based on the updates enabled flag

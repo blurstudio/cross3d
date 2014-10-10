@@ -261,7 +261,7 @@ class MayaScene(AbstractScene):
 			:sa: setUpdatesEnabled, update
 			:return: <bool> success
 		"""
-		return self.viewport().nativePointer().refresh(True, False)
+		return self.viewport().nativePointer().refresh(True, True)
 
 	def _setNativeSelection(self, selection):
 		""" Select the inputed native objects in the scene

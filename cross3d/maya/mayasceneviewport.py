@@ -154,8 +154,10 @@ class MayaSceneViewport(AbstractSceneViewport):
 					return False
 		except os.error:
 			return False
-		
 		return True
+	
+	def refresh(self):
+		self._nativePointer.refresh(False, True)
 
 # register the symbol
 api.registerSymbol('SceneViewport', MayaSceneViewport)

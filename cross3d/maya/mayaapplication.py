@@ -106,6 +106,12 @@ class MayaApplication(AbstractApplication):
 	def nameSpaceSeparator(self):
 		return ':'
 
+	def refresh(self):
+		if not self._blockRefresh:
+			self.viewport().nativePointer().refresh(True, True)
+			return True
+		return False
+
 	def sceneFileExtension(self):
 		return 'ma'
 
