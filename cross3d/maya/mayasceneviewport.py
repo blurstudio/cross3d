@@ -128,7 +128,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Set FilmBack.FitResolutionGate to Overscan
 			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'filmFit'), 'filmFit', 3)
 			# set Aspect Ratio
-			stateLocker.setMethod(cam, cam.setPictureRatio, cam.pictureRatio, 2.35)
+#			stateLocker.setMethod(cam, cam.setPictureRatio, cam.pictureRatio, 2.35)
 			# uncheck Display Film Gate
 			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayFilmGate'), 'displayFilmGate', 0)
 			# uncheck Display Resolution
