@@ -29,7 +29,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 		else:
 			self._nativePointer = omUI.M3dView()
 			omUI.M3dView.get3dView(viewportID, self._nativePointer)
-		self._name = self.camera().displayName()
+		self._name = api.SceneWrapper._mObjName(self._nativeCamera())
 	
 	#--------------------------------------------------------------------------------
 	#									Private Methods
@@ -40,6 +40,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 		return undocumentedPythonFunctionRequirement.node()
 		
 	def _setNativeCamera(self, nativeCamera):
+		nativeCamera = api.SceneWrapper._asMOBject(nativeCamera)
 		dagPath = om.MDagPath.getAPathTo(nativeCamera)
 		self._nativePointer.setCamera(dagPath)
 		return True
@@ -48,7 +49,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 	#--------------------------------------------------------------------------------
 	def cameraName(self):
 		""" Return the viewport's camera name """
-		return self.camera().displayName()
+		return self.camera().name()
 	
 	def createCamera(self, name='Camera', type='Standard'):
 		""" Creates a camera that matches that viewport. """
@@ -84,6 +85,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 			frameRange = FrameRange([frameRange, frameRange])
 		if not frameRange:
 			frameRange = self._scene.animationRange()
+		padding = len(str(frameRange.end()))
 		if not resolution:
 			resolution = self._scene.renderSize()
 		
@@ -100,7 +102,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 			blurdev.debug.debugObject(self.generatePlayblast, 'pathFormat is not implemented in Maya')
 		
 		# Prepare to detect if the playblast was canceled
-		lastFrameFileName = '{fileName}.{frame:04}{ext}'.format(fileName=fileName, frame=frameRange[1], ext=ext)
+		formatter = '{fileName}.{frame:0%i}{ext}' % padding
+		lastFrameFileName = formatter.format(fileName=fileName, frame=frameRange[1], ext=ext)
 		try:
 			lastFrameStartTime = os.path.getmtime(lastFrameFileName)
 		except os.error:
@@ -136,9 +139,19 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Set overscan to 1.0
 			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'overscan'), 'overscan', 1.0)
 			# generate playblast
-			cmds.playblast(width=resolution.width(), height=resolution.height(), startTime=frameRange.start(), endTime=frameRange.end(), 
-							percent=100, filename=fileName, showOrnaments=False, format=playblastFormat, 
-							compression=compression, quality=quality, viewer=False)
+			cmds.playblast(
+					width=resolution.width(), 
+					height=resolution.height(), 
+					startTime=frameRange.start(), 
+					endTime=frameRange.end(), 
+					percent=100, 
+					filename=fileName, 
+					showOrnaments=False, 
+					format=playblastFormat, 
+					compression=compression, 
+					quality=quality, 
+					framePadding=padding,
+					viewer=False)
 		if overscanLocked:
 			# relock overscan
 			cmds.setAttr("{name}.overscan".format(name=name), lock=True)

@@ -263,6 +263,19 @@ class MayaScene(AbstractScene):
 		"""
 		return self.viewport().nativePointer().refresh(True, True)
 
+	def _removeNativeObjects(self, nativeObjects):
+		""" Removes the inputed objects from the scene
+			:param nativeObjects:	<list> [ <variant> nativeObject, .. ]
+			:return: <bool> success
+		"""
+		objs = []
+		for obj in nativeObjects:
+			if not isinstance(obj, basestring):
+				obj = api.SceneWrapper._mObjName(obj, True)
+			objs.append(obj)
+		cmds.delete(*objs)
+		return True
+
 	def _setNativeSelection(self, selection):
 		""" Select the inputed native objects in the scene
 			:param selection: <list> [ <PySoftimage.xsi.Object> nativeObject, .. ] || MSelectionList || str || unicode
