@@ -85,7 +85,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 			frameRange = FrameRange([frameRange, frameRange])
 		if not frameRange:
 			frameRange = self._scene.animationRange()
-		padding = len(str(frameRange.end()))
+		# TODO: Make generating movies not require setting frame padding to 1
+		padding = 1
 		if not resolution:
 			resolution = self._scene.renderSize()
 		
