@@ -108,7 +108,10 @@ class MayaApplication(AbstractApplication):
 
 	def refresh(self):
 		if not self._blockRefresh:
-			self.viewport().nativePointer().refresh(True, True)
+			# Ensure the scene object is created.
+			if self._scene == None:
+				self._scene = api.Scene()
+			self._scene.viewport().nativePointer().refresh(True, True)
 			return True
 		return False
 

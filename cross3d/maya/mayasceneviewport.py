@@ -43,6 +43,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 		nativeCamera = api.SceneWrapper._asMOBject(nativeCamera)
 		dagPath = om.MDagPath.getAPathTo(nativeCamera)
 		self._nativePointer.setCamera(dagPath)
+		# Ensure the viewport is refreshed
+		api.application.refresh()
 		return True
 	#--------------------------------------------------------------------------------
 	#									Public Methods
