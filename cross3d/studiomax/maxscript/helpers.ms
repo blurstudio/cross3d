@@ -8,6 +8,23 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function removeAllRetimers = (
+			t = trackviewnodes
+			n = t[#Retimer_Manager]
+			if n != undefined do (
+				deleteTrackViewController t n.controller
+				gc()
+			)
+		),
+
+		function removeMotionClipTracks = (
+			mcm = trackViewNodes[#Max_MotionClip_Manager]
+			if mcm != undefined do (
+				mcm.track = copy trackViewNodes[#Max_MotionClip_Manager].track
+				gc()
+			)
+		),
+
 		function setModifyMode = (
 			max modify mode
 		),
@@ -25,6 +42,7 @@ global blur3dhelper
 					for v=1 to mesh.numverts do
 					(
 						vp = transPoint (GetVert mesh v)
+						if vp == undefined do continue
 						if vp.x < bmin.x do bmin.x = vp.x
 						if vp.x > bmax.x do bmax.x = vp.x
 						if vp.y < bmin.y do bmin.y = vp.y
