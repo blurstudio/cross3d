@@ -104,7 +104,6 @@ class Dispatch(QObject):
 		"""
 			\remarks	Handle cleanup of blur3d code, in this case disable any callbacks/events etc to blur3d.api.Dispatch
 		"""
-		debug.debugMsg('Disconnecting dispatch signals', debug.DebugLevel.Mid)
 		try:
 			blur3d.api.application.disconnect()
 		except:
