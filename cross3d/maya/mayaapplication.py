@@ -100,6 +100,9 @@ class MayaApplication(AbstractApplication):
 		for signal in self._callbackMap.keys():
 			self.disconnectCallback(signal)
 	
+	def allowedCharacters(self):
+		return 'A-Za-z0-9_'
+		
 	def name(self):
 		return "Maya"
 
