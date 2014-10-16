@@ -419,7 +419,7 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
-	def _importNativeModel(self, name='', referenced=False, resolution='', load=True, createFile=False):
+	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
