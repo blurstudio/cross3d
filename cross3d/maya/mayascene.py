@@ -145,7 +145,6 @@ class MayaScene(AbstractScene):
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
-
 	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
 		""" Implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
 			:param name: <str>
@@ -161,6 +160,22 @@ class MayaScene(AbstractScene):
 			nativeCamera = api.SceneWrapper._asMOBject(shape)
 		cmds.rename(tform, name)
 		return nativeCamera
+
+	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
+		name = 'Model' if not name else name
+		# Create the transform node then the shape node so the transform is properly named
+		parent = cmds.createNode('transform', name=name)
+		name = cmds.createNode('locator', name='{}Shape'.format(name), parent=parent)
+		output = api.SceneWrapper._asMOBject(name)
+		userProps = api.UserProps(output)
+		userProps['model'] = True
+
+		if nativeObjects:
+			for nativeObject in nativeObjects:
+				nativeObject.parent = output
+				nativeObject.name = '.'.join([name, nativeObject.name])
+		nativeObjects.append(output)
+		return output
 
 	def _findNativeObject(self, name='', uniqueId=0):
 		""" Looks up a native object based on the inputed name or uniqueId. If name is provided
@@ -193,6 +208,33 @@ class MayaScene(AbstractScene):
 		# by default, we assume all conversions have already occurred
 		# Re-implented to shut-up the abstractmethod warning
 		return nativeValue
+
+	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
+		if os.path.exists(path):
+			model = None
+			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
+#			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
+			objects = cmds.file(path, reference=True, returnNewNodes=True)
+			print objects
+#			mxs.mergeMAXFile(path, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
+
+#			# Adding name space to objects.
+#			for name in objectNames:
+#				obj = self._findNativeObject(name)
+#				if not model and name == 'Model':
+#					model = obj
+#					model.name = modelName
+#				else:
+#					obj.name = '.'.join([modelName, name])
+#
+#			# Adding name space to layers.
+#			for layer in self.layers():
+#				if 'Model.' in layer.name():
+#					nativePointer = layer.nativePointer()
+#					nativePointer.setName(nativePointer.name.replace('Model', modelName))
+
+			return model
+		raise Exception('Model file does not exist.')
 
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
@@ -378,6 +420,40 @@ class MayaScene(AbstractScene):
 			:return: The current File name as a string
 		"""
 		return cmds.file(query=True, sceneName=True)
+	
+#	def loadFile(self, filename='', confirm=True):
+#		""" Loads the specified filename in the application.
+#		
+#		Loads the inputed filename into the application, returning true on success
+#		args:
+#			filename: The filename as a string
+#		Returns:
+#			a boolean value indicating success
+#		"""
+#		# Using the prompt argument will affect all future calls to cmds.file, so backup the current
+#		# value and restore it later.
+#		prompt = cmds.file(query=True, prompt=True)
+#		loaded = cmds.file(filename, open=True, prompt=confirm)
+#		# restore the previous prompt behavior
+#		cmds.file(prompt=prompt)
+#		return filename == loaded
+	
+	def property(self, key, default=None):
+		"""
+			\remarks	returns a global scene value
+			\param		key			<str> || <QString>
+			\param		default		<variant>	default value to return if no value was found
+			\return		<variant>
+		"""
+		return cmds.getAttr(key)
+	
+	def setProperty(self, key, value):
+		""" Sets the global scene property to the inputed value
+			\param		key			<str> || <QString>
+			\param		value		<variant>
+			\return		<bool>
+		"""
+		return cmds.setAttr(key, value)
 	
 	def renderSize(self):
 		""" Return the render output size for the scene

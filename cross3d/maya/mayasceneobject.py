@@ -1,7 +1,7 @@
 import maya.OpenMaya as om
 import maya.cmds as cmds
 from blur3d.constants import ObjectType
-from blur3d.api import application
+from blur3d.api import application, UserProps
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
 class MayaSceneObject( AbstractSceneObject ):
@@ -76,6 +76,13 @@ class MayaSceneObject( AbstractSceneObject ):
 		apiType = nativeObject.apiType()
 		if apiType == om.MFn.kTransform:
 			apiType = cls._getShapeNode(nativeObject).apiType()
+		
+		# Checking for model.
+		if apiType == om.MFn.kLocator:
+			userProps = UserProps(nativeObject)
+			if 'model' in userProps:
+				return ObjectType.Model
+		
 		if apiType in cls._nativeToAbstractObjectType:
 			return cls._nativeToAbstractObjectType[apiType]
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)

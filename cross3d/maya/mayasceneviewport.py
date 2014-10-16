@@ -97,8 +97,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Note: this is probably how we can handle slate
 			#cmds.headsUpDisplay( 'blurBurnin', section=8, block=0, blockAlignment='right', dw=50, label='This is my burnin')
 			blurdev.debug.debugObject(self.generatePlayblast, 'slate is not implemented in Maya')
-		if not effects:
-			blurdev.debug.debugObject(self.generatePlayblast, 'effects is not implemented in Maya')
+#		if not effects:
+#			blurdev.debug.debugObject(self.generatePlayblast, 'effects is not implemented in Maya')
 		if antiAlias:
 			blurdev.debug.debugObject(self.generatePlayblast, 'antiAlias is not implemented in Maya')
 		if pathFormat != r'{basePath}\{fileName}.{frame}.{ext}':
@@ -122,6 +122,18 @@ class MayaSceneViewport(AbstractSceneViewport):
 		# 	set proper film aspect ratio?
 		# set the render resolution?
 		
+		
+		# MCH 10/16/14 NOTE: Info on parsing playblast Display Menu if we decide to add support for that later
+		#--------------------------------------------------------------------------------
+		#for i in cmds.optionVar(list=True):
+		#	if i.startswith('playblastShow'):
+		#		print cmds.optionVar(query=i), i
+		#		# Set the value
+		#		cmds.optionVar( intValue=(i, False)
+		#		# Update the playblast menus
+		#		maya.mel.eval('updatePlayblastPluginMenus()')
+		#--------------------------------------------------------------------------------
+		
 		cam = self.camera()
 		name = cam.name()
 		overscanLocked = cmds.getAttr("{name}.overscan".format(name=cam.name()), lock=True)
@@ -131,16 +143,58 @@ class MayaSceneViewport(AbstractSceneViewport):
 		
 		# create a StateLocker object to backup the current values before setting them
 		with StateLocker() as stateLocker:
+			# Currently the state locker isnt the most convienent to use
+			def setPropertyLocker(obj, key, value):
+				stateLocker.setMethodArgs(obj, obj.setProperty, partial(obj.property, key), key, value)
+			
 			# Set FilmBack.FitResolutionGate to Overscan
 			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'filmFit'), 'filmFit', 3)
 			# set Aspect Ratio
 #			stateLocker.setMethod(cam, cam.setPictureRatio, cam.pictureRatio, 2.35)
 			# uncheck Display Film Gate
-			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayFilmGate'), 'displayFilmGate', 0)
+			setPropertyLocker(cam, 'displayFilmGate', 0)
+#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayFilmGate'), 'displayFilmGate', 0)
 			# uncheck Display Resolution
-			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayResolution'), 'displayResolution', 0)
+			setPropertyLocker(cam, 'displayResolution', 0)
+#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayResolution'), 'displayResolution', 0)
 			# Set overscan to 1.0
-			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'overscan'), 'overscan', 1.0)
+			setPropertyLocker(cam, 'overscan', 1.0)
+#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'overscan'), 'overscan', 1.0)
+			if effects:
+				# Wildman's Deadpool settings
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.vertexAnimationCache', 2)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.hwInstancing', True)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoEnable', 1)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoAmount', 3.0)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoRadius', 14.0)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoFilterRadius', 10.0)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 1)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurShutterOpenFraction', 0.2)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurSampleCount', 8)
+				
+				# HACK: This records the viewport show options, sets them to playblast options, then
+				# restores them
+				panel = cmds.getPanel(withFocus=True)
+				# Check for if non-viewport panel's are active
+				if not panel in cmds.getPanel(type='modelPanel'):
+					panel = 'modelPanel4'
+				# Dirty dict to query values
+				options = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
+							'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
+							'ikHandles', 'dynamics', 'deformers', 'particleInstancers', 'fluids', 
+							'hairSystems', 'follicles', 'nCloths', 'nParticles', 'nRigids', 
+							'dynamicConstraints', 'locators', 'dimensions', 'pivots', 'handles', 
+							'textures', 'strokes', 'motionTrails', 'pluginShapes', 'clipGhosts', 
+							'greasePencils', 'manipulators', 'grid', 'hud', 'sel']
+				# Store the current values
+				states = {}
+				for option in options:
+					states[option] = cmds.modelEditor(panel, query=True, **{option: True})
+				
+				# Hide everything but Polygons
+				cmds.modelEditor(panel, edit=True, allObjects=False)
+				cmds.modelEditor(panel, edit=True, polymeshes=True)
+			
 			# generate playblast
 			cmds.playblast(
 					width=resolution.width(), 
@@ -155,6 +209,11 @@ class MayaSceneViewport(AbstractSceneViewport):
 					quality=quality, 
 					framePadding=padding,
 					viewer=False)
+			
+			if effects:
+				# Restore the original values
+				for option, value in states.iteritems():
+					cmds.modelEditor(panel, edit=True, **{option: value})
 		if overscanLocked:
 			# relock overscan
 			cmds.setAttr("{name}.overscan".format(name=name), lock=True)
