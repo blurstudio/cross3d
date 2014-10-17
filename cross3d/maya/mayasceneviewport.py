@@ -97,10 +97,6 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Note: this is probably how we can handle slate
 			#cmds.headsUpDisplay( 'blurBurnin', section=8, block=0, blockAlignment='right', dw=50, label='This is my burnin')
 			blurdev.debug.debugObject(self.generatePlayblast, 'slate is not implemented in Maya')
-#		if not effects:
-#			blurdev.debug.debugObject(self.generatePlayblast, 'effects is not implemented in Maya')
-		if antiAlias:
-			blurdev.debug.debugObject(self.generatePlayblast, 'antiAlias is not implemented in Maya')
 		if pathFormat != r'{basePath}\{fileName}.{frame}.{ext}':
 			blurdev.debug.debugObject(self.generatePlayblast, 'pathFormat is not implemented in Maya')
 		
@@ -134,6 +130,14 @@ class MayaSceneViewport(AbstractSceneViewport):
 		#		maya.mel.eval('updatePlayblastPluginMenus()')
 		#--------------------------------------------------------------------------------
 		
+		# MCH 10/16/14 NOTE: To query/enable depth of field
+		#--------------------------------------------------------------------------------
+		# cam = scene.viewport().camera()
+		# ntp = cam._nativeTypePointer
+		# ntp.isDepthOfField()
+		# ntp.setDepthOfField(False)
+		#--------------------------------------------------------------------------------
+		
 		cam = self.camera()
 		name = cam.name()
 		overscanLocked = cmds.getAttr("{name}.overscan".format(name=cam.name()), lock=True)
@@ -148,55 +152,55 @@ class MayaSceneViewport(AbstractSceneViewport):
 				stateLocker.setMethodArgs(obj, obj.setProperty, partial(obj.property, key), key, value)
 			
 			# Set FilmBack.FitResolutionGate to Overscan
-			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'filmFit'), 'filmFit', 3)
-			# set Aspect Ratio
-#			stateLocker.setMethod(cam, cam.setPictureRatio, cam.pictureRatio, 2.35)
+			setPropertyLocker(cam, 'filmFit', 3)
 			# uncheck Display Film Gate
 			setPropertyLocker(cam, 'displayFilmGate', 0)
-#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayFilmGate'), 'displayFilmGate', 0)
 			# uncheck Display Resolution
 			setPropertyLocker(cam, 'displayResolution', 0)
-#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'displayResolution'), 'displayResolution', 0)
 			# Set overscan to 1.0
 			setPropertyLocker(cam, 'overscan', 1.0)
-#			stateLocker.setMethodArgs(cam, cam.setProperty, partial(cam.property, 'overscan'), 'overscan', 1.0)
-			if effects:
-				# Wildman's Deadpool settings
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.vertexAnimationCache', 2)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.hwInstancing', True)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoEnable', 1)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoAmount', 3.0)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoRadius', 14.0)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoFilterRadius', 10.0)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 1)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurShutterOpenFraction', 0.2)
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurSampleCount', 8)
-				
+			
+			if antiAlias:
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', True)
+			
+			# Store and restore these settings
+			options = ['sel']
+			
+			# Find the current viewport so we can apply the viewport settings
+			panel = cmds.getPanel(withFocus=True)
+			# Check for if non-viewport panel's are active
+			if not panel in cmds.getPanel(type='modelPanel'):
+				panel = 'modelPanel4'
+			
+			if geometryOnly:
 				# HACK: This records the viewport show options, sets them to playblast options, then
 				# restores them
-				panel = cmds.getPanel(withFocus=True)
-				# Check for if non-viewport panel's are active
-				if not panel in cmds.getPanel(type='modelPanel'):
-					panel = 'modelPanel4'
+				# TODO: Make this load the settings from the playblast overrides
 				# Dirty dict to query values
-				options = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
+				options.extend(['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
 							'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
 							'ikHandles', 'dynamics', 'deformers', 'fluids', 
 							'hairSystems', 'follicles', 'nCloths', 'nParticles', 'nRigids', 
 							'dynamicConstraints', 'locators', 'dimensions', 'pivots', 'handles', 
 							'textures', 'strokes', 'motionTrails', 'pluginShapes', 'clipGhosts', 
-							'greasePencils', 'manipulators', 'grid', 'hud', 'sel']
-				# New features
+							'greasePencils', 'manipulators', 'grid', 'hud',
+							])
+				# New features in 2015
 				if api.application.version() > 2014:
 					options.append('particleInstancers')
-				# Store the current values
-				states = {}
-				for option in options:
-					states[option] = cmds.modelEditor(panel, query=True, **{option: True})
-				
+			
+			# Store the current values
+			states = {}
+			for option in options:
+				states[option] = cmds.modelEditor(panel, query=True, **{option: True})
+			
+			if geometryOnly:
 				# Hide everything but Polygons
 				cmds.modelEditor(panel, edit=True, allObjects=False)
 				cmds.modelEditor(panel, edit=True, polymeshes=True)
+			
+			# Hide selection
+			cmds.modelEditor(panel, edit=True, sel=False)
 			
 			# generate playblast
 			cmds.playblast(
@@ -213,7 +217,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 					framePadding=padding,
 					viewer=False)
 			
-			if effects:
+			if geometryOnly:
 				# Restore the original values
 				for option, value in states.iteritems():
 					cmds.modelEditor(panel, edit=True, **{option: value})
