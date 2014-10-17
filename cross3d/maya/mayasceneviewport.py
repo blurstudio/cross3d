@@ -181,11 +181,14 @@ class MayaSceneViewport(AbstractSceneViewport):
 				# Dirty dict to query values
 				options = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
 							'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
-							'ikHandles', 'dynamics', 'deformers', 'particleInstancers', 'fluids', 
+							'ikHandles', 'dynamics', 'deformers', 'fluids', 
 							'hairSystems', 'follicles', 'nCloths', 'nParticles', 'nRigids', 
 							'dynamicConstraints', 'locators', 'dimensions', 'pivots', 'handles', 
 							'textures', 'strokes', 'motionTrails', 'pluginShapes', 'clipGhosts', 
 							'greasePencils', 'manipulators', 'grid', 'hud', 'sel']
+				# New features
+				if api.application.version() > 2014:
+					options.append('particleInstancers')
 				# Store the current values
 				states = {}
 				for option in options:

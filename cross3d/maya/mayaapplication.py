@@ -122,7 +122,8 @@ class MayaApplication(AbstractApplication):
 		return 'ma'
 
 	def version(self):
-		return int(cmds.about(version=True))
+		v = cmds.about(version=True).replace(' x64', '')
+		return int(v)
 	
 	def year(self):
 		return self.version()
