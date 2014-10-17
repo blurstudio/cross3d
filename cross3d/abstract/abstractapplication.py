@@ -77,7 +77,7 @@ class AbstractApplication(QObject):
 
 	@abstractmethod
 	def allowedCharacters(self):
-		return ''
+		return 'A-Za-z0-9'
 
 	@abstractmethod
 	def connectCallback(self, signal):
