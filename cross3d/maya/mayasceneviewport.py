@@ -74,6 +74,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 		if ext.replace('.', '').lower() not in self._validPlayblastFormats:
 			raise Exceptions.FileFormatNotSupported('The file format {ext} is not supported by Maya'.format(ext=ext))
 		
+		if antiAlias:
+			blurdev.debug.debugObject(self.generatePlayblast, 'antiAlias is depreciated, please use effects')
+		
 		playblastFormat = 'image'
 		compression = ext.replace('.', '')
 		quality = 100
@@ -130,14 +133,6 @@ class MayaSceneViewport(AbstractSceneViewport):
 		#		maya.mel.eval('updatePlayblastPluginMenus()')
 		#--------------------------------------------------------------------------------
 		
-		# MCH 10/16/14 NOTE: To query/enable depth of field
-		#--------------------------------------------------------------------------------
-		# cam = scene.viewport().camera()
-		# ntp = cam._nativeTypePointer
-		# ntp.isDepthOfField()
-		# ntp.setDepthOfField(False)
-		#--------------------------------------------------------------------------------
-		
 		cam = self.camera()
 		name = cam.name()
 		overscanLocked = cmds.getAttr("{name}.overscan".format(name=cam.name()), lock=True)
@@ -160,11 +155,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 			# Set overscan to 1.0
 			setPropertyLocker(cam, 'overscan', 1.0)
 			
-			if antiAlias:
-				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', True)
-			
-			# Store and restore these settings
-			options = ['sel']
+			# Store and restore these settings using modelEditor
+			# The key is the property to query/edit, the value is the value used while playblasting
+			modelEditorOverrides = {'sel':False}
 			
 			# Find the current viewport so we can apply the viewport settings
 			panel = cmds.getPanel(withFocus=True)
@@ -173,34 +166,54 @@ class MayaSceneViewport(AbstractSceneViewport):
 				panel = 'modelPanel4'
 			
 			if geometryOnly:
+				modelEditorOverrides['polymeshes'] = True
 				# HACK: This records the viewport show options, sets them to playblast options, then
 				# restores them
 				# TODO: Make this load the settings from the playblast overrides
-				# Dirty dict to query values
-				options.extend(['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
-							'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
-							'ikHandles', 'dynamics', 'deformers', 'fluids', 
-							'hairSystems', 'follicles', 'nCloths', 'nParticles', 'nRigids', 
-							'dynamicConstraints', 'locators', 'dimensions', 'pivots', 'handles', 
-							'textures', 'strokes', 'motionTrails', 'pluginShapes', 'clipGhosts', 
-							'greasePencils', 'manipulators', 'grid', 'hud',
-							])
+				attrs = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 
+						'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
+						'ikHandles', 'dynamics', 'deformers', 'fluids', 'hairSystems', 'follicles', 
+						'nCloths', 'nParticles', 'nRigids', 'dynamicConstraints', 'locators', 
+						'dimensions', 'pivots', 'handles', 'textures', 'strokes', 'motionTrails', 
+						'pluginShapes', 'clipGhosts', 'greasePencils', 'manipulators', 'grid', 'hud']
+				# Disable display of all of these options
+				modelEditorOverrides.update(dict([(attr, False) for attr in attrs]))
 				# New features in 2015
 				if api.application.version() > 2014:
-					options.append('particleInstancers')
+					modelEditorOverrides.update(particleInstancers=False)
+			
+			if effects == True:
+				modelEditorOverrides.update(displayTextures=True, displayLights='all')
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoEnable', 1)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 1)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', True)
+				
+				# TODO: Add Camera.setDeptOfField to blur3d
+				ntp = cam._nativeTypePointer
+				stateLocker.setMethod(ntp, ntp.setDepthOfField, ntp.isDepthOfField, True)
+				
+			if effects == False:
+				modelEditorOverrides.update(displayTextures=False, displayLights='default')
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.ssaoEnable', 0)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 0)
+				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', False)
+				
+				# TODO: Add Camera.setDeptOfField to blur3d
+				ntp = cam._nativeTypePointer
+				stateLocker.setMethod(ntp, ntp.setDepthOfField, ntp.isDepthOfField, False)
 			
 			# Store the current values
-			states = {}
-			for option in options:
-				states[option] = cmds.modelEditor(panel, query=True, **{option: True})
+			modelEditorStates = {}
+			for option, value in modelEditorOverrides.iteritems():
+				# Store  the current value
+				modelEditorStates[option] = cmds.modelEditor(panel, query=True, **{option: True})
+				# Set the playblast value
+				cmds.modelEditor(panel, edit=True, **{option: value})
 			
-			if geometryOnly:
-				# Hide everything but Polygons
-				cmds.modelEditor(panel, edit=True, allObjects=False)
-				cmds.modelEditor(panel, edit=True, polymeshes=True)
-			
-			# Hide selection
-			cmds.modelEditor(panel, edit=True, sel=False)
+			# Test code
+			from PyQt4.QtGui import QApplication, QMessageBox
+			QApplication.processEvents()
+			QMessageBox.question(None, 'Temp', 'update')
 			
 			# generate playblast
 			cmds.playblast(
@@ -217,10 +230,10 @@ class MayaSceneViewport(AbstractSceneViewport):
 					framePadding=padding,
 					viewer=False)
 			
-			if geometryOnly:
-				# Restore the original values
-				for option, value in states.iteritems():
-					cmds.modelEditor(panel, edit=True, **{option: value})
+			# Restore the modelEditor options to their previous value
+			for option, value in modelEditorStates.iteritems():
+				cmds.modelEditor(panel, edit=True, **{option: value})
+		
 		if overscanLocked:
 			# relock overscan
 			cmds.setAttr("{name}.overscan".format(name=name), lock=True)
