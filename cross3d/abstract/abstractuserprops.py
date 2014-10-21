@@ -13,6 +13,7 @@ import re
 import json
 import blur3d.api
 from blur3d.naming import Name
+from collections import OrderedDict
 from PyQt4.QtCore import QTimer as _QTimer
 
 dispatchObject = blur3d.api.dispatch.dispatchObject
@@ -209,7 +210,7 @@ class AbstractUserProps(dict):
 			return float(string)
 		elif typ == int:
 			return int(string)
-		elif typ in (list, dict, tuple, bool):
+		elif typ in (list, dict, tuple, bool, OrderedDict):
 			return eval(string)
 		return string
 	
@@ -242,6 +243,8 @@ class AbstractUserProps(dict):
 			return s, list
 		if re.match('\(.*\)', string):
 			return string, tuple
+		if re.match('OrderedDict\(.*\)', string):
+			return string, OrderedDict
 		return string, None
 	
 	@staticmethod
