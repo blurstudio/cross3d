@@ -169,6 +169,11 @@ class MayaScene(AbstractScene):
 		output = api.SceneWrapper._asMOBject(name)
 		userProps = api.UserProps(output)
 		userProps['model'] = True
+		if referenced:
+			userProps['Referenced'] = referenced
+			# Create the Active_Resolution enum if it doesn't exist
+#			cmds.addAttr(name, longName="Active_Resolution", attributeType="enum", enumName="Offloaded:")
+#			userProps['Resolutions'] = OrderedDict(Offloaded='')
 
 		if nativeObjects:
 			for nativeObject in nativeObjects:
@@ -190,7 +195,12 @@ class MayaScene(AbstractScene):
 		found = False
 		if name:
 			sel = om.MSelectionList()
-			sel.add(name)
+			try:
+				sel.add(name)
+			except RuntimeError as e:
+				if e.message != '(kInvalidParameter): Object does not exist':
+					raise
+				return None
 			obj = om.MObject()
 			sel.getDependNode(0, obj)
 			if not obj.isNull():
@@ -216,23 +226,7 @@ class MayaScene(AbstractScene):
 #			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
 			objects = cmds.file(path, reference=True, returnNewNodes=True)
 			print objects
-#			mxs.mergeMAXFile(path, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
-
-#			# Adding name space to objects.
-#			for name in objectNames:
-#				obj = self._findNativeObject(name)
-#				if not model and name == 'Model':
-#					model = obj
-#					model.name = modelName
-#				else:
-#					obj.name = '.'.join([modelName, name])
-#
-#			# Adding name space to layers.
-#			for layer in self.layers():
-#				if 'Model.' in layer.name():
-#					nativePointer = layer.nativePointer()
-#					nativePointer.setName(nativePointer.name.replace('Model', modelName))
-
+			
 			return model
 		raise Exception('Model file does not exist.')
 

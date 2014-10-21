@@ -63,6 +63,11 @@ class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
+	def _nativeName(self):
+		""" A convience method that returns the name of the shape node, not the transform node.
+		"""
+		return self._mObjName(self._nativePointer, True)
+	
 	@classmethod
 	def _typeOfNativeObject(cls, nativeObject):
 		"""
@@ -75,7 +80,8 @@ class MayaSceneObject( AbstractSceneObject ):
 		nativeObject = cls._asMOBject(nativeObject)
 		apiType = nativeObject.apiType()
 		if apiType == om.MFn.kTransform:
-			apiType = cls._getShapeNode(nativeObject).apiType()
+			nativeObject = cls._getShapeNode(nativeObject)
+			apiType = nativeObject.apiType()
 		
 		# Checking for model.
 		if apiType == om.MFn.kLocator:
