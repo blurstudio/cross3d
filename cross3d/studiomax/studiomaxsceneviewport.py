@@ -110,7 +110,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=None, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		'''
 			/option <bool> effects
 		'''
@@ -192,7 +192,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		nitrous = not mxs.gw.GetDriverString() and application.version() >= 15
 
 		# If the viewport is using Nitrous.
-		if nitrous and camera.hasMultiPassEffects() and effects:
+		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
 			# TODO: Make sure we store and activate progressive rendering state.
 			pass
@@ -211,7 +211,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			if camera:
 
 				# If multi-pass effects are active.
-				if camera.hasMultiPassEffects() and effects:
+				if camera.hasMultiPassEffects() and effects in [None, True]:
 					
 					# If we use a Nitrous viewport, we compute the depth of field the new way.
 					if nitrous:
@@ -227,7 +227,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 						self.slateDraw()	
 
 				# For Max 2012 and above only the viewport object allows to save the picture with multipass effects.
-				if application.version() >= 14 and camera.hasMultiPassEffects() and effects:
+				if application.version() >= 14 and camera.hasMultiPassEffects() and effects in [None, True]:
 					image = mxs.viewport.getViewportDib()
 
 			if not image:
@@ -264,7 +264,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		self.setSlateIsActive( False )
 
 		# Restoring Nitrous settings.
-		if nitrous and camera.hasMultiPassEffects() and effects:
+		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
 			# TODO: Restore progressive rendering state.
 			pass
