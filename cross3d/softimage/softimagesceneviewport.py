@@ -84,7 +84,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		camera.matchCamera(self.camera())
 		return camera
 
-	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
+	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
@@ -93,9 +93,9 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		"""
 
 		frame = self._scene.currentFrame()
-		return self.generatePlayblast(fileName, frameRange=[frame, frame], resolution=resolution, slate=slate, effects=effects, geometryOnly=geometryOnly, antiAlias=antiAlias, pathFormat=pathFormat)
+		return self.generatePlayblast(fileName, frameRange=[frame, frame], resolution=resolution, slate=slate, effects=effects, geometryOnly=geometryOnly, pathFormat=pathFormat)
 
-	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
+	def generatePlayblast( self, fileName, frameRange=None, resolution=None, slate=None, effects=True, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		
 		"""
 			Creates an unpadded JPG file sequence from the viewport for a given range.
@@ -225,7 +225,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		viewportCapture( 'Launch Flipbook' ).Value = False
 		viewportCapture( 'Use Native Movie Player' ).Value = False 
 		viewportCapture( 'Movie' ).Value = False 
-		viewportCapture( 'OpenGL Anti-Aliasing' ).Value = 16 if antiAlias else 1
+		viewportCapture( 'OpenGL Anti-Aliasing' ).Value = 16 if effects else 1
 		viewportCapture( 'Remember Last Sequence' ).Value = False
 
 		letterToNumber = { "A":1, "B":2, "C":3, "D":4 }

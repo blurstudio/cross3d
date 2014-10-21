@@ -110,7 +110,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
-	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, antiAlias=False, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
+	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=True, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		'''
 			/option <bool> effects
 		'''

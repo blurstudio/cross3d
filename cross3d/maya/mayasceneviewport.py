@@ -67,15 +67,11 @@ class MayaSceneViewport(AbstractSceneViewport):
 				slate=None, 
 				effects=True, 
 				geometryOnly=True, 
-				antiAlias=False, 
 				pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		fileName, ext = os.path.splitext(fileName)
 		# Make sure a invalid file format was not requested
 		if ext.replace('.', '').lower() not in self._validPlayblastFormats:
 			raise Exceptions.FileFormatNotSupported('The file format {ext} is not supported by Maya'.format(ext=ext))
-		
-		if antiAlias:
-			blurdev.debug.debugObject(self.generatePlayblast, 'antiAlias is depreciated, please use effects')
 		
 		playblastFormat = 'image'
 		compression = ext.replace('.', '')
