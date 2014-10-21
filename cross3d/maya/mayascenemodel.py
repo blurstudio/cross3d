@@ -78,6 +78,12 @@ class MayaSceneModel(AbstractSceneModel):
 	def resolutionsPaths(self):
 		return [self.resolutionPath(resolution) for resolution in self.resolutions() if resolution != 'Offloaded']
 
+	def _referenceNodeName(self):
+		filename = self.userProps().get('Loaded_Reference')
+		if filename:
+			return cmds.referenceQuery(filename, referenceNode=True)
+		return None
+
 	def setResolution(self, resolution):
 		if self.isReferenced():
 			# handles qstrings
@@ -89,35 +95,30 @@ class MayaSceneModel(AbstractSceneModel):
 				# names often come from filenames).
 				if res.lower() != resolution.lower():
 					continue
-				# unload the existing reference
-				loaded = self.userProps().get('Loaded_Reference')
-				if loaded:
-					cmds.file(loaded, unloadReference=True)
-					cmds.file(loaded, removeReference=True)
-					del(self.userProps()['Loaded_Reference'])
-				# Load the reference into the BlurImport namespace so we can get the filename for this
-				# reference. We need the filename to unload the reference later. If c:\test.ma is
-				# referenced twice the second uses the filename c:\test.ma{1}.
 				path = self.resolutionPath(res)
-				filename = cmds.file(path, reference=True, namespace='BlurImport')
-				# Find all top level items that were referenced into the scene
-				topLevel = []
-				# Use the namespace to find all of the nodes we just referenced into the scene
-				objects = cmds.namespaceInfo('BlurImport', listOnlyDependencyNodes=True, dagPath=True)
-				for obj in objects:
-					if not cmds.listRelatives(obj, parent=True, path=True) and \
-							cmds.nodeType(obj) == 'transform':
-								topLevel.append(obj)
-				# Reparent the top level nodes under the model locator
-				topLevel.append(self.name())
-				cmds.parent(*topLevel)
+				# Update the existing reference if it exists
+				nodeName = self._referenceNodeName()
+				if nodeName:
+					cmds.file(path, loadReference=nodeName)
+					filename = cmds.referenceQuery(nodeName, filename=True)
+				else:
+					# We use the filename to replace/unload the reference later. If c:\test.ma is
+					# referenced twice the second uses the filename c:\test.ma{1}.
+					filename = cmds.file(path, reference=True, namespace=":")
+					# Find all top level items that were referenced into the scene
+					topLevel = []
+					# Use the namespace to find all of the nodes we just referenced into the scene
+					objects = cmds.referenceQuery(filename, showDagPath=True, nodes=True)
+					for obj in objects:
+						if cmds.nodeType(obj) == 'transform' and not cmds.listRelatives(obj, parent=True, path=True):
+									topLevel.append(obj)
+					# Reparent the top level nodes under the model locator
+					topLevel.append(self.name())
+					cmds.parent(*topLevel)
 				# Update the Active_Resolution property
 				self.setProperty(resolutionAttr, i)
 				# Store the loaded reference filename so we can remove it later
 				self.userProps()['Loaded_Reference'] = filename
-				# remove the importing namespacing
-				cmds.namespace(setNamespace=':')
-				cmds.namespace(removeNamespace=':BlurImport', mergeNamespaceWithRoot=True)
 				return True
 		else:
 			self.userProps()['resolution'] = resolution
