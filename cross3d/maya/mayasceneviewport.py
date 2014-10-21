@@ -210,10 +210,10 @@ class MayaSceneViewport(AbstractSceneViewport):
 				# Set the playblast value
 				cmds.modelEditor(panel, edit=True, **{option: value})
 			
-			# Test code
-			from PyQt4.QtGui import QApplication, QMessageBox
-			QApplication.processEvents()
-			QMessageBox.question(None, 'Temp', 'update')
+#			# Uncomment this code to update the ui so you can see what options get disabled in the toolbar
+#			from PyQt4.QtGui import QApplication, QMessageBox
+#			QApplication.processEvents()
+#			QMessageBox.question(None, 'Temp', 'update')
 			
 			# generate playblast
 			cmds.playblast(
