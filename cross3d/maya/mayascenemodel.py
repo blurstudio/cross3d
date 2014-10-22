@@ -96,24 +96,32 @@ class MayaSceneModel(AbstractSceneModel):
 				if res.lower() != resolution.lower():
 					continue
 				path = self.resolutionPath(res)
-				# Update the existing reference if it exists
 				nodeName = self._referenceNodeName()
-				if nodeName:
+				if res.lower() == 'offloaded':
+					# If offloaded, unload the reference
+					if nodeName:
+						cmds.file(unloadReference=nodeName)
+					return True
+				# If the reference is already loaded, switch it with the requested one while
+				# preserving any updated properties like animation.
+				elif nodeName:
 					cmds.file(path, loadReference=nodeName)
 					filename = cmds.referenceQuery(nodeName, filename=True)
 				else:
 					# We use the filename to replace/unload the reference later. If c:\test.ma is
 					# referenced twice the second uses the filename c:\test.ma{1}.
 					filename = cmds.file(path, reference=True, namespace=":")
-					# Find all top level items that were referenced into the scene
-					topLevel = []
-					# Use the namespace to find all of the nodes we just referenced into the scene
-					objects = cmds.referenceQuery(filename, showDagPath=True, nodes=True)
-					for obj in objects:
-						if cmds.nodeType(obj) == 'transform' and not cmds.listRelatives(obj, parent=True, path=True):
-									topLevel.append(obj)
-					# Reparent the top level nodes under the model locator
-					topLevel.append(self.name())
+				# Find all top level items that were referenced into the scene and reparent them
+				# under the model node
+				objects = cmds.referenceQuery(filename, dagPath=True, nodes=True)
+				topLevel = []
+				for obj in objects:
+					if cmds.nodeType(obj) in ('transform', 'dagContainer') and \
+							not cmds.listRelatives(obj, parent=True, path=True):
+								topLevel.append(obj)
+				# Reparent the top level nodes under the model locator
+				topLevel.append(self.name())
+				if len(topLevel) > 1:
 					cmds.parent(*topLevel)
 				# Update the Active_Resolution property
 				self.setProperty(resolutionAttr, i)
