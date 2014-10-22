@@ -78,12 +78,6 @@ class MayaSceneModel(AbstractSceneModel):
 	def resolutionsPaths(self):
 		return [self.resolutionPath(resolution) for resolution in self.resolutions() if resolution != 'Offloaded']
 
-	def _referenceNodeName(self):
-		filename = self.userProps().get('Loaded_Reference')
-		if filename:
-			return cmds.referenceQuery(filename, referenceNode=True)
-		return None
-
 	def setResolution(self, resolution):
 		if self.isReferenced():
 			# handles qstrings
@@ -101,6 +95,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# If offloaded, unload the reference
 					if nodeName:
 						cmds.file(unloadReference=nodeName)
+					self.setProperty(resolutionAttr, i)
 					return True
 				# If the reference is already loaded, switch it with the requested one while
 				# preserving any updated properties like animation.
@@ -127,6 +122,16 @@ class MayaSceneModel(AbstractSceneModel):
 				self.setProperty(resolutionAttr, i)
 				# Store the loaded reference filename so we can remove it later
 				self.userProps()['Loaded_Reference'] = filename
+				# Copy the modelInfo user props to the model
+				modelInfos = self.children(wildcard='{}|ModelInfo'.format(self.name()))
+				if modelInfos:
+					modelInfo = modelInfos[0]
+					userProps = modelInfo.userProps()
+					infos = userProps.get('infos')
+					# TODO: Should we copy all properties? At this point things like project and 
+					# department are already set even if this is the first time a resolution is loaded
+					if infos:
+						self.userProps()['infos'] = infos
 				return True
 		else:
 			self.userProps()['resolution'] = resolution
@@ -137,6 +142,12 @@ class MayaSceneModel(AbstractSceneModel):
 
 	def update(self):
 		return False
+	
+	def _referenceNodeName(self):
+		filename = self.userProps().get('Loaded_Reference')
+		if filename:
+			return cmds.referenceQuery(filename, referenceNode=True)
+		return None
 
 	
 # register the symbol
