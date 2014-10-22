@@ -1,5 +1,7 @@
+import re
 import maya.OpenMaya as om
 import maya.cmds as cmds
+import blurdev
 from blur3d.constants import ObjectType
 from blur3d.api import application, UserProps
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
@@ -17,7 +19,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		ObjectType.Geometry: om.MFn.kMesh,
 		ObjectType.Light: om.MFn.kLight,
 		ObjectType.Camera: om.MFn.kCamera,
-		ObjectType.Model: om.MFn.kModel,
+		ObjectType.Model: om.MFn.kLocator,
 		ObjectType.Group: None,
 		ObjectType.Bone: om.MFn.kJoint,
 		ObjectType.Particle: (om.MFn.kParticle, om.MFn.kNParticle), # I am not sure this is required, but it is supported
@@ -63,6 +65,40 @@ class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
+	@classmethod
+	def _mObjChildren(cls, mObj, recursive=True, regex=None):
+		path = om.MDagPath.getAPathTo(mObj)
+		for index in range(path.childCount()):
+			child = path.child(index)
+			if child.apiType() == om.MFn.kTransform:
+				if not regex or regex.match(api.SceneObject._mObjName(child)):
+					yield child
+				if recursive == True:
+					for i in cls._mObjChildren(child, regex=regex):
+						yield i 
+	
+	def _nativeChildren(self, recursive=False, wildcard='', type='', parent='', childrenCollector=[]):
+		"""
+			\remarks	looks up the native children for this object
+			\param		recursive         <bool>
+			\param		parent		      <variant> nativeObject(used for recursive searches when necessary)
+			\param		childrenCollector <list> (used for recursive searches when necessary)
+			\sa			children
+			\return		<list> [ <variant> nativeObject, .. ]
+		"""
+		if type:
+			blurdev.debug.debugObject(self._nativeChildren, 'type not implemented yet.')
+		if parent:
+			blurdev.debug.debugObject(self._nativeChildren, 'parent not implemented yet.')
+		if childrenCollector:
+			blurdev.debug.debugObject(self._nativeChildren, 'childrenCollector not implemented yet.')
+		# Convert the wildcard to a regular expression so the generator doesn't have to create the
+		# regex over and over
+		if wildcard:
+			expression = application._wildcardToRegex(wildcard)
+			regex = re.compile(expression, flags=re.I)
+		return self._mObjChildren(self._nativeTransform, recursive=recursive, regex=regex)
+	
 	def _nativeName(self):
 		""" A convience method that returns the name of the shape node, not the transform node.
 		"""

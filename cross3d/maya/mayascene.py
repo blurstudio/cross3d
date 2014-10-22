@@ -234,16 +234,7 @@ class MayaScene(AbstractScene):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			:return: list [<Py3dsMax.mxs.Object> nativeObject, ..]
 		"""
-		if wildcard:
-			# Maya uses pipes as seperators, so escape them so they are not treated as or's
-			expression = re.sub(r'(?<!\\)\|', r'\|', wildcard)
-			# This will replace any "*" into ".+" therefore converting basic star based wildcards into a regular expression.
-			expression = re.sub(r'(?<!\\)\*', r'.*', expression)
-			if not expression[-1] == '$':
-				expression += '$'
-		else:
-			# No wildcard provided, match everything
-			expression = '.*'
+		expression = api.application._wildcardToRegex(wildcard)
 #		print expression
 		regex = re.compile(expression, flags=re.I)
 		if getsFromSelection:
@@ -268,7 +259,10 @@ class MayaScene(AbstractScene):
 			if wildcard:
 				ret = []
 				for obj in objects:
-					if regex.match(api.SceneObject._mObjName(obj)):
+					# Because a Model is defined by a user prop, we have to do a blur3d type check 
+					# on the objects that were returned in the iterator
+					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
+					if typeCheck and regex.match(api.SceneObject._mObjName(obj)):
 						ret.append(obj)
 				objects = ret
 		return objects

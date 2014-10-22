@@ -11,6 +11,7 @@
 #   :date       09/10/14
 #
 
+import re
 import maya.cmds as cmds
 from maya.OpenMaya import MSceneMessage, MMessage, MModelMessage, MEventMessage
 
@@ -23,6 +24,21 @@ class MayaApplication(AbstractApplication):
 		super(MayaApplication, self).__init__()
 		# Scene can not be imported at this point, the class has not been defined.
 		self._scene = None
+	
+	def _wildcardToRegex(self, wildcard):
+		""" Convert a * syntax wildcard string into a parsable regular expression
+		"""
+		if wildcard:
+			# Maya uses pipes as seperators, so escape them so they are not treated as or's
+			expression = re.sub(r'(?<!\\)\|', r'\|', wildcard)
+			# This will replace any "*" into ".+" therefore converting basic star based wildcards into a regular expression.
+			expression = re.sub(r'(?<!\\)\*', r'.*', expression)
+			if not expression[-1] == '$':
+				expression += '$'
+		else:
+			# No wildcard provided, match everything
+			expression = '.*'
+		return expression
 	
 	def _fileNameCallback(self, clientData):
 		# Ensure the scene object is created.
