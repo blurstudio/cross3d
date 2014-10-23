@@ -190,7 +190,9 @@ class MayaScene(AbstractScene):
 		:param uniqueId: Unique ID of the object. Defaults to 0
 		:return: nativeObject || None
 		"""
-		name = unicode(name)
+		# Most of our tools use the xsi/max naming conventions, so they will pass hyphens
+		# because maya doesn't support this automaticly convert them to underscores
+		name = unicode(name).replace('-', '_')
 		output = None
 		found = False
 		if name:
@@ -219,23 +221,22 @@ class MayaScene(AbstractScene):
 		# Re-implented to shut-up the abstractmethod warning
 		return nativeValue
 
-	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
-		if os.path.exists(path):
-			model = None
-			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
-#			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
-			objects = cmds.file(path, reference=True, returnNewNodes=True)
-			print objects
-			
-			return model
-		raise Exception('Model file does not exist.')
+#	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
+#		if os.path.exists(path):
+#			model = None
+#			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
+##			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
+#			objects = cmds.file(path, reference=True, returnNewNodes=True)
+#			print objects
+#			
+#			return model
+#		raise Exception('Model file does not exist.')
 
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			:return: list [<Py3dsMax.mxs.Object> nativeObject, ..]
 		"""
 		expression = api.application._wildcardToRegex(wildcard)
-#		print expression
 		regex = re.compile(expression, flags=re.I)
 		if getsFromSelection:
 			objects = self._selectionIter()
@@ -244,7 +245,6 @@ class MayaScene(AbstractScene):
 				for obj in objects:
 					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
 					wildcardCheck = regex.match(api.SceneObject._mObjName(obj))
-#					print api.SceneObject._typeOfNativeObject(obj) & objectType,  api.SceneObject._typeOfNativeObject(obj), objectType, '----', typeCheck, wildcardCheck, api.SceneObject._mObjName(obj)
 					if typeCheck and wildcardCheck:
 						ret.append(obj)
 				objects = ret

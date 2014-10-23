@@ -29,6 +29,8 @@ class MayaApplication(AbstractApplication):
 		""" Convert a * syntax wildcard string into a parsable regular expression
 		"""
 		if wildcard:
+			# Maya doesn't support our current naming convetions, so convert hyphens to underscores
+			wildcard = wildcard.replace('-', '_')
 			# Maya uses pipes as seperators, so escape them so they are not treated as or's
 			expression = re.sub(r'(?<!\\)\|', r'\|', wildcard)
 			# This will replace any "*" into ".+" therefore converting basic star based wildcards into a regular expression.
