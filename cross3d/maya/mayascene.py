@@ -243,7 +243,7 @@ class MayaScene(AbstractScene):
 			if objectType != 0 or wildcard:
 				ret = []
 				for obj in objects:
-					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
+					typeCheck = True if objectType else api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
 					wildcardCheck = regex.match(api.SceneObject._mObjName(obj))
 					if typeCheck and wildcardCheck:
 						ret.append(obj)
@@ -261,8 +261,8 @@ class MayaScene(AbstractScene):
 				for obj in objects:
 					# Because a Model is defined by a user prop, we have to do a blur3d type check 
 					# on the objects that were returned in the iterator
-					typeCheck = api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
-					if typeCheck and regex.match(api.SceneObject._mObjName(obj)):
+					typeCheck = True if objectType else api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
+					if typeCheck and regex.match(api.SceneObject._mObjName(obj, False)):
 						ret.append(obj)
 				objects = ret
 		return objects
@@ -339,12 +339,13 @@ class MayaScene(AbstractScene):
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
 
-	def animationFPS(self):
+	@classmethod
+	def animationFPS(cls):
 		""" Return the current frames per second rate.
 			:return: float
 		"""
-		base = self._currentTimeUnit()
-		return float(self._timeUnitToFPS[base])
+		base = cls._currentTimeUnit()
+		return float(cls._timeUnitToFPS[base])
 
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Seconds, callback=None):
 		""" Updates the scene's fps to the provided value and scales existing keys as specified.
