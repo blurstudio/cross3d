@@ -97,6 +97,7 @@ class MayaSceneObject( AbstractSceneObject ):
 			blurdev.debug.debugObject(self._nativeChildren, 'childrenCollector not implemented yet.')
 		# Convert the wildcard to a regular expression so the generator doesn't have to create the
 		# regex over and over
+		regex=None
 		if wildcard:
 			expression = application._wildcardToRegex(wildcard)
 			regex = re.compile(expression, flags=re.I)
