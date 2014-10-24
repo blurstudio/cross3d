@@ -17,6 +17,8 @@ class MayaUserProps(AbstractUserProps):
 		cmds.deleteAttr(api.SceneWrapper._mObjName(self._nativePointer), attribute=key)
 	
 	def __getitem__(self, key):
+		if not key in self:
+			raise KeyError('{} is not stored in UserProps'.format(key))
 		return self.unescapeValue(api.SceneWrapper._getAttribute(self._nativePointer, key))
 	
 	def __setitem__(self, key, value):
