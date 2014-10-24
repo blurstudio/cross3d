@@ -106,6 +106,11 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return depNode.hasAttribute(name)
 	
 	@classmethod
+	def _namespace(self, mObj):
+		name = self._mObjName(mObj, False)
+		return re.match(r'((?P<namespace>[^:]+):)?(?P<name>.+)', name).groupdict()
+	
+	@classmethod
 	def _normalizeAttributeName(cls, name):
 		""" Removes invalid characters for attribute names from the provided string.
 		:param name: The string used as the name of a attribute.

@@ -20,7 +20,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		ObjectType.Light: om.MFn.kLight,
 		ObjectType.Camera: om.MFn.kCamera,
 		ObjectType.Model: om.MFn.kLocator,
-		ObjectType.Group: None,
+		ObjectType.Group: om.MFn.kLocator,
 		ObjectType.Bone: om.MFn.kJoint,
 		ObjectType.Particle: (om.MFn.kParticle, om.MFn.kNParticle), # I am not sure this is required, but it is supported
 		ObjectType.FumeFX: None,
@@ -39,6 +39,9 @@ class MayaSceneObject( AbstractSceneObject ):
 				_nativeToAbstractObjectType[item] = abstract
 		else:
 			_nativeToAbstractObjectType[native] = abstract
+	# Make sure Group is associated with kLocator not Model. They both are kLocator objects, but
+	# are models have more specific requirements that are explicitly checked for
+	_nativeToAbstractObjectType[om.MFn.kLocator] = ObjectType.Group
 	
 	def __init__(self, scene, nativeObject):
 		""" MayaSceneObject's should always have the shape node stored in _nativePointer
