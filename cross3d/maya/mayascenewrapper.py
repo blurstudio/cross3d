@@ -76,19 +76,6 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return name, shortName
 	
 	@classmethod
-	def _getAttribute(cls, mObj, name):
-		""" For the given OpenMaya.MObject and attribute name return the pythonic value stored on 
-		the attribute.
-		:param mObj: The OpenMaya.MObject
-		:param name: The attribute name to return the value of
-		:return: Python value stored on the attribute
-		"""
-		plug = cls._getPlug(mObj, name)
-		# OpenMaya doesn't provide a QObject.toPyObject like function, but pymel does.
-		import pymel.core
-		return pymel.core.datatypes.getPlugValue(plug)
-	
-	@classmethod
 	def _getPlug(cls, mObj, name):
 		""" For a given OpenMaya.MObject return the OpenMaya.MPlug object with that attribute name.
 		If the property does not exist, raises "RuntimeError: (kInvalidParameter): Cannot find item of required type"

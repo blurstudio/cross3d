@@ -19,7 +19,8 @@ class MayaUserProps(AbstractUserProps):
 	def __getitem__(self, key):
 		if not key in self:
 			raise KeyError('{} is not stored in UserProps'.format(key))
-		return self.unescapeValue(api.SceneWrapper._getAttribute(self._nativePointer, key))
+		node = api.SceneWrapper._mObjName(self._nativePointer)
+		return self.unescapeValue(cmds.getAttr('{node}.{attr}'.format(node=node, attr=key)))
 	
 	def __setitem__(self, key, value):
 		# Note: self.escapeKey(key) will be called when we create the attribute, so there is no
