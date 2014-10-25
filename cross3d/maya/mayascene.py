@@ -163,17 +163,23 @@ class MayaScene(AbstractScene):
 
 	def _createNativeModel(self, name='Model', nativeObjects=[], referenced=False):
 		name = 'Model' if not name else name
+		# Create a "model" namespace and add the locator to it
+		# TODO: Make this a context
+		currentNamespace = cmds.namespaceInfo(currentNamespace=True)
+		namespace = cmds.namespace(addNamespace=name)
+		cmds.namespace(setNamespace=namespace)
 		# Create the transform node then the shape node so the transform is properly named
-		parent = cmds.createNode('transform', name=name)
+		parent = cmds.createNode('transform', name='Model')
 		name = cmds.createNode('locator', name='{}Shape'.format(name), parent=parent)
 		output = api.SceneWrapper._asMOBject(name)
 		userProps = api.UserProps(output)
 		userProps['model'] = True
 		if referenced:
-			userProps['Referenced'] = referenced
+			userProps['referenced'] = referenced
 			# Create the Active_Resolution enum if it doesn't exist
 #			cmds.addAttr(name, longName="Active_Resolution", attributeType="enum", enumName="Offloaded:")
 #			userProps['Resolutions'] = OrderedDict(Offloaded='')
+		cmds.namespace(setNamespace=currentNamespace)
 
 		if nativeObjects:
 			for nativeObject in nativeObjects:
@@ -202,6 +208,9 @@ class MayaScene(AbstractScene):
 			except RuntimeError as e:
 				if e.message != '(kInvalidParameter): Object does not exist':
 					raise
+				# Workaround for that fact that Model Nodes are named [ModelName]:Model
+				if not uniqueId and not name.endswith(':Model'):
+					return self._findNativeObject('{}:Model'.format(name), uniqueId=uniqueId)
 				return None
 			obj = om.MObject()
 			sel.getDependNode(0, obj)
