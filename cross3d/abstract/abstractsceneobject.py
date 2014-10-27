@@ -213,7 +213,15 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		
 		return None
-		
+	
+	def addController(self, name, group='', tpe=float, default=0.0):
+		from blur3d.api import SceneAnimationController
+		return SceneAnimationController(self._scene, self._addNativeController(name, group, tpe, default))
+
+	@abstractmethod
+	def _addNativeController(self, name, group='', tpe=float, default=0.0):
+		return False
+
 	def addCacheFromFile(self, cacheFile):
 		"""Adds a new cache based on the inputed filename
 		
@@ -228,6 +236,14 @@ class AbstractSceneObject(SceneWrapper):
 			return SceneCache(self._scene, nativeCache)
 		return None
 	
+	def animationRange(self):
+		""" Returns the animated range from the first to the last key frame.
+
+		Returns:
+			FrameRange: The animated range.
+		"""
+		return FrameRange((0, 0))
+
 	def applyCache(self, path, type):
 		"""Applies cache to object
 		param Type <cache type>
@@ -279,6 +295,13 @@ class AbstractSceneObject(SceneWrapper):
 		scene = self._scene
 		return [ SceneObject(scene, native) for native in self._nativeChildren(recursive, wildcard, type) ]
 
+	def convertCachesOriginalPlaybackToCurvePlayback(self, alembic=True):
+		""" Takes all PC modifiers and TMC controllers and convert their original playback to a linear curve playback.
+
+		This is used as a base setup for further time alterations.
+		"""
+		return False
+		
 	def deselect(self):
 		"""Deslects this object in the scene
 

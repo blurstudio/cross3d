@@ -22,6 +22,9 @@ from blurdev import debug
 from PyQt4.QtCore import QTimer
 from blur3d.api import UserProps
 from blur3d.api import application
+from blur3d.lib.tmclib import TMCInfo
+from blur3d.constants import ControllerType
+from blur3d.lib.pclib import PointCacheInfo
 from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
 
@@ -1595,7 +1598,7 @@ class StudiomaxScene(AbstractScene):
 				return True
 		return False
 
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None):
 		"""
 		Exports a given set of objects as FBX.
 		
@@ -1621,7 +1624,11 @@ class StudiomaxScene(AbstractScene):
 		initialSelection = self._nativeSelection()
 		initialFrameRange = self.animationRange()
 		frameRange = initialFrameRange if not frameRange else frameRange
-		
+
+		# Feedback on non-implemented arguments.
+		if frameRate:
+			debug.debugObject(self._findNativeObject, 'frameRate argument not implemented yet.')
+
 		self.setAnimationRange(frameRange)
 		self._setNativeSelection(nativeObjects)
 
@@ -2043,6 +2050,76 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return mxs.rendsavefile
 
+	def resetTimeControllers(self):
+		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
+		alembicCaches = mxs.getClassInstances(mxs.Alembic_Float_Controller)
+
+		# Resetting Alembics to normal playback by instantiating the same expression.
+		controller = mxs.Float_Script(script='S')
+		for cache in alembicCaches:
+			mxs.setPropertyController(cache, 'time', controller) 
+
+		# Resetting PCs and TMCs to default playback.
+		for cache in nativeCaches:
+			cache.playbackType = 0
+
+		return True
+				
+	def applyRetimeCurve(self, curve, cachesFrameRate=None):
+		""" See abstract method for more info.
+
+		TODO: Make sure we can also provide an alembic curve.
+
+		Args:
+			curve: Currently only takes a controller.
+			cacheFrameRate: For TMCs and PCs there is not way to detect the frame rate at which they have been created, lame!
+		"""
+		from blur3d.api import SceneAnimationController
+
+		# Works with a blur3d.api.SceneAnimationController.
+		if isinstance(curve, SceneAnimationController):
+			if curve.controllerType() in [ControllerType.BezierFloat, ControllerType.LinearFloat]:
+				controller = curve.nativePointer()
+
+		# Works with a native Max controller.
+		elif mxs.classOf(curve) in [mxs.bezier_float, mxs.linear_float]:
+			controller = curve
+		else:
+			raise Exceptions('Sorry this method only accept keyable controllers like bezier_float or linear_float.')
+
+ 		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
+		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
+
+		# Getting all cache modifiers and controllers.
+		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
+		alembicCaches = mxs.getClassInstances(mxs.Alembic_Float_Controller) + mxs.getClassInstances(mxs.Alembic_Xform)
+
+		# Loading time on alembics by instantiating a single controller.
+		for alembicCache in alembicCaches:
+			mxs.setPropertyController(alembicCache, 'time', controller)
+
+		# TODO: Stop supporting PCs and TMCs, they suck, we need to move on.
+		for cache in nativeCaches:
+			cache.playbackType = 3
+			timeScriptController = mxs.Float_Script()
+
+			# This optimized greatly the playback.
+			cache.sampleRate = self.animationFPS() / float(cachesFrameRate)
+
+			# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
+			if mxs.classof(mxs.Point_Cache):
+				cacheInfo = PointCacheInfo.read(cache.filename, header_only=True)
+			elif mxs.classof(mxs.Transform_Cache):
+				cacheInfo = TMCInfo.read(cache.filename, header_only=True)
+
+			# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+			timeScriptController.addtarget('retimeCurve', mxs.getPropertyController(alembicCache, "time"))
+			timeScriptController.script = 'retimeCurve * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
+			mxs.setPropertyController(cache, "playbackFrame", timeScriptController)
+
+		mxs.redrawViews()
+		return True
+
 	def renderSize(self):
 		"""
 			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders
@@ -2121,6 +2198,7 @@ class StudiomaxScene(AbstractScene):
 		:param callback: <funciton> Code called after the fps is changed.
 		:return: bool success
 		"""
+
 		# No need to change it if the frameRate is already correct
 		if mxs.frameRate != fps:
 			if changeType == constants.FPSChangeType.Frames:
@@ -2357,7 +2435,8 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return mxs.timeConfiguration.playbackLoop
 
-	def animationFPS(self):
+	@classmethod
+	def animationFPS(cls):
 		"""
 			\remarks	gets the current scene's fps.
 			\return		<float>

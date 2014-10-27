@@ -17,6 +17,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 	#--------------------------------------------------------------------------------
 	#								private methods
 	#--------------------------------------------------------------------------------
+
 	@abstractmethod
 	def _createNativeKeyAt(self, time):
 		"""Creates a new key at the inputed time
@@ -119,6 +120,20 @@ class AbstractSceneAnimationController(SceneWrapper):
 		from blur3d.api import SceneAnimationKey
 		return [ SceneAnimationKey(self._scene, nativeKey) for nativeKey in self._nativeKeys() ]
 
+	@abstractmethod
+ 	def valueAtFrame(self, frame):
+ 		return 0.0
+ 		
+ 	@abstractmethod
+ 	def framesForValue(self, value):
+ 		return []
+
+ 	@abstractmethod
+ 	def fromAlembic(self, alembic):
+ 		""" Loads data from an alembic curve file.
+ 		"""
+ 		return False
+
 	def removeKeyAt(self, time):
 		"""Clears the key at the inputed time
 		
@@ -145,6 +160,15 @@ class AbstractSceneAnimationController(SceneWrapper):
 		if (key):
 			nativeKey = key.nativePointer()
 		return self._setNativeKeyAt(time, nativeKey)
+
+	@abstractmethod
+  	def toAlembic(self, path=''):
+ 		""" Returns a alembic curve.
+
+ 		Args:
+ 			path(boolean): Save the curve to disk if provided.
+ 		"""
+ 		return False
 
 	@classmethod
 	def createNew(cls, scene, controllerType):

@@ -92,6 +92,14 @@ class AbstractSceneModel(SceneObject):
 	def setResolution(self, name):
 		return False
 
+	def resetTimeControllers(self):
+		""" Removes any customization on time controllers of alembics, PC2s and TMCs making sure the data is read as exported.
+
+		Returns: Wheter or not the operation was a success.
+		"""
+
+		return False
+
 	@abstractmethod
 	def resolution(self):
 		return ''

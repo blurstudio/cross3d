@@ -815,6 +815,28 @@ class AbstractScene(QObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
+	# TODO: We need to get rid of BAF dependency and use alembic instead.
+	@abstractmethod
+	def applyRetimeCurve(self, path, obj, controller, cachesFrameRate):
+		""" Applies a BAF retime curve to the all the time controller found in the scene.
+
+		TODO: Get rid of BAF dependency and drop TMC and PC support.
+
+		The expected curve should express time in second and will be applied as is to alembic modifiers/controllers.
+		Any PC and TMC modifiers/controllers will be wired to the alembic ones through a float script that will both reference the alembic controller
+		and the frame rate at which we know these point cache have been made. Unfortunately this information cannot be deduced from parsing the PC or TMC file.
+
+		Args:
+			path(str): The path to the BAF document used for retime.
+			obj(str): The BAF object we are looking for.
+			controller(str): The BAF controller we are looking for.
+			cachesFrameRate: The frame rates at which PCs and TMCs have been made.
+
+		Return:
+			boolean: Wherther or not retime was applied with success.
+		"""
+		return False
+
 	@abstractmethod
 	def undo(self):
 		"""
@@ -880,8 +902,9 @@ class AbstractScene(QObject):
 		"""
 		return False
 
+	@classmethod
 	@abstractmethod
-	def animationFPS(self):
+	def animationFPS(cls):
 		"""
 			\remarks	returns the current frame per second rate
 			\return		<float> fps
@@ -1093,6 +1116,17 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def resetTimeControllers(self):
+		""" Removes any alteration done to time controllers.
+
+		This currently supports alembic, TMC and PC caches.
+
+		Returns: 
+			boolean: Whether or not the operation was a success.
+		"""
+		return False
+
+	@abstractmethod
 	def renderSize(self):
 		"""
 			\remarks	return the render output size for the scene
@@ -1280,7 +1314,7 @@ class AbstractScene(QObject):
 		"""
 		return False
 		
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
@@ -2515,12 +2549,12 @@ class AbstractScene(QObject):
 		from blur3d.api import application
 		return application
 
-	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True):
+	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
 		"""
-		return self._exportNativeObjectsToFBX([ obj.nativePointer() for obj in objects ], path, frameRange, showUI=showUI)
+		return self._exportNativeObjectsToFBX([ obj.nativePointer() for obj in objects ], path, frameRange, showUI, frameRate)
 
 	@pendingdeprecation('Use Scene.objects( type=ObjectType.Model )')
 	def models(self):

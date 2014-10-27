@@ -30,6 +30,20 @@ class AbstractSceneCamera(SceneObject):
 		self._viewOptions = {}
 		self._target = target
 
+	@abstractmethod
+	def applyCache(self, path, transformID, propertiesID):
+		""" Applies a alembic point cache modifier to the camera.
+
+		Args:
+			path(str): Path to the alembic file to apply. 
+			transformID(str): Pointer to the transform data within the alembic file.
+			propertiesID(str): Pointer to the properties data within the alembic file.
+
+		Returns:
+			boolean: Whether or not the cache was applied.
+		"""
+		return False
+
 	def target(self):
 		return self._target
 
@@ -155,7 +169,8 @@ class AbstractSceneCamera(SceneObject):
 	def lens(self, filmWidth=None, rounded=False):
 		if filmWidth:
 			fov = math.radians(self.fov())
-			lens = (0.5 * float(filmWidth)) / math.tan(fov / 2.0)
+			denominator = math.tan(fov / 2.0)
+			lens = (0.5 * float(filmWidth)) / denominator if denominator else 0
 		else:
 			lens = self._nativeFocalLength()
 		if rounded:
@@ -196,6 +211,15 @@ class AbstractSceneCamera(SceneObject):
 
 	@abstractmethod
 	def renderMultiPassEffects(self):
+		return False
+
+	@abstractmethod
+	def readsCache(self):
+		""" Returns whether or note the camera is reading alembic cache data.
+
+		Returns:
+			boolean: Whether or not an alembic cache is being read by the camera.
+		"""
 		return False
 
 	@abstractmethod

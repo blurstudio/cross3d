@@ -14,6 +14,7 @@ import re
 import time
 
 from PySoftimage import xsi
+from PyQt4.QtCore import QSize
 from blur3d.api import Exceptions
 from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
@@ -82,6 +83,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 	def createCamera(self, name='Camera', type='Standard'):
 		camera = self._scene.createCamera(name, type)
 		camera.matchCamera(self.camera())
+		camera.setDisplayName(name)
 		return camera
 
 	def generateSnapshot(self, fileName, resolution=None, slate=None, effects=True, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
@@ -104,7 +106,12 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		# Treating inputs.
 		if isinstance(frameRange, int):
 			frameRange = FrameRange([frameRange, frameRange])
-			
+
+		# Checking frame range.
+		initialFrameRange = self._scene.animationRange()
+		if not frameRange:
+			frameRange = initialFrameRange
+
 		# Collecting data.
 		nativeCamera = self._nativeCamera()
 		def genImagePath(frame=None):
@@ -188,12 +195,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'objenvironment' ).Value = False
 			nativeCamera.Properties( 'Camera Visibility' ).Parameters( 'custominfo' ).Value = False
 		
-		# Checking inputs.
-		initialFrameRange = self._scene.animationRange()
-		if not frameRange:
-			frameRange = initialFrameRange
+		# Checking resolution.
 		if not resolution:
-			from PyQt4.QtCore import QSize
 			resolution = QSize( xsi.GetValue( "Passes.RenderOptions.ImageWidth" ), xsi.GetValue( "Passes.RenderOptions.ImageHeight" ) )
 
 		# Setting the scene range. Apparently if you don't it causes an animation layer issue.

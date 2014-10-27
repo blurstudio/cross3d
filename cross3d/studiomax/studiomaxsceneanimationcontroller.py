@@ -8,14 +8,16 @@
 #	\date		09/08/10
 #
 
-from Py3dsMax 												import mxs
-from blur3d.api.abstract.abstractsceneanimationcontroller	import AbstractSceneAnimationController
-#from blur3d.api.abstract.abstractsceneanimationkey import AbstractSceneAnimationKey
+from Py3dsMax import mxs
+from blur3d.constants import ControllerType
+from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
 class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
+	#
 	def _createNativeKeyAt( self, time ):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._nativeKeys method to create a new key at the inputed time
@@ -30,7 +32,11 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 						for this controller instance
 			\return		<list> [ <Py3dsMax.mxs.Key> nativeKey, .. ]
 		"""
-		return self._nativePointer.keys
+
+		# This method only supports controllers with keys.
+	  	if mxs.classOf(self._nativePointer) in [mxs.bezier_float, mxs.linear_float]:
+			return self._nativePointer.keys
+		return []
 		
 	@classmethod
 	def _createNewNative( cls, scene, controllerType ):
@@ -40,7 +46,6 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 			\param		controllerType		<blur3d.constants.ControllerType>
 			\return		<blur3d.api.SceneAnimationController> || None
 		"""
-		from blur3d.constants import ControllerType
 		if ( controllerType == ControllerType.Bezier_Float ):
 			return mxs.Bezier_Float()
 		return None
@@ -70,28 +75,79 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
+	#
 	def controllerType( self ):
 		"""
 			\remarks	implements AbstractSceneAnimationController.controllerType method to return the controller type for this instance
 			\return		<blur3d.constants.ControllerType>
 		"""
-		from blur3d.constants import ControllerType
 		cls = mxs.classof(self._nativePointer)
-		
-		# return a float controller
-		if ( cls == mxs.Bezier_Float ):
-			return ControllerType.Bezier_Float
+
+		if (cls == mxs.Bezier_Float):
+			return ControllerType.BezierFloat
+
+		elif (cls == mxs.Linear_Float):
+			return ControllerType.LinearFloat
 		
 		return 0
-		
+
+	def displayName(self):
+		return '.'.join( mxs.exprForMaxObject( self._nativePointer ).split( '.' )[1:] )
+
 	def name( self ):
 		"""
 			\remarks	implements AbstractSceneWrapper.name to return the name of this animation controller instance
 			\sa			setName
 			\return		<str> name
 		"""
-		return '.'.join( mxs.exprForMaxObject( self._nativePointer ).split( '.' )[1:] )
-	
+		return self.displayName()
+
+ 	def valueAtFrame(self, frame):
+ 		mxs.execute("""fn getControllerValueAtFrame controller frame = (
+	 		at time frame
+	 		return controller.value
+ 		)""")
+ 		return mxs.getControllerValueAtFrame(self._nativePointer, frame)
+
+ 	def framesForValue(self, value, closest=True):
+
+ 		# TODO: (Douglas) This function is far from being perfect but it does the job.
+  		frames = {}
+
+ 		keys = self.keys()
+ 		start = int(round(keys[0].time()))
+ 		end = int(round(keys[-1].time()))
+ 		index = 0
+ 		previousValue = None
+ 		closestValue = 0.0
+ 		closestFrame = 0
+
+ 		# Looping through frames.
+ 		for frame in range(start, end + 1):
+ 			currentValue = self.valueAtFrame(frame)
+
+ 			if closest:
+				if abs(value-currentValue) < abs(value-closestValue):
+					closestValue = currentValue
+					closestFrame = frame
+			
+			if round(currentValue) == round(value):
+				if previousValue is None or abs(value-currentValue) < abs(value-previousValue):
+					print frame, value, abs(currentValue - value)
+					frames[index] = frame
+
+					# Saving value as previous value.
+					previousValue = currentValue
+
+			elif frames.get(index):
+				index += 1
+				previousValue = None
+
+		if not frames and closest:
+			return [closestFrame]
+
+		return sorted(frames.values())		
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneAnimationController', StudiomaxSceneAnimationController )

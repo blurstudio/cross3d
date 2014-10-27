@@ -31,12 +31,20 @@ class FileSequence( object ):
 		import blurdev.media
 		return cls(blurdev.media.imageSequenceReprFromFileName(fileName, '{pre}{firstNum}-{lastNum}{post}'), step)
 
-	def __init__( self, path, step=1 ):
+	def __init__(self, path, step=1, frameRange=None):
 		"""
 			\remarks	Initialize the class.
 		"""
-		self._path = path
+		self._path = self.buildPath(path, frameRange) if frameRange else path
+		print self._path
 		self._step = step
+
+	@classmethod
+	def buildPath(cls, uniquePath, frameRange):
+		extension = os.path.splitext(uniquePath)[1]
+		if extension:
+			return uniquePath.replace(extension, '.%i-%i%s' % (frameRange[0], frameRange[1], extension))
+		raise Exception('Path needs an extension.')
 
 	def path( self ):
 		return os.path.abspath( self._path )
@@ -218,6 +226,7 @@ class FileSequence( object ):
 				os.remove( path )
 
 	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
+		print outputPath, self.isComplete()
 		if not outputPath:
 			outputPath = os.path.join(( self.basePath() ), self.baseName() + '.mov' )
 		extension = os.path.splitext( outputPath )[1]
@@ -243,9 +252,11 @@ class FileSequence( object ):
 			if not os.path.exists( outputBasePath ):
 				os.makedirs( outputBasePath )
 			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
+			print 'RUNNING COMMAND'
+			print ' '.join(command)
 			process = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE )
 			process.communicate()
-			normalisedSequence.delete()
+			#normalisedSequence.delete()
 			return True
 		else:
 			raise Exception( 'Input sequence %s is missing frames' % self._path )

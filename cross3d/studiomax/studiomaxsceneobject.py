@@ -11,7 +11,9 @@
 
 from Py3dsMax import mxs
 from blur3d.api import UserProps
+from blur3d.lib.tmclib import TMCInfo
 from blur3d.constants import ObjectType
+from blur3d.lib.pclib import PointCacheInfo
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
 class StudiomaxSceneObject( AbstractSceneObject ):
@@ -293,6 +295,93 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		cloneObject = mxs.blur3dhelper.cloneObjects([self._nativePointer], expandHierarchy=True)
 		return self.__class__(self.scene(), cloneObject[0])
 
+	def keyframeTimeControllers(self, alembic=True):
+		""" Takes all Alembic, PC and TMC time controllers and keyframe their original time controllers.
+
+		This is used as a base setup for further time alterations.
+
+		Returns:
+			SceneAnimationController|boolean: The bezier float keyframed controller used to control time.
+		"""
+
+		np = self._nativePointer
+		timeController = None
+		frameRate = self._scene.animationFPS()
+
+		# Processing Alembic controllers.
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Xform, target=np) + mxs.getClassInstances(mxs.Alembic_Float_Controller, target=np)
+		for controller in alembicControllers:
+
+			# Instantiating if we already computed the time controller.
+			if not timeController:
+
+				# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
+				import cask
+				archive = cask.Archive(controller.path)
+				item = archive.top.children[controller.identifier]
+
+				# Sometimes the identifier will point to a Xform object.
+				# Unfortunately I did not find a way to access the sample count from there.
+				# So instead I am digging through the hierarchy.
+				while item.children:
+					item = item.children[item.children.keys()[0]]
+
+				properties = item.iobject.getProperties()
+				geometry = properties.getProperty(0)
+				core = geometry.getProperty(0)
+				sampleCount = core.getNumSamples()
+				startTime = core.getTimeSampling().getSampleTime(0)
+				endTime = core.getTimeSampling().getSampleTime((sampleCount - 1))
+
+				# Creating the controller.
+				timeController = mxs.bezier_float()
+				frames = [(round(startTime * frameRate), startTime), (round(endTime * frameRate), endTime)]
+				for frame, value in frames:
+					print frame, value
+					k = mxs.addNewKey(timeController, frame)
+					k.value = value
+					k.inTangentType = mxs.pyhelper.namify('linear')
+					k.outTangentType = mxs.pyhelper.namify('linear')
+
+			# Assigning the controller.
+			mxs.setPropertyController(controller, 'time', timeController)
+
+		# Processing TMCs and PCs.
+		nativeCaches = mxs.getClassInstances(mxs.Transform_Cache, target=np) + mxs.getClassInstances(mxs.Point_Cache, target=np)
+		for cache in nativeCaches:
+
+			# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
+			if mxs.classof(cache) == mxs.Point_Cache:
+				cacheInfo = PointCacheInfo.read(cache.filename, header_only=True)
+
+			elif mxs.classof(cache) == mxs.Transform_Cache:
+				cacheInfo = TMCInfo.read(cache.filename, header_only=True)
+
+			# Playback type 3 is "Playback Graph".
+			cache.playbackType = 3
+
+			# Set the playback frame to a float cache with start and end values pulled from the cache.
+			mxs.setPropertyController(cache, 'playbackFrame', mxs.bezier_float())
+			timeController = mxs.getPropertyController(cache, 'playbackFrame')
+
+			# Clearing the keys.
+			mxs.deleteKeys(timeController)
+			
+			# Set keys on the playback frame cache that matches the current frame rate.
+			duration = cacheInfo.start_frame - cacheInfo.end_frame + 1
+			frames = [(cacheInfo.start_frame, 0), (cacheInfo.end_frame, duration)]
+			for frame, value in frames:
+				k = mxs.addNewKey(timeController, frame)
+				k.value = value
+				k.inTangentType = mxs.pyhelper.namify('linear')
+				k.outTangentType = mxs.pyhelper.namify('linear')
+
+		print timeController
+		if timeController:
+			from blur3d.api import SceneAnimationController
+			return SceneAnimationController(self._scene, timeController)
+		return None
+
 	def isBoxMode( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.isBoxMode to return whether or not this object is in boxMode
@@ -324,6 +413,32 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> selected
 		"""
 		return self._nativePointer.isselected
+
+	def _addNativeController(self, name, group='', tpe=float, default=0.0):
+
+		if not group:
+			group = 'Custom_Attributes'
+
+		types = {float: 'float', int:'integer'}
+		
+		if tpe in [float, int] and isinstance(default, tpe):
+
+			maxScript = """fn addAttributeToObject obj = (
+				attribute = attributes {group} (
+					parameters main (
+						{name} type:#{tpe} default:{default}
+					)
+				)
+				CustAttributes.add obj attribute #Unique
+				return obj.{name}.controller
+			)"""
+
+			mxs.execute(maxScript.format(name=name, group=group, tpe=types[tpe], default=default))
+			return mxs.addAttributeToObject(self._nativePointer)
+
+		else:
+			raise Exception('This method only support ints ')
+			return None
 
 	def key(self, target='keyable'):
 		"""
@@ -427,7 +542,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
-		return mxs.blurUtil.uniqueId( self._nativePointer )
+		return mxs.blurUtil.uniqueId( self._nativePointer )	
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods

@@ -17,11 +17,11 @@ from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
 from blurdev.decorators import stopwatch
-from blur3d.api import application, dispatch
 from blur3d import pendingdeprecation, constants
-from PySoftimage import xsi, xsiFactory, constants as xsiConstants
+from blur3d.api import application, dispatch, FrameRange
 from blur3d.api.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
+from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 
 class SoftimageScene(AbstractScene):
 
@@ -270,12 +270,15 @@ class SoftimageScene(AbstractScene):
 		self.setSilentMode(False)
 		return renderPass
 	
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
 		"""
 		
+		# Storing the scene state.
+		self.storeState()
+
 		# Collecting the controllers we want to plot.
 		controllers = []
 		for nativeObject in nativeObjects:
@@ -289,42 +292,57 @@ class SoftimageScene(AbstractScene):
 						controllers.append(controllerLocal)
 
 		# Storing all the stuff we will be doing.
-		xsi.OpenUndo("Plotting and Exporting to FBX")
+		with application.undoContext('Plotting and Exporting to FBX'):
 
-		# Defining the range.
-		if frameRange:
-			self.setAnimationRange(frameRange)
+			# Defining the range.
+			if frameRange:
+				self.setAnimationRange(frameRange)
+			else:
+				frameRange = self.animationRange()
 
-		# Setting the selection.
-		self._setNativeSelection(nativeObjects)
-		
-		# Plotting.
-		if controllers:
-			xsi.PlotAndApplyActions(controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
+			# Handling the frame rate.
+			if frameRate:
+				ratio = float(frameRate) / self.animationFPS()
+				if ratio != 1.0:
+					self.setAnimationFPS(frameRate)
 
-		# Setting the FBX export options.
-		xsi.FBXExportScaleFactor(1)
-		xsi.FBXExportGeometries(True)
-		xsi.FBXExportSkins(True)
-		xsi.FBXExportCameras(True)
-		xsi.FBXExportAscii(True)
-		xsi.FBXExportLights(True)
-		xsi.FBXExportAnimation(True)
-		xsi.FBXExportShapes(True)
-		xsi.FBXExportFrameRate(self.animationFPS())
-		xsi.FBXExportEmbedMedias(False)
-		xsi.FBXExportKeepXSIEffectors(False)	
-		xsi.FBXExportGroupAsCache(False)	
-		xsi.FBXExportDeformerAsSkeleton(False)
-		xsi.FBXExportSelection(True)
+					# Processing the frame range.
+					if not isinstance(frameRange, FrameRange):
+						frameRange = FrameRange(frameRange)
+					frameRange = frameRange.multiply(ratio)
+	
+			# Plotting.
+			if controllers:
+				xsi.PlotAndApplyActions(controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
 
-		# Exporting.
-		xsi.FBXExport(path)
+			# Setting the FBX export options.
+			xsi.FBXExportScaleFactor(1)
+			xsi.FBXExportGeometries(True)
+			xsi.FBXExportSkins(True)
+			xsi.FBXExportCameras(True)
+			xsi.FBXExportAscii(True)
+			xsi.FBXExportLights(True)
+			xsi.FBXExportAnimation(True)
+			xsi.FBXExportShapes(True)
+			xsi.FBXExportFrameRate(self.animationFPS())
+			xsi.FBXExportEmbedMedias(False)
+			xsi.FBXExportKeepXSIEffectors(False)	
+			xsi.FBXExportGroupAsCache(False)	
+			xsi.FBXExportDeformerAsSkeleton(False)
+			xsi.FBXExportSelection(True)
+
+			# Setting the selection.
+			self._setNativeSelection(nativeObjects)
+
+			# Exporting.
+			xsi.FBXExport(path)
+
+		# Undoing.
+		xsi.Undo()
 
 		# Restoring the scene state.
-		xsi.CloseUndo()
-		xsi.Undo("")
-		
+		self.restoreState()
+
 		return True
 		
 	def viewports(self):
@@ -479,7 +497,8 @@ class SoftimageScene(AbstractScene):
 		playControl = xsi.ActiveProject.Properties("Play Control")
 		return FrameRange([int(playControl.Parameters("GlobalIn").Value), int(playControl.Parameters("GlobalOut").Value)])
 
-	def animationFPS(self):
+	@classmethod
+	def animationFPS(cls):
 		"""
 			\remarks	implements AbstractScene.animationFPS method to return the current frame per second rate.
 			\return		<float> fps
@@ -649,6 +668,8 @@ class SoftimageScene(AbstractScene):
 		self._state['rangeGlobalIn'] = playControl.Parameters("GlobalIn").Value
 		self._state['rangeGlobalOut']= playControl.Parameters("GlobalOut").Value
 		self._state['loop'] = playControl.Parameters("Loop").Value
+		self._state['selection'] = self._nativeSelection()
+		self._state['fps'] = self.animationFPS()
 		return True
 	
 	def renderSize(self):
@@ -664,12 +685,14 @@ class SoftimageScene(AbstractScene):
 			\remarks	restores the state of the scene based on previously stored state.
 			\return		<bool> success
 		"""
+		self.setAnimationFPS(self._state.get('fps', []))
 		playControl = xsi.ActiveProject.Properties("Play Control")
 		playControl.Parameters("In").Value = self._state.get('rangeIn', 0)
 		playControl.Parameters("Out").Value = self._state.get('rangeOut', 100)
 		playControl.Parameters("GlobalIn").Value = self._state.get('rangeGlobalIn', 0)
 		playControl.Parameters("GlobalOut").Value = self._state.get('rangeGlobalOut', 100)
 		playControl.Parameters("Loop").Value = self._state.get('loop', False)
+		self._setNativeSelection(self._state.get('selection', []))
 		return True
 
 	def reset(self, silent=False):
