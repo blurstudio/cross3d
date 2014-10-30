@@ -85,7 +85,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			\return		n/a
 		"""
 		# XSI uses inches, convert inches to mm 1in / 25.4mm
-		self._nativePointer.projplaneheight.Value = width / 25.4
+		self._nativePointer.projplaneheight.Value = height / 25.4
 		return True
 
 	def _nativeFocalLength(self):
