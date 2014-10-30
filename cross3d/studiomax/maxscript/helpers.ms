@@ -8,6 +8,15 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function getSelectedVertPositions = (
+			vs = ((getVertSelection $) as array)
+			vertPositions = #()
+			for vid in vs do (
+				append vertPositions (getVert $ vid)
+			)
+			vertPositions
+		),
+
 		function removeAllRetimers = (
 			t = trackviewnodes
 			n = t[#Retimer_Manager]
