@@ -20,7 +20,14 @@ class MayaUserProps(AbstractUserProps):
 		if not key in self:
 			raise KeyError('{} is not stored in UserProps'.format(key))
 		node = api.SceneWrapper._mObjName(self._nativePointer)
-		return self.unescapeValue(cmds.getAttr('{node}.{attr}'.format(node=node, attr=key)))
+
+		# TODO MIKE: I had to do a try except here for the character native object that already has native custom attributes.
+		# Maybe there is a better way to handle that.
+		try:
+			return self.unescapeValue(cmds.getAttr('{node}.{attr}'.format(node=node, attr=key)))
+		except RuntimeError:
+			return None
+
 	
 	def __setitem__(self, key, value):
 		# Note: self.escapeKey(key) will be called when we create the attribute, so there is no
@@ -35,11 +42,17 @@ class MayaUserProps(AbstractUserProps):
 		self.emitChange()
 	
 	def keys(self):
-		# Only show user defined keys
-		out = cmds.listAttr(api.SceneWrapper._mObjName(self._nativePointer), userDefined=True)
-		if out:
-			return out
+
+		# TODO MIKE: I had to do a try except here for the the object called "|groundPlane_transform".
+		# It's apparently always in the scene and error with that line.
+		try:
+			keys = cmds.listAttr(api.SceneWrapper._mObjName(self._nativePointer), userDefined=True)
+			if keys:
+				return keys
+		except ValueError:
+			pass
 		return []
+		
 		# http://forums.cgsociety.org/showthread.php?t=888612
 		# Note: I was unable to find a way to identify userDefined keys in the following method
 		# so I used the maya.cmds method. If possible this finish this method and replace the 

@@ -51,7 +51,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 	#--------------------------------------------------------------------------------
 	def cameraName(self):
 		""" Return the viewport's camera name """
-		return self.camera().name()
+		return self.camera().path()
 	
 	def createCamera(self, name='Camera', type='Standard'):
 		""" Creates a camera that matches that viewport. """
@@ -130,8 +130,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 		#--------------------------------------------------------------------------------
 		
 		cam = self.camera()
-		name = cam.name()
-		overscanLocked = cmds.getAttr("{name}.overscan".format(name=cam.name()), lock=True)
+		name = cam.path()
+		overscanLocked = cmds.getAttr("{name}.overscan".format(name=cam.path()), lock=True)
 		if overscanLocked:
 			# unlock overscan if it is locked
 			cmds.setAttr("{name}.overscan".format(name=name), lock=False)

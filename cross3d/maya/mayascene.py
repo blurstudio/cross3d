@@ -170,8 +170,8 @@ class MayaScene(AbstractScene):
 		cmds.namespace(setNamespace=namespace)
 		# Create the transform node then the shape node so the transform is properly named
 		parent = cmds.createNode('transform', name='Model')
-		name = cmds.createNode('locator', name='{}Shape'.format(name), parent=parent)
-		output = api.SceneWrapper._asMOBject(name)
+		#name = cmds.createNode('locator', name='{}Shape'.format(name), parent=parent)
+		output = api.SceneWrapper._asMOBject(parent)
 		userProps = api.UserProps(output)
 		userProps['model'] = True
 		if referenced:
@@ -247,33 +247,25 @@ class MayaScene(AbstractScene):
 		"""
 		expression = api.application._wildcardToRegex(wildcard)
 		regex = re.compile(expression, flags=re.I)
+
 		if getsFromSelection:
 			objects = self._selectionIter()
-			if objectType != 0 or wildcard:
-				ret = []
-				for obj in objects:
-					typeCheck = True if objectType else api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
-					wildcardCheck = regex.match(api.SceneObject._mObjName(obj))
-					if typeCheck and wildcardCheck:
-						ret.append(obj)
-				objects = ret
-		else:
-			if objectType == 0:
-				# If a type was not provided, use the Generic type aka OpenMaya.MFn.kDagNode
-				objectType = ObjectType.Generic
-			# Get a list of objects by type from Maya
-			mType = api.SceneObject._abstractToNativeObjectType[objectType]
+		else: 	
+			# TODO MIKE: I had to support kCharacters aka key set cause they are part of what we export.
+			# The problem is not the export because we don't have to select them since they are "dependant".
+			# The issue is for when I try to re-apply the namespace after export.
+			mType = api.SceneObject._abstractToNativeObjectType.get(objectType, (om.MFn.kDagNode, om.MFn.kCharacter))
 			objects = self._objectsOfMTypeIter(mType)
-			# If a wildcard was provided, filter results that don't match from the type objects
-			if wildcard:
-				ret = []
-				for obj in objects:
-					# Because a Model is defined by a user prop, we have to do a blur3d type check 
-					# on the objects that were returned in the iterator
-					typeCheck = True if objectType else api.SceneObject._typeOfNativeObject(obj) & objectType == objectType
-					if typeCheck and regex.match(api.SceneObject._mObjName(obj, False)):
-						ret.append(obj)
-				objects = ret
+
+		if objectType != 0 or wildcard:
+
+			container = []
+			for obj in objects:
+				typeCheck = True if not objectType else api.SceneObject._typeOfNativeObject(obj) == objectType
+				wildcardCheck = True if not wildcard else regex.match(api.SceneObject._mObjName(obj, False))
+				if typeCheck and wildcardCheck:
+					container.append(obj)
+			objects = container
 		return objects
 
 	def _nativeRootObject(self):
@@ -336,10 +328,12 @@ class MayaScene(AbstractScene):
 			if not isinstance(selection, om.MSelectionList):
 				# Build a selection List
 				tempList = om.MSelectionList()
-				for obj in selection:
-					# Passing the object directly doesnt seem to work
-					dagPath = om.MDagPath.getAPathTo(obj)
-					tempList.add(dagPath)
+				for nativeObject in selection:
+					# Passing the object directly doesnt seem to work.
+					# TODO MIKE: Let's analyze that shit together.
+					if not nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kSet, om.MFn.kDependencyNode, om.MFn.kCharacter]: 
+						dagPath = om.MDagPath.getAPathTo(nativeObject)
+						tempList.add(dagPath)
 				selection = tempList
 			om.MGlobal.setActiveSelectionList(selection)
 		return True
@@ -347,6 +341,13 @@ class MayaScene(AbstractScene):
 	#--------------------------------------------------------------------------------
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
+
+	def _addToNativeSelection(self, nativeObjects):
+
+		# TODO MIKE: Could it be better?
+		selection = list(self._nativeObjects(getsFromSelection=True))
+		selection += nativeObjects
+		self._setNativeSelection(selection)
 
 	@classmethod
 	def animationFPS(cls):

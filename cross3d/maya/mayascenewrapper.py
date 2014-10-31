@@ -72,7 +72,13 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			attr = sAttr.create(name, shortName, dataType, default)
 		else:
 			attr = sAttr.create(name, shortName, dataType)
-		depNode.addAttribute(attr)
+
+		# TODO MIKE: Problem with "|groundPlane_transform".
+		try:
+			depNode.addAttribute(attr)
+		except RuntimeError:
+			pass
+			
 		return name, shortName
 	
 	@classmethod
@@ -120,9 +126,15 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			name = name[0] + re.sub(r'[a-z]', '', name[1:])
 		name = name.lower()
 		if uniqueOnObj:
-			# Ensure a uniqe object name by adding a value to the number
-			names = set(cmds.listAttr(cls._mObjName(uniqueOnObj), shortNames=True))
-			name = api.Scene._findUniqueName(name, names, incFormat='{name}{count}')
+
+			# Ensure a unique object name by adding a value to the number.
+			# TODO MIKE: Same issue with the "|groundPlane_transform".
+			try:
+				names = set(cmds.listAttr(cls._mObjName(uniqueOnObj), shortNames=True))
+				name = api.Scene._findUniqueName(name, names, incFormat='{name}{count}')
+			except ValueError:
+				pass
+
 		return name
 	
 	@classmethod
@@ -189,9 +201,13 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param nativeObject: The OpenMaya.MObject to get the transform node of
 		:return: OpenMaya.MObject
 		"""
-		if nativeObject.apiType() == om.MFn.kWorld:
-			# The world node doesn't play well with the getting transform code
+
+		# TODO MIKE: I am handling the character and dependency object for key sets. We need to discuss.
+		if nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kCharacter]:
+
+			# The world node doesn't play well with the getting transform code.
 			return nativeObject
+			
 		path = om.MDagPath.getAPathTo(nativeObject)
 		newPointer = path.transform()
 		if newPointer != nativeObject:
@@ -206,11 +222,14 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param fullName: If True return the Name(Full Path), else return the displayName. Defaults to True
 		:return: nativeObject's name as a string
 		"""
-		dagPath = om.MDagPath.getAPathTo(nativeObject)
-		if fullName:
-			return dagPath.fullPathName()
-		return dagPath.partialPathName()
-	
+
+		if not nativeObject.hasFn(om.MFn.kCharacter):
+			dagPath = om.MDagPath.getAPathTo(nativeObject)
+			if fullName:
+				return dagPath.fullPathName()
+			return dagPath.partialPathName()
+		return om.MFnDependencyNode(nativeObject).name()
+
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
@@ -261,12 +280,39 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 	#--------------------------------------------------------------------------------
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
+	
+	def namespace(self):
+		# I am not re-using the name method on purpose.
+		name = self._mObjName(self._nativePointer, False)
+
+		# Splitting the name to detect for name spaces.
+		split = name.split(':')[0:]
+		if len(split) > 1:
+			return ':'.join(split[:-1])
+		return ''
+
+	def setNamespace(self, namespace):
+		# I am not re-using the name method on purpose.
+		name = self._mObjName(self._nativePointer, False)
+		displayName = name.split(':')[-1]
+
+		if not namespace:
+			cmds.rename(self.path(), self.displayName())
+		else:
+			if not cmds.namespace(exists=namespace):
+				cmds.namespace(add=namespace)
+			cmds.rename(self.path(), ':'.join([namespace, displayName]))
+		return True
+
 	def displayName(self):
 		""" Returns the display name for object. This does not include parent structure """
-		return self._mObjName(self._nativePointer, False)
+		return self.name().split(':')[-1]
 
 	def name(self):
 		""" Return the full name of this object, including parent structure """
+		return self._mObjName(self._nativePointer, False)
+
+	def path(self):
 		return self._mObjName(self._nativePointer, True)
 
 	def setDisplayName(self, name):
@@ -274,7 +320,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		name - if not reimplemented, then it will set the object's actual 
 		name to the inputed name
 		"""
-		cmds.rename(self.name(), name)
+		cmds.rename(self.path(), ':'.join([self.namespace, name]))
 	
 # register the symbol
 from blur3d import api

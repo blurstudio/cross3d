@@ -19,7 +19,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		ObjectType.Geometry: om.MFn.kMesh,
 		ObjectType.Light: om.MFn.kLight,
 		ObjectType.Camera: om.MFn.kCamera,
-		ObjectType.Model: om.MFn.kLocator,
+		ObjectType.Model: om.MFn.kTransform,
 		ObjectType.Group: None,
 		ObjectType.Bone: om.MFn.kJoint,
 		ObjectType.Particle: (om.MFn.kParticle, om.MFn.kNParticle), # I am not sure this is required, but it is supported
@@ -117,33 +117,58 @@ class MayaSceneObject( AbstractSceneObject ):
 		nativeObject = cls._asMOBject(nativeObject)
 		apiType = nativeObject.apiType()
 		if apiType == om.MFn.kTransform:
+
+			# Checking for model.
+			userProps = UserProps(nativeObject)
+			if 'model' in userProps and len(cls._mObjName(nativeObject, False).split(':')) > 1:
+				return ObjectType.Model
+			return ObjectType.Generic
+
 			nativeObject = cls._getShapeNode(nativeObject)
 			apiType = nativeObject.apiType()
 		
-		# Checking for model.
-		if apiType == om.MFn.kLocator:
-			userProps = UserProps(nativeObject)
-			if 'model' in userProps:
-				return ObjectType.Model
-		
 		if apiType in cls._nativeToAbstractObjectType:
 			return cls._nativeToAbstractObjectType[apiType]
+
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
 	
 	#--------------------------------------------------------------------------------
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
-	def displayName(self):
-		""" Returns the display name for object. This does not include parent structure """
-		return self._mObjName(self._nativeTransform, False)
+
+	def namespace(self):
+		# I am not re-using the name method on purpose.
+		name = self._mObjName(self._nativeTransform, False)
+
+		# Splitting the name to detect for name spaces.
+		split = name.split(':')[0:]
+		if len(split) > 1:
+			return ':'.join(split[:-1])
+		return ''
+
+	def setNamespace(self, namespace):
+		# I am not re-using the name method on purpose.
+		name = self._mObjName(self._nativeTransform, False)
+		displayName = name.split(':')[-1]
+
+		if not namespace:
+			cmds.rename(self.path(), self.displayName())
+		else:
+			if not cmds.namespace(exists=namespace):
+				cmds.namespace(add=namespace)
+			cmds.rename(self.path(), ':'.join([namespace, displayName]))
+		return True
 
 	def name(self):
 		""" Return the full name of this object, including parent structure """
+		return self._mObjName(self._nativeTransform, False)
+
+	def path(self):
 		return self._mObjName(self._nativeTransform, True)
 	
 	def matchTransforms(self, obj, position=True, rotation=True, scale=True):
 		""" Currently the auto-key support is a bit lite, but it should cover most of the cases. """
-		srcName = obj.name()
+		srcName = obj.path()
 		destName = self._mObjName(self._nativeTransform)
 		def copyAttr(attrName):
 			value = cmds.getAttr('{name}.{attrName}'.format(name=srcName, attrName=attrName))

@@ -1,54 +1,36 @@
 import re
-from collections import OrderedDict
 import maya.cmds as cmds
 import maya.OpenMaya as om
+
 from blur3d import api
+from collections import OrderedDict
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
-resolutionAttr = 'active_resolution'
+# TODO MIKE: That's pretty dirty! Isn't it?
+resolutionAttr = 'resolution'
 
 #------------------------------------------------------------------------
 
 class MayaSceneModel(AbstractSceneModel):
 	""" Used to handle Maya's file Referencing
-	
-	Model Requirements in Maya:
-		A model is a locator node named "Model" with a user prop named "Model" inside a namespace. 
-		The namespace is used as the Model's name and displayName. If the model has a user prop named
-		"referenced" with a value, the first time a reference method is called on the model "referenced"
-		will be replaced with a "active_resolution" enum. and a "resolutions" user prop. I plan to
-		change a model from a locator to a transform node after I resolve a few issues with user props
-		and nodes like groundPlane_transform.
+
+	Model Requirements:
+		A model is a namespaced transform node named "Model" with a user prop named "model". 
+		The namespace is used as the model's name and displayName. If the model has a user prop named
+		"referenced" with a value, the first time a reference method is called on the model an
+		"resolution" enum. and a "resolutions" user prop will be created.
 	
 	Referencing:
-		MayaSceneModel stores a OrderedDict containing Reference Name: filepath in the user prop
-		"resolutions". It stores the current resolution in a enum attribute on the model called
-		"active_resolution". Currently changing this attribute does nothing, but I plan to make it 
-		call setResolution in the future. I am tracking the finding the current resolution by storing
-		the resolution file path on the user prop "loaded_reference". This is neccissary to keep track
+		MayaSceneModel stores a "resolutions" OrderedDict userProp containing resolution name keys 
+		and filePath values. It stores the current resolution in a enum attribute on the model called
+		"resolution". Currently changing this attribute does nothing, but I plan to make it 
+		call setResolution in the future. I am tracking the reference path of the current resolution
+		by cross-referencing both "resolution" and "resolutions". This is neccissary to keep track
 		of the {1} maya adds the second time a reference is loaded. This means that if you swap 
 		reference in the Reference Editor, it will loose the reference. I plan to change this to lookup
 		the reference node from the namespace.
-		
-	Parenting:
-		Currently when a resolution is loaded, all Transform nodes and Asset Containers are reparented
-		under the Model transform.
-	
-	MayaSceneModel.userProps:
-		To make it possible for referenced models to be referenced in with user props, MayaSceneModel
-		does some behind the scene's magic. When using resolutions, MayaSceneModel's user props will
-		return userprops stored on the Model node, and a transform node under the model node called 
-		"Metadata". When you add/set/delete a user prop, it will be stored/deleted on the Model, and 
-		the Metadata object. If you request a prop that doesn't exist on the Model, but exists on the 
-		Metadata object, it will return the value stored on the Metadata. If you then set a value on 
-		that key it will be stored on both the Model and Metadata. In this way offloaded references 
-		still retain most of the user props, and referenced user props automaticly get updated unless 
-		they have been overridden.
-		
-		UserProps node example:
-			C_Ly_Deadpool_:Model
-			 \--- C_Ly_Deadpool_:Metadata
 	"""
+
 	def _attrName(self):
 		return '{node}.{attr}'.format(node=self._nativeName(), attr=resolutionAttr)
 	
@@ -69,7 +51,7 @@ class MayaSceneModel(AbstractSceneModel):
 	
 	def displayName(self):
 		# Ignore the name of the object, we only care about the namespace for tools.
-		return self._namespace(self._nativeTransform)['namespace']
+		return self._namespace(self._nativeTransform).get('namespace', '')
 	
 	def setDisplayName(self, name):
 		name = name.replace('-', '_')
@@ -79,9 +61,11 @@ class MayaSceneModel(AbstractSceneModel):
 			if namespace == name:
 				# Renaming the model to its current name, nothing to do.
 				return
+
 			# TODO: pull the reference node from the namespace instead of storing it in a user prop
-			# that way if a user swaps reference in the Reference Editor we won't loose track of it
-			filename = self.userProps().get('loaded_reference')
+			# that way if a user swaps reference in the Reference Editor we won't loose track of it.
+			filename = self.resolutionPath(self.resolution())
+
 			if self.isReferenced() and filename:
 				cmds.file(filename, edit=True, namespace=name, mergeNamespacesOnClash=True)
 				# Doc's say cmds.file should move non-referenced nodes to the new namespace, but
@@ -109,30 +93,54 @@ class MayaSceneModel(AbstractSceneModel):
 			return
 		super(MayaSceneModel, self).setDisplayName(name)
 	
+	def _createResolutionComboBox(self):
+		userProps = api.UserProps(self._nativePointer)
+
+		# Local models have a resolution metadata.
+		# Maybe it's not a good idea.
+		if 'resolution' in userProps:
+			del userProps['resolution']
+
+		resolutions = ':'.join(userProps.get('resolutions', []))
+
+		# Object should support referencing, but referencing hasn't been setup, so create the structure.
+		cmds.addAttr(self._nativeName(), longName=resolutionAttr, attributeType="enum", enumName=resolutions)
+
+		# Make the attribute viewable, but not keyable in the channelBox
+		cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
+
 	def isReferenced(self):
-		# Check if it already has referenceing set up
-		ret = resolutionAttr in cmds.listAttr(self._nativeName())
-		if not ret:
-			# NOTE: do not use self.userProps() to avoid recursion loop
-			props = api.UserProps(self._nativePointer)
-			# Check if this object should support referencing
-			ret = props.get('referenced')
-			if ret:
-				# Object should support referencing, but referencing hasn't been setup, so create
-				# the structure.
-				cmds.addAttr(
-						self._nativeName(), 
-						longName=resolutionAttr, 
-						attributeType="enum", 
-						enumName="Offloaded")
-				# Make the attribute viewable, but not keyable in the channelBox
-				cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
-				# Remove the temp reference user prop
-				del(props['referenced'])
-				# Create the user props for the reference
-				props['resolutions'] = OrderedDict(Offloaded='')
-		return ret
-	
+		userProps = api.UserProps(self._nativePointer)
+		if userProps.get('referenced', False):
+
+			# Checking if we need to set the resolution combobox.
+			if not resolutionAttr in cmds.listAttr(self._nativeName()):
+
+				# Create the user props for the reference.
+				userProps['resolutions'] = OrderedDict(Offloaded='')
+				self._createResolutionComboBox()
+
+			return True
+		return False
+
+	def export(self, fileName):
+		name = self.name()
+		objects = self.objects()
+		selection = self._scene.selection()
+
+		# Selecting the object.
+		self._scene.setSelection(objects)
+		cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
+		cmds.file(fileName, force=True, exportSelected=True, typ="mayaAscii", usingNamespaces=False)
+		
+		# TODO MIKE: Is this really the best way to put the namespace back?
+		for obj in objects:
+			obj.setNamespace(name)
+
+		# Restoring selection
+		self._scene.setSelection(selection)
+		return True
+
 	def name(self):
 		return self.displayName()
 	
@@ -166,86 +174,125 @@ class MayaSceneModel(AbstractSceneModel):
 		return [self.resolutionPath(resolution) for resolution in self.resolutions() if resolution != 'Offloaded']
 
 	def setResolution(self, resolution):
+
 		if self.isReferenced():
-			# handles qstrings
+
+			# Handling QStrings.
 			resolution = unicode(resolution)
-			# If I dont re-initialize a model object it does not return me the right resolutions.
+			currentResolution = self.resolution()
 			resolutions = self.resolutions()
+			referenceNodeName = self._referenceNodeName()
+
+			# Looping through the model resolutions.
 			for i, res in enumerate(resolutions):
-				# Handles cases sensitivity (crappy, but needed because resolution
-				# names often come from filenames).
+
+				# Skipping if the resolution name does not match.
+				# Handles cases sensitivity, crappy but because of filenames.
 				if res.lower() != resolution.lower():
 					continue
+
+				# Getting the resolution path.
 				path = self.resolutionPath(res)
-				nodeName = self._referenceNodeName()
-				if res.lower() == 'offloaded':
-					# If offloaded, unload the reference
-					if nodeName:
-						cmds.file(unloadReference=nodeName)
+
+				# If we are going for offloaed.
+				if res == 'Offloaded':
+				
+					# TODO MIKE: How can we only store the local overridden user props?
+					userProps = {}
+					for key, value in self.userProps().iteritems():
+
+						# Important: We want to drop the resolution key as it's only used for local models.
+						if not key == resolutionAttr:
+							userProps[key] = value
+
+					# Storing the name of the model root.
+					name = self._mObjName(self._nativePointer, False)
+
+					# Un-loading the reference.
+					if referenceNodeName:
+						cmds.file(unloadReference=referenceNodeName)
+
+					# Recreating the local model root.
+					from blur3d.api import SceneWrapper, UserProps
+					self._nativePointer = SceneWrapper._asMOBject(cmds.createNode('transform', name=name))
+					self._nativeTransform = self._nativePointer
+
+					# Re-applying user props.
+					api.UserProps(self._nativePointer).update(userProps)
+
+					# Re-creating resolution channel box.
+					self._createResolutionComboBox()
+
+					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
 					return True
-				# If the reference is already loaded, switch it with the requested one while
-				# preserving any updated properties like animation.
-				elif nodeName:
-					cmds.file(path, loadReference=nodeName)
-					filename = cmds.referenceQuery(nodeName, filename=True)
+
+				# If we are coming from offloaded.
+				elif currentResolution == 'Offloaded':
+
+					# We store the user props.
+					userProps = {}
+					for key, value in self.userProps().iteritems():
+						if not key == resolutionAttr:
+							userProps[key] = value
+
+					# We delete the offloaded local model root.
+					name = self._mObjName(self._nativePointer, False)
+					namespace = self._namespace(self._nativeTransform)['namespace']
+					self._scene._removeNativeObjects([self._nativePointer])
+
+					# If the a reference node does not exists. We create a reference.
+					if not referenceNodeName:
+						cmds.file(path, reference=True, mergeNamespacesOnClash=True, usingNamespaces=True, namespace=namespace)
+						reference = path
+
+					# Else simply switching the reference preserving any local change.
+					else:
+						cmds.file(path, loadReference=referenceNodeName)
+						reference = cmds.referenceQuery(referenceNodeName, filename=True)
+
+					# Making sure native pointers are re-assigned.
+					self._nativePointer = self._scene._findNativeObject(name)
+					self._nativeTransform = self._nativePointer
+
+					# Re-applying user props.
+					api.UserProps(self._nativePointer).update(userProps)
+
+					# Re-creating resolution channel box.
+					self._createResolutionComboBox()
+
+					# This will be important later when we come out offload and try to access the reference node.
+					# Also you will notice we set the reference path using the reference variable and not the path one.
+					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
+					# You can see that if you look in File > Reference Editor.
+					self.userProps()['reference'] = reference
+
+					# Setting the current resolution property.
+					self.setProperty(resolutionAttr, i)
+					return True
+
+				# If we are just switching resolution.
 				else:
-					# We use the filename to replace/unload the reference later. If c:\test.ma is
-					# referenced twice the second uses the filename c:\test.ma{1}.
-					filename = cmds.file(
-							path, 
-							reference=True, 
-							mergeNamespacesOnClash=True, 
-							usingNamespaces=True,
-							namespace=self._namespace(self._nativeTransform)['namespace'])
-				# Find all top level items that were referenced into the scene and reparent them
-				# under the model node
-				objects = cmds.referenceQuery(filename, dagPath=True, nodes=True)
-				topLevel = []
-				for obj in objects:
-					if cmds.nodeType(obj) in ('transform', 'dagContainer') and \
-							not cmds.listRelatives(obj, parent=True, path=True):
-								topLevel.append(obj)
-				# Reparent the top level nodes under the model locator
-				topLevel.append(api.SceneWrapper._mObjName(self._nativeTransform))
-				if len(topLevel) > 1:
-					cmds.parent(*topLevel)
-				# Update the active_resolution property
-				self.setProperty(resolutionAttr, i)
-				# Store the loaded reference filename so we can remove it later
-				self.userProps()['loaded_reference'] = filename
-#				# Copy the modelInfo user props to the model
-#				modelInfos = self.children(wildcard='{name}:Model|{name}:UserProps'.format(name=self.name()))
-#				if modelInfos:
-#					modelInfo = modelInfos[0]
-#					userProps = modelInfo.userProps()
-#					infos = userProps.get('infos')
-#					# TODO: Should we copy all properties? At this point things like project and 
-#					# department are already set even if this is the first time a resolution is loaded
-#					if infos:
-#						self.userProps()['infos'] = infos
-				return True
-		else:
-			self.userProps()['resolution'] = resolution
-		return False
+
+					# Simply switching the reference preserving any local change.
+					cmds.file(path, loadReference=referenceNodeName)
+
+					# This will be important later when we come out offload and try to access the reference node.
+					# Also you will notice we set the reference path using the reference variable and not the path one.
+					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
+					# You can see that if you look in File > Reference Editor.
+					self.userProps()['reference'] = cmds.referenceQuery(referenceNodeName, filename=True)
+
+					# Setting the current resolution property.
+					self.setProperty(resolutionAttr, i)
+					return True
+
+		else:	
+			self.userProps()[resolutionAttr] = resolution
+		return True
 
 	def setResolutionPath(self, path, name=''):
 		return False
-
-	def setUserProps(self, newDict):
-		"""
-		Ovewrites the current custom properties with the provided dict
-		:param newDict: dict
-		"""
-		props = MayaModelUserProps(self)
-		props.clear()
-		props.update(newDict)
-
-	def userProps(self):
-		"""Returns the UserProps object associated with this element
-		:return; :class:`blur3d.api.UserProps`
-		"""
-		return MayaModelUserProps(self)
 
 	def update(self):
 		return False
@@ -254,74 +301,10 @@ class MayaSceneModel(AbstractSceneModel):
 		super(MayaSceneModel, self).setUserProps(newDict)
 
 	def _referenceNodeName(self):
-		filename = self.userProps().get('loaded_reference')
+		filename = self.userProps().get('reference')
 		if filename:
 			return cmds.referenceQuery(filename, referenceNode=True)
 		return None
-
-
-class MayaModelUserProps(api.UserProps):
-	""" This is a subclass of UserProps that takes a MayaSceneModel not a nativePointer.
-	"""
-	def __init__(self, blur3dModel):
-		if not isinstance(blur3dModel, MayaSceneModel):
-			raise Exception('Unlike UserProps, you must pass a MayaSceneModel to this class')
-		self._model = blur3dModel
-		# this stores the native pointer used to modify the SceneModel object
-		self._metadataUserProps = None
-		# The self._nativePointer will be set to the referenced Metadata object if it exists.
-		nativePointer = self._model.nativePointer()
-		if self._model.isReferenced():
-			modelInfos = self._model.children(wildcard='|{name}:Model|{name}:Metadata'.format(name=self._model.name()))
-			if modelInfos:
-				self._metadataUserProps = api.UserProps(modelInfos[0].nativePointer())
-		super(MayaModelUserProps, self).__init__(nativePointer)
-	
-	def __contains__(self, key):
-		ret = super(MayaModelUserProps, self).__contains__(key)
-		if not ret and self._metadataUserProps != None:
-			ret = self._metadataUserProps.__contains__(key)
-		return ret
-	
-	def __delitem__(self, key):
-		metaHasAttribute = super(MayaModelUserProps, self).__contains__(key)
-		modelHasAttribute = self._metadataUserProps.__contains__(key)
-		if not metaHasAttribute and not modelHasAttribute:
-			raise KeyError('{} is not stored in UserProps'.format(key))
-		if metaHasAttribute:
-			super(MayaModelUserProps, self).__delitem__(key)
-		if modelHasAttribute:
-			self._metadataUserProps.__delitem__(key)
-		
-	
-	def __getitem__(self, key):
-		if self._metadataUserProps != None:
-			hasAtribute = super(MayaModelUserProps, self).__contains__(key)
-			# If not stored on Metadata, check for and return it if its stored on the model
-			if not hasAtribute and self._metadataUserProps.__contains__(key):
-				return self._metadataUserProps.__getitem__(key)
-		return super(MayaModelUserProps, self).__getitem__(key)
-	
-	def __setitem__(self, key, value):
-		# Note: self.escapeKey(key) will be called when we create the attribute, so there is no
-		# reason to call it twice.
-		super(MayaModelUserProps, self).__setitem__(key, value)
-		if self._metadataUserProps != None:
-			# this will call self.emitChange() so no need to emit it twice.
-			self._metadataUserProps.__setitem__(key, value)
-		else:
-			# Notify listening slots about the change
-			self.emitChange()
-	
-	def keys(self):
-		keys = super(MayaModelUserProps, self).keys()
-		if self._metadataUserProps != None:
-			modelKeys = self._metadataUserProps.keys()
-			keys = list(set(keys).union(modelKeys))
-		# TODO: Make MayaUserProps not show custom user props that are not strings
-		if resolutionAttr in keys:
-			keys.remove(resolutionAttr)
-		return keys
 
 # register the symbol
 api.registerSymbol('SceneModel', MayaSceneModel)
