@@ -139,6 +139,9 @@ class MayaApplication(AbstractApplication):
 	def sceneFileExtension(self):
 		return 'ma'
 
+	def modelFileExtension(sefl):
+		return 'ma'
+		
 	def version(self):
 		v = cmds.about(version=True).replace(' x64', '')
 		return int(v)

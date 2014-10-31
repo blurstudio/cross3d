@@ -1,23 +1,81 @@
 ##
 #   :namespace  blur3d.api.maya.external
 #
-#   :remarks    This class can be used even outside of Maya. It gives you info on where#				Maya is installed, and allows you to run scripts in Maya.
+#   :remarks    This class can be used even outside of Maya. It gives you info on where
+#				Maya is installed, and allows you to run scripts in Maya.
 #				To Access this class use: blur3d.api.external('maya')
 #   
 #   :author     mikeh@blur.com
 #   :author     Blur Studio
 #   :date       09/10/14
 #
+#
+
 import os
+import re
+import subprocess
+
 from blur3d.api import Exceptions
+from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
+
 class External(AbstractExternal):
 	_hkeyBase = r'Software\Autodesk\Maya'
 	# In case the software is installed but not used don't find it when not passing in a version
 	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_MAYA', '').split(','))
 	# map years to version numbers. Maya doesnt use these anymore, add older versions if support is needed
 	_yearForVersion = {}
-	
+
+	@classmethod
+	def name(cls):
+		return 'Maya'
+
+	@classmethod
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
+
+		# TODO: The script syntax is currently super sensitive. Here is an example of the only string I was able to have working.
+		# r"fle=open(r'C:\\Temp\\Test.txt', 'w')\nfle.close()"
+
+		# If the script argument is a path to a file.
+		if os.path.exists(script):
+
+			# If the language is Mel we just use the script as is.
+			if language == ScriptLanguage.MEL:
+				scriptPath = script
+
+			# If the language is Python we parse the file to get the content.
+			elif language == ScriptLanguage.Python:
+				with open(script, 'r') as fle:
+					script = fle.read()
+
+		if language == ScriptLanguage.Python:
+			scriptTemplate = os.path.join(os.path.dirname(__file__), 'templates', 'external_python_script.mstempl')
+
+			with open(scriptTemplate) as fle:
+				script = fle.read().format(pythonScript=script, debug=str(debug).lower())
+				
+			scriptPath = os.path.splitext(cls.scriptPath())[0] + '.mel'
+			with open(scriptPath, "w") as fle:
+				fle.write(script)
+
+		binary = os.path.join(cls.binariesPath(version, architecture), 'mayabatch.exe' if headless else 'maya.exe')
+		process = subprocess.Popen([binary, '-script', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
+
+		return True
+		
+		# TODO: This is the way to check for success. But it is blocking.
+		# Check what Perry has done here \\source\source\dev\perry\winTest.py.
+		# # Writing the log file.
+		# fle = open(cls.scriptLog(), 'w')
+		# fle.write(process.stdout.read())
+		# fle.close()
+
+		# # Checking the error in the log file.
+		# fle = open(cls.scriptLog())
+		# content = fle.read()
+
+		# return False if 'FATAL' in content else True
+
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):
 		""" Finds the install path for various software installations.
@@ -54,11 +112,3 @@ class External(AbstractExternal):
 		if ret:
 			return os.path.join(os.path.normpath(ret), 'bin')
 		raise Exceptions.SoftwareNotInstalled('Maya', version=version, architecture=architecture, language=language)
-				
-	@classmethod
-	def scriptPath(cls):
-		return r'C:\temp\maya_script.py'
-		
-	@classmethod
-	def scriptLog(cls):
-		return r'C:\temp\maya_script.log'

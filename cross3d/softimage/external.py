@@ -29,6 +29,10 @@ class External(AbstractExternal):
 	_yearForVersion = {'8': '2010', '9': '2011', '10': '2012', '11': '2013', '12': '2014', '13': '2015'}
 
 	@classmethod
+	def name(cls):
+		return 'Softimage'
+
+	@classmethod
 	def getFileVersion(cls, filepath):
 		"""
 		Reads the xsi version of an xsi file from the associated scntoc. 
@@ -41,38 +45,32 @@ class External(AbstractExternal):
 		return None
 
 	@classmethod
-	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
 
 		if os.path.exists(script):
 			scriptPath = script
 
 		else:
 			scriptPath = cls.scriptPath()
-			fle = open(scriptPath, "w")
-			fle.write(script)
-			fle.close()
+			with open(scriptPath, "w") as fle:
+				fle.write(script)
 
-		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe')
+		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe' if headless else 'xsi.exe')
 		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		
-		# TODO: Currently the logging is done in a blocking way. Would be nice to not have to block.
-		fle = open(cls.scriptLog(), 'w')
-		fle.write(pipe.stdout.read())
-		fle.close()
+		return True
+		
+		# TODO: This is the way to check for success. But it is blocking.
+		# # Writing the log file.
+		# fle = open(cls.scriptLog(), 'w')
+		# fle.write(process.stdout.read())
+		# fle.close()
 
-		# Checking the error in the log file.
-		fle = open(cls.scriptLog())
-		content = fle.read()
+		# # Checking the error in the log file.
+		# fle = open(cls.scriptLog())
+		# content = fle.read()
 
-		return False if 'FATAL' in content else True
-
-	@classmethod
-	def scriptPath(cls):
-		return r'C:\temp\softimage_batchscript.py'
-
-	@classmethod
-	def scriptLog(cls):
-		return r'C:\temp\softimage_batchscript.log'
+		# return False if 'FATAL' in content else True
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):

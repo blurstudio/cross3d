@@ -36,7 +36,6 @@ class FileSequence( object ):
 			\remarks	Initialize the class.
 		"""
 		self._path = self.buildPath(path, frameRange) if frameRange else path
-		print self._path
 		self._step = step
 
 	@classmethod
@@ -91,7 +90,6 @@ class FileSequence( object ):
 		nameSplit = [ self.baseName(), self.extension() ]
 		if rangePlaceHolder is not None:
 			nameSplit.insert( 1, rangePlaceHolder )
-		print self.baseName(), self.extension(), nameSplit
 		return '.'.join( nameSplit )
 
 	def frameRange( self, returnsAsString=False ):
@@ -226,7 +224,6 @@ class FileSequence( object ):
 				os.remove( path )
 
 	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
-		print outputPath, self.isComplete()
 		if not outputPath:
 			outputPath = os.path.join(( self.basePath() ), self.baseName() + '.mov' )
 		extension = os.path.splitext( outputPath )[1]
@@ -252,11 +249,9 @@ class FileSequence( object ):
 			if not os.path.exists( outputBasePath ):
 				os.makedirs( outputBasePath )
 			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
-			print 'RUNNING COMMAND'
-			print ' '.join(command)
 			process = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE )
 			process.communicate()
-			#normalisedSequence.delete()
+			normalisedSequence.delete()
 			return True
 		else:
 			raise Exception( 'Input sequence %s is missing frames' % self._path )

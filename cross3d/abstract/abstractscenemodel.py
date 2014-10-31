@@ -34,13 +34,20 @@ class AbstractSceneModel(SceneObject):
 		return []
 
 	@abstractmethod
+	def _addNativeObjects(self, nativeObjects):
+		return False
+
+	@abstractmethod
 	def isReferenced(self):
 		return False
-		
-	def objects(self, wildcard='*', type=''):
+
+	def addObjects(self, objects):
+		return self._addNativeObjects([obj.nativePointer() for obj in objects])
+
+	def objects(self, wildcard='*', type=0):
 		return [SceneObject(self._scene, nativeObject) for nativeObject in self._nativeObjects(wildcard=wildcard, type=type)]
 
-	def _nativeObjects(self, wildcard='*', type=''):
+	def _nativeObjects(self, wildcard='*', type=0):
 
 		# Adding model name space to wildcard.
 		wildcard = '%s%s%s' % (self.displayName(), application.nameSpaceSeparator(), wildcard)

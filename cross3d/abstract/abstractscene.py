@@ -1500,7 +1500,8 @@ class AbstractScene(QObject):
 		nativeModel = self._createNativeModel(name=name, nativeObjects=[obj.nativePointer() for obj in objects], referenced=referenced)
 		if (nativeModel):
 			from blur3d.api import SceneObject
-			return SceneObject(self, nativeModel)
+			model = SceneObject(self, nativeModel)
+			return model
 		return None
 
 	def createCamera(self, name='Camera', type='Standard', target=None):
@@ -1933,7 +1934,7 @@ class AbstractScene(QObject):
 			\return		<list> [ <blur3d.api.Variant>, .. ]
 		"""
 		from blur3d.api import SceneObject
-		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type)]
+		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, objectType=type)]
 
 	def saveMaterialsToLibrary(self, filename=''):
 		"""

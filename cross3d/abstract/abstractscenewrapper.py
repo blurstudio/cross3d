@@ -160,6 +160,14 @@ class AbstractSceneWrapper(object):
 		return False
 
 	@abstractmethod
+	def namespace(self):
+		return ''
+
+	@abstractmethod
+	def setNamespace(self):
+		return False
+
+	@abstractmethod
 	def name(self):
 		"""
 		Return the name of this controller instance

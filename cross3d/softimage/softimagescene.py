@@ -271,37 +271,27 @@ class SoftimageScene(AbstractScene):
 		return renderPass
 	
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None):
-		"""
-			\remarks	exports a given set of nativeObjects as FBX.
-			\return		<bool> success
+		""" Exports a given set of nativeObjects as FBX.
+		
+		Args:
+			frameRange(FrameRange|False|None): If a range is provided animation will be exported. If None is provided, 
+			the animation will be detected automatically. If False is provided animation will not be exported. 
 		"""
 		
 		# Storing the scene state.
 		self.storeState()
 
-		# Collecting the controllers we want to plot.
-		controllers = []
-		for nativeObject in nativeObjects:
-			transformsGlobal = nativeObject.Kinematics.Global
-			transformsLocal = nativeObject.Kinematics.Local
-			for transform in [ 'pos', 'rot', 'scl' ]:
-				for axis in 'xyz':
-					controllerGlobal = transformsGlobal.Parameters(transform + axis)
-					controllerLocal = transformsLocal.Parameters(transform + axis)
-					if (controllerGlobal and controllerGlobal.IsAnimated()) or (controllerLocal and controllerLocal.isAnimated()):
-						controllers.append(controllerLocal)
-
 		# Storing all the stuff we will be doing.
 		with application.undoContext('Plotting and Exporting to FBX'):
 
 			# Defining the range.
-			if frameRange:
+			if isinstance(list, FrameRange):
 				self.setAnimationRange(frameRange)
-			else:
+			elif frameRange is None:
 				frameRange = self.animationRange()
 
 			# Handling the frame rate.
-			if frameRate:
+			if frameRate and frameRange:
 				ratio = float(frameRate) / self.animationFPS()
 				if ratio != 1.0:
 					self.setAnimationFPS(frameRate)
@@ -311,11 +301,26 @@ class SoftimageScene(AbstractScene):
 						frameRange = FrameRange(frameRange)
 					frameRange = frameRange.multiply(ratio)
 	
-			# Plotting.
-			if controllers:
-				xsi.PlotAndApplyActions(controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
+			if frameRange:
+				# Collecting the controllers we want to plot.
+				controllers = []
+				for nativeObject in nativeObjects:
+					transformsGlobal = nativeObject.Kinematics.Global
+					transformsLocal = nativeObject.Kinematics.Local
+					for transform in [ 'pos', 'rot', 'scl' ]:
+						for axis in 'xyz':
+							controllerGlobal = transformsGlobal.Parameters(transform + axis)
+							controllerLocal = transformsLocal.Parameters(transform + axis)
+							if (controllerGlobal and controllerGlobal.IsAnimated()) or (controllerLocal and controllerLocal.isAnimated()):
+								if controllerLocal.isAnimated:
+									controllers.append(controllerLocal)
+
+				# Plotting.
+				if controllers:
+					xsi.PlotAndApplyActions(controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
 
 			# Setting the FBX export options.
+			xsi.FBXExportAnimation(frameRange is not False and controllers)
 			xsi.FBXExportScaleFactor(1)
 			xsi.FBXExportGeometries(True)
 			xsi.FBXExportSkins(True)

@@ -29,6 +29,10 @@ class External(AbstractExternal):
 	_yearForVersion = dict((v, k) for k,v in _versionForYear.iteritems())
 
 	@classmethod
+	def name(cls):
+		return 'StudioMax'
+
+	@classmethod
 	def getFileVersion(cls, filepath):
 		"""
 			Reads the max version that a max file was saved with from a custom 
@@ -49,7 +53,7 @@ class External(AbstractExternal):
 		return None
 	
 	@classmethod
-	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
 
 		if os.path.exists(script):
 			scriptPath = script
@@ -73,19 +77,19 @@ class External(AbstractExternal):
 		binary = os.path.join(cls.binariesPath(version, architecture), '3dsmax.exe')
 		process = subprocess.Popen([binary, '-U', 'MAXScript', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
-		# Checking the error in the log file.
-		fle = open(cls.scriptLog())
-		content = fle.read()
+		return True
+		
+		# TODO: This is the way to check for success. But it is blocking.
+		# # Writing the log file.
+		# fle = open(cls.scriptLog(), 'w')
+		# fle.write(process.stdout.read())
+		# fle.close()
 
-		return False if 'FATAL' in content else True
+		# # Checking the error in the log file.
+		# fle = open(cls.scriptLog())
+		# content = fle.read()
 
-	@classmethod
-	def scriptPath(cls):
-		return r'C:\temp\studiomax_script.py'
-
-	@classmethod
-	def scriptLog(cls):
-		return r'C:\temp\studiomax_script.log'
+		# return False if 'FATAL' in content else True
 
 	@classmethod
 	def _getHkey(cls, version, langId):

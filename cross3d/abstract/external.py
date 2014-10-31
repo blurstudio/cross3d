@@ -23,6 +23,11 @@ class External(QObject):
 
 	@classmethod
 	@abstractmethod
+	def name(cls):
+		return ''
+
+	@classmethod
+	@abstractmethod
 	def getFileVersion(cls, filepath):
 		""" Reads the version info that was saved to a custom dso property
 		added to the file when saved from its application.
@@ -36,7 +41,7 @@ class External(QObject):
 	
 	@classmethod
 	@abstractmethod
-	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False):
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
 		return False
 	
 	@classmethod
@@ -121,3 +126,11 @@ class External(QObject):
 			import _winreg
 			return _winreg.QueryValueEx(regKey, value_name)
 		return ('', 0)
+
+	@classmethod
+	def scriptPath(cls):
+		return r'C:\temp\%s_script.py' % cls.name().lower()
+		
+	@classmethod
+	def scriptLog(cls):
+		return r'C:\temp\%s_script.log' % cls.name().lower()

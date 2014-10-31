@@ -32,23 +32,23 @@ class AbstractUserProps(dict):
 		# Pulls values from Tags and BlurTags the first time they are encountered
 		# and then immediately deletes them so that they don't continue to overwrite
 		# any values that are set on UserProps.
-		if 'BlurTags' in self.keys() and self['BlurTags']:
-			for key in self['BlurTags']:
-				self[key] = self['BlurTags'][key]
-			scene = blur3d.api.Scene()
-			obj = blur3d.api.SceneObject(scene, nativePointer)
-			self['BlurTags'] = {}
-			if not obj.model().isReferenced():
-				del self['BlurTags']
+		# if 'BlurTags' in self.keys() and self['BlurTags']:
+		# 	for key in self['BlurTags']:
+		# 		self[key] = self['BlurTags'][key]
+		# 	scene = blur3d.api.Scene()
+		# 	obj = blur3d.api.SceneObject(scene, nativePointer)
+		# 	self['BlurTags'] = {}
+		# 	if not obj.model().isReferenced():
+		# 		del self['BlurTags']
 
-		if 'Tags' in self.keys() and self['Tags']:
-			for key in self['Tags']:
-				self[key] = self['Tags'][key]
-			scene = blur3d.api.Scene()
-			obj = blur3d.api.SceneObject(scene, nativePointer)
-			self['Tags'] = {}
-			if not obj.model().isReferenced():
-				del self['Tags']
+		# if 'Tags' in self.keys() and self['Tags']:
+		# 	for key in self['Tags']:
+		# 		self[key] = self['Tags'][key]
+		# 	scene = blur3d.api.Scene()
+		# 	obj = blur3d.api.SceneObject(scene, nativePointer)
+		# 	self['Tags'] = {}
+		# 	if not obj.model().isReferenced():
+		# 		del self['Tags']
 
 	def __contains__(self, key):
 		return key in self.lookupProps()

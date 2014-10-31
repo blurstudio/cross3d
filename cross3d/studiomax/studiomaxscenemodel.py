@@ -16,6 +16,10 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 class StudiomaxSceneModel( AbstractSceneModel ):
 
+	def _addNativeObjects(self, nativeObjects):
+		for nativeObject in nativeObjects:
+			nativeObject.name = '.'.join([self.displayName(), nativeObject.name])
+
 	def setDisplayName(self, displayName):
 
 		# Renaming model objects.
@@ -39,7 +43,7 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 	def resolution(self):
 		return self.userProps().get('resolution', '')
 
-	def export(self, filename):
+	def export(self, fileName):
 		name = self.displayName()
 		objects = self._nativeObjects()
 		groups = self._nativeGroups()
@@ -57,7 +61,7 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 
 		# ExportNativeObjects call will trigger sceneSaveFinished and scene data is invalid until the name space is restored.
 		dispatch.blockSignals(True)
-		self._scene._exportNativeObjects(objects + [self._nativePointer], filename)
+		self._scene._exportNativeObjects(objects + [self._nativePointer], fileName)
 		dispatch.blockSignals(False)
 
 		# Restoring the name space on objects.

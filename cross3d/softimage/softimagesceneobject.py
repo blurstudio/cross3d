@@ -154,7 +154,6 @@ class SoftimageSceneObject(AbstractSceneObject):
 
 			cache = obj.ActivePrimitive.ConstructionHistory.Find("BlurPCOperator")
 			if not cache:
-				#print(self._nativePointer)
 				xsi.BlurPCAddDeformer(self._nativePointer)
 				cache = obj.ActivePrimitive.ConstructionHistory.Find("BlurPCOperator")
 				cache.Parameters("Filename").Value = path
@@ -199,7 +198,6 @@ class SoftimageSceneObject(AbstractSceneObject):
 	def setParameters(self, parameters):
 		for key, value in parameters.iteritems():
 			try:
-				print key, value
 				self._nativePointer.Parameters(key).Value = value
 			except:
 				print 'TRACEBACK: skipping param: {} {}...'.format(key, value)
