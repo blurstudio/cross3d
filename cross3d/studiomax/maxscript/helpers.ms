@@ -8,6 +8,23 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function getMeshElements obj = (
+			elements = #()
+			prev = #()
+			for fid = 1 to obj.numFaces do (
+				element = ((meshop.getElementsUsingFace obj fid) as array)
+				if element.count == prev.count do (
+					if (for i = 1 to element.count where element[i] != prev[i] collect i).count == 0 do (
+						prev = element
+						continue
+					)
+				)
+				append elements element
+				prev = element
+			)
+			elements
+		),
+
 		function getSelectedVertPositions = (
 			vs = ((getVertSelection $) as array)
 			vertPositions = #()
