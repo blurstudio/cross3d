@@ -130,12 +130,21 @@ class MayaSceneModel(AbstractSceneModel):
 
 		# Selecting the object.
 		self._scene.setSelection(objects)
+
+		# Make sure we set the current namespace to root otherwise the next line does not work.
+		initialNamespace = cmds.namespaceInfo(currentNamespace=True)
+		cmds.namespace(setNamespace=":" )
+
+		# Trashing the namespace.
 		cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
 		cmds.file(fileName, force=True, exportSelected=True, typ="mayaAscii", usingNamespaces=False)
 		
 		# TODO MIKE: Is this really the best way to put the namespace back?
 		for obj in objects:
 			obj.setNamespace(name)
+
+		# Restoring the namespace.
+		cmds.namespace(setNamespace=initialNamespace)
 
 		# Restoring selection
 		self._scene.setSelection(selection)
