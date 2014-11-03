@@ -320,7 +320,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		name - if not reimplemented, then it will set the object's actual 
 		name to the inputed name
 		"""
-		cmds.rename(self.path(), ':'.join([self.namespace, name]))
+		cmds.rename(self.path(), ':'.join([self.namespace(), name]))
 	
 # register the symbol
 from blur3d import api
