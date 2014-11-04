@@ -16,6 +16,7 @@ def init():
 	import maya.cmds
 	
 	# Importing the layer's classes.
+	import mayaexceptionrouter
 	import mayauserprops
 	import mayaapplication
 	import mayascene

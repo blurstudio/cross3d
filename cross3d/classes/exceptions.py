@@ -55,3 +55,8 @@ class Exceptions:
 		""" Exception raised if you try to save a file in a unsuported file format
 		"""
 		pass
+	
+	class InvalidNativeObject(Blur3DException):
+		""" Exception raised if you try to access a native pointer that is no longer valid
+		"""
+		pass

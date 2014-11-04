@@ -16,6 +16,7 @@ def init():
 	Initializes the original abstract classes, registering them to the api 
 	module when necessary
 	"""
+	import abstractexceptionrouter
 	import abstractuserprops
 	import abstractundocontext
 	import abstractapplication
