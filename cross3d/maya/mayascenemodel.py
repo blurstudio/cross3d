@@ -171,9 +171,14 @@ class MayaSceneModel(AbstractSceneModel):
 		if self.isReferenced():
 			if not resolution:
 				resolution = self.resolution()
-			resolutions = self.userProps().get('resolutions', {})
+			props = self.userProps()
+			resolutions = props.get('resolutions', {})
 			if resolution in resolutions:
-				return resolutions[resolution]
+				ret = resolutions[resolution]
+				reference = props.get('reference', '')
+				if reference.replace('\\', '/').startswith(ret.replace('\\', '/')):
+					return reference
+				return ret
 		return ''
 
 	def resolutions(self):
@@ -252,13 +257,11 @@ class MayaSceneModel(AbstractSceneModel):
 
 					# If the a reference node does not exists. We create a reference.
 					if not referenceNodeName:
-						cmds.file(path, reference=True, mergeNamespacesOnClash=True, usingNamespaces=True, namespace=namespace)
-						reference = path
+						reference = cmds.file(path, reference=True, mergeNamespacesOnClash=True, usingNamespaces=True, namespace=namespace)
 
 					# Else simply switching the reference preserving any local change.
 					else:
-						cmds.file(path, loadReference=referenceNodeName)
-						reference = cmds.referenceQuery(referenceNodeName, filename=True)
+						reference = cmds.file(path, loadReference=referenceNodeName)
 
 					# Making sure native pointers are re-assigned.
 					self._nativePointer = self._scene._findNativeObject(name)
@@ -284,13 +287,13 @@ class MayaSceneModel(AbstractSceneModel):
 				else:
 
 					# Simply switching the reference preserving any local change.
-					cmds.file(path, loadReference=referenceNodeName)
+					reference = cmds.file(path, loadReference=referenceNodeName)
 
 					# This will be important later when we come out offload and try to access the reference node.
 					# Also you will notice we set the reference path using the reference variable and not the path one.
 					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
 					# You can see that if you look in File > Reference Editor.
-					self.userProps()['reference'] = cmds.referenceQuery(referenceNodeName, filename=True)
+					self.userProps()['reference'] = reference
 
 					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
