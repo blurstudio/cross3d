@@ -6,7 +6,7 @@ import maya.cmds as cmds
 import maya.OpenMaya as om
 import maya.OpenMayaUI as omUI
 from blur3d import api
-from blur3d.api import Exceptions
+from blur3d.api import Exceptions, ExceptionRouter
 from blur3d.api.classes import FrameRange
 from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
 
@@ -41,7 +41,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 		
 	def _setNativeCamera(self, nativeCamera):
 		nativeCamera = api.SceneWrapper._asMOBject(nativeCamera)
-		dagPath = om.MDagPath.getAPathTo(nativeCamera)
+		with ExceptionRouter():
+			dagPath = om.MDagPath.getAPathTo(nativeCamera)
 		self._nativePointer.setCamera(dagPath)
 		# Ensure the viewport is refreshed
 		api.application.refresh()

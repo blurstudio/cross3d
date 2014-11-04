@@ -3,6 +3,7 @@ import itertools
 import maya.OpenMaya as om
 import maya.cmds as cmds
 from blur3d.api.abstract.abstractscenewrapper import AbstractSceneWrapper
+from blur3d.api import ExceptionRouter
 
 class MayaSceneWrapper( AbstractSceneWrapper ):
 	#--------------------------------------------------------------------------------
@@ -63,9 +64,10 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		if dataType == None:
 			# MCH 09/17/14 # TODO Evaluate if this is a valid default?
 			dataType = om.MFnData.kAny
-		if shortName == None:
-			shortName = cls._normalizeAttributeShortName(name, uniqueOnObj=mObj)
-		depNode = om.MFnDependencyNode(mObj)
+		with ExceptionRouter():
+			if shortName == None:
+				shortName = cls._normalizeAttributeShortName(name, uniqueOnObj=mObj)
+			depNode = om.MFnDependencyNode(mObj)
 		sAttr = om.MFnTypedAttribute()
 		if False: #if default:
 			# TODO: Handle creating the default object
@@ -89,14 +91,16 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param name: The name of the attribute to get from mObj.
 		:return: A OpenMaya.MPlug object
 		"""
-		depNode = om.MFnDependencyNode(mObj)
-		attr = depNode.attribute(name)
-		return om.MPlug(mObj, attr)
+		with ExceptionRouter():
+			depNode = om.MFnDependencyNode(mObj)
+			attr = depNode.attribute(name)
+			return om.MPlug(mObj, attr)
 	
 	@classmethod
 	def _hasAttribute(cls, mObj, name):
-		depNode = om.MFnDependencyNode(mObj)
-		return depNode.hasAttribute(name)
+		with ExceptionRouter():
+			depNode = om.MFnDependencyNode(mObj)
+			return depNode.hasAttribute(name)
 	
 	@classmethod
 	def _namespace(self, mObj):
@@ -201,18 +205,18 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param nativeObject: The OpenMaya.MObject to get the transform node of
 		:return: OpenMaya.MObject
 		"""
+		with ExceptionRouter():
+			# TODO MIKE: I am handling the character and dependency object for key sets. We need to discuss.
+			if nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kCharacter]:
 
-		# TODO MIKE: I am handling the character and dependency object for key sets. We need to discuss.
-		if nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kCharacter]:
-
-			# The world node doesn't play well with the getting transform code.
+				# The world node doesn't play well with the getting transform code.
+				return nativeObject
+				
+			path = om.MDagPath.getAPathTo(nativeObject)
+			newPointer = path.transform()
+			if newPointer != nativeObject:
+				return newPointer
 			return nativeObject
-			
-		path = om.MDagPath.getAPathTo(nativeObject)
-		newPointer = path.transform()
-		if newPointer != nativeObject:
-			return newPointer
-		return nativeObject
 	
 	@classmethod
 	def _mObjName(cls, nativeObject, fullName=True):
@@ -222,17 +226,33 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:param fullName: If True return the Name(Full Path), else return the displayName. Defaults to True
 		:return: nativeObject's name as a string
 		"""
-
-		if not nativeObject.hasFn(om.MFn.kCharacter):
-			dagPath = om.MDagPath.getAPathTo(nativeObject)
-			if fullName:
-				return dagPath.fullPathName()
-			return dagPath.partialPathName()
-		return om.MFnDependencyNode(nativeObject).name()
+		with ExceptionRouter():
+			if not nativeObject.hasFn(om.MFn.kCharacter):
+				dagPath = om.MDagPath.getAPathTo(nativeObject)
+				if fullName:
+					return dagPath.fullPathName()
+				return dagPath.partialPathName()
+			return om.MFnDependencyNode(nativeObject).name()
 
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
+	@property
+	def _nativePointer(self):
+		""" If you are storing OpenMaya.MObject's long enough for them to become invalidated(opening 
+		a new scene for example), maya will crash and close because it is now accessing invalid 
+		memory. To be able to safely store MObject's for long term, we need to store them in a
+		MObjectHandle object.
+		"""
+		return self._nativeHandle.object()
+	
+	@_nativePointer.setter
+	def _nativePointer(self, nativePointer):
+		if nativePointer is None:
+			# We can't pass None to om.MObjectHandle, but we can pass a empty MObject
+			nativePointer = om.MObject()
+		self._nativeHandle = om.MObjectHandle(nativePointer)
+	
 	def _nativeProperty(self, key, default=None):
 		"""
 			\remarks	return the value of the property defined by the inputed key

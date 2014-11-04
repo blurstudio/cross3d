@@ -3,7 +3,7 @@ import maya.OpenMaya as om
 import maya.cmds as cmds
 import blurdev
 from blur3d.constants import ObjectType
-from blur3d.api import application, UserProps
+from blur3d.api import application, UserProps, ExceptionRouter
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
 class MayaSceneObject( AbstractSceneObject ):
@@ -54,7 +54,8 @@ class MayaSceneObject( AbstractSceneObject ):
 		"""
 		# Make sure the nativeObject is a OpenMaya.MObject, and that its a shape node.
 		mObj = self._asMOBject(nativeObject)
-		nativeObject = self._getShapeNode(mObj)
+		with ExceptionRouter():
+			nativeObject = self._getShapeNode(mObj)
 		super(MayaSceneObject, self).__init__(scene, nativeObject)
 		# _nativeTypePointer stores the specific MFn* object representation of MObject this is
 		# used mostly by subclasses of SceneObject
@@ -67,15 +68,16 @@ class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	@classmethod
 	def _mObjChildren(cls, mObj, recursive=True, regex=None):
-		path = om.MDagPath.getAPathTo(mObj)
-		for index in range(path.childCount()):
-			child = path.child(index)
-			if child.apiType() == om.MFn.kTransform:
-				if not regex or regex.match(api.SceneObject._mObjName(child)):
-					yield child
-				if recursive == True:
-					for i in cls._mObjChildren(child, regex=regex):
-						yield i 
+		with ExceptionRouter():
+			path = om.MDagPath.getAPathTo(mObj)
+			for index in range(path.childCount()):
+				child = path.child(index)
+				if child.apiType() == om.MFn.kTransform:
+					if not regex or regex.match(api.SceneObject._mObjName(child)):
+						yield child
+					if recursive == True:
+						for i in cls._mObjChildren(child, regex=regex):
+							yield i 
 	
 	def _nativeChildren(self, recursive=False, wildcard='', type='', parent='', childrenCollector=[]):
 		"""
@@ -116,6 +118,19 @@ class MayaSceneObject( AbstractSceneObject ):
 		"""
 		return self._mObjName(self._nativePointer, True)
 	
+	@property
+	def _nativeTransform(self):
+		""" If you are storing OpenMaya.MObject's long enough for them to become invalidated(opening 
+		a new scene for example), maya will crash and close because it is now accessing invalid 
+		memory. To be able to safely store MObject's for long term, we need to store them in a
+		MObjectHandle object.
+		"""
+		return self._nativeTypeHandle.object()
+	
+	@_nativeTransform.setter
+	def _nativeTransform(self, nativePointer):
+		self._nativeTypeHandle = om.MObjectHandle(nativePointer)
+	
 	@classmethod
 	def _typeOfNativeObject(cls, nativeObject):
 		"""
@@ -126,20 +141,21 @@ class MayaSceneObject( AbstractSceneObject ):
 		# Make sure the nativeObject is a OpenMaya.MObject
 		# TODO: Move this into a blur3d private function the __new__ factory can call.
 		nativeObject = cls._asMOBject(nativeObject)
-		apiType = nativeObject.apiType()
-		if apiType == om.MFn.kTransform:
-
-			# Checking for model.
-			userProps = UserProps(nativeObject)
-			if 'model' in userProps and len(cls._mObjName(nativeObject, False).split(':')) > 1:
-				return ObjectType.Model
-			return ObjectType.Generic
-
-			nativeObject = cls._getShapeNode(nativeObject)
+		with ExceptionRouter():
 			apiType = nativeObject.apiType()
-		
-		if apiType in cls._nativeToAbstractObjectType:
-			return cls._nativeToAbstractObjectType[apiType]
+			if apiType == om.MFn.kTransform:
+
+				# Checking for model.
+				userProps = UserProps(nativeObject)
+				if 'model' in userProps and len(cls._mObjName(nativeObject, False).split(':')) > 1:
+					return ObjectType.Model
+				return ObjectType.Generic
+
+				nativeObject = cls._getShapeNode(nativeObject)
+				apiType = nativeObject.apiType()
+			
+			if apiType in cls._nativeToAbstractObjectType:
+				return cls._nativeToAbstractObjectType[apiType]
 
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
 	
