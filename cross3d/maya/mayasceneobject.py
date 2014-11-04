@@ -100,6 +100,17 @@ class MayaSceneObject( AbstractSceneObject ):
 			regex = re.compile(expression, flags=re.I)
 		return self._mObjChildren(self._nativeTransform, recursive=recursive, regex=regex)
 	
+	def _nativeModel(self):
+		"""
+			\remarks	looks up the native model for this object
+			\sa			model, setModel, _setNativeModel
+			\return		<variant> nativeObject || None
+		"""
+		namespace = self._namespace(self._nativePointer)['namespace']
+		if namespace:
+			return self._scene._findNativeObject(name=namespace)
+		return None
+	
 	def _nativeName(self):
 		""" A convience method that returns the name of the shape node, not the transform node.
 		"""
