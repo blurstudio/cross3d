@@ -250,7 +250,7 @@ class MayaScene(AbstractScene):
 
 		if getsFromSelection:
 			objects = self._selectionIter()
-		else: 	
+		else:
 			# TODO MIKE: I had to support kCharacters aka key set cause they are part of what we export.
 			# The problem is not the export because we don't have to select them since they are "dependant".
 			# The issue is for when I try to re-apply the namespace after export.

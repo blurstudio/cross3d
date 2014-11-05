@@ -107,7 +107,14 @@ class MayaSceneModel(AbstractSceneModel):
 		cmds.addAttr(self._nativeName(), longName=resolutionAttr, attributeType="enum", enumName=resolutions)
 
 		# Make the attribute viewable, but not keyable in the channelBox
-		cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
+		try:
+			cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
+		# Consume a runtime error if the resolution attribute was in the reference. This is only a
+		# issue with some of our first models, Asset Exporter will remove them from future exports.
+		except RuntimeError as error:
+			pattern = r"setAttr: The attribute '[^']+' is from a referenced file, thus the keyable state cannot be changed."
+			if not re.match(pattern, error.message):
+				raise
 
 	def isReferenced(self):
 		userProps = api.UserProps(self._nativePointer)
