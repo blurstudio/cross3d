@@ -144,7 +144,33 @@ class MayaSceneModel(AbstractSceneModel):
 
 		# Trashing the namespace.
 		cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
+		
+		# Remove attributes that should not be stored in a exported model.
+		userProps = self.userProps()
+		resolutions = None
+		resolution = {}
+		if 'resolutions' in userProps:
+			resolutions = userProps.pop('resolutions')
+		if 'resolution' in userProps:
+			# Resolution is a bit complicated because it can be a enum.
+			if cmds.attributeQuery('resolution', node= self._nativeName(), attributeType=True) == 'enum':
+				# Store the enum list
+				resolution['names'] = cmds.attributeQuery( 'resolution', node=self._nativeName(), listEnum=True)
+			resolution['value'] = self.userProps().pop('resolution')
+		# Export the model
 		cmds.file(fileName, force=True, exportSelected=True, typ="mayaAscii", usingNamespaces=False)
+		
+		# Restore the attributes we used earlier
+		userProps = self.userProps()
+		if resolutions != None:
+			userProps['resolutions'] = resolutions
+		if resolution:
+			if 'names' in resolution:
+				cmds.addAttr(self._nativeName(), longName=resolutionAttr, attributeType="enum", enumName=resolution['names'][0])
+				cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
+				cmds.setAttr(self._attrName(), resolution['value'])
+			else:
+				userProps['resolution'] = resolution['value']
 		
 		# TODO MIKE: Is this really the best way to put the namespace back?
 		for obj in objects:
