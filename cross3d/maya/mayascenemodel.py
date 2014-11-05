@@ -6,7 +6,6 @@ from blur3d import api
 from collections import OrderedDict
 from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
-# TODO MIKE: That's pretty dirty! Isn't it?
 resolutionAttr = 'resolution'
 
 #------------------------------------------------------------------------
@@ -98,8 +97,8 @@ class MayaSceneModel(AbstractSceneModel):
 
 		# Local models have a resolution metadata.
 		# Maybe it's not a good idea.
-		if 'resolution' in userProps:
-			del userProps['resolution']
+		if resolutionAttr in userProps:
+			del userProps[resolutionAttr]
 
 		resolutions = ':'.join(userProps.get('resolutions', []))
 
@@ -151,12 +150,12 @@ class MayaSceneModel(AbstractSceneModel):
 		resolution = {}
 		if 'resolutions' in userProps:
 			resolutions = userProps.pop('resolutions')
-		if 'resolution' in userProps:
+		if resolutionAttr in userProps:
 			# Resolution is a bit complicated because it can be a enum.
-			if cmds.attributeQuery('resolution', node= self._nativeName(), attributeType=True) == 'enum':
+			if cmds.attributeQuery(resolutionAttr, node= self._nativeName(), attributeType=True) == 'enum':
 				# Store the enum list
-				resolution['names'] = cmds.attributeQuery( 'resolution', node=self._nativeName(), listEnum=True)
-			resolution['value'] = self.userProps().pop('resolution')
+				resolution['names'] = cmds.attributeQuery( resolutionAttr, node=self._nativeName(), listEnum=True)
+			resolution['value'] = self.userProps().pop(resolutionAttr)
 		# Export the model
 		cmds.file(fileName, force=True, exportSelected=True, typ="mayaAscii", usingNamespaces=False)
 		
@@ -170,10 +169,12 @@ class MayaSceneModel(AbstractSceneModel):
 				cmds.setAttr(self._attrName(), keyable=False, channelBox=True)
 				cmds.setAttr(self._attrName(), resolution['value'])
 			else:
-				userProps['resolution'] = resolution['value']
+				userProps[resolutionAttr] = resolution['value']
 		
-		# TODO MIKE: Is this really the best way to put the namespace back?
+		# Re-add all items to the namespace
 		for obj in objects:
+			# TODO: Optomize setNamespace, it checks for if the namespace exists before renameing.
+			# In this case this is unneccissary.
 			obj.setNamespace(name)
 
 		# Restoring the namespace.
