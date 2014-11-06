@@ -319,9 +319,16 @@ class MayaSceneModel(AbstractSceneModel):
 
 				# If we are just switching resolution.
 				else:
-
+					# Get the name of the model node so we can update the native pointer after
+					# loading the new reference
+					name = self._mObjName(self._nativePointer, False)
 					# Simply switching the reference preserving any local change.
 					reference = cmds.file(path, loadReference=referenceNodeName)
+					
+					# Find the newly referenced model node
+					# Making sure native pointers are re-assigned.
+					self._nativePointer = self._scene._findNativeObject(name)
+					self._nativeTransform = self._nativePointer
 
 					# This will be important later when we come out offload and try to access the reference node.
 					# Also you will notice we set the reference path using the reference variable and not the path one.
