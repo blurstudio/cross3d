@@ -312,7 +312,8 @@ class MayaScene(AbstractScene):
 				cmds.file(filename, removeReference=True)
 				# Remove nodes that were parented to referneced nodes
 				leftovers = self.objects(wildcard='{refNode}fosterParent*'.format(refNode=refNode))
-				self.removeObjects(leftovers)
+				if leftovers:
+					self.removeObjects(leftovers)
 			# Local node processing: check for unreferenced items in the namespace and remove them.
 			namespace = nameInfo['namespace']
 			if cmds.namespace(exists=namespace):
