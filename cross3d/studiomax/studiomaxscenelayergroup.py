@@ -182,9 +182,12 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 
 		# update the layers
 		for layer in self._scene.layers():
-			ldata 	= layer.metaData()
-			gi		= ldata.value( 'groupIndex' )
-			oname	= orignames[gi-1]
+			ldata = layer.metaData()
+			gi = ldata.value('groupIndex')
+			try:
+				oname = orignames[gi-1]
+			except IndexError:
+				return False
 			ldata.setValue( 'groupIndex', names.index(oname) + 1 )
 
 		return True
