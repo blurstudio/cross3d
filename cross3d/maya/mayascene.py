@@ -294,6 +294,37 @@ class MayaScene(AbstractScene):
 		"""
 		return self.viewport().nativePointer().refresh(True, True)
 
+	def _removeNativeModels(self, models):
+		""" Deletes provided native models.
+			:param models: list of native models
+			:return: <bool> success
+		"""
+		ret = True
+		for model in models:
+			nameInfo = api.SceneWrapper._namespace(model)
+			fullName = api.SceneWrapper._mObjName(model)
+			print 'removing', fullName
+			if cmds.referenceQuery(fullName, isNodeReferenced=True):
+				# The model is referenced and we need to unload it.
+				refNode = cmds.referenceQuery(fullName, referenceNode=True)
+				filename = cmds.referenceQuery(refNode, filename=True)
+				# If all nodes in the namespace are referenced, the namespace will be removed, otherwise
+				# the namespace will still exist and contain all of those unreferenced nodes.
+				cmds.file(filename, removeReference=True)
+				# Remove nodes that were parented to referneced nodes
+				leftovers = self.objects(wildcard='{refNode}fosterParent*'.format(refNode=refNode))
+				self.removeObjects(leftovers)
+				print '	referenced!', filename
+			# Local node processing: check for unreferenced items in the namespace and remove them.
+			namespace = nameInfo['namespace']
+			if cmds.namespace(exists=namespace):
+				print 'Nodes left over!'
+				cmds.namespace(removeNamespace=namespace, deleteNamespaceContent=True)
+			if cmds.namespace(exists=namespace):
+				print 'The namespace {ns} still exists the model {model} was not entirely removed.'.format(namespace, model=fullName)
+				ret = False
+		return ret
+
 	def _removeNativeObjects(self, nativeObjects):
 		""" Removes the inputed objects from the scene
 			:param nativeObjects:	<list> [ <variant> nativeObject, .. ]
