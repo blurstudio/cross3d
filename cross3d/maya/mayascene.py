@@ -303,7 +303,6 @@ class MayaScene(AbstractScene):
 		for model in models:
 			nameInfo = api.SceneWrapper._namespace(model)
 			fullName = api.SceneWrapper._mObjName(model)
-			print 'removing', fullName
 			if cmds.referenceQuery(fullName, isNodeReferenced=True):
 				# The model is referenced and we need to unload it.
 				refNode = cmds.referenceQuery(fullName, referenceNode=True)
@@ -314,11 +313,9 @@ class MayaScene(AbstractScene):
 				# Remove nodes that were parented to referneced nodes
 				leftovers = self.objects(wildcard='{refNode}fosterParent*'.format(refNode=refNode))
 				self.removeObjects(leftovers)
-				print '	referenced!', filename
 			# Local node processing: check for unreferenced items in the namespace and remove them.
 			namespace = nameInfo['namespace']
 			if cmds.namespace(exists=namespace):
-				print 'Nodes left over!'
 				cmds.namespace(removeNamespace=namespace, deleteNamespaceContent=True)
 			if cmds.namespace(exists=namespace):
 				print 'The namespace {ns} still exists the model {model} was not entirely removed.'.format(namespace, model=fullName)
