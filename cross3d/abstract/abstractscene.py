@@ -1509,7 +1509,7 @@ class AbstractScene(QObject):
 			return model
 		return None
 
-	def createCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
+	def createCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.XYZ):
 		"""
 			\remarks	creates a new camera with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
