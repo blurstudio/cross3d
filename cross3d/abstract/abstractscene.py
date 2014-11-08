@@ -173,12 +173,17 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
-		"""
-			\remarks	creates and returns a new native 3d camera with the inputed name and objects
-			\param		name			<str>
-			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
-			\return		<variant> nativeCamera || None
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
+		""" Creates and returns a new native 3d camera with the inputed name and objects.
+			
+			Args:
+				name: the name of the camera
+				type: The type of camera. Defaults to Standard
+				target: The target object. Defaults to None
+				rotationOrder: The rotation order of the camera. Defaults to zxy
+			
+			Returns:
+				nativeCamera || None
 		"""
 		return None
 
@@ -1504,7 +1509,7 @@ class AbstractScene(QObject):
 			return model
 		return None
 
-	def createCamera(self, name='Camera', type='Standard', target=None):
+	def createCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
 		"""
 			\remarks	creates a new camera with the inputed name and returns it
 			\return		<blur3d.api.SceneObject> || None
@@ -1514,9 +1519,10 @@ class AbstractScene(QObject):
 				name=name,
 				type=type,
 				target=target.nativePointer(),
+				rotationOrder=rotationOrder
 			)
 		else:
-			nativeCamera = self._createNativeCamera(name, type)
+			nativeCamera = self._createNativeCamera(name, type, rotationOrder=rotationOrder)
 		if (nativeCamera):
 			from blur3d.api import SceneCamera
 			return SceneCamera(self, nativeCamera, target=target)

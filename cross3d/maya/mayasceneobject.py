@@ -2,7 +2,7 @@ import re
 import maya.OpenMaya as om
 import maya.cmds as cmds
 import blurdev
-from blur3d.constants import ObjectType
+from blur3d.constants import ObjectType, RotationOrder
 from blur3d.api import application, UserProps, ExceptionRouter
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
@@ -238,6 +238,37 @@ class MayaSceneObject( AbstractSceneObject ):
 				print 'TRACEBACK: skipping param: {} {}...'.format(key, value)
 				import traceback
 				print traceback.format_exc()
+
+	def rotationOrder(self):
+		""" Returns the blur3d.constants.RotationOrder enum for this object or zero """
+		tform = self._mObjName(self._nativeTransform)
+		selected = cmds.getAttr('{}.rotateOrder'.format(tform))
+		enumValues = cmds.attributeQuery('rotateOrder', node=tform, listEnum=True)
+		if enumValues:
+			enumValues = enumValues[0].split(':')
+		return RotationOrder.valueByLabel(enumValues[selected].upper())
+
+	def _setNativeRotationOrder(self, nativePointer, order):
+		""" Sets the transform rotation order for the provided object to the provided value.
+		
+		Args:
+			order: blur3d.constants.RotationOrder enum
+		"""
+		# Set the rotation order for the camera.
+		tform = self._mObjName(nativePointer)
+		enumValues = cmds.attributeQuery('rotateOrder', node=tform, listEnum=True)
+		if enumValues:
+			enumValues = enumValues[0].split(':')
+			rotName = RotationOrder.labelByValue(order)
+			cmds.setAttr('{}.rotateOrder'.format(tform), enumValues.index(rotName.lower()))
+
+	def setRotationOrder(self, order):
+		""" Sets the transform rotation order for this object. 
+		
+		Args:
+			order: blur3d.constants.RotationOrder enum
+		"""
+		return self._setNativeRotationOrder(self._nativeTransform, order)
 
 # register the symbol
 from blur3d import api

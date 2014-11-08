@@ -23,7 +23,7 @@ from blur3d.api.abstract.abstractscene import AbstractScene
 from blurdev.enum import enum
 from blurdev import debug
 from blur3d import api
-from blur3d.constants import ObjectType
+from blur3d.constants import ObjectType, RotationOrder
 
 class MayaScene(AbstractScene):
 	# Create dicts used to map framerates to maya's time units
@@ -145,7 +145,7 @@ class MayaScene(AbstractScene):
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=RotationOrder.ZXY):
 		""" Implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
 			:param name: <str>
 			:return: <variant> nativeCamera || None
@@ -157,6 +157,10 @@ class MayaScene(AbstractScene):
 			if target != None:
 				debug.debugObject(self._createNativeCamera, 'Target not supported currently.')
 			tform, shape = cmds.camera()
+			
+			# Set the rotation order for the camera.
+			api.SceneObject._setNativeRotationOrder(tform, rotationOrder)
+			
 			nativeCamera = api.SceneWrapper._asMOBject(shape)
 		cmds.rename(tform, name)
 		return nativeCamera
