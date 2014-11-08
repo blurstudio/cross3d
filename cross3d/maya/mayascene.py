@@ -185,10 +185,15 @@ class MayaScene(AbstractScene):
 #			userProps['Resolutions'] = OrderedDict(Offloaded='')
 		cmds.namespace(setNamespace=currentNamespace)
 
+		# Add each of nativeObjects to the model namespace
 		if nativeObjects:
 			for nativeObject in nativeObjects:
-				nativeObject.parent = output
-				nativeObject.name = '.'.join([name, nativeObject.name])
+				nativeObject = api.SceneWrapper._getTransformNode(nativeObject)
+				objName = api.SceneWrapper._mObjName(nativeObject)
+#				cmds.parent(objName, api.SceneWrapper._mObjName(nativeParent))
+				nameInfo = api.SceneWrapper._namespace(nativeObject)
+				newName = '{namespace}:{name}'.format(namespace=namespace, name=nameInfo['name'])
+				cmds.rename(objName, newName)
 		nativeObjects.append(output)
 		return output
 
