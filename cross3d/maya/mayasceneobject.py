@@ -248,14 +248,15 @@ class MayaSceneObject( AbstractSceneObject ):
 			enumValues = enumValues[0].split(':')
 		return RotationOrder.valueByLabel(enumValues[selected].upper())
 
-	def _setNativeRotationOrder(self, nativePointer, order):
+	@classmethod
+	def _setNativeRotationOrder(cls, nativePointer, order):
 		""" Sets the transform rotation order for the provided object to the provided value.
 		
 		Args:
 			order: blur3d.constants.RotationOrder enum
 		"""
 		# Set the rotation order for the camera.
-		tform = self._mObjName(nativePointer)
+		tform = cls._mObjName(cls._asMOBject(nativePointer))
 		enumValues = cmds.attributeQuery('rotateOrder', node=tform, listEnum=True)
 		if enumValues:
 			enumValues = enumValues[0].split(':')

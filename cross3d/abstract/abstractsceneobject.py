@@ -479,8 +479,9 @@ class AbstractSceneObject(SceneWrapper):
 		""" Returns the blur3d.constants.RotationOrder enum for this object or zero """
 		return 0
 
+	@classmethod
 	@abstractmethod
-	def _setNativeRotationOrder(self, nativePointer, order):
+	def _setNativeRotationOrder(cls, nativePointer, order):
 		""" Sets the transform rotation order for the provided object to the provided value.
 		
 		Args:
