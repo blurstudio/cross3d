@@ -9,10 +9,10 @@
 #	\date		03/15/10
 #
 
-from blur3d import abstractmethod, pendingdeprecation
-from blur3d.api	import UserProps
 from blur3d import api
-
+from blur3d.api	import UserProps
+from blur3d.constants import ControllerType
+from blur3d import abstractmethod, pendingdeprecation
 
 class AbstractSceneWrapper(object):
 	"""
@@ -231,10 +231,17 @@ class AbstractSceneWrapper(object):
 		:param controller: :class:`blur3d.api.SceneAnimationController` or None
 
 		"""
-		nativeController = None
-		if (controller):
-			nativeController = controller.nativePointer()
-		return self._setNativeController(name, nativeController)
+
+		if isinstance(controller, api.FCurve):
+			fCurve = controller
+			nativeController = api.SceneAnimationController._abstractToNativeTypes.get(ControllerType.BezierFloat)()
+			controller = api.SceneAnimationController(self, nativeController)
+			controller.setFCurve(fCurve)
+
+		elif not isinstance(controller, SceneAnimationController):
+			raise Exception('Argument 2 should be an instance of SceneAnimationController of FCurve.')
+
+		return self._setNativeController(name, controller.nativePointer())
 
 	@pendingdeprecation('Use setDisplayName() instead. Call setDisplayName to rename parent objects/Models.')
 	def setName(self, name):

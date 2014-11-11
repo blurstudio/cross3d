@@ -19,9 +19,12 @@
 #	\date		03/15/10
 #
 
-from blur3d			import abstractmethod, pendingdeprecation, constants
-from PyQt4.QtCore 	import QObject, pyqtSignal
 import collections as _collections
+
+from blur3d import api
+from blur3d import constants
+from PyQt4.QtCore import QObject, pyqtSignal
+from blur3d	import abstractmethod, pendingdeprecation, constants
 
 class AbstractScene(QObject):
 	# layer signals
@@ -820,26 +823,36 @@ class AbstractScene(QObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	# TODO: We need to get rid of BAF dependency and use alembic instead.
-	@abstractmethod
-	def applyRetimeCurve(self, path, obj, controller, cachesFrameRate):
-		""" Applies a BAF retime curve to the all the time controller found in the scene.
+	def applyRetimeController(self, controller, cachesFrameRate=None, include='', exclude=''):
+		""" Applies a controller to all the time controller found in the scene.
 
-		TODO: Get rid of BAF dependency and drop TMC and PC support.
-
-		The expected curve should express time in second and will be applied as is to alembic modifiers/controllers.
+		The expected controller should express time in seconds and will be applied as is to alembic modifiers/controllers.
 		Any PC and TMC modifiers/controllers will be wired to the alembic ones through a float script that will both reference the alembic controller
 		and the frame rate at which we know these point cache have been made. Unfortunately this information cannot be deduced from parsing the PC or TMC file.
 
 		Args:
-			path(str): The path to the BAF document used for retime.
-			obj(str): The BAF object we are looking for.
-			controller(str): The BAF controller we are looking for.
-			cachesFrameRate: The frame rates at which PCs and TMCs have been made.
+			controller(SceneAnimationController|FCurve): The controller we want to use for controlling time.
+			cacheFrameRate(float): For TMCs and PCs there is not way to detect the frame rate at which they have been created.
+			So if it happens to differ from the one set for that scene, the user will have to provide one.
+			include(str): All the objects which name can be found by that regex will be included.
+			exclude(str): All the objects which name can be found byt that regex will be excluded.
 
 		Return:
 			boolean: Wherther or not retime was applied with success.
 		"""
+		if isinstance(controller, api.FCurve):
+			fCurve = controller
+			nativeController = api.SceneAnimationController._abstractToNativeTypes.get(constants.ControllerType.BezierFloat)()
+			controller = api.SceneAnimationController(self, nativeController)
+			controller.setFCurve(fCurve)
+
+		elif not isinstance(controller, api.SceneAnimationController):
+			raise Exception('Argument 1 should be an instance of SceneAnimationController or FCurve.')
+
+		return self._applyRetimeNativeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude)
+
+	@abstractmethod
+	def _applyRetimeNativeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
 		return False
 
 	@abstractmethod

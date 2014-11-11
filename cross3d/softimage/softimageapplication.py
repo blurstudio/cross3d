@@ -109,7 +109,6 @@ class SoftimageApplication(AbstractApplication):
 		job['out'] = kwargs.get('out', scene.animationRange()[1])
 		
 		jobString = ";".join( [ "=".join([k,str(v)]) for k, v in job.iteritems()] )
-		print jobString 
 		return xsi.alembic_export(jobString)
 	
 	def importAlembic(self, filename, **kwargs):

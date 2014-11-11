@@ -309,16 +309,19 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		frameRate = self._scene.animationFPS()
 
 		# Processing Alembic controllers.
-		alembicControllers = mxs.getClassInstances(mxs.Alembic_Xform, target=np) + mxs.getClassInstances(mxs.Alembic_Float_Controller, target=np)
-		for controller in alembicControllers:
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller, target=np) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform, target=np) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry, target=np)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals, target=np)
+		for alembicController in alembicControllers:
 
 			# Instantiating if we already computed the time controller.
 			if not timeController:
 
 				# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
 				import cask
-				archive = cask.Archive(controller.path)
-				item = archive.top.children[controller.identifier]
+				archive = cask.Archive(alembicController.path)
+				item = archive.top.children[alembicController.identifier]
 
 				# Sometimes the identifier will point to a Xform object.
 				# Unfortunately I did not find a way to access the sample count from there.
@@ -337,14 +340,13 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				timeController = mxs.bezier_float()
 				frames = [(round(startTime * frameRate), startTime), (round(endTime * frameRate), endTime)]
 				for frame, value in frames:
-					print frame, value
 					k = mxs.addNewKey(timeController, frame)
 					k.value = value
 					k.inTangentType = mxs.pyhelper.namify('linear')
 					k.outTangentType = mxs.pyhelper.namify('linear')
 
 			# Assigning the controller.
-			mxs.setPropertyController(controller, 'time', timeController)
+			mxs.setPropertyController(alembicController, 'time', timeController)
 
 		# Processing TMCs and PCs.
 		nativeCaches = mxs.getClassInstances(mxs.Transform_Cache, target=np) + mxs.getClassInstances(mxs.Point_Cache, target=np)
@@ -360,23 +362,38 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			# Playback type 3 is "Playback Graph".
 			cache.playbackType = 3
 
-			# Set the playback frame to a float cache with start and end values pulled from the cache.
+			# Set the playback frame to a float controller with start and end values pulled from the cache.
 			mxs.setPropertyController(cache, 'playbackFrame', mxs.bezier_float())
 			timeController = mxs.getPropertyController(cache, 'playbackFrame')
-
-			# Clearing the keys.
-			mxs.deleteKeys(timeController)
 			
 			# Set keys on the playback frame cache that matches the current frame rate.
 			duration = cacheInfo.start_frame - cacheInfo.end_frame + 1
 			frames = [(cacheInfo.start_frame, 0), (cacheInfo.end_frame, duration)]
 			for frame, value in frames:
-				k = mxs.addNewKey(timeController, frame)
-				k.value = value
-				k.inTangentType = mxs.pyhelper.namify('linear')
-				k.outTangentType = mxs.pyhelper.namify('linear')
+				key = mxs.addNewKey(timeController, frame)
+				key.value = value
+				key.inTangentType = mxs.pyhelper.namify('linear')
+				key.outTangentType = mxs.pyhelper.namify('linear')
 
-		print timeController
+		# Processing XMeshes.
+		xMeshes = mxs.getClassInstances(mxs.Transform_Cache, target=np) + mxs.getClassInstances(mxs.Point_Cache, target=np)
+		for xMesh in xMeshes:
+
+			# Enable curve playback.
+			xMesh.enablePlaybackGraph = True
+
+			# Create a new bezier float controller for the time.
+			mxs.setPropertyController(cache, 'playbackGraphTime', mxs.bezier_float())
+			timeController = mxs.getPropertyController(cache, 'playbackGraphTime')
+
+			# Set keys on the playback in and out frames.
+			frames = (xMesh.rangeFirstFrame, xMesh.rangeLastFrame)
+			for frame in frames:
+				key = mxs.addNewKey(timeController, frame)
+				key.value = frame
+				key.inTangentType = mxs.pyhelper.namify('linear')
+				key.outTangentType = mxs.pyhelper.namify('linear')
+						
 		if timeController:
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController(self._scene, timeController)

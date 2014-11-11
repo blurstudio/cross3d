@@ -33,13 +33,10 @@ class External(AbstractExternal):
 	@classmethod
 	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
 
-		# TODO: The script syntax is currently super sensitive. Here is an example of the only string I was able to have working.
-		# r"fle=open(r'C:\\Temp\\Test.txt', 'w')\nfle.close()"
-
 		# If the script argument is a path to a file.
 		if os.path.exists(script):
 
-			# If the language is Mel we just use the script as is.
+			# If the language is MEL we just use the script as is.
 			if language == ScriptLanguage.MEL:
 				scriptPath = script
 
@@ -50,15 +47,23 @@ class External(AbstractExternal):
 
 		if language == ScriptLanguage.Python:
 			scriptTemplate = os.path.join(os.path.dirname(__file__), 'templates', 'external_python_script.mstempl')
+			pythonScritpPath = os.path.splitext(cls.scriptPath())[0] + '.py'
+
+			with open(pythonScritpPath, 'w') as fle:
+				fle.write(script)
 
 			with open(scriptTemplate) as fle:
-				script = fle.read().format(pythonScript=script, debug=str(debug).lower())
+				script = fle.read().format(debug=unicode(debug).lower())
 				
 			scriptPath = os.path.splitext(cls.scriptPath())[0] + '.mel'
 			with open(scriptPath, "w") as fle:
 				fle.write(script)
 
+		# TODO: Unforunately headless mode does not work for now.
+		headless = False
+
 		binary = os.path.join(cls.binariesPath(version, architecture), 'mayabatch.exe' if headless else 'maya.exe')
+		print ' '.join([binary, '-script', scriptPath])
 		process = subprocess.Popen([binary, '-script', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
 		return True

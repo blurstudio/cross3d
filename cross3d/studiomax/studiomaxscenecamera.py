@@ -294,14 +294,13 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         if cameraType == CameraType.VRayPhysical:
 
             # We need to create a dedicated radians FOV contoller as the regular FOV controller expects degrees.
-            self._addNativeController('radFOV')
-            properties = {'Custom_Attributes.radFOV': 'horizontalFOV', 'clip_near': 'NearClippingPlane', 'clip_far': 'FarClippingPlane', 'focus_distance': 'FocusDistance'}
+            self._addNativeController('RadianFOV', group='Alembic')
+            properties = {'Alembic.RadianFOV': 'horizontalFOV', 'clip_near': 'NearClippingPlane', 'clip_far': 'FarClippingPlane', 'focus_distance': 'FocusDistance'}
 
         else:
             properties = {'fov': 'horizontalFOV', 'nearclip': 'NearClippingPlane', 'farclip': 'FarClippingPlane', 'mpassEffect.focalDepth': 'FocusDistance'}
 
         for prop in properties:
-            print prop
             mxs.execute(maxScript.format(prop=prop, path=path, identifier=propertiesIdentifier, propertyName=properties[prop]))
             alembicController = mxs.setAlembicFloatController(self._nativePointer, timeController)
 
@@ -310,10 +309,10 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
     
             # Building a script controller for the FOV in degrees.
             scriptController = mxs.float_script()
-            scriptController.addtarget('radFOV', mxs.getPropertyController(self._nativePointer, "radFOV"))
+            scriptController.addtarget('RadianFOV', mxs.getPropertyController(self._nativePointer, "RadianFOV"))
 
             # Using the radians FOV controller reading the Alembic and converting to degrees.
-            scriptController.script = 'radToDeg(radFOV)'
+            scriptController.script = 'radToDeg(RadianFOV)'
             mxs.setPropertyController(self._nativePointer, 'fov', scriptController)
 
         return True

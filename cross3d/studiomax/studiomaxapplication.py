@@ -188,6 +188,7 @@ class StudiomaxApplication(AbstractApplication):
 		return
 	
 	def log(self, message):
+		
 		# TODO: Can't seem to access the native log message.
 		print message
 		return True

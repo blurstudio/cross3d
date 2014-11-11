@@ -58,7 +58,13 @@ class AbstractSceneModel(SceneObject):
 		for nativeGroup in self._nativeGroups(wildcard):
 			groups.append(Group(self._scene, nativeGroup))
 		return groups
-		
+	
+	@abstractmethod
+	def exportToOtherPackages(self, path):
+		""" Exports the model to other 3D packages supported by this module.
+		"""
+		return False
+
 	@abstractmethod
 	def export(self, fileName):
 		return False

@@ -1,4 +1,4 @@
-python("{pythonScript}");
+python("execfile(r'C:\\temp\\maya_script.py')");
 
 if (!{debug}) {{
 	quit -force;

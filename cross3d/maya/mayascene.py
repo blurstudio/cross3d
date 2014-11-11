@@ -475,6 +475,34 @@ class MayaScene(AbstractScene):
 #		cmds.file(prompt=prompt)
 #		return filename == loaded
 	
+	def importFBX(self, path, **kwargs):
+
+		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
+		args = { "animation":True, 
+				 "cameras":True,
+				 "lights":True,
+				 "envelopes":True,
+				 "forceNormEnvelope":False,
+				 "keepXSIEffectors":True,
+				 "skeletonsAsNulls":True,
+				 "scaleFactor":1.0,
+				 "fillTimeline":True,
+				 'scaleConversion': False,
+				 'converUnit': 'cm' }
+
+		args.update(kwargs)
+
+		# TODO: We could handle way more options.
+		cmds.FBXImportSkins(v=args[envelopes])
+		cmds.FBXImportScaleFactorEnable(v=args['scaleConversion'])
+		cmds.FBXImportCameras(v=args['cameras'])
+		cmds.FBXImportLights(v=args['lights'])
+
+		if os.path.exists(path):
+			cmds.FBXImport(file=path)
+			return True
+		return False
+
 	def property(self, key, default=None):
 		"""
 			\remarks	returns a global scene value

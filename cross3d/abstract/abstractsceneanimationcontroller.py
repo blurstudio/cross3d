@@ -8,10 +8,11 @@
 #	\date		03/15/10
 #
 
+from blur3d import api
+from blur3d.api import FCurve
 from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
-from blur3d import api
-
+from blurdev.decorators import pendingdeprecation
 
 class AbstractSceneAnimationController(SceneWrapper):
 	#--------------------------------------------------------------------------------
@@ -76,13 +77,17 @@ class AbstractSceneAnimationController(SceneWrapper):
 		return None
 
 	@abstractmethod
-	def controllerType(self):
+	def type(self):
 		"""Return the type of controller that this controller is
 		
 		:return: :data:`blur3d.constants.ControllerType`
 		
 		"""
 		return 0
+
+	@pendingdeprecation('Use type method instead.')
+	def controllerType( self ):
+		return self.type()
 
 	def isKeyedAt(self, time):
 		"""Return whether or not a key exists at the inputed time frame
@@ -129,10 +134,8 @@ class AbstractSceneAnimationController(SceneWrapper):
  		return []
 
  	@abstractmethod
- 	def fromAlembic(self, alembic):
- 		""" Loads data from an alembic curve file.
- 		"""
- 		return False
+ 	def fCurve(self):
+ 		return FCurve()
 
 	def removeKeyAt(self, time):
 		"""Clears the key at the inputed time
@@ -145,6 +148,10 @@ class AbstractSceneAnimationController(SceneWrapper):
 		"""
 		return self.setKeyAt(time, None)
 
+ 	@abstractmethod
+ 	def setFCurve(self, fCurve):
+ 		return False
+ 		
 	def setKeyAt(self, time, key):
 		"""Set the key at the inputed time frame to the inputed key
 
@@ -160,15 +167,6 @@ class AbstractSceneAnimationController(SceneWrapper):
 		if (key):
 			nativeKey = key.nativePointer()
 		return self._setNativeKeyAt(time, nativeKey)
-
-	@abstractmethod
-  	def toAlembic(self, path=''):
- 		""" Returns a alembic curve.
-
- 		Args:
- 			path(boolean): Save the curve to disk if provided.
- 		"""
- 		return False
 
 	@classmethod
 	def createNew(cls, scene, controllerType):

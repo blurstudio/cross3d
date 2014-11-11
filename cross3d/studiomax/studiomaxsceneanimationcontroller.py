@@ -8,16 +8,29 @@
 #	\date		09/08/10
 #
 
+import math
+
 from Py3dsMax import mxs
+from blur3d.api import FCurve
 from blur3d.constants import ControllerType
 from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
 class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
+	_nativeToAbstractTypes = { 'bezier_float'             : ControllerType.BezierFloat,
+							   'linear_float'             : ControllerType.LinearFloat,
+							   'script_float'             : ControllerType.ScriptFloat,
+							   'Alembic_Float_Controller' : ControllerType.AlembicFloat }
+
+	_abstractToNativeTypes = { ControllerType.BezierFloat  : mxs.bezier_float,
+							   ControllerType.LinearFloat  : mxs.linear_float,
+							   ControllerType.ScriptFloat  : mxs.script_float,
+							   ControllerType.AlembicFloat : mxs.Alembic_Float_Controller }
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
-	#
+
 	def _createNativeKeyAt( self, time ):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._nativeKeys method to create a new key at the inputed time
@@ -39,15 +52,17 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		return []
 		
 	@classmethod
-	def _createNewNative( cls, scene, controllerType ):
+	def _createNewNative(cls, scene, controllerType):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._createNewNative method to create a new native controller in the scene of the inputed controller type
 			\param		scene				<blur3d.api.Scene>
 			\param		controllerType		<blur3d.constants.ControllerType>
 			\return		<blur3d.api.SceneAnimationController> || None
 		"""
-		if ( controllerType == ControllerType.Bezier_Float ):
-			return mxs.Bezier_Float()
+		if (controllerType == ControllerType.BezierFloat):
+			return mxs.bezier_float()
+		elif (controllerType == ControllerType.LinearFloat):
+			return mxs.linear_float()
 		return None
 	
 	def _setNativeKeyAt(self, time, nativeKey):
@@ -75,24 +90,16 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
-	#
-	def controllerType( self ):
+
+	def type(self):
 		"""
 			\remarks	implements AbstractSceneAnimationController.controllerType method to return the controller type for this instance
 			\return		<blur3d.constants.ControllerType>
 		"""
-		cls = mxs.classof(self._nativePointer)
-
-		if (cls == mxs.Bezier_Float):
-			return ControllerType.BezierFloat
-
-		elif (cls == mxs.Linear_Float):
-			return ControllerType.LinearFloat
-		
-		return 0
+		return self._nativeToAbstractTypes.get(str(mxs.classOf(self._nativePointer)), 0)
 
 	def displayName(self):
-		return '.'.join( mxs.exprForMaxObject( self._nativePointer ).split( '.' )[1:] )
+		return self.name().split('.')[-1]
 
 	def name( self ):
 		"""
@@ -100,7 +107,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 			\sa			setName
 			\return		<str> name
 		"""
-		return self.displayName()
+		return '.'.join(mxs.exprForMaxObject(self._nativePointer).split('.')[1:])
 
  	def valueAtFrame(self, frame):
  		mxs.execute("""fn getControllerValueAtFrame controller frame = (
@@ -108,6 +115,95 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	 		return controller.value
  		)""")
  		return mxs.getControllerValueAtFrame(self._nativePointer, frame)
+
+ 	def fCurve(self):
+ 		""" Returns a FCurve object to manipulate or save the curve data.
+ 		"""
+ 		fCurve = None
+	  	controllerType = self.controllerType()
+	  	
+	  	# We only support controllers that can have keys.
+	  	if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
+
+	  		# Creating a new fCurve object.
+	  		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
+
+	  		for key in self.keys():
+	  			key = key.nativePointer()
+	  			
+	  			# We want the non normalized handle length values.
+	  			freeHandle = key.freeHandle
+	  			key.freeHandle = True
+
+	  			kwargs ={}
+				kwargs['value'] = key.value
+				kwargs['time'] = key.time
+
+				# Bare in mind that the Max values are the slopes.
+				kwargs['inTangentAngle'] = math.atan((key.inTangent * 0.1 / 0.12) * 10.0)
+				kwargs['outTangentAngle'] = math.atan((key.outTangent * 0.1 / 0.12) * 10.0)
+				kwargs['inTangentType'] = key.inTangentType
+				kwargs['outTangentType'] = key.outTangentType
+
+				# Bare in mind that Max tangent length is actually not the length but the length on the time axis.
+				kwargs['inTangentLength'] = key.inTangentLength / math.cos(kwargs['inTangentAngle']) if kwargs['inTangentAngle'] != 0.0 else key.inTangentLength
+				kwargs['outTangentLength'] = key.outTangentLength / math.cos(kwargs['outTangentAngle']) if kwargs['outTangentAngle'] != 0.0 else key.outTangentLength
+				kwargs['normalizedTangents'] = not freeHandle
+				kwargs['brokenTangents'] = not key.x_locked
+				fCurve.addKey(**kwargs)
+
+				# Restoring the key settings.
+				key.freeHandle = freeHandle
+
+		return fCurve
+
+ 	def setFCurve(self, fCurve):
+ 		""" Takes a fCurve object data and applies it to the controller.
+ 		"""
+
+ 		tpe = fCurve.type()
+ 		keys = fCurve.keys()
+
+ 		if tpe and keys:
+
+			# Making a fresh controller.
+			controller = self._abstractToNativeTypes.get(tpe)()
+
+			if controller:
+
+				# For a reason that falls beyond my comprehension, it is important to set all the keys first.
+				for k in keys:
+					key = mxs.addNewKey(controller, k.time)
+					key.value = k.value
+				
+				# And then do a second pass to process the tangents.
+				for k in keys:
+					key = mxs.getKey(controller, mxs.getKeyIndex(controller, k.time))
+					
+					# The tangeants do not expected the same values if the are free.
+					key.freeHandle = True
+					key.x_locked = False
+					key.inTangentType = mxs.pyhelper.namify('custom')
+					key.outTangentType = mxs.pyhelper.namify('custom')
+
+					# The Max tangent lenght is actually the distance on the time axis.	
+					key.inTangentLength = math.cos(k.inTangentAngle) * k.inTangentLength
+					key.inTangent = (math.tan(k.inTangentAngle) / 10.0) * 0.12 / 0.1
+
+					# The Max tangent lenght is actually the distance on the time axis.
+					key.outTangentLength = math.cos(k.outTangentAngle) * k.outTangentLength
+					key.outTangent = (math.tan(k.outTangentAngle) / 10.0) * 0.12 / 0.1
+							
+					# Restore other key properties.
+					key.inTangentType = mxs.pyhelper.namify(k.inTangentType)
+					key.outTangentType = mxs.pyhelper.namify(k.outTangentType)
+					key.freeHandle = not k.normalizedTangents
+					key.x_locked = not k.brokenTangents
+
+				mxs.replaceInstances(self._nativePointer, controller)
+
+				# It is essential to re-point the native pointer.
+				self._nativePointer = controller
 
  	def framesForValue(self, value, closest=True):
 
@@ -133,7 +229,6 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 			
 			if round(currentValue) == round(value):
 				if previousValue is None or abs(value-currentValue) < abs(value-previousValue):
-					print frame, value, abs(currentValue - value)
 					frames[index] = frame
 
 					# Saving value as previous value.

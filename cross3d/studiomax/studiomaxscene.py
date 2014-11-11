@@ -1488,7 +1488,6 @@ class StudiomaxScene(AbstractScene):
 	def importFBX(self, path, **kwargs):
 
 		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
-
 		args = { "animation":True, 
 				 "cameras":True,
 				 "lights":True,
@@ -2051,71 +2050,107 @@ class StudiomaxScene(AbstractScene):
 		return mxs.rendsavefile
 
 	def resetTimeControllers(self):
-		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
-		alembicCaches = mxs.getClassInstances(mxs.Alembic_Float_Controller)
 
 		# Resetting Alembics to normal playback by instantiating the same expression.
-		controller = mxs.Float_Script(script='S')
-		for cache in alembicCaches:
-			mxs.setPropertyController(cache, 'time', controller) 
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
+		for cache in alembicControllers:
+			mxs.setPropertyController(cache, 'time', mxs.Float_Script(script='S')) 
 
 		# Resetting PCs and TMCs to default playback.
+		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
 		for cache in nativeCaches:
 			cache.playbackType = 0
 
+		# Resetting XMeshes to default playback.
+		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
+		for xMesh in xMeshes:
+			xMesh.enablePlaybackGraph = False
+
 		return True
 				
-	def applyRetimeCurve(self, curve, cachesFrameRate=None):
+	def _applyRetimeNativeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
 		""" See abstract method for more info.
-
-		TODO: Make sure we can also provide an alembic curve.
-
-		Args:
-			curve: Currently only takes a controller.
-			cacheFrameRate: For TMCs and PCs there is not way to detect the frame rate at which they have been created, lame!
 		"""
-		from blur3d.api import SceneAnimationController
-
-		# Works with a blur3d.api.SceneAnimationController.
-		if isinstance(curve, SceneAnimationController):
-			if curve.controllerType() in [ControllerType.BezierFloat, ControllerType.LinearFloat]:
-				controller = curve.nativePointer()
-
-		# Works with a native Max controller.
-		elif mxs.classOf(curve) in [mxs.bezier_float, mxs.linear_float]:
-			controller = curve
-		else:
-			raise Exceptions('Sorry this method only accept keyable controllers like bezier_float or linear_float.')
 
  		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
 
-		# Getting all cache modifiers and controllers.
-		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
-		alembicCaches = mxs.getClassInstances(mxs.Alembic_Float_Controller) + mxs.getClassInstances(mxs.Alembic_Xform)
-
 		# Loading time on alembics by instantiating a single controller.
-		for alembicCache in alembicCaches:
-			mxs.setPropertyController(alembicCache, 'time', controller)
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
+		for alembicController in alembicControllers:
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(alembicController)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+						mxs.setPropertyController(alembicController, 'Time', nativeController)
+
+		# Since the TMC and PC time controllers will take the form of a script that references the provided time controller.
+		# We need to make sure the provided controller is not "floating" otherwise we use a pointer the one we have instanciated on alembics.
+		nativeController = mxs.getPropertyController(alembicController, "Time") if not mxs.refs.dependents(nativeController) else nativeController
 
 		# TODO: Stop supporting PCs and TMCs, they suck, we need to move on.
-		for cache in nativeCaches:
-			cache.playbackType = 3
-			timeScriptController = mxs.Float_Script()
+		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
+		for nativeCache in nativeCaches:
 
-			# This optimized greatly the playback.
-			cache.sampleRate = self.animationFPS() / float(cachesFrameRate)
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(nativeCache)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
 
-			# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
-			if mxs.classof(mxs.Point_Cache):
-				cacheInfo = PointCacheInfo.read(cache.filename, header_only=True)
-			elif mxs.classof(mxs.Transform_Cache):
-				cacheInfo = TMCInfo.read(cache.filename, header_only=True)
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 
-			# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-			timeScriptController.addtarget('retimeCurve', mxs.getPropertyController(alembicCache, "time"))
-			timeScriptController.script = 'retimeCurve * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
-			mxs.setPropertyController(cache, "playbackFrame", timeScriptController)
+						# Setting the playback to curve.
+						nativeCache.playbackType = 3
+						timeScriptController = mxs.Float_Script()
+
+						# This optimized greatly the playback.
+						nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
+
+						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
+						if mxs.classof(mxs.Point_Cache):
+							cacheInfo = PointCacheInfo.read(nativeCache.filename, header_only=True)
+						elif mxs.classof(mxs.Transform_Cache):
+							cacheInfo = TMCInfo.read(nativeCache.filename, header_only=True)
+
+						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+						timeScriptController.addtarget('Time', nativeController)
+						timeScriptController.script = 'Time * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
+						mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
+
+		# TODO: Stop supporting XMesh, Alembic is the industry standard.
+		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
+		for xMesh in xMeshes:
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(nativeCache)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+						# Setting the playback to curve.
+						xMesh.enablePlaybackGraph = True
+						timeScriptController= mxs.Float_Script()
+
+						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+						timeScriptController.addtarget('Time', nativeController)
+						timeScriptController.script = 'Time * %f' % cachesFrameRate
+						mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
 
 		mxs.redrawViews()
 		return True

@@ -28,6 +28,23 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		if ( not name ):
 			return ''
 			
+		try:
+			# Handling nested attributes.
+			maxScript = """fn attributeValue obj = (
+				return obj.{path}
+			)"""
+			mxs.execute(maxScript.format(path=name))
+			if mxs.attributeValue(self._nativePointer) is None:
+				return None
+			else:
+				maxScript = """fn controller obj = (
+					return obj.{path}.controller
+				)"""
+				mxs.execute(maxScript.format(path=name))
+				return mxs.controller(self._nativePointer)
+		except RuntimeError:
+			pass
+
 		# strip out controller references
 		name 	= name.replace( '.controller', '' )
 		parent 	= self._nativePointer
@@ -73,9 +90,26 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		return True
 	
 	def _setNativeController( self, name, nativeController ):
+
 		# strip out controller references
 		name = name.replace( '.controller', '' )
 		
+		# Handling nested attributes.
+		try:
+			maxScript = """fn attributeValue obj = (
+				return obj.{path}
+			)"""
+			mxs.execute(maxScript.format(path=name))
+			if mxs.attributeValue(self._nativePointer) is not None:
+				maxScript = """fn setController obj ctrl = (
+					obj.{path}.controller = ctrl
+				)"""
+				mxs.execute(maxScript.format(path=name))
+				mxs.setController(self._nativePointer, nativeController)
+				return True
+		except RuntimeError:
+			pass
+
 		# look up the parent
 		splt 		= name.split( '.' )
 		parent 		= self._nativePointer
@@ -85,8 +119,8 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 			parent = parent.controller
 			splt = splt[1:]
 		
-		for section in splt[:-1]:
-			parent = mxs.getPropertyController( parent, section )
+		for section in splt:
+			parent = mxs.getPropertyController(parent, section)
 			if ( not parent ):
 				return False
 		
@@ -117,7 +151,6 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		if len(split) == 2:
 			model = self._scene._findNativeObject(split[0])
 			if model and UserProps(model).get('model'):
-				print 'returning', split[1]
 				return split[1]
 
 		# Otherwise we just return the name.

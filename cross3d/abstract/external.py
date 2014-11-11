@@ -47,12 +47,12 @@ class External(QObject):
 	@classmethod
 	@abstractmethod
 	def scriptPath(cls):
-		return r'C:\temp\abstract_script.py'
+		return r'C:\temp\{application}_script.py'.format(application=self.name().lower())
 
 	@classmethod
 	@abstractmethod
 	def scriptLog(cls):
-		return r'C:\temp\abstract_script.log'
+		return r'C:\temp\{application}_script.log'.format(application=self.name().lower())
 	
 	@classmethod
 	def _getRegKey(cls, registry, key, architecture=64):
