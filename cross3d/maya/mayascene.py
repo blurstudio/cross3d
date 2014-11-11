@@ -218,8 +218,8 @@ class MayaScene(AbstractScene):
 				if e.message != '(kInvalidParameter): Object does not exist':
 					raise
 				# Workaround for that fact that Model Nodes are named [ModelName]:Model
-				if not uniqueId and not name.endswith(':Model'):
-					return self._findNativeObject('{}:Model'.format(name), uniqueId=uniqueId)
+				if not uniqueId and not re.match(r'[^:]+:Model\d*', name):
+					return self._findNativeObject('{}:Model*'.format(name), uniqueId=uniqueId)
 				return None
 			obj = om.MObject()
 			sel.getDependNode(0, obj)
