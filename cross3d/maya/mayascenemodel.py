@@ -1,4 +1,5 @@
 import re
+from blurdev.debug import DebugLevel, debugLevel, debugMsg
 import maya.cmds as cmds
 import maya.OpenMaya as om
 
@@ -29,6 +30,35 @@ class MayaSceneModel(AbstractSceneModel):
 		reference in the Reference Editor, it will loose the reference. I plan to change this to lookup
 		the reference node from the namespace.
 	"""
+
+	def _modifiedAttrs(self):
+		""" Returns a dictionary of modifications made to this referenced model.
+		
+		For referneced models return info describing the modifications made by the referencing
+		system.
+		"""
+		modified = {}
+		if self.isReferenced():
+			fullName = self.path()
+			refNode = cmds.referenceQuery(fullName, referenceNode=True)
+			# Build the setAttr pattern
+			pattern = r'setAttr {node}.(?P<attr>[^ ]+)'.format(node = fullName.replace('|', r'\|'))
+			setAttrRegex = re.compile(pattern)
+			# TODO: Add patterns for other mel commands like addAttr, etc
+			for s in cmds.referenceQuery(refNode, editStrings=True):
+				# Process setAttr
+				match = setAttrRegex.match(s)
+				if match:
+					key = match.groupdict()['attr']
+					if s.endswith('"'):
+						# Found a string. Note, this does not include escaped quotes.
+						openingQuote = s[::-1].find('"', 1)
+						value = s[-openingQuote:-1]
+					else:
+						# its not a string
+						value = s.split(' ')[-1]
+					modified.setdefault(key, {}).setdefault('setAttr', {}).update(value=value, command=s)
+		return modified
 
 	def _attrName(self):
 		return '{node}.{attr}'.format(node=self._nativeName(), attr=resolutionAttr)
@@ -245,13 +275,12 @@ class MayaSceneModel(AbstractSceneModel):
 				# If we are going for offloaed.
 				if res == 'Offloaded':
 				
-					# TODO MIKE: How can we only store the local overridden user props?
-					userProps = {}
-					for key, value in self.userProps().iteritems():
-
+					# Copy the user props before offloading the reference so we can add them to the
+					# temp node later.
+					userProps = self.userProps().lookupProps()
+					if resolutionAttr in userProps:
 						# Important: We want to drop the resolution key as it's only used for local models.
-						if not key == resolutionAttr:
-							userProps[key] = value
+						userProps.pop(resolutionAttr)
 
 					# Storing the name of the model root.
 					name = self._mObjName(self._nativePointer, False)
@@ -261,8 +290,7 @@ class MayaSceneModel(AbstractSceneModel):
 						cmds.file(unloadReference=referenceNodeName)
 
 					# Recreating the local model root.
-					from blur3d.api import SceneWrapper, UserProps
-					self._nativePointer = SceneWrapper._asMOBject(cmds.createNode('transform', name=name))
+					self._nativePointer = api.SceneWrapper._asMOBject(cmds.createNode('transform', name=name))
 					self._nativeTransform = self._nativePointer
 
 					# Re-applying user props.
@@ -279,10 +307,7 @@ class MayaSceneModel(AbstractSceneModel):
 				elif currentResolution == 'Offloaded':
 
 					# We store the user props.
-					userProps = {}
-					for key, value in self.userProps().iteritems():
-						if not key == resolutionAttr:
-							userProps[key] = value
+					oldProps = self.userProps().lookupProps()
 
 					# We delete the offloaded local model root.
 					name = self._mObjName(self._nativePointer, False)
@@ -291,17 +316,64 @@ class MayaSceneModel(AbstractSceneModel):
 
 					# If the a reference node does not exists. We create a reference.
 					if not referenceNodeName:
-						reference = cmds.file(path, reference=True, mergeNamespacesOnClash=True, usingNamespaces=True, namespace=namespace)
+						reference = cmds.file(
+								path, 
+								reference=True, 
+								mergeNamespacesOnClash=True, 
+								usingNamespaces=True, 
+								namespace=namespace)
 
 					# Else simply switching the reference preserving any local change.
 					else:
-						reference = cmds.file(path, loadReference=referenceNodeName)
+						cmds.file(path, loadReference=referenceNodeName)
+						reference = cmds.referenceQuery(referenceNodeName, filename=True)
 
 					# Making sure native pointers are re-assigned.
 					self._nativePointer = self._scene._findNativeObject(name)
 					self._nativeTransform = self._nativePointer
 
 					# Re-applying user props.
+					userProps = api.UserProps(self._nativePointer)
+					mods = self._modifiedAttrs()
+					# I've left the debug message inside here in case we need to debug this later
+					debugMsg('{res} {line}'.format(res=resolution, line='-'*80), DebugLevel.Low)
+					debugMsg(unicode(mods.keys()), DebugLevel.Low)
+					for key, value in oldProps.iteritems():
+						debugMsg('	0 "{}"'.format(key), DebugLevel.Low)
+						if key in userProps:
+							debugMsg('	1', DebugLevel.Low)
+							if key == resolutionAttr:
+								# The keys are the same
+								debugMsg('	2 Skipping, Its the resolution attr', DebugLevel.Low)
+								continue
+							if userProps[key] == value:
+								# Do not override values that are the same
+								debugMsg('	3 Skipping {} is the same value'.format(key), DebugLevel.Low)
+								continue
+							if key in mods:
+								debugMsg('\t4 {comp}\n\t\t\t{upVal}\n\t\t\t{modVal}'.format(
+										comp = userProps.escapeValue(value) == mods[key]['setAttr']['value'],
+										upVal = [userProps.escapeValue(value)],
+										modVal = [mods[key]['setAttr']['value']]
+										), DebugLevel.Low)
+								if userProps.escapeValue(value) == mods[key]['setAttr']['value']:
+									# Ignore any modified values that haven't changed while the 
+									# reference was offloaded
+									debugMsg('	skipping, not changed while offloaded {}'.format(key), DebugLevel.Low)
+									continue
+							elif key in userProps:
+								debugMsg('	5 Skipping, Value didnt change while offloaded Key: {key} Values: {value}'.format(
+										key=key, value=unicode([userProps[key], value])), DebugLevel.Low)
+								continue
+						# printing debug data block #-----------------------------------------------
+						if debugLevel() >= DebugLevel.Low:
+							old = ''
+							if key in userProps:
+								old = userProps[key]
+							debugMsg('# Setting {key} value from {old} to {value}'.format(key=key, old=old, value=value), DebugLevel.Low)
+						# End printing debug data block---------------------------------------------
+						userProps[key] = value
+					
 					api.UserProps(self._nativePointer).update(userProps)
 
 					# Re-creating resolution channel box.
@@ -311,7 +383,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# Also you will notice we set the reference path using the reference variable and not the path one.
 					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
 					# You can see that if you look in File > Reference Editor.
-					self.userProps()['reference'] = reference
+					api.UserProps(self._nativePointer)['reference'] = reference
 
 					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
@@ -323,7 +395,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# loading the new reference
 					name = self._mObjName(self._nativePointer, False)
 					# Simply switching the reference preserving any local change.
-					reference = cmds.file(path, loadReference=referenceNodeName)
+					cmds.file(path, loadReference=referenceNodeName)
 					
 					# Find the newly referenced model node
 					# Making sure native pointers are re-assigned.
@@ -334,7 +406,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# Also you will notice we set the reference path using the reference variable and not the path one.
 					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
 					# You can see that if you look in File > Reference Editor.
-					self.userProps()['reference'] = reference
+					api.UserProps(self._nativePointer)['reference'] = cmds.referenceQuery(referenceNodeName, filename=True)
 
 					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
