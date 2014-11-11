@@ -103,6 +103,11 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			return depNode.hasAttribute(name)
 	
 	@classmethod
+	def _isDagNode(cls, mObj):
+		""" Is this object in the DAG. """
+		return mObj.hasFn(om.MFn.kDagNode)
+	
+	@classmethod
 	def _namespace(self, mObj):
 		name = self._mObjName(mObj, False)
 		return re.match(r'((?P<namespace>[^:]+):)?(?P<name>.+)', name).groupdict()
@@ -206,17 +211,33 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:return: OpenMaya.MObject
 		"""
 		with ExceptionRouter():
-			# TODO MIKE: I am handling the character and dependency object for key sets. We need to discuss.
-			if nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kCharacter]:
+			# If its not a dag object, there is no transform to return use the nativeObject
+			if not cls._isDagNode(nativeObject):
 
 				# The world node doesn't play well with the getting transform code.
 				return nativeObject
-				
 			path = om.MDagPath.getAPathTo(nativeObject)
 			newPointer = path.transform()
 			if newPointer != nativeObject:
 				return newPointer
-			return nativeObject
+		return nativeObject
+	
+	@classmethod
+	def _mFnApiTypeMap(cls):
+		""" Creates a dictionary mapping all apiType values to their apiTypeStr. 
+		
+		A few values have duplicate keys so the names are inside a list. This method is intended
+		to be used for api exploration only and should not be used in production code.
+		
+		Returns:
+			dict: A dict mapping int values to a list of OpenMaya.MFn constant names.
+		"""
+		out = {}
+		for name in dir(om.MFn):
+			value = getattr(om.MFn, name)
+			if name.startswith('k'):
+				out.setdefault(value, []).append(name)
+		return out
 	
 	@classmethod
 	def _mObjName(cls, nativeObject, fullName=True):
@@ -227,7 +248,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		:return: nativeObject's name as a string
 		"""
 		with ExceptionRouter():
-			if not nativeObject.hasFn(om.MFn.kCharacter):
+			if cls._isDagNode(nativeObject):
 				dagPath = om.MDagPath.getAPathTo(nativeObject)
 				if fullName:
 					return dagPath.fullPathName()
