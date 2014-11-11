@@ -14,6 +14,7 @@ _useDebug = _blurdev.debug.debugLevel() == _blurdev.debug.DebugLevel.High
 # specify the module you wish to check. This way it will not report the fail to load softimage if you are in max, as this is a expected failure
 _modName = _blurdev.core.objectName()
 
+from classes import FCurve
 from classes import Exceptions
 from classes import FrameRange
 from classes import FileSequence
