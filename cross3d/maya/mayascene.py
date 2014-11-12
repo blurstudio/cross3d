@@ -369,9 +369,11 @@ class MayaScene(AbstractScene):
 				for nativeObject in selection:
 					# Passing the object directly doesnt seem to work.
 					# TODO: Support selecting non-dag objects
-					if not api.SceneWrapper._isDagNode(nativeObject)
+					if api.SceneWrapper._isDagNode(nativeObject):
 						dagPath = om.MDagPath.getAPathTo(nativeObject)
 						tempList.add(dagPath)
+					else:
+						tempList.add(nativeObject)
 				selection = tempList
 			om.MGlobal.setActiveSelectionList(selection)
 		return True
