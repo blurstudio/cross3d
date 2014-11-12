@@ -27,6 +27,8 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 							   ControllerType.ScriptFloat  : mxs.script_float,
 							   ControllerType.AlembicFloat : mxs.Alembic_Float_Controller }
 
+	_slopeDistortions = {24:0.12, 25:0.13, 30:0.187, 60:0.75}
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -128,6 +130,9 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	  		# Creating a new fCurve object.
 	  		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 
+			# Getting the slope distortion based on scene frame rate. On of Max's treats.
+			sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
+
 	  		for key in self.keys():
 	  			key = key.nativePointer()
 	  			
@@ -139,9 +144,9 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				kwargs['value'] = key.value
 				kwargs['time'] = key.time
 
-				# Bare in mind that the Max values are the slopes.
-				kwargs['inTangentAngle'] = math.atan((key.inTangent * 0.1 / 0.12) * 10.0)
-				kwargs['outTangentAngle'] = math.atan((key.outTangent * 0.1 / 0.12) * 10.0)
+				# Bare in mind that inTangent and outTangent are the slopes.
+				kwargs['inTangentAngle'] = math.atan((key.inTangent * 0.1 / sd) * 10.0)
+				kwargs['outTangentAngle'] = math.atan((key.outTangent * 0.1 / sd) * 10.0)
 				kwargs['inTangentType'] = key.inTangentType
 				kwargs['outTangentType'] = key.outTangentType
 
@@ -164,12 +169,16 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
  		tpe = fCurve.type()
  		keys = fCurve.keys()
 
+
  		if tpe and keys:
 
 			# Making a fresh controller.
 			controller = self._abstractToNativeTypes.get(tpe)()
 
 			if controller:
+
+				# Getting the slope distortion based on scene frame rate. On of Max's treats.
+				sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
 
 				# For a reason that falls beyond my comprehension, it is important to set all the keys first.
 				for k in keys:
@@ -188,11 +197,11 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
 					# The Max tangent lenght is actually the distance on the time axis.	
 					key.inTangentLength = math.cos(k.inTangentAngle) * k.inTangentLength
-					key.inTangent = (math.tan(k.inTangentAngle) / 10.0) * 0.12 / 0.1
+					key.inTangent = (math.tan(k.inTangentAngle) / 10.0) * sd / 0.1
 
 					# The Max tangent lenght is actually the distance on the time axis.
 					key.outTangentLength = math.cos(k.outTangentAngle) * k.outTangentLength
-					key.outTangent = (math.tan(k.outTangentAngle) / 10.0) * 0.12 / 0.1
+					key.outTangent = (math.tan(k.outTangentAngle) / 10.0) * sd / 0.1
 							
 					# Restore other key properties.
 					key.inTangentType = mxs.pyhelper.namify(k.inTangentType)
