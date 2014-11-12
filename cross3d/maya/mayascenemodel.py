@@ -336,41 +336,41 @@ class MayaSceneModel(AbstractSceneModel):
 					userProps = api.UserProps(self._nativePointer)
 					mods = self._modifiedAttrs()
 					# I've left the debug message inside here in case we need to debug this later
-					debugMsg('{res} {line}'.format(res=resolution, line='-'*80), DebugLevel.Low)
-					debugMsg(unicode(mods.keys()), DebugLevel.Low)
+					debugMsg('{res} {line}'.format(res=resolution, line='-'*80), DebugLevel.Mid)
+					debugMsg(unicode(mods.keys()), DebugLevel.Mid)
 					for key, value in oldProps.iteritems():
-						debugMsg('	0 "{}"'.format(key), DebugLevel.Low)
+						debugMsg('	0 "{}"'.format(key), DebugLevel.Mid)
 						if key in userProps:
-							debugMsg('	1', DebugLevel.Low)
+							debugMsg('	1', DebugLevel.Mid)
 							if key == resolutionAttr:
 								# The keys are the same
-								debugMsg('	2 Skipping, Its the resolution attr', DebugLevel.Low)
+								debugMsg('	2 Skipping, Its the resolution attr', DebugLevel.Mid)
 								continue
 							if userProps[key] == value:
 								# Do not override values that are the same
-								debugMsg('	3 Skipping {} is the same value'.format(key), DebugLevel.Low)
+								debugMsg('	3 Skipping {} is the same value'.format(key), DebugLevel.Mid)
 								continue
 							if key in mods:
 								debugMsg('\t4 {comp}\n\t\t\t{upVal}\n\t\t\t{modVal}'.format(
 										comp = userProps.escapeValue(value) == mods[key]['setAttr']['value'],
 										upVal = [userProps.escapeValue(value)],
 										modVal = [mods[key]['setAttr']['value']]
-										), DebugLevel.Low)
+										), DebugLevel.Mid)
 								if userProps.escapeValue(value) == mods[key]['setAttr']['value']:
 									# Ignore any modified values that haven't changed while the 
 									# reference was offloaded
-									debugMsg('	skipping, not changed while offloaded {}'.format(key), DebugLevel.Low)
+									debugMsg('	skipping, not changed while offloaded {}'.format(key), DebugLevel.Mid)
 									continue
 							elif key in userProps:
 								debugMsg('	5 Skipping, Value didnt change while offloaded Key: {key} Values: {value}'.format(
-										key=key, value=unicode([userProps[key], value])), DebugLevel.Low)
+										key=key, value=unicode([userProps[key], value])), DebugLevel.Mid)
 								continue
 						# printing debug data block #-----------------------------------------------
-						if debugLevel() >= DebugLevel.Low:
+						if debugLevel() >= DebugLevel.Mid:
 							old = ''
 							if key in userProps:
 								old = userProps[key]
-							debugMsg('# Setting {key} value from {old} to {value}'.format(key=key, old=old, value=value), DebugLevel.Low)
+							debugMsg('# Setting {key} value from {old} to {value}'.format(key=key, old=old, value=value), DebugLevel.Mid)
 						# End printing debug data block---------------------------------------------
 						userProps[key] = value
 					
