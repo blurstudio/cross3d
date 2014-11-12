@@ -368,8 +368,8 @@ class MayaScene(AbstractScene):
 				tempList = om.MSelectionList()
 				for nativeObject in selection:
 					# Passing the object directly doesnt seem to work.
-					# TODO MIKE: Let's analyze that shit together.
-					if not nativeObject.apiType() in [om.MFn.kWorld, om.MFn.kSet, om.MFn.kDependencyNode, om.MFn.kCharacter]: 
+					# TODO: Support selecting non-dag objects
+					if not api.SceneWrapper._isDagNode(nativeObject)
 						dagPath = om.MDagPath.getAPathTo(nativeObject)
 						tempList.add(dagPath)
 				selection = tempList
