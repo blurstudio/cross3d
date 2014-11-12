@@ -350,21 +350,21 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 		# Processing TMCs and PCs.
 		nativeCaches = mxs.getClassInstances(mxs.Transform_Cache, target=np) + mxs.getClassInstances(mxs.Point_Cache, target=np)
-		for cache in nativeCaches:
+		for nativeCache in nativeCaches:
 
 			# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
-			if mxs.classof(cache) == mxs.Point_Cache:
-				cacheInfo = PointCacheInfo.read(cache.filename, header_only=True)
+			if mxs.classof(nativeCache) == mxs.Point_Cache:
+				cacheInfo = PointCacheInfo.read(nativeCache.filename, header_only=True)
 
-			elif mxs.classof(cache) == mxs.Transform_Cache:
-				cacheInfo = TMCInfo.read(cache.filename, header_only=True)
+			elif mxs.classof(nativeCache) == mxs.Transform_Cache:
+				cacheInfo = TMCInfo.read(nativeCache.filename, header_only=True)
 
 			# Playback type 3 is "Playback Graph".
-			cache.playbackType = 3
+			nativeCache.playbackType = 3
 
 			# Set the playback frame to a float controller with start and end values pulled from the cache.
-			mxs.setPropertyController(cache, 'playbackFrame', mxs.bezier_float())
-			timeController = mxs.getPropertyController(cache, 'playbackFrame')
+			mxs.setPropertyController(nativeCache, 'playbackFrame', mxs.bezier_float())
+			timeController = mxs.getPropertyController(nativeCache, 'playbackFrame')
 			
 			# Set keys on the playback frame cache that matches the current frame rate.
 			duration = cacheInfo.start_frame - cacheInfo.end_frame + 1
@@ -376,7 +376,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				key.outTangentType = mxs.pyhelper.namify('linear')
 
 		# Processing XMeshes.
-		xMeshes = mxs.getClassInstances(mxs.Transform_Cache, target=np) + mxs.getClassInstances(mxs.Point_Cache, target=np)
+		xMeshes = mxs.getClassInstances(mxs.Transform_Cache, target=np)
 		for xMesh in xMeshes:
 
 			# Enable curve playback.
@@ -384,7 +384,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 			# Create a new bezier float controller for the time.
 			mxs.setPropertyController(cache, 'playbackGraphTime', mxs.bezier_float())
-			timeController = mxs.getPropertyController(cache, 'playbackGraphTime')
+			timeController = mxs.getPropertyController(xMesh, 'playbackGraphTime')
 
 			# Set keys on the playback in and out frames.
 			frames = (xMesh.rangeFirstFrame, xMesh.rangeLastFrame)
@@ -393,7 +393,26 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				key.value = frame
 				key.inTangentType = mxs.pyhelper.namify('linear')
 				key.outTangentType = mxs.pyhelper.namify('linear')
-						
+
+		# Processing Ray Fire caches.
+		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache, target=np)
+		for rayFireCache in rayFireCaches:
+
+			# Enable curve playback.
+			xMesh.playUseGraph = True
+
+			# Create a new bezier float controller for the time.
+			mxs.setPropertyController(cache, 'playFrame', mxs.bezier_float())
+			timeController = mxs.getPropertyController(cache, 'playFrame')
+
+			# Set keys on the playback in and out frames.
+			frames = (xMesh.rangeFirstFrame, xMesh.rangeLastFrame)
+			for frame in frames:
+				key = mxs.addNewKey(timeController, frame)
+				key.value = frame
+				key.inTangentType = mxs.pyhelper.namify('linear')
+				key.outTangentType = mxs.pyhelper.namify('linear')
+
 		if timeController:
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController(self._scene, timeController)

@@ -30,7 +30,7 @@ class Key(object):
 
 class FCurve(object):
 
-	def __init__(self, name=None, tpe=None):
+	def __init__(self, name='', tpe=ControllerType.BezierFloat):
 		self._name = name
 		self._type = tpe
 		self._keys = []

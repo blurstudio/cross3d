@@ -2077,7 +2077,7 @@ class StudiomaxScene(AbstractScene):
 			rayFireCache.playUseGraph = False
 
 		return True
-				
+		
 	def _applyRetimeNativeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
 		""" See abstract method for more info.
 		"""
