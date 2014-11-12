@@ -2056,8 +2056,10 @@ class StudiomaxScene(AbstractScene):
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
-		for cache in alembicControllers:
-			mxs.setPropertyController(cache, 'time', mxs.Float_Script(script='S')) 
+		for alembicController in alembicControllers:
+			scriptController = mxs.Float_Script()
+			scriptController.script = 'S'
+			mxs.setPropertyController(alembicController, 'time', scriptController) 
 
 		# Resetting PCs and TMCs to default playback.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
@@ -2068,6 +2070,11 @@ class StudiomaxScene(AbstractScene):
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
 		for xMesh in xMeshes:
 			xMesh.enablePlaybackGraph = False
+
+		# Resetting XMeshes to default playback.
+		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
+		for rayFireCache in rayFireCaches:
+			rayFireCache.playUseGraph = False
 
 		return True
 				
@@ -2135,7 +2142,7 @@ class StudiomaxScene(AbstractScene):
 		for xMesh in xMeshes:
 
 			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-			dependents = mxs.refs.dependents(nativeCache)
+			dependents = mxs.refs.dependents(xMesh)
 			for dependent in dependents:
 				if mxs.isProperty(dependent, 'name'):
 					name = dependent.name
@@ -2151,6 +2158,28 @@ class StudiomaxScene(AbstractScene):
 						timeScriptController.addtarget('Time', nativeController)
 						timeScriptController.script = 'Time * %f' % cachesFrameRate
 						mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
+
+		# Handling Ray Fire caches.
+		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
+		for rayFireCache in rayFireCaches:
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(rayFireCache)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+						# Setting the playback to curve.
+						rayFireCache.playUseGraph = True
+						timeScriptController= mxs.Float_Script()
+
+						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+						timeScriptController.addtarget('Time', nativeController)
+						timeScriptController.script = 'Time * %f' % cachesFrameRate
+						mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
 
 		mxs.redrawViews()
 		return True
