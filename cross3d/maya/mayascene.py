@@ -498,6 +498,7 @@ class MayaScene(AbstractScene):
 		args.update(kwargs)
 
 		# TODO: We could handle way more options.
+		mel.eval('loadPlugin -quiet "fbxmaya.mll"')
 		mel.eval('FBXImportSkins -v %s' % unicode(args['envelopes']).lower())
 		mel.eval('FBXImportCameras -v %s' % unicode(args['cameras']).lower())
 		mel.eval('FBXImportLights -v %s' % unicode(args['lights']).lower())
