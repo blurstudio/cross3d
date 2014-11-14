@@ -502,6 +502,7 @@ class MayaScene(AbstractScene):
 		mel.eval('FBXImportCameras -v %s' % unicode(args['cameras']).lower())
 		mel.eval('FBXImportLights -v %s' % unicode(args['lights']).lower())
 		mel.eval('FBXImportFillTimeline -v %s' % unicode(args['fillTimeline']).lower())
+		mel.eval('FBXImportSkeletonDefinitionsAs -v "humanik"')
 		mel.eval('FBXImportAxisConversionEnable -v %s' % unicode(args['axisConversion']).lower())
 
 		if os.path.exists(path):

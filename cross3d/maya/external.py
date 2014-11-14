@@ -56,6 +56,7 @@ class External(AbstractExternal):
 				script = fle.read().format(debug=unicode(debug).lower())
 				
 			scriptPath = os.path.splitext(cls.scriptPath())[0] + '.mel'
+			logPath = os.path.splitext(cls.scriptPath())[0] + '.log'
 			with open(scriptPath, "w") as fle:
 				fle.write(script)
 
@@ -64,8 +65,9 @@ class External(AbstractExternal):
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'mayabatch.exe' if headless else 'maya.exe')
 		print ' '.join([binary, '-script', scriptPath])
-		process = subprocess.Popen([binary, '-script', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
+		process = subprocess.Popen([binary, '-script', scriptPath, '-log', logPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
+		# TODO: Need to figure out a way to return False if the script has failed.
 		return True
 		
 		# TODO: This is the way to check for success. But it is blocking.
