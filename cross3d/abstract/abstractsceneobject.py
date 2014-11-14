@@ -532,6 +532,10 @@ class AbstractSceneObject(SceneWrapper):
 		return False
 
 	@abstractmethod
+	def keyframeTimeControllers(self, alembic=True):
+		return False
+
+	@abstractmethod
 	def keyedFrames(self, start=None, end=None):
 		return []
 		

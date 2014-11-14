@@ -218,7 +218,7 @@ class AbstractApplication(QObject):
 		
 	@abstractmethod
 	def log(self, message):
-		pass
+		print message
 	
 	def undoContext(self, name):
 		"""

@@ -2063,18 +2063,34 @@ class StudiomaxScene(AbstractScene):
 
 		# Resetting PCs and TMCs to default playback.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
-		for cache in nativeCaches:
-			cache.playbackType = 0
+		for nativeCache in nativeCaches:
+
+			if mxs.classOf(nativeCache) == mxs.Point_Cache:
+				nativeCache.sampleRate = 1.0
+
+			nativeCache.playbackType = 0
+			mxs.setPropertyController(nativeCache, "playbackFrame", mxs.bezier_float())
 
 		# Resetting XMeshes to default playback.
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
 		for xMesh in xMeshes:
 			xMesh.enablePlaybackGraph = False
+			mxs.setPropertyController(xMesh, "playbackGraphTime", mxs.bezier_float())
 
 		# Resetting XMeshes to default playback.
 		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
 		for rayFireCache in rayFireCaches:
 			rayFireCache.playUseGraph = False
+			mxs.setPropertyController(rayFireCache, "playFrame", mxs.bezier_float())
+
+		# Resetting Fumes.
+		fumes = mxs.getClassInstances(mxs.FumeFX)
+		for fume in fumes:
+			mxs.setPropertyController(fume, 'TimeValue', mxs.bezier_float())
+			mxs.setPropertyController(fume, 'timescale', mxs.bezier_float())
+			fume.timescale = 1.0
+			mxs.setPropertyController(fume, 'TimeScaleFactor', mxs.bezier_float())
+			fume.TimeScaleFactor = 1.0
 
 		return True
 		
@@ -2119,18 +2135,20 @@ class StudiomaxScene(AbstractScene):
 					# TODO: That check is a little lite.
 					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 
+						# This optimized greatly the playback.
+						if mxs.classOf(nativeCache) == mxs.Point_Cache:
+							nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
+
 						# Setting the playback to curve.
 						nativeCache.playbackType = 3
 						timeScriptController = mxs.Float_Script()
 
-						# This optimized greatly the playback.
-						nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
-
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
+						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
 						if mxs.classof(mxs.Point_Cache):
-							cacheInfo = PointCacheInfo.read(nativeCache.filename, header_only=True)
+							cacheInfo = PointCacheInfo.read(fileName, header_only=True)
 						elif mxs.classof(mxs.Transform_Cache):
-							cacheInfo = TMCInfo.read(nativeCache.filename, header_only=True)
+							cacheInfo = TMCInfo.read(fileName, header_only=True)
 
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 						timeScriptController.addtarget('Time', nativeController)
@@ -2180,6 +2198,36 @@ class StudiomaxScene(AbstractScene):
 						timeScriptController.addtarget('Time', nativeController)
 						timeScriptController.script = 'Time * %f' % cachesFrameRate
 						mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
+	
+		# Handling fumes.
+		fumes = mxs.getClassInstances(mxs.FumeFX)
+		for fume in fumes:
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(fume)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+						# Setting the playback to curve.
+						timeScriptController= mxs.Float_Script()
+						speedScriptController = mxs.Float_Script()
+
+						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+						timeScriptController.addtarget('Time', nativeController)
+						timeScriptController.script = 'Time * %f' % cachesFrameRate
+						mxs.setPropertyController(fume, "TimeValue", timeScriptController)
+
+						# We are now generating a script that computes the derivative of the time curve for the speed curve.
+						speedScriptController.addtarget('Time', nativeController)
+
+						# TODO
+						# speedScriptController.script = '0'
+						# mxs.setPropertyController(fume, "timescale", speedScriptController)
+						# mxs.setPropertyController(fume, "timeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
 		return True

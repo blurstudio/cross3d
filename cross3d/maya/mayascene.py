@@ -10,20 +10,22 @@
 #   :date       09/11/14
 #
 
+import os
 import re
-from collections import OrderedDict
-import collections as _collections
+import maya.mel as mel
 import maya.cmds as cmds
 import maya.OpenMaya as om
 import maya.OpenMayaUI as omUI
 import maya.OpenMayaAnim as oma
+import collections as _collections
 
-from blur3d import pendingdeprecation, constants
-from blur3d.api.abstract.abstractscene import AbstractScene
-from blurdev.enum import enum
-from blurdev import debug
 from blur3d import api
+from blurdev import debug
+from blurdev.enum import enum
+from collections import OrderedDict
+from blur3d import pendingdeprecation, constants
 from blur3d.constants import ObjectType, RotationOrder
+from blur3d.api.abstract.abstractscene import AbstractScene
 
 class MayaScene(AbstractScene):
 	# Create dicts used to map framerates to maya's time units
@@ -409,12 +411,12 @@ class MayaScene(AbstractScene):
 		:return: bool success
 		"""
 		# Maya doesn't appear to allow you to set the fps to a specific value,
-		# so we attempt to find a exact match in our _fpsToTimeUnit dictonary
-		name = self._fpsToTimeUnit.get(fps)
+		# so we attempt to find a exact match in our _timeUnitToConst dictonary
+		name = self._timeUnitToConst.get(fps)
 		if not name:
 			# If there isn't a exact match, find the value closest to the requested fps.
-			closest = min(self._fpsToTimeUnit, key=lambda x: abs(x - fps))
-			name = self._fpsToTimeUnit[closest]
+			closest = min(self._timeUnitToConst, key=lambda x: abs(x - fps))
+			name = self._timeUnitToConst[closest]
 		# Only update the fps if the value is different
 		if name != self._currentTimeUnit():
 			# Only update animation if Seconds is specified
@@ -480,28 +482,30 @@ class MayaScene(AbstractScene):
 	def importFBX(self, path, **kwargs):
 
 		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
-		args = { "animation":True, 
-				 "cameras":True,
-				 "lights":True,
-				 "envelopes":True,
-				 "forceNormEnvelope":False,
-				 "keepXSIEffectors":True,
-				 "skeletonsAsNulls":True,
-				 "scaleFactor":1.0,
-				 "fillTimeline":True,
+		args = { 'animation':True, 
+				 'cameras':True,
+				 'lights':True,
+				 'envelopes':True,
+				 'forceNormEnvelope':False,
+				 'keepXSIEffectors':True,
+				 'skeletonsAsNulls':True,
+				 'scaleFactor':1.0,
+				 'axisConversion':True,
+				 'fillTimeline':True,
 				 'scaleConversion': False,
 				 'converUnit': 'cm' }
 
 		args.update(kwargs)
 
 		# TODO: We could handle way more options.
-		cmds.FBXImportSkins(v=args[envelopes])
-		cmds.FBXImportScaleFactorEnable(v=args['scaleConversion'])
-		cmds.FBXImportCameras(v=args['cameras'])
-		cmds.FBXImportLights(v=args['lights'])
+		mel.eval('FBXImportSkins -v %s' % unicode(args['envelopes']).lower())
+		mel.eval('FBXImportCameras -v %s' % unicode(args['cameras']).lower())
+		mel.eval('FBXImportLights -v %s' % unicode(args['lights']).lower())
+		mel.eval('FBXImportFillTimeline -v %s' % unicode(args['fillTimeline']).lower())
+		mel.eval('FBXImportAxisConversionEnable -v %s' % unicode(args['axisConversion']).lower())
 
 		if os.path.exists(path):
-			cmds.FBXImport(file=path)
+			mel.eval('FBXImport -f "%s" -t -1' % os.path.normpath(path).replace('\\', '\\\\'))
 			return True
 		return False
 
@@ -530,7 +534,11 @@ class MayaScene(AbstractScene):
 		width = cmds.getAttr('defaultResolution.width')
 		height = cmds.getAttr('defaultResolution.height')
 		return QSize(width, height)
-	
+
+	def reset(self, silent=False):
+		cmds.file(new=True, force=silent)
+		return True
+
 	def setRenderSize(self, size):
 		""" Set the render output size for the scene
 			:param size: <QSize>
