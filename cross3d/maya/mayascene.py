@@ -528,6 +528,14 @@ class MayaScene(AbstractScene):
 		"""
 		return cmds.setAttr(key, value)
 	
+	def removeObjects(self, objects):
+		""" removes the objects from the scene
+			\sa			_removeNativeObjects
+			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\return		<bool> success
+		"""
+		return self._removeNativeObjects([ obj._nativeTransform for obj in objects if not obj.isDeleted()])
+	
 	def renderSize(self):
 		""" Return the render output size for the scene
 			:return: <QSize>
