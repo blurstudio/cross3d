@@ -2145,9 +2145,9 @@ class StudiomaxScene(AbstractScene):
 
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
-						if mxs.classof(mxs.Point_Cache):
+						if mxs.classof(nativeCache) == mxs.Point_Cache:
 							cacheInfo = PointCacheInfo.read(fileName, header_only=True)
-						elif mxs.classof(mxs.Transform_Cache):
+						elif mxs.classof(nativeCache) == mxs.Transform_Cache:
 							cacheInfo = TMCInfo.read(fileName, header_only=True)
 
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
