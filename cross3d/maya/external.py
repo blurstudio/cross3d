@@ -60,12 +60,26 @@ class External(AbstractExternal):
 			with open(scriptPath, "w") as fle:
 				fle.write(script)
 
-		# TODO: Unforunately headless mode does not work for now.
+		# TODO: headless mode works now, but requires a blurdev and blur_maya.py plugin update.
 		headless = False
 
+		#--------------------------------------------------------------------------------
+		# Developer's note: When running headless, these three messages are to be expected
+		# I did my testing in Maya 2015 with Bonus Tools installed. The first two lines are because
+		# bifrost doesn't properly check if it is in mayabatch mode. The third is because a script
+		# in Bonus Tools also does not check if its in mayabatch mode.
+		#--------------------------------------------------------------------------------
+		# 1 error generated.
+		# Error while processing C:\Program Files\Autodesk\Maya2015\plug-ins\bifrost\db\presets\__rootincludeall__.h.
+		# Error: file: C:/ProgramData/Autodesk/ApplicationPlugins/MayaBonusTools/Contents/scripts-2015/bonusToolsMenu.mel line 1546: UI commands can't be run in batch mode.
+		#--------------------------------------------------------------------------------
+
 		binary = os.path.join(cls.binariesPath(version, architecture), 'mayabatch.exe' if headless else 'maya.exe')
-		print ' '.join([binary, '-script', scriptPath])
-		process = subprocess.Popen([binary, '-script', scriptPath, '-log', logPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
+		args = [binary, '-script', scriptPath, '-log', logPath]
+		if debug and headless:
+			# run mayabatch inside a cmd.exe prompt so you can see the output of mayabatch
+			args = ['cmd.exe', '/k'] + args
+		process = subprocess.Popen(args, creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
 		# TODO: Need to figure out a way to return False if the script has failed.
 		return True
