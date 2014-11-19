@@ -163,6 +163,14 @@ class MayaSceneObject( AbstractSceneObject ):
 	#							blur3d public methods
 	#--------------------------------------------------------------------------------
 
+	def isHidden(self):
+		""" Returns whether or not this object is hidden """
+		return not cmds.getAttr('{}.visibility'.format(self._mObjName(self._nativePointer)))
+	
+	def setHidden(self, state):
+		""" Hides/unhides this object """
+		return cmds.setAttr('{}.visibility'.format(self._mObjName(self._nativePointer)), not state)
+
 	def namespace(self):
 		# I am not re-using the name method on purpose.
 		name = self._mObjName(self._nativeTransform, False)

@@ -58,6 +58,8 @@ class MayaSceneViewport(AbstractSceneViewport):
 		""" Creates a camera that matches that viewport. """
 		camera = self._scene.createCamera(name, type)
 		camera.matchCamera(self.camera())
+		# Default cameras are hidden. Force the camera visible
+		camera.setHidden(False)
 		return camera
 	
 	def generatePlayblast(
