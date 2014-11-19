@@ -163,20 +163,24 @@ class MayaSceneViewport(AbstractSceneViewport):
 				panel = 'modelPanel4'
 			
 			if geometryOnly:
+				modelEditorOverrides['nurbsSurfaces'] = True
 				modelEditorOverrides['polymeshes'] = True
+				modelEditorOverrides['subdivSurfaces'] = True
 				# HACK: This records the viewport show options, sets them to playblast options, then
 				# restores them
 				# TODO: Make this load the settings from the playblast overrides
-				attrs = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 
+				attrs = ['nurbsCurves', 'nurbsSurfaces', 'cv', 'hulls', 'polymeshes', 
 						'subdivSurfaces', 'planes', 'lights', 'cameras', 'imagePlane', 'joints', 
 						'ikHandles', 'dynamics', 'deformers', 'fluids', 'hairSystems', 'follicles', 
 						'nCloths', 'nParticles', 'nRigids', 'dynamicConstraints', 'locators', 
 						'dimensions', 'pivots', 'handles', 'textures', 'strokes', 'motionTrails', 
 						'pluginShapes', 'clipGhosts', 'greasePencils', 'manipulators', 'grid', 'hud']
-				# Disable display of all of these options
-				modelEditorOverrides.update(dict([(attr, False) for attr in attrs]))
+				# Disable display of all of these options as long as modelEditorOverrides doesnt 
+				# already contain a setting key
+				updateDict = dict([(attr, False) for attr in attrs if attr not in modelEditorOverrides])
+				modelEditorOverrides.update(updateDict)
 				# New features in 2015
-				if api.application.version() > 2014:
+				if api.application.version() > 2014 and 'particleInstancers' not in modelEditorOverrides:
 					modelEditorOverrides.update(particleInstancers=False)
 			
 			if effects == True:
