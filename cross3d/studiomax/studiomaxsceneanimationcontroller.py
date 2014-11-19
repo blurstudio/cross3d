@@ -136,8 +136,14 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	  		for key in self.keys():
 	  			key = key.nativePointer()
 	  			
-	  			# We want the non normalized handle length values.
+	  			# Storing current key values.
 	  			freeHandle = key.freeHandle
+	  			inTangentLength = key.inTangentLength
+	  			inTangentType = key.inTangentType
+	  			outTangentLength = key.outTangentLength
+	  			outTangentType = key.outTangentType
+	  			
+	  			# We want the non normalized handle length values.
 	  			key.freeHandle = True
 
 	  			kwargs ={}
@@ -159,6 +165,10 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
 				# Restoring the key settings.
 				key.freeHandle = freeHandle
+				key.inTangentLength = inTangentLength
+				key.inTangentType = inTangentType
+				key.outTangentLength = outTangentLength
+				key.outTangentType = outTangentType
 
 		return fCurve
 
