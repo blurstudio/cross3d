@@ -235,7 +235,7 @@ class AbstractSceneWrapper(object):
 		if isinstance(controller, api.FCurve):
 			fCurve = controller
 			nativeController = api.SceneAnimationController._abstractToNativeTypes.get(ControllerType.BezierFloat)()
-			controller = api.SceneAnimationController(self, nativeController)
+			controller = api.SceneAnimationController(self._scene, nativeController)
 			controller.setFCurve(fCurve)
 
 		elif not isinstance(controller, SceneAnimationController):
