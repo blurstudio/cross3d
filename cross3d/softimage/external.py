@@ -56,7 +56,7 @@ class External(AbstractExternal):
 				fle.write(script)
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe' if headless else 'xsi.exe')
-		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+		process = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
 		# TODO: This is the way to check for success. But it is blocking.
 		# Writing the log file.
