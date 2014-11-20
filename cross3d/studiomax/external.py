@@ -77,19 +77,8 @@ class External(AbstractExternal):
 		binary = os.path.join(cls.binariesPath(version, architecture), '3dsmax.exe')
 		process = subprocess.Popen([binary, '-U', 'MAXScript', scriptPath], creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
 
+		# TODO: Need to figure out a way to return False if the script has failed.
 		return True
-		
-		# TODO: This is the way to check for success. But it is blocking.
-		# # Writing the log file.
-		# fle = open(cls.scriptLog(), 'w')
-		# fle.write(process.stdout.read())
-		# fle.close()
-
-		# # Checking the error in the log file.
-		# fle = open(cls.scriptLog())
-		# content = fle.read()
-
-		# return False if 'FATAL' in content else True
 
 	@classmethod
 	def _getHkey(cls, version, langId):

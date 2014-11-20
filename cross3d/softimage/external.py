@@ -57,20 +57,18 @@ class External(AbstractExternal):
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe' if headless else 'xsi.exe')
 		pipe = subprocess.Popen([binary, '-processing', '-script', scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-		
-		return True
-		
+
 		# TODO: This is the way to check for success. But it is blocking.
-		# # Writing the log file.
-		# fle = open(cls.scriptLog(), 'w')
-		# fle.write(process.stdout.read())
-		# fle.close()
+		# Writing the log file.
+		fle = open(cls.scriptLog(), 'w')
+		fle.write(process.stdout.read())
+		fle.close()
 
-		# # Checking the error in the log file.
-		# fle = open(cls.scriptLog())
-		# content = fle.read()
+		# Checking the error in the log file.
+		fle = open(cls.scriptLog())
+		content = fle.read()
 
-		# return False if 'FATAL' in content else True
+		return False if 'FATAL' in content else True
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):

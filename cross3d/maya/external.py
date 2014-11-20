@@ -83,19 +83,6 @@ class External(AbstractExternal):
 
 		# TODO: Need to figure out a way to return False if the script has failed.
 		return True
-		
-		# TODO: This is the way to check for success. But it is blocking.
-		# Check what Perry has done here \\source\source\dev\perry\winTest.py.
-		# # Writing the log file.
-		# fle = open(cls.scriptLog(), 'w')
-		# fle.write(process.stdout.read())
-		# fle.close()
-
-		# # Checking the error in the log file.
-		# fle = open(cls.scriptLog())
-		# content = fle.read()
-
-		# return False if 'FATAL' in content else True
 
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):
