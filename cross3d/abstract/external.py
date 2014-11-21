@@ -45,16 +45,6 @@ class External(QObject):
 		return False
 	
 	@classmethod
-	@abstractmethod
-	def scriptPath(cls):
-		return r'C:\temp\{application}_script.py'.format(application=self.name().lower())
-
-	@classmethod
-	@abstractmethod
-	def scriptLog(cls):
-		return r'C:\temp\{application}_script.log'.format(application=self.name().lower())
-	
-	@classmethod
 	def _getRegKey(cls, registry, key, architecture=64):
 		""" Returns a _winreg hkey or none.
 		:param registry: The registry to look in. 'HKEY_LOCAL_MACHINE' for example

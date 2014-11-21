@@ -60,13 +60,12 @@ class External(AbstractExternal):
 
 		# TODO: This is the way to check for success. But it is blocking.
 		# Writing the log file.
-		fle = open(cls.scriptLog(), 'w')
-		fle.write(process.stdout.read())
-		fle.close()
+		with open(cls.scriptLog(), 'w') as fle:
+			fle.write(process.stdout.read())
 
 		# Checking the error in the log file.
-		fle = open(cls.scriptLog())
-		content = fle.read()
+		with open(cls.scriptLog()) as fle:
+			content = fle.read()
 
 		return False if 'FATAL' in content else True
 
