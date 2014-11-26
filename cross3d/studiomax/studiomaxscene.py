@@ -2301,14 +2301,23 @@ class StudiomaxScene(AbstractScene):
 
 	def setAnimationFPS(self, fps, changeType=constants.FPSChangeType.Seconds, callback=None):
 		""" Updates the scene's fps to the provided value and scales existing keys as specified.
-		StudioMax Note: If you have any code that you need to run after changing the fps and plan to use it in
-			3dsMax you will need to pass that code into the callback argument.
-		Maya Note: Maya only supports specific fps settings. If you provide it with a value it doesn't understand,
-			it will be set to the closest matching value. See MayaScene._timeUnitToFPS for valid values.
-		:param fps: The FPS value to set.
-		:param changeType: <constants.FPSChangeType> Defaults to constants.FPSChangeType.Frames
+		
+		If you have any code that you need to run after changing the FPS and plan to use it in 
+		Max you will need to pass that code into the callback argument.
+
+		Although any float can be provided the only supported FPS supported by Max are:
+		1,2,3,4,5,6,8,10,12,15,16,20,24,25,30,32,40,48,50,60,64,75,80,96,100,120,150,160,192,200,240,300,300,320,400,480,600,800,1200,1600,2400,4800
+
+		This can be expressed in Python using "sorted([2**a * 3**b * 5**c for a in range(7) for b in range(2) for c in range(3)])".
+		Thank you Tyler Fox.
+
+		Args:
+			fps(float): The FPS value to set.
+		    changeType(enum): <constants.FPSChangeType> Defaults to constants.FPSChangeType.Frames
 		:param callback: <funciton> Code called after the fps is changed.
-		:return: bool success
+
+		Returns:
+			(bool): Wheter the FPS was set.
 		"""
 
 		# No need to change it if the frameRate is already correct

@@ -272,6 +272,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		if initialViewNumber != 1:
 			mxs.execute( 'max tool maximize' )
 
+		# After storing all these bitmaps. We make sure to flush Max's memory.
 		mxs.gc()
 		
 		return completed

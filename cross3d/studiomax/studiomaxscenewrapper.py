@@ -28,34 +28,35 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		if ( not name ):
 			return ''
 			
-		try:
-			# Handling nested attributes.
-			maxScript = """fn attributeValue obj = (
-				return obj.{path}
+		# Handling nested attributes. The try is here to avoid crashes. 
+		# If you do not believe it, try for yourself.
+		maxScript = """fn attributeValue obj = (
+			value = undefined
+			try value = obj.{path}
+			catch()
+			value
+		)"""
+		mxs.execute(maxScript.format(path=name))
+		if mxs.attributeValue(self._nativePointer) is not None:	
+			maxScript = """fn controller obj = (
+				obj.{path}.controller
 			)"""
 			mxs.execute(maxScript.format(path=name))
-			if mxs.attributeValue(self._nativePointer) is None:
-				return None
-			else:
-				maxScript = """fn controller obj = (
-					return obj.{path}.controller
-				)"""
-				mxs.execute(maxScript.format(path=name))
-				return mxs.controller(self._nativePointer)
-		except RuntimeError:
-			pass
+			controller = mxs.controller(self._nativePointer)
+			if controller is not None:
+				return controller
 
-		# strip out controller references
-		name 	= name.replace( '.controller', '' )
-		parent 	= self._nativePointer
+		# Strip out controller references.
+		name = name.replace('.controller', '')
+		parent = self._nativePointer
 		
 		# look up the parent
-		splt			= name.split('.')
-		controller	 	= None
-		parent			= self._nativePointer
+		splt = name.split('.')
+		controller = None
+		parent = self._nativePointer
 		
-		# start with the transform controller if necessary
-		if ( splt[0] == 'transform' ):
+		# Start with the transform controller if necessary.
+		if (splt[0] == 'transform'):
 			parent = parent.controller
 			controller = parent
 			splt = splt[1:]
