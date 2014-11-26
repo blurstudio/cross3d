@@ -107,7 +107,7 @@ class MayaScene(AbstractScene):
 		"""
 		if unit == None:
 			unit = cls._currentTimeUnit()
-		return MTime(value, cls._fpsToMTime[unit])
+		return om.MTime(value, cls._fpsToMTime[unit])
 	
 	@classmethod
 	def _selectionIter(cls):
@@ -445,7 +445,7 @@ class MayaScene(AbstractScene):
 		playControl = oma.MAnimControl
 		
 		playControl.setAnimationStartEndTime(om.MTime(globalRange[0]), om.MTime(globalRange[1]))
-		playControl.setMinMaxTime(om.MTime(animationRange[0]), om.MTime(animationRange[1]))
+		playControl.setMinMaxTime(self._createMTime(animationRange[0]), self._createMTime(animationRange[1]))
 		return True
 
 	def clearSelection(self):
