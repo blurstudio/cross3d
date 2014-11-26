@@ -118,6 +118,27 @@ class MayaSceneObject( AbstractSceneObject ):
 		"""
 		return self._mObjName(self._nativePointer, True)
 	
+	def _nativeParent(self):
+		""" Looks up the native parent for this object
+			\sa			parent, setParent, _setNativeParent
+			\return		<variant> nativeObject || None
+		"""
+		ret = cmds.listRelatives(self.path(), parent=True)
+		if ret:
+			return self._asMOBject(ret[0])
+		return None
+	
+	def _setNativeParent(self, nativeParent):
+		""" sets the native parent for this object
+			\sa			parent, setParent, _nativeParent
+			\param		<variant> nativeObject || None
+			\return		<bool> success
+		"""
+		if nativeParent:
+			cmds.parent(self._mObjName(self._nativeTransform), self._mObjName(nativeParent))
+			return True
+		return False
+	
 	@property
 	def _nativeTransform(self):
 		""" If you are storing OpenMaya.MObject's long enough for them to become invalidated(opening 
@@ -246,6 +267,22 @@ class MayaSceneObject( AbstractSceneObject ):
 				print 'TRACEBACK: skipping param: {} {}...'.format(key, value)
 				import traceback
 				print traceback.format_exc()
+
+	# Overridden to pass the _nativeTransform, not the _nativePointer
+	def setParent(self, parent):
+		"""Sets the parent for this object to the inputed item
+		
+		:param parent: :class:`blur3d.api.SceneObject` or None
+		"""
+		# set the model in particular
+		if (parent and parent.isObjectType(ObjectType.Model)):
+			return self._setNativeModel(parent.nativePointer())
+
+		nativeParent = None
+		if (parent):
+			# NOTE: !!!!!! passing the native transform not the nativePointer
+			nativeParent = parent._nativeTransform
+		return self._setNativeParent(nativeParent)
 
 	def rotationOrder(self):
 		""" Returns the blur3d.constants.RotationOrder enum for this object or zero """
