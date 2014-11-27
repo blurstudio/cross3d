@@ -122,7 +122,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
  		""" Returns a FCurve object to manipulate or save the curve data.
  		"""
  		fCurve = None
-	  	controllerType = self.controllerType()
+	  	controllerType = self.type()
 	  	
 	  	# We only support controllers that can have keys.
 	  	if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
@@ -132,6 +132,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
 			# Getting the slope distortion based on scene frame rate. On of Max's treats.
 			sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
+
 
 	  		for key in self.keys():
 	  			key = key.nativePointer()
@@ -143,8 +144,12 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	  			outTangentLength = key.outTangentLength
 	  			outTangentType = key.outTangentType
 	  			
-	  			# We want the non normalized handle length values.
-	  			key.freeHandle = True
+	  			# It takes time to set and restore the free handles so I only do it if necessary.
+	  			needsFreeHandle = not (str(inTangentType) == 'linear' and str(outTangentType) == 'linear') and not freeHandle
+	  			if needsFreeHandle:
+
+	  				# We want the non normalized handle length values.
+	  				key.freeHandle = True
 
 	  			kwargs ={}
 				kwargs['value'] = key.value
@@ -163,12 +168,15 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				kwargs['brokenTangents'] = not key.x_locked
 				fCurve.addKey(**kwargs)
 
-				# Restoring the key settings.
-				key.freeHandle = freeHandle
-				key.inTangentLength = inTangentLength
-				key.inTangentType = inTangentType
-				key.outTangentLength = outTangentLength
-				key.outTangentType = outTangentType
+	  			# It takes time to set and restore the free handles so I only do it if necessary.
+	  			if needsFreeHandle:
+
+					# Restoring the key settings.
+					key.freeHandle = freeHandle
+					key.inTangentType = inTangentType
+					key.outTangentType = outTangentType
+					key.inTangentLength = inTangentLength
+					key.outTangentLength = outTangentLength
 
 		return fCurve
 

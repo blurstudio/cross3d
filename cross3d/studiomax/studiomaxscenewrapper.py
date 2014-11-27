@@ -25,8 +25,10 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		return mxs.copy(self._nativePointer)
 	
 	def _nativeController( self, name ):
-		if ( not name ):
-			return ''
+
+		# Checking inputs.
+		if not isinstance(name, basestring):
+			return None
 			
 		# Handling nested attributes. The try is here to avoid crashes. 
 		# If you do not believe it, try for yourself.
