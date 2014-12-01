@@ -34,8 +34,8 @@ class MayaScene(AbstractScene):
 				('show', 48), ('palf', 50), ('ntscf', 60), ('millisec', 1000), 
 				('sec', 1), ('min', 1/60.0), ('hour', 1/3600.0)):
 		_timeUnitToFPS.update({k: v})
-	for val in (2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 40, 75, 80, 100, 120, 150, 
-				200, 240, 250, 300, 375, 400, 500, 600, 750, 1200, 2000, 3000, 6000):
+	for val in (2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 40, 75, 80, 100, 120, 125, 150, 
+				200, 240, 250, 300, 375, 400, 500, 600, 750, 1200, 1500, 2000, 3000, 6000):
 		_timeUnitToFPS.update({'{}fps'.format(val): val})
 	_timeUnitToConst = dict([(v, i) for i, v in _timeUnitToFPS.iteritems()])
 	# This is used because OpenMaya.MTime doesnt't default to the current fps setting
@@ -59,10 +59,10 @@ class MayaScene(AbstractScene):
 	_fpsToMTime.update({'ntsc': om.MTime.kNTSCFrame}) # 30 fps
 	_fpsToMTime.update({'40fps': om.MTime.k40FPS})
 	_fpsToMTime.update({'show': om.MTime.kShowScan}) # 48 fps
-	_fpsToMTime.update({'plaf': om.MTime.kPALField}) # # 50 fps
+	_fpsToMTime.update({'palf': om.MTime.kPALField}) # # 50 fps
 	_fpsToMTime.update({'ntscf': om.MTime.kNTSCField}) # 60 fps
 	_fpsToMTime.update({'75fps': om.MTime.k75FPS})
-	_fpsToMTime.update({'50fps': om.MTime.k80FPS})
+	_fpsToMTime.update({'80fps': om.MTime.k80FPS})
 	_fpsToMTime.update({'100fps': om.MTime.k100FPS})
 	_fpsToMTime.update({'120fps': om.MTime.k120FPS})
 	_fpsToMTime.update({'125fps': om.MTime.k125FPS})
