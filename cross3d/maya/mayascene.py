@@ -444,7 +444,7 @@ class MayaScene(AbstractScene):
 			globalRange = animationRange
 		playControl = oma.MAnimControl
 		
-		playControl.setAnimationStartEndTime(om.MTime(globalRange[0]), om.MTime(globalRange[1]))
+		playControl.setAnimationStartEndTime(self._createMTime(globalRange[0]), self._createMTime(globalRange[1]))
 		playControl.setMinMaxTime(self._createMTime(animationRange[0]), self._createMTime(animationRange[1]))
 		return True
 
