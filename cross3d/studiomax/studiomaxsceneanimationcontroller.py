@@ -49,7 +49,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		"""
 
 		# This method only supports controllers with keys.
-	  	if mxs.classOf(self._nativePointer) in [mxs.bezier_float, mxs.linear_float]:
+		if mxs.classOf(self._nativePointer) in [mxs.bezier_float, mxs.linear_float]:
 			return self._nativePointer.keys
 		return []
 		
@@ -111,47 +111,47 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		"""
 		return '.'.join(mxs.exprForMaxObject(self._nativePointer).split('.')[1:])
 
- 	def valueAtFrame(self, frame):
- 		mxs.execute("""fn getControllerValueAtFrame controller frame = (
-	 		at time frame
-	 		return controller.value
- 		)""")
- 		return mxs.getControllerValueAtFrame(self._nativePointer, frame)
+	def valueAtFrame(self, frame):
+		mxs.execute("""fn getControllerValueAtFrame controller frame = (
+			at time frame
+			return controller.value
+		)""")
+		return mxs.getControllerValueAtFrame(self._nativePointer, frame)
 
- 	def fCurve(self):
- 		""" Returns a FCurve object to manipulate or save the curve data.
- 		"""
- 		fCurve = None
-	  	controllerType = self.type()
-	  	
-	  	# We only support controllers that can have keys.
-	  	if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
+	def fCurve(self):
+		""" Returns a FCurve object to manipulate or save the curve data.
+		"""
+		fCurve = None
+		controllerType = self.type()
+		
+		# We only support controllers that can have keys.
+		if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
 
-	  		# Creating a new fCurve object.
-	  		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
+			# Creating a new fCurve object.
+			fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 
 			# Getting the slope distortion based on scene frame rate. On of Max's treats.
 			sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
 
 
-	  		for key in self.keys():
-	  			key = key.nativePointer()
-	  			
-	  			# Storing current key values.
-	  			freeHandle = key.freeHandle
-	  			inTangentLength = key.inTangentLength
-	  			inTangentType = key.inTangentType
-	  			outTangentLength = key.outTangentLength
-	  			outTangentType = key.outTangentType
-	  			
-	  			# It takes time to set and restore the free handles so I only do it if necessary.
-	  			needsFreeHandle = not (str(inTangentType) == 'linear' and str(outTangentType) == 'linear') and not freeHandle
-	  			if needsFreeHandle:
+			for key in self.keys():
+				key = key.nativePointer()
+				
+				# Storing current key values.
+				freeHandle = key.freeHandle
+				inTangentLength = key.inTangentLength
+				inTangentType = key.inTangentType
+				outTangentLength = key.outTangentLength
+				outTangentType = key.outTangentType
+				
+				# It takes time to set and restore the free handles so I only do it if necessary.
+				needsFreeHandle = not (str(inTangentType) == 'linear' and str(outTangentType) == 'linear') and not freeHandle
+				if needsFreeHandle:
 
-	  				# We want the non normalized handle length values.
-	  				key.freeHandle = True
+					# We want the non normalized handle length values.
+					key.freeHandle = True
 
-	  			kwargs ={}
+				kwargs ={}
 				kwargs['value'] = key.value
 				kwargs['time'] = key.time
 
@@ -168,8 +168,8 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				kwargs['brokenTangents'] = not key.x_locked
 				fCurve.addKey(**kwargs)
 
-	  			# It takes time to set and restore the free handles so I only do it if necessary.
-	  			if needsFreeHandle:
+				# It takes time to set and restore the free handles so I only do it if necessary.
+				if needsFreeHandle:
 
 					# Restoring the key settings.
 					key.freeHandle = freeHandle
@@ -180,15 +180,15 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
 		return fCurve
 
- 	def setFCurve(self, fCurve):
- 		""" Takes a fCurve object data and applies it to the controller.
- 		"""
+	def setFCurve(self, fCurve):
+		""" Takes a fCurve object data and applies it to the controller.
+		"""
 
- 		tpe = fCurve.type()
- 		keys = fCurve.keys()
+		tpe = fCurve.type()
+		keys = fCurve.keys()
 
 
- 		if tpe and keys:
+		if tpe and keys:
 
 			# Making a fresh controller.
 			controller = self._abstractToNativeTypes.get(tpe)()
@@ -232,24 +232,24 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				# It is essential to re-point the native pointer.
 				self._nativePointer = controller
 
- 	def framesForValue(self, value, closest=True):
+	def framesForValue(self, value, closest=True):
 
- 		# TODO: (Douglas) This function is far from being perfect but it does the job.
-  		frames = {}
+		# TODO: (Douglas) This function is far from being perfect but it does the job.
+		frames = {}
 
- 		keys = self.keys()
- 		start = int(round(keys[0].time()))
- 		end = int(round(keys[-1].time()))
- 		index = 0
- 		previousValue = None
- 		closestValue = 0.0
- 		closestFrame = 0
+		keys = self.keys()
+		start = int(round(keys[0].time()))
+		end = int(round(keys[-1].time()))
+		index = 0
+		previousValue = None
+		closestValue = 0.0
+		closestFrame = 0
 
- 		# Looping through frames.
- 		for frame in range(start, end + 1):
- 			currentValue = self.valueAtFrame(frame)
+		# Looping through frames.
+		for frame in range(start, end + 1):
+			currentValue = self.valueAtFrame(frame)
 
- 			if closest:
+			if closest:
 				if abs(value-currentValue) < abs(value-closestValue):
 					closestValue = currentValue
 					closestFrame = frame
