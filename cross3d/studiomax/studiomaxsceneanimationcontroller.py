@@ -238,13 +238,13 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		frames = {}
 
 		keys = self.keys()
+		closestFrame = 0
 		if keys:
 			start = int(round(keys[0].time()))
 			end = int(round(keys[-1].time()))
 			index = 0
 			previousValue = None
 			closestValue = 0.0
-			closestFrame = 0
 
 			# Looping through frames.
 			for frame in range(start, end + 1):
