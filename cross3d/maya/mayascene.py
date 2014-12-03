@@ -446,6 +446,12 @@ class MayaScene(AbstractScene):
 		
 		playControl.setAnimationStartEndTime(self._createMTime(globalRange[0]), self._createMTime(globalRange[1]))
 		playControl.setMinMaxTime(self._createMTime(animationRange[0]), self._createMTime(animationRange[1]))
+		# Ensure the currentFrame is inside the animation range
+		currentFrame = self.currentFrame() 
+		if currentFrame < animationRange[0]:
+			self.setCurrentFrame(animationRange[0])
+		elif currentFrame > animationRange[1]:
+			self.setCurrentFrame(animationRange[1])
 		return True
 
 	def clearSelection(self):
@@ -461,6 +467,19 @@ class MayaScene(AbstractScene):
 			:return: The current File name as a string
 		"""
 		return cmds.file(query=True, sceneName=True)
+	
+	def currentFrame(self):
+		""" returns the current frame
+			\return		<float> frame
+		"""
+		return cmds.currentTime(query=True)
+
+	def setCurrentFrame(self, frame):
+		""" sets the current frame
+			\param		frame <float>
+			\return		<bool> success
+		"""
+		return cmds.currentTime(frame) == frame
 	
 #	def loadFile(self, filename='', confirm=True):
 #		""" Loads the specified filename in the application.
