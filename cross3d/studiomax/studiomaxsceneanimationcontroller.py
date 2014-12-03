@@ -238,32 +238,33 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		frames = {}
 
 		keys = self.keys()
-		start = int(round(keys[0].time()))
-		end = int(round(keys[-1].time()))
-		index = 0
-		previousValue = None
-		closestValue = 0.0
-		closestFrame = 0
+		if keys:
+			start = int(round(keys[0].time()))
+			end = int(round(keys[-1].time()))
+			index = 0
+			previousValue = None
+			closestValue = 0.0
+			closestFrame = 0
 
-		# Looping through frames.
-		for frame in range(start, end + 1):
-			currentValue = self.valueAtFrame(frame)
+			# Looping through frames.
+			for frame in range(start, end + 1):
+				currentValue = self.valueAtFrame(frame)
 
-			if closest:
-				if abs(value-currentValue) < abs(value-closestValue):
-					closestValue = currentValue
-					closestFrame = frame
-			
-			if round(currentValue) == round(value):
-				if previousValue is None or abs(value-currentValue) < abs(value-previousValue):
-					frames[index] = frame
+				if closest:
+					if abs(value-currentValue) < abs(value-closestValue):
+						closestValue = currentValue
+						closestFrame = frame
+				
+				if round(currentValue) == round(value):
+					if previousValue is None or abs(value-currentValue) < abs(value-previousValue):
+						frames[index] = frame
 
-					# Saving value as previous value.
-					previousValue = currentValue
+						# Saving value as previous value.
+						previousValue = currentValue
 
-			elif frames.get(index):
-				index += 1
-				previousValue = None
+				elif frames.get(index):
+					index += 1
+					previousValue = None
 
 		if not frames and closest:
 			return [closestFrame]
