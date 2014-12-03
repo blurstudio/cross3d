@@ -36,8 +36,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 	#--------------------------------------------------------------------------------
 	def _nativeCamera(self):
 		undocumentedPythonFunctionRequirement = om.MDagPath()
-		self._nativePointer.getCamera(undocumentedPythonFunctionRequirement)
-		return undocumentedPythonFunctionRequirement.node()
+		with ExceptionRouter():
+			self._nativePointer.getCamera(undocumentedPythonFunctionRequirement)
+			return undocumentedPythonFunctionRequirement.node()
 		
 	def _setNativeCamera(self, nativeCamera):
 		nativeCamera = api.SceneWrapper._asMOBject(nativeCamera)

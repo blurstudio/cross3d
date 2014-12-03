@@ -23,7 +23,8 @@ class MayaExceptionRouter(object):
 	
 	def __exit__(self, exec_type, exec_value, traceback):
 		if hasattr(exec_value, 'message'):
-			if exec_value.message == '(kInvalidParameter): Argument is a NULL pointer':
+			if exec_value.message in ('(kInvalidParameter): Argument is a NULL pointer',
+									'(kFailure): Object does not exist'):
 				# This exception is raised when you try to access a MObject via MObjectHandle that
 				# no longer exists in the scene.
 				raise Exceptions.InvalidNativeObject('The Native Pointer is invalid')
