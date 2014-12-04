@@ -2087,10 +2087,10 @@ class StudiomaxScene(AbstractScene):
 		fumes = mxs.getClassInstances(mxs.FumeFX)
 		for fume in fumes:
 			mxs.setPropertyController(fume, 'TimeValue', mxs.bezier_float())
-			mxs.setPropertyController(fume, 'timescale', mxs.bezier_float())
-			fume.timescale = 1.0
 			mxs.setPropertyController(fume, 'TimeScaleFactor', mxs.bezier_float())
 			fume.TimeScaleFactor = 1.0
+			mxs.setPropertyController(fume, 'timescale', mxs.bezier_float())
+			fume.timescale = 1.0
 
 		return True
 		
@@ -2214,7 +2214,6 @@ class StudiomaxScene(AbstractScene):
 
 						# Setting the playback to curve.
 						timeScriptController= mxs.Float_Script()
-						speedScriptController = mxs.Float_Script()
 
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 						timeScriptController.addtarget('Time', nativeController)
@@ -2222,12 +2221,17 @@ class StudiomaxScene(AbstractScene):
 						mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
 						# We are now generating a script that computes the derivative of the time curve for the speed curve.
-						speedScriptController.addtarget('Time', nativeController)
+						speedScriptController = mxs.Float_Script()
+						speedScriptController.addObject('Time', nativeController)
 
-						# TODO
-						# speedScriptController.script = '0'
-						# mxs.setPropertyController(fume, "timescale", speedScriptController)
-						# mxs.setPropertyController(fume, "timeScaleFactor", speedScriptController)
+						# Making a float script that approximates the derivative of the time curve.
+						speedScriptController.script = """t = F - 1
+														  a = (at time t (point2 t (Time.value * frameRate)))
+														  t = F + 1
+													 	  b = (at time t (point2 t (Time.value * frameRate)))
+														  c = b - a
+														  c.y / c.x"""					  
+						mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
 		return True
