@@ -2133,15 +2133,15 @@ class StudiomaxScene(AbstractScene):
 					name = dependent.name
 
 					# TODO: That check is a little lite.
-					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude) and mxs.classOf(self._findNativeObject(name)) != mxs.FumeFX:
 
 						# This optimized greatly the playback.
 						if mxs.classOf(nativeCache) == mxs.Point_Cache:
 							nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
 
 						# Setting the playback to curve.
+						print 'SETTING PLAYBACK CURVE', nativeCache, name
 						nativeCache.playbackType = 3
-						timeScriptController = mxs.Float_Script()
 
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
@@ -2150,13 +2150,44 @@ class StudiomaxScene(AbstractScene):
 						elif mxs.classof(nativeCache) == mxs.Transform_Cache:
 							cacheInfo = TMCInfo.read(fileName, header_only=True)
 
-						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+						# Setting up the start frame.
+						# nativeCache.recordStart = cacheInfo.start_frame
+
+						# Creating the time script controller.
+						timeScriptController = mxs.Float_Script()
 						timeScriptController.addtarget('Time', nativeController)
 						timeScriptController.script = 'Time * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
+
+						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 						mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
 
-		# TODO: Stop supporting XMesh, Alembic is the industry standard.
+		# Collecting other types of point caches.
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
+		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
+		fumes = mxs.getClassInstances(mxs.FumeFX)
+
+		if xMeshes or rayFireCaches or fumes:
+
+			# Creating the XMesh and RayFire and Fume instanciated time script controller.
+			timeScriptController= mxs.Float_Script()
+			timeScriptController.addtarget('Time', nativeController)
+			timeScriptController.script = 'Time * %f' % cachesFrameRate
+
+			if fumes:
+
+				# Creating instantiated speed controller for Fume caches.
+				speedScriptController = mxs.Float_Script()
+				speedScriptController.addObject('Time', nativeController)
+
+				# Making a float script that approximates the derivative of the time curve.
+				speedScriptController.script = """t = F - 1
+												  a = (at time t (point2 t (Time.value * frameRate)))
+												  t = F + 1
+											 	  b = (at time t (point2 t (Time.value * frameRate)))
+												  c = b - a
+												  c.y / c.x"""	
+															  
+		# Handling XMesh caches.
 		for xMesh in xMeshes:
 
 			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
@@ -2170,15 +2201,11 @@ class StudiomaxScene(AbstractScene):
 
 						# Setting the playback to curve.
 						xMesh.enablePlaybackGraph = True
-						timeScriptController= mxs.Float_Script()
 
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						timeScriptController.addtarget('Time', nativeController)
-						timeScriptController.script = 'Time * %f' % cachesFrameRate
 						mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
 
-		# Handling Ray Fire caches.
-		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
+		# Handling RayFire caches.
 		for rayFireCache in rayFireCaches:
 
 			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
@@ -2192,15 +2219,11 @@ class StudiomaxScene(AbstractScene):
 
 						# Setting the playback to curve.
 						rayFireCache.playUseGraph = True
-						timeScriptController= mxs.Float_Script()
 
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						timeScriptController.addtarget('Time', nativeController)
-						timeScriptController.script = 'Time * %f' % cachesFrameRate
 						mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
 	
 		# Handling fumes.
-		fumes = mxs.getClassInstances(mxs.FumeFX)
 		for fume in fumes:
 
 			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
@@ -2212,25 +2235,10 @@ class StudiomaxScene(AbstractScene):
 					# TODO: That check is a little lite.
 					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 
-						# Setting the playback to curve.
-						timeScriptController= mxs.Float_Script()
-
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						timeScriptController.addtarget('Time', nativeController)
-						timeScriptController.script = 'Time * %f' % cachesFrameRate
 						mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
-						# We are now generating a script that computes the derivative of the time curve for the speed curve.
-						speedScriptController = mxs.Float_Script()
-						speedScriptController.addObject('Time', nativeController)
-
-						# Making a float script that approximates the derivative of the time curve.
-						speedScriptController.script = """t = F - 1
-														  a = (at time t (point2 t (Time.value * frameRate)))
-														  t = F + 1
-													 	  b = (at time t (point2 t (Time.value * frameRate)))
-														  c = b - a
-														  c.y / c.x"""					  
+						# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
 						mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
