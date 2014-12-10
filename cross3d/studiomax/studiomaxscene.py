@@ -2360,8 +2360,8 @@ class StudiomaxScene(AbstractScene):
 				self._rescaleTime.scaleTimeFinished.connect(finishFrameRate)
 				animRange = self.animationRange()
 				currFrame = self.currentFrame()
-				self.setAnimationRange(FrameRange((0, 10000000)))
-				self._rescaleTime.scaleTime(round(10000000 * mxs.frameRate / float(fps)))
+				self.setAnimationRange(FrameRange((0, 1000000)))
+				self._rescaleTime.scaleTime(round(1000000 * mxs.frameRate / float(fps)))
 			else:
 				mxs.frameRate = round(fps)
 				if callback:
