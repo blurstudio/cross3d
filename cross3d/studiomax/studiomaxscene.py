@@ -2140,7 +2140,6 @@ class StudiomaxScene(AbstractScene):
 							nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
 
 						# Setting the playback to curve.
-						print 'SETTING PLAYBACK CURVE', nativeCache, name
 						nativeCache.playbackType = 3
 
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
@@ -2174,18 +2173,20 @@ class StudiomaxScene(AbstractScene):
 			timeScriptController.script = 'Time * %f' % cachesFrameRate
 
 			if fumes:
-
+				
+				# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
 				# Creating instantiated speed controller for Fume caches.
-				speedScriptController = mxs.Float_Script()
-				speedScriptController.addObject('Time', nativeController)
+				# speedScriptController = mxs.Float_Script()
+				# speedScriptController.addObject('Time', nativeController)
 
 				# Making a float script that approximates the derivative of the time curve.
-				speedScriptController.script = """t = F - 1
-												  a = (at time t (point2 t (Time.value * frameRate)))
-												  t = F + 1
-											 	  b = (at time t (point2 t (Time.value * frameRate)))
-												  c = b - a
-												  c.y / c.x"""	
+				# speedScriptController.script = """t = F - 1
+				# 								  a = (at time t (point2 t (Time.value * frameRate)))
+				# 								  t = F + 1
+				# 							 	  b = (at time t (point2 t (Time.value * frameRate)))
+				# 								  c = b - a
+				# 								  c.y / c.x"""	
+				pass
 															  
 		# Handling XMesh caches.
 		for xMesh in xMeshes:
@@ -2238,8 +2239,9 @@ class StudiomaxScene(AbstractScene):
 						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 						mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
+						# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
 						# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
-						mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
+						# mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
 		return True
