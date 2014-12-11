@@ -68,17 +68,22 @@ class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	@classmethod
 	def _mObjChildren(cls, mObj, recursive=True, regex=None):
+
 		with ExceptionRouter():
 			path = om.MDagPath.getAPathTo(mObj)
 			for index in range(path.childCount()):
 				child = path.child(index)
 				if child.apiType() == om.MFn.kTransform:
-					if not regex or regex.match(api.SceneObject._mObjName(child)):
+					if not regex or regex.match(api.SceneObject._mObjName(child, fullName=False)):
 						yield child
 					if recursive == True:
 						for i in cls._mObjChildren(child, regex=regex):
 							yield i 
-	
+
+	def _findNativeChild(self, name, recursive=False, parent=None):
+		for child in self._nativeChildren(recursive=recursive, wildcard=name, parent=parent):
+			return child
+
 	def _nativeChildren(self, recursive=False, wildcard='', type='', parent='', childrenCollector=[]):
 		"""
 			\remarks	looks up the native children for this object
@@ -101,7 +106,7 @@ class MayaSceneObject( AbstractSceneObject ):
 			expression = application._wildcardToRegex(wildcard)
 			regex = re.compile(expression, flags=re.I)
 		return self._mObjChildren(self._nativeTransform, recursive=recursive, regex=regex)
-	
+
 	def _nativeModel(self):
 		"""
 			\remarks	looks up the native model for this object
