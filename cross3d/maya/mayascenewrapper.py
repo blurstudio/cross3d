@@ -14,11 +14,15 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		''' When passed a object name it will convert it to a MObject. If passed a MObject, it will return the MObject
 		:param obj: A MObject or object name to return as a MObject
 		'''
+
 		if isinstance(obj, basestring):
 			sel = om.MSelectionList()
 			sel.add(obj)
 			obj = om.MObject()
 			sel.getDependNode(0, obj)
+		elif obj.__module__.startswith("pymel"):
+			obj = obj.__apimfn__().object()
+
 		return obj
 	
 	@classmethod
