@@ -140,6 +140,10 @@ class MayaSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		if nativeParent:
+			# Making sure the object is not already child of the new parent. Otherwise Maya throw an error.
+			parents = cmds.listRelatives(self._mObjName(self._nativeTransform), parent=1, fullPath=True)
+			if parents and parents[0] == self._mObjName(nativeParent):
+				return True
 			cmds.parent(self._mObjName(self._nativeTransform), self._mObjName(nativeParent))
 			return True
 		return False

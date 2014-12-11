@@ -74,9 +74,11 @@ class SoftimageSceneObject(AbstractSceneObject):
 			\return		<bool> success
 		"""
 		if nativeParent is None:
-			xsi.Application.Cutobj(self._nativePointer)
-		else:
-			xsi.Application.ParentObj(nativeParent, self._nativePointer)
+			nativeParent = xsi.ActiveSceneRoot
+
+		# Making sure the object is not already a child of the parent, otherwise Softimage throws an error
+		if not self._nativePointer.Parent3DObject.IsEqualTo(nativeParent):
+			nativeParent.AddChild(self._nativePointer)
 		return True
 
 	def _nativeModel(self):
