@@ -265,9 +265,19 @@ global blur3dhelper
 			object.transform.controller = controller
 		),
 
-		function replaceTransformController source target frame = (
+		function replaceTransformController source target frame swapHandedness:false = (
 			at time frame (
-				with animate on target.transform = source.transform
+				if swapHandedness then (
+					mm = source.transform
+					pc = pymax.import "blur3d.lib.cartesian"
+					pm = pc.Matrix4x4.newFromMaxMatrix mm
+					spm = pm.swapHandedness()
+					smm = spm.newMaxMatrix()
+					with animate on target.transform = smm
+				)
+				else (
+					with animate on target.transform = source.transform
+				)
 			)
 		),
 
