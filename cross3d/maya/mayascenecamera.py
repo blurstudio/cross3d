@@ -10,6 +10,16 @@ class MayaSceneCamera(AbstractSceneCamera):
 		# all of its special goodness.
 		self._nativeTypePointer = om.MFnCamera(self._nativePointer)
 
+	def clippingEnabled(self):
+		# As far as I can tell, maya doesn't provide a way to disable the near/far clip planes
+		# so store it as a user prop so we can diff against the camera files.
+		return self.userProps().setdefault('clipping_enabled', False)
+		
+	def setClippingEnabled(self, state):
+		# As far as I can tell, maya doesn't provide a way to disable the near/far clip planes
+		# so store it as a user prop so we can diff against the camera files.
+		self.userProps()['clipping_enabled'] = state
+
 	def farClippingPlane(self):
 		return self._nativeTypePointer.farClippingPlane()
 
