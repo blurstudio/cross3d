@@ -241,16 +241,13 @@ class MayaScene(AbstractScene):
 		# Re-implented to shut-up the abstractmethod warning
 		return nativeValue
 
-#	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
-#		if os.path.exists(path):
-#			model = None
-#			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
-##			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
-#			objects = cmds.file(path, reference=True, returnNewNodes=True)
-#			print objects
-#			
-#			return model
-#		raise Exception('Model file does not exist.')
+	def _nativeMaterials(self, *args, **kwargs):
+		"""The native materials in the scene."""
+		names = cmds.ls(type='shadingEngine')
+		mtls = []
+		for name in names:
+			mtls.append(api.SceneWrapper._asMOBject(name))
+		return mtls
 
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
