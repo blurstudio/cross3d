@@ -112,7 +112,8 @@ class StudiomaxSceneMaterial(AbstractSceneMaterial):
 			obj = mxs.getNodeByName(objName)
 			if obj:
 				obj.material = mtl
-		return StudiomaxSceneMaterial(self._scene, mtl)
+		scn = Scene()
+		return StudiomaxSceneMaterial(scn, mtl)
 	
 	def name(self):
 		"""The name of this material."""
