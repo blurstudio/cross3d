@@ -370,7 +370,6 @@ class StudiomaxScene(AbstractScene):
 
 		if nativeObjects:
 			for nativeObject in nativeObjects:
-				nativeObject.parent = output
 				nativeObject.name = '.'.join([name, nativeObject.name])
 		nativeObjects.append(output)
 		return output
