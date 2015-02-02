@@ -124,7 +124,10 @@ class FileSequence( object ):
 		return True
 	
 	def padding( self ):
-		return len( str( self.nameTokens()[ 'start' ] ) )
+		try:
+			return len( str( self.nameTokens()[ 'start' ] ) )
+		except KeyError:
+			return 0
 		
 	def setPadding( self, padding ):
 		"""
