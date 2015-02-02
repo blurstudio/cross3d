@@ -60,9 +60,6 @@ class External(AbstractExternal):
 			with open(scriptPath, "w") as fle:
 				fle.write(script)
 
-		# TODO: headless mode works now, but requires a blurdev and blur_maya.py plugin update.
-		headless = False
-
 		#--------------------------------------------------------------------------------
 		# Developer's note: When running headless, these three messages are to be expected
 		# I did my testing in Maya 2015 with Bonus Tools installed. The first two lines are because
