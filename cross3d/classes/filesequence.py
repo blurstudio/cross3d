@@ -162,7 +162,7 @@ class FileSequence( object ):
 		
 	def exists( self ):
 		import glob
-		paths = glob.glob( os.path.join( self.basePath(), self.baseName() + '.*.' + self.extension() ) )
+		paths = glob.glob( os.path.join( self.basePath(), self.baseName() + self.nameToken('separator') + '*.' + self.extension() ) )
 		if len( paths ) > 0:
 			return True
 		return False
