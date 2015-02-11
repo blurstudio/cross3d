@@ -320,8 +320,9 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 				# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
 				import cask
-				archive = cask.Archive(alembicController.path)
-				item = archive.top.children[alembicController.identifier]
+				print alembicController.identifier
+				archive = cask.Archive(str(alembicController.path))
+				item = archive.top.children[str(alembicController.identifier)]
 
 				# Sometimes the identifier will point to a Xform object.
 				# Unfortunately I did not find a way to access the sample count from there.
