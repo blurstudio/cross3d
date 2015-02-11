@@ -176,14 +176,14 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
 		""" Creates and returns a new native 3d camera with the inputed name and objects.
 			
 			Args:
 				name: the name of the camera
 				type: The type of camera. Defaults to Standard
 				target: The target object. Defaults to None
-				rotationOrder: The rotation order of the camera. Defaults to zxy
+				rotationOrder: The rotation order of the camera. Defaults to SceneCamera.defaultRotationOrder
 			
 			Returns:
 				nativeCamera || None
@@ -1522,10 +1522,18 @@ class AbstractScene(QObject):
 			return model
 		return None
 
-	def createCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.XYZ):
-		"""
-			\remarks	creates a new camera with the inputed name and returns it
-			\return		<blur3d.api.SceneObject> || None
+	def createCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
+		""" Creates a new camera in the scene.
+		
+		Args:
+			name (str): The name of the camera. Defaults to 'Camera'
+			type (str): the type of camera. Defaults to 'Standard'
+			target (blur3d.api.SceneObject): Used as the target of the camera. Defaults to None
+			rotationOrder (blur3d.constants.RotationOrder): Rotation order for the camera. Defaults
+				to None. If None, it will use the value of SceneCamera.defaultRotationOrder.
+		
+		Returns:
+			blur3d.api.SceneCamera: The created camera.
 		"""
 		if target:
 			nativeCamera = self._createNativeCamera(

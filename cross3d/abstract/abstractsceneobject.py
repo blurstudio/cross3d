@@ -13,7 +13,7 @@ from blur3d import api
 from PyQt4.QtGui import QColor
 from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
-from blur3d.constants import ObjectType
+from blur3d.constants import ObjectType, RotationOrder
 
 class AbstractSceneObject(SceneWrapper):
 
@@ -653,6 +653,16 @@ class AbstractSceneObject(SceneWrapper):
 		:return: :class:`PyQt4.QtGui.QColor`
 		"""
 		return self._scene._fromNativeValue(self._nativeWireColor())
+
+	@classmethod
+	@abstractmethod
+	def defaultRotationOrder(cls):
+		""" The default rotation order when creating new cameras.
+		
+		Returns:
+			blur3d.constants.RotationOrder
+		"""
+		return RotationOrder.XYZ
 
 	@abstractmethod
 	def deleteProperty(self, propertyName):

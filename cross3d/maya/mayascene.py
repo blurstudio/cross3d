@@ -147,7 +147,7 @@ class MayaScene(AbstractScene):
 	#--------------------------------------------------------------------------------
 	#							blur3d private methods
 	#--------------------------------------------------------------------------------
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=RotationOrder.ZXY):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
 		""" Implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
 			:param name: <str>
 			:return: <variant> nativeCamera || None
@@ -161,6 +161,8 @@ class MayaScene(AbstractScene):
 			tform, shape = cmds.camera()
 			
 			# Set the rotation order for the camera.
+			if rotationOrder == None:
+				rotationOrder = api.SceneCamera.defaultRotationOrder()
 			api.SceneObject._setNativeRotationOrder(tform, rotationOrder)
 			
 			nativeCamera = api.SceneWrapper._asMOBject(shape)

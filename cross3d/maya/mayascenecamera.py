@@ -2,6 +2,7 @@ import maya.OpenMaya as om
 import blur3d.api
 import math
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
+from blur3d.constants import RotationOrder
 
 class MayaSceneCamera(AbstractSceneCamera):
 	def __init__(self, scene, nativeCamera, target=None):
@@ -19,6 +20,15 @@ class MayaSceneCamera(AbstractSceneCamera):
 		# As far as I can tell, maya doesn't provide a way to disable the near/far clip planes
 		# so store it as a user prop so we can diff against the camera files.
 		self.userProps()['clipping_enabled'] = state
+
+	@classmethod
+	def defaultRotationOrder(cls):
+		""" The default rotation order when creating new cameras.
+		
+		Returns:
+			blur3d.constants.RotationOrder
+		"""
+		return RotationOrder.ZXY
 
 	def farClippingPlane(self):
 		return self._nativeTypePointer.farClippingPlane()

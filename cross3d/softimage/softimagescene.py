@@ -382,7 +382,7 @@ class SoftimageScene(AbstractScene):
 		fact.AddItems(nativeObjects)
 		return root.addModel(fact, name)
 		
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
 		"""
 			\remarks	implements the AbstractScene._createNativeCamera method to return a new Softimage camera
 			\param		name			<str>

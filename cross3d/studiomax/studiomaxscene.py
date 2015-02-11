@@ -406,7 +406,7 @@ class StudiomaxScene(AbstractScene):
 			return name
 		return ''
 
-	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=constants.RotationOrder.ZXY):
+	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
 		"""
 			\remarks	implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
 			\param		name			<str>
