@@ -30,6 +30,19 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
     # 												public methods
     #-------------------------------------------------------------------------
 
+    def addProceduralShake(self):
+
+        listController = mxs.rotation_list()
+        mxs.setPropertyController(self._nativePointer.controller, 'rotation', listController)
+
+        noise = mxs.Noise_rotation()
+        noise.frequency = 0.05
+        noise.fractal = False
+        
+        mxs.setPropertyController(listController, 'Available', noise)
+
+        return True
+
     def animateTurntable(self, objects=[], startFrame=0, endFrame=100):
         """
                 \remarks	Animates the camera around (and properly framing) the given object(s).

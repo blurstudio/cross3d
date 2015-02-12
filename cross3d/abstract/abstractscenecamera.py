@@ -44,6 +44,10 @@ class AbstractSceneCamera(SceneObject):
 		"""
 		return False
 
+	@abstractmethod
+	def addProceduralShake(self):
+		return False
+
 	def target(self):
 		return self._target
 
