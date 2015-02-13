@@ -43,8 +43,10 @@ class AbstractSceneSubmitter(SceneWrapper):
 		# initialize the SceneWrapper base class
 		SceneWrapper.__init__(self, scene, None)
 
+		# TODO: This class should not be using trax records, remove this or move it.
+		from blur3d.pipe.cinematic.api import Scene
 		# initialize the default job settings based on the scene
-		element = scene.currentElement()
+		element = scene.element()
 		filename = scene.currentFileName()
 
 		self._submitType = submitType
