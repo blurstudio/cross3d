@@ -367,6 +367,14 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		"""
 		cmds.rename(self.path(), ':'.join([self.namespace(), name]))
 	
+	def setUniqueId(self, uniqueId):
+		""" Unique Id is read only and can not be set in Maya """
+		return False
+
+	def uniqueId(self):
+		""" Return the unique id for this controller instance """
+		return self._nativeHandle.hashCode()
+	
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'SceneWrapper', MayaSceneWrapper )
