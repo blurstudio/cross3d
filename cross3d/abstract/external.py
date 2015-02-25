@@ -13,6 +13,7 @@
 from PyQt4.QtCore import QObject
 from blur3d import abstractmethod
 from blur3d.constants import ScriptLanguage
+from blur3d	import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -45,6 +46,7 @@ class External(QObject):
 		return False
 	
 	@classmethod
+	@pendingdeprecation('This function will be removed once blurdev r16889 or newer is distributed. Use blurdev.osystem.getRegKey instead.')
 	def _getRegKey(cls, registry, key, architecture=64):
 		""" Returns a _winreg hkey or none.
 		:param registry: The registry to look in. 'HKEY_LOCAL_MACHINE' for example
@@ -67,6 +69,7 @@ class External(QObject):
 		return regKey
 	
 	@classmethod
+	@pendingdeprecation('This function will be removed once blurdev r16889 or newer is distributed. Use blurdev.osystem.listRegKeyValues instead.')
 	def _listRegKeyValues(cls, registry, key, architecture=64):
 		""" Returns a list of child keys and their values as tuples.
 		Each tuple contains 3 items.
@@ -88,6 +91,7 @@ class External(QObject):
 		return ret
 	
 	@classmethod
+	@pendingdeprecation('This function will be removed once blurdev r16889 or newer is distributed. Use blurdev.osystem.listRegKeys instead.')
 	def _listRegKeys(cls, registry, key, architecture=64):
 		import _winreg
 		regKey = cls._getRegKey(registry, key, architecture=architecture)
@@ -103,6 +107,7 @@ class External(QObject):
 		return ret
 	
 	@classmethod
+	@pendingdeprecation('This function will be removed once blurdev r16889 or newer is distributed. Use blurdev.osystem.registryValue instead.')
 	def _registryValue(cls, registry, key, value_name, architecture=64):
 		""" Returns the value of the provided registry key's value name.
 		:param registry: The registry to look in. 'HKEY_LOCAL_MACHINE' for example
