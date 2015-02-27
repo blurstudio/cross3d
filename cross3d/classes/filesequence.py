@@ -11,10 +11,11 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
-import subprocess
 import re
+import subprocess
 
 from framerange import FrameRange
+from blur3d.constants import VideoCodec
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -226,7 +227,7 @@ class FileSequence( object ):
 			if os.path.exists( path ):
 				os.remove( path )
 
-	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg' ):
+	def generateMovie( self, outputPath=None, fps=30, ffmpeg='ffmpeg', videoCodec=VideoCodec.PhotoJPEG):
 		if not outputPath:
 			outputPath = os.path.join(( self.basePath() ), self.baseName() + '.mov' )
 		extension = os.path.splitext( outputPath )[1]
@@ -251,7 +252,18 @@ class FileSequence( object ):
 			outputBasePath = os.path.split( outputPath )[0]
 			if not os.path.exists( outputBasePath ):
 				os.makedirs( outputBasePath )
-			command = [ ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath ]
+
+			if videoCodec == VideoCodec.PhotoJPEG:
+				command = [ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath]
+
+			# TODO: GIF Implementation is a bit wonky right now.
+			elif videoCodec == VideoCodec.GIF:
+				command = [ffmpeg, '-r', str( fps ), "-i", normalisedSequence.codePath(), '-pix_fmt', 'rgb24','-y', outputPath.replace('.mov', '.gif')]
+
+			# TODO: Implement H264.
+			elif videoCodec == VideoCodec.H264:
+				command = [ffmpeg ]
+
 			process = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE )
 			process.communicate()
 			normalisedSequence.delete()
