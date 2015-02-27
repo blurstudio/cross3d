@@ -41,7 +41,7 @@ class SoftimageScene(AbstractScene):
 			\return		<PySoftimage.xsi.X3DObject> nativeObject || None
 		"""
 		if referenced:
-			return xsi.SICreateRefModel(path, name, resolution, '', loaded, createFile)('Value')
+			return xsi.SICreateRefModel(path, name, resolution, '', load, createFile)
 		return xsi.ImportModel(path, '', '', '', name)('Value')
 		
 	def _removeNativeModels(self, models):
