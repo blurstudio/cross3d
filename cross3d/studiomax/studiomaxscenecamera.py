@@ -10,6 +10,7 @@
 #
 
 import os
+import random
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
 from blur3d.constants import CameraType
@@ -38,7 +39,16 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         noise = mxs.Noise_rotation()
         noise.frequency = 0.05
         noise.fractal = False
+        noise.seed = random.randint(0, 10000000)
+
+        # Got lazy here, did not have time to find the Python way to do it.
+        maxScript = """fn setNoiseControllerStrength noiseController x y z = (
+            noiseController.noise_strength = [x, y, z]
+        )"""
         
+        mxs.execute(maxScript)
+        weirdFactor = 57.296
+        mxs.setNoiseControllerStrength(noise, 0.4/weirdFactor, 0.4/weirdFactor, 0.1/weirdFactor)
         mxs.setPropertyController(listController, 'Available', noise)
 
         return True
