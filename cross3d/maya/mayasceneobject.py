@@ -302,6 +302,15 @@ class MayaSceneObject( AbstractSceneObject ):
 			enumValues = enumValues[0].split(':')
 		return RotationOrder.valueByLabel(enumValues[selected].upper())
 
+	def shapes(self):
+		""" Returns a generator used to access all shape nodes that are children of this object
+		
+		Returns:
+			generator: SceneObjects representing the shape children of this object
+		"""
+		for nativeObject in self._getchildShapeNodes(self._nativeTransform):
+			yield api.SceneObject(self._scene, nativeObject)
+
 	@classmethod
 	def _setNativeRotationOrder(cls, nativePointer, order):
 		""" Sets the transform rotation order for the provided object to the provided value.

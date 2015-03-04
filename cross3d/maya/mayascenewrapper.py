@@ -187,13 +187,35 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 #			plug.setNumElements(value)
 #		elif isinstance(value, ShortInt):
 #			plug.setShort(value)
+	@classmethod
+	def _getchildShapeNodes(cls, nativeObject):
+		""" A Maya helper that returns a generator of all shape nodes for the provided transform node.
 		
+		Args:
+			nativeObject (OpenMaya.MObject): The object to get the shape nodes of.
+		"""
+		if nativeObject.apiType() == om.MFn.kTransform:
+			path = om.MDagPath.getAPathTo(nativeObject)
+			numShapes = om.MScriptUtil()
+			numShapes.createFromInt(0)
+			numShapesPtr = numShapes.asUintPtr()
+			path.numberOfShapesDirectlyBelow(numShapesPtr)
+			for index in range(om.MScriptUtil(numShapesPtr).asUint()):
+				p = om.MDagPath.getAPathTo(nativeObject)
+				p.extendToShapeDirectlyBelow(index)
+				yield p.node()
+	
 	@classmethod
 	def _getShapeNode(cls, nativeObject):
 		""" A Maya Helper that returns the first shape node of the provided transform node.
-		If no shape node exists the nativeObject is returned
-		:param nativeObject: The OpenMaya.MObject to get the shape node of
-		:return: OpenMaya.MObject
+		
+		If no shape node exists the nativeObject is returned.
+		
+		Args:
+			nativeObject (OpenMaya.MObject): The MObject to get the first shape node from.
+		
+		Returns:
+			OpenMaya.MObject: The first shape node of the transform or the passed in object.
 		"""
 		if nativeObject.apiType() == om.MFn.kTransform:
 			path = om.MDagPath.getAPathTo(nativeObject)

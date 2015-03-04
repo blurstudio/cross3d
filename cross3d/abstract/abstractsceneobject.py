@@ -617,6 +617,15 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		return self._setNativeWireColor(self._scene._toNativeValue(QColor(color)))
 
+	@abstractmethod
+	def shapes(self):
+		""" Returns a generator used to access all shape nodes that are children of this object
+		
+		Returns:
+			generator: SceneObjects representing the shape children of this object
+		"""
+		yield self
+
 	def translate(self, axes, relative=False):
 		"""
 		:param axes: A list with a length of 3 floats representing x, y, z
