@@ -194,8 +194,10 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		# If the viewport is using Nitrous.
 		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
-			# TODO: Make sure we store and activate progressive rendering state.
-			pass
+			# Storing and setting up Nitrous options.
+			nitrousSettings = mxs.NitrousGraphicsManager.GetActiveViewportSetting()
+			initialFadingFactor = nitrousSettings.ProgressiveFadingFactor 
+			nitrousSettings.ProgressiveFadingFactor = 0
 			
 		# For each frame.	
 		for frame in range( frameRange[0], frameRange[1] + 1 ):
@@ -214,9 +216,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 				if camera.hasMultiPassEffects() and effects in [None, True]:
 					
 					# If we use a Nitrous viewport, we compute the depth of field the new way.
+					passes = 0
 					if nitrous:
 						while not mxs.NitrousGraphicsManager.isProgressiveRenderingFinished():
 							mxs.NitrousGraphicsManager.progressiveRendering()
+							passes += 1
+							if passes == 32:
+								break
 
 					# Otherwise we compute it the old way by using the API method.
 					else:
@@ -266,8 +272,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		# Restoring Nitrous settings.
 		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
-			# TODO: Restore progressive rendering state.
-			pass
+			# Restoring Nitrous settings.
+			nitrousSettings.ProgressiveFadingFactor = initialFadingFactor
 			
 		if initialViewNumber != 1:
 			mxs.execute( 'max tool maximize' )
