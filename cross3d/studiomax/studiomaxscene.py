@@ -23,6 +23,7 @@ from PyQt4.QtCore import QTimer
 from blur3d.api import UserProps
 from blur3d.api import application
 from blur3d.lib.tmclib import TMCInfo
+from blur3d.constants import UpVector
 from blur3d.constants import ControllerType
 from blur3d.lib.pclib import PointCacheInfo
 from blur3d import pendingdeprecation, constants
@@ -1596,7 +1597,7 @@ class StudiomaxScene(AbstractScene):
 				return True
 		return False
 
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y):
 		"""
 		Exports a given set of objects as FBX.
 		
@@ -1670,7 +1671,7 @@ class StudiomaxScene(AbstractScene):
 					preset = f.read()
 					cached_presets[preset_path] = preset
 
-			preset = template.format(user=user, start=frameRange[0], end=frameRange[1])
+			preset = template.format(user=user, start=frameRange[0], end=frameRange[1], upVector=UpVector.labelByValue(upVector))
 			
 			try:
 				# Creating the path to the preset if not existing.

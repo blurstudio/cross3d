@@ -22,7 +22,7 @@
 import collections as _collections
 
 from blur3d import api
-from blur3d import constants
+from blur3d.constants import UpVector
 from PyQt4.QtCore import QObject, pyqtSignal
 from blur3d	import abstractmethod, pendingdeprecation, constants
 
@@ -1332,7 +1332,7 @@ class AbstractScene(QObject):
 		"""
 		return False
 		
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
@@ -2577,12 +2577,12 @@ class AbstractScene(QObject):
 		from blur3d.api import application
 		return application
 
-	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None):
+	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
 		"""
-		return self._exportNativeObjectsToFBX([ obj.nativePointer() for obj in objects ], path, frameRange, showUI, frameRate)
+		return self._exportNativeObjectsToFBX([obj.nativePointer() for obj in objects], path, frameRange, showUI, frameRate, upVector)
 
 	@pendingdeprecation('Use Scene.objects( type=ObjectType.Model )')
 	def models(self):

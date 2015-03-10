@@ -16,6 +16,7 @@ import time
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
+from blur3d.constants import UpVector
 from blurdev.decorators import stopwatch
 from blur3d import pendingdeprecation, constants
 from blur3d.api import application, dispatch, FrameRange
@@ -270,7 +271,7 @@ class SoftimageScene(AbstractScene):
 		self.setSilentMode(False)
 		return renderPass
 	
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y):
 		""" Exports a given set of nativeObjects as FBX.
 		
 		Args:

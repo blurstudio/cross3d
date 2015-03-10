@@ -34,6 +34,14 @@ class AbstractSceneModel(SceneObject):
 		return []
 
 	@abstractmethod
+	def explode(self):
+		return False
+
+	@abstractmethod
+	def recompose(self):
+		return False
+
+	@abstractmethod
 	def _addNativeObjects(self, nativeObjects):
 		return False
 

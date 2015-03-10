@@ -16,6 +16,12 @@ from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
 
 class StudiomaxSceneModel( AbstractSceneModel ):
 
+	def __init__(self, scene, nativeObject):
+		super(self.__class__, self).__init__(scene, nativeObject)
+
+		# The vault is used when exploding or recomposing a model.
+		self._vault = {}
+
 	def _addNativeObjects(self, nativeObjects):
 		for nativeObject in nativeObjects:
 			nativeObject.name = '.'.join([self.displayName(), nativeObject.name])
@@ -43,40 +49,57 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 	def resolution(self):
 		return self.userProps().get('resolution', '')
 
-	def export(self, fileName):
-		name = self.displayName()
-		objects = self._nativeObjects()
-		groups = self._nativeGroups()
+	def explode(self):
+		self._vault['name'] = self.displayName()
+		self._vault['nativeObjects'] = self._nativeObjects()
+		self._vault['nativeGroups'] = self._nativeGroups()
 
 		# Removing the name space on objects.
-		for obj in objects:
-			obj.name = obj.name.replace(name + '.', '')
+		for obj in self._vault['nativeObjects']:
+			obj.name = obj.name.replace(self._vault['name'] + '.', '')
 
 		# Removing the name space on layers.
-		for group in groups:
-			group.setName(group.name.replace(name, 'Model'))
+		for group in self._vault['nativeGroups']:
+			group.setName(group.name.replace(self._vault['name'], 'Model'))
 
 		# Removing the name space on model.
 		self._nativePointer.name = 'Model'
 
+	def recompose(self):
+		name =  self._vault.get('name')
+		if name:
+
+			# Restoring the name space on objects.
+			for obj in self._vault.get('nativeObjects'):
+				obj.name = '.'.join([name, obj.name])
+
+			# Restoring the name space on layers.
+			for group in self._vault.get('nativeGroups'):
+				group.setName(group.name.replace('Model', name))
+
+			# Restoring the name space on model.
+			self._nativePointer.name = name
+
+			# Running the delayed sceneSaveFinished signal.
+			dispatch.dispatch('sceneSaveFinished', self._scene.currentFileName())
+
+			# Clearing the temporary holders.
+			self._vault['name'] = None
+			self._vault['nativeObjects'] = None
+			self._vault['nativeGroups'] = None
+
+	def export(self, fileName):
+
+		# Exploding in Max means basically loosing the name space.
+		self.explode()
+
 		# ExportNativeObjects call will trigger sceneSaveFinished and scene data is invalid until the name space is restored.
 		dispatch.blockSignals(True)
-		self._scene._exportNativeObjects(objects + [self._nativePointer], fileName)
+		self._scene._exportNativeObjects(self._vault.get('nativeObjects') + [self._nativePointer], fileName)
 		dispatch.blockSignals(False)
 
-		# Restoring the name space on objects.
-		for obj in objects:
-			obj.name = '.'.join([name, obj.name])
-
-		# Restoring the name space on layers.
-		for group in groups:
-			group.setName(group.name.replace('Model', name))
-
-		# Restoring the name space on model.
-		self._nativePointer.name = name
-
-		# Running the delayed sceneSaveFinished signal.
-		dispatch.dispatch('sceneSaveFinished', self._scene.currentFileName())
+		# Recomposing reverts the name space.
+		self.recompose()
 
 	def _nativeGroups(self, wildcard='*'):
 		"""
