@@ -8,6 +8,48 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function buildLightMeterBox position width:100 length:100 wSegs:3 lSegs:3 = (
+			lm1 = VRayLightMeter()
+			lm2 = VRayLightMeter()
+			lm3 = VRayLightMeter()
+			lm4 = VRayLightMeter()
+			lm5 = VRayLightMeter()
+			lm6 = VRayLightMeter()
+			lm2.rotation = (eulerAngles 0 90 0)
+			lm3.rotation = (eulerAngles 90 0 90)
+			lm5.rotation = (eulerAngles 0 -90 0)
+			lm6.rotation = (eulerAngles -90 0 -90)
+			lms = #(lm1, lm2, lm3, lm4, lm5, lm6)
+			for lm in lms do (
+				lm.pos = position
+				lm.width = width
+				lm.length = length
+				lm.wSegs = wSegs
+				lm.lSegs = lSegs
+			)
+			lms
+		),
+
+		function getAverageLightEnergyAtPosition position = (
+			meters = buildLightMeterBox position
+			averages = #()
+			for meter in meters do (
+				meter.calculate()
+				mAvg = for energy in meter.total collect energy
+				ttl = 0
+				for avg in mAvg do (
+					ttl = (avg + ttl)
+				)
+				append averages (ttl / mAvg.count)
+			)
+			delete meters
+			ttl = 0
+			for avg in averages do (
+				ttl = (ttl + avg)
+			)
+			ttl / averages.count
+		),
+
 		function getMeshElements obj = (
 			elements = #()
 			prev = #()
