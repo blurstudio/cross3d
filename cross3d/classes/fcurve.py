@@ -150,7 +150,7 @@ class FCurve(object):
 		"""
 		if isinstance(other, FCurve):
 
-			if blurdev.debug.debugLevel() == blurdev.debug.DebugLevel.Mid: 
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid: 
 				with open(r'C:\temp\fCurve.xml', 'w') as fle:
 					fle.write(self.toXML())
 				with open(r'C:\temp\otherFCurve.xml', 'w') as fle:

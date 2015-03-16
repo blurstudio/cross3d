@@ -12,6 +12,7 @@
 
 import os
 import re
+import blurdev
 import subprocess
 
 from framerange import FrameRange
@@ -264,9 +265,15 @@ class FileSequence( object ):
 			elif videoCodec == VideoCodec.H264:
 				command = [ffmpeg ]
 
-			process = subprocess.Popen( command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE )
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid: 
+				print 'SEQUENCE TO MOVIE COMMAND: {}'.format(' '.join(command))
+
+			process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
 			process.communicate()
-			normalisedSequence.delete()
+
+			if blurdev.debug.debugLevel() < blurdev.debug.DebugLevel.Mid: 
+				normalisedSequence.delete()
+				
 			return True
 		else:
 			raise Exception( 'Input sequence %s is missing frames' % self._path )
