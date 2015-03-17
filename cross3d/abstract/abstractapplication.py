@@ -79,6 +79,18 @@ class AbstractApplication(QObject):
 	def allowedCharacters(self):
 		return 'A-Za-z0-9'
 
+	def clipboardCopyText(self, text):
+		""" Set the provided text to the system clipboard so it can be pasted
+		
+		This function is used because QApplication.clipboard sometimes deadlocks in some
+		applications like XSI.
+		
+		Args:
+			text (str): Set the text in the paste buffer to this text.
+		"""
+		from PyQt4.QtGui import QApplication
+		QApplication.clipboard().setText(text)
+
 	@abstractmethod
 	def connectCallback(self, signal):
 		"""

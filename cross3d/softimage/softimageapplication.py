@@ -28,6 +28,22 @@ class SoftimageApplication(AbstractApplication):
 	# it generates a single event and requires the scripter to figure out if they need to do anything with the event.
 	objectCallbacks = set(['objectRenamed', 'objectUnHide', 'objectHide', 'objectUnfreeze', 'objectFreeze', 'objectParented'])
 	_objectsConnectedCount = 0
+	
+	def clipboardCopyText(self, text):
+		""" Set the provided text to the system clipboard so it can be pasted
+		
+		This function is used because QApplication.clipboard sometimes deadlocks in some
+		applications like XSI.
+		
+		Args:
+			text (str): Set the text in the paste buffer to this text.
+		"""
+		import win32clipboard
+		win32clipboard.OpenClipboard()
+		win32clipboard.EmptyClipboard()
+		win32clipboard.SetClipboardText(text)
+		win32clipboard.CloseClipboard()
+	
 	def connect(self):
 		"""
 			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
