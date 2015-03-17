@@ -35,7 +35,7 @@ global blur3dhelper
 			averages = #()
 			for meter in meters do (
 				meter.calculate()
-				mAvg = for energy in meter.total collect energy
+				mAvg = for energy in meter.total where energy > 0 collect energy
 				ttl = 0
 				for avg in mAvg do (
 					ttl = (avg + ttl)
