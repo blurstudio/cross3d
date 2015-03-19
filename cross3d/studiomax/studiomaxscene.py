@@ -2144,21 +2144,23 @@ class StudiomaxScene(AbstractScene):
 
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
-						if mxs.classof(nativeCache) == mxs.Point_Cache:
-							cacheInfo = PointCacheInfo.read(fileName, header_only=True)
-						elif mxs.classof(nativeCache) == mxs.Transform_Cache:
-							cacheInfo = TMCInfo.read(fileName, header_only=True)
+						if os.path.exists(fileName):
+							
+							if mxs.classof(nativeCache) == mxs.Point_Cache:
+								cacheInfo = PointCacheInfo.read(fileName, header_only=True)
+							elif mxs.classof(nativeCache) == mxs.Transform_Cache:
+								cacheInfo = TMCInfo.read(fileName, header_only=True)
 
-						# Setting up the start frame.
-						# nativeCache.recordStart = cacheInfo.start_frame
+							# Setting up the start frame.
+							# nativeCache.recordStart = cacheInfo.start_frame
 
-						# Creating the time script controller.
-						timeScriptController = mxs.Float_Script()
-						timeScriptController.addtarget('Time', nativeController)
-						timeScriptController.script = 'Time * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
+							# Creating the time script controller.
+							timeScriptController = mxs.Float_Script()
+							timeScriptController.addtarget('Time', nativeController)
+							timeScriptController.script = 'Time * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
 
-						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
+							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+							mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
 
 		# Collecting other types of point caches.
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
