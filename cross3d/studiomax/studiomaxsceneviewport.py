@@ -110,6 +110,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		vertical = round( ( viewSize[1] - safeFrameSize[1] ) / 2 )
 		return [ horizontal, vertical ]
 
+	def generateSnapshot(self, fileName, **options):
+		'''TODO: Options are not implemented.'''
+
+		image = mxs.gw.getViewportDib()
+		image.filename = fileName
+		mxs.save(image)
+
 	def generatePlayblast( self, path, frameRange=None, resolution=None, slate='', effects=None, geometryOnly=True, pathFormat=r'{basePath}\{fileName}.{frame}.{ext}'):
 		'''
 			/option <bool> effects
