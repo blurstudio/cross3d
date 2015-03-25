@@ -5,12 +5,6 @@ from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 from blur3d.constants import RotationOrder
 
 class MayaSceneCamera(AbstractSceneCamera):
-	def __init__(self, scene, nativeCamera, target=None):
-		super(MayaSceneCamera, self).__init__(scene, nativeCamera, target)
-		# Convert the nativePointer to a OpenMaya.mFnCamera object so we get access to
-		# all of its special goodness.
-		self._nativeTypePointer = om.MFnCamera(self._nativePointer)
-
 	def clippingEnabled(self):
 		# As far as I can tell, maya doesn't provide a way to disable the near/far clip planes
 		# so store it as a user prop so we can diff against the camera files.

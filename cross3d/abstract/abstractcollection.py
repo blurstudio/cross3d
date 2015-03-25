@@ -12,12 +12,24 @@
 from blur3d import abstractmethod
 from blur3d import api
 
+def wrapList(items):
+	scene = api.Scene()
+	for obj in items:
+		if isinstance(obj, api.SceneWrapper):
+			yield obj
+		else:
+			yield api.SceneObject(scene, obj)
+
 class AbstractCollection(list):
 	"""
 		The Collection object allows to perform operation on several objects at once
 		allowing to optimize the process and lift weight from the Scene object.
 	"""
 	def __init__(self, nativePointer):
+		# If a list is provided make sure all of the items are SceneWrapper or SceneObjects
+		if isinstance(nativePointer, (list, tuple)):
+			nativePointer = wrapList(nativePointer)
+			super(AbstractCollection, self).__init__(nativePointer)
 		self._nativePointer = nativePointer
 
 	def unhide(self):

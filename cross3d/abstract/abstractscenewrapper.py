@@ -11,7 +11,7 @@
 
 from blur3d import api
 from blur3d.api	import UserProps
-from blur3d.constants import ControllerType
+from blur3d.constants import ControllerType, PointerTypes
 from blur3d import abstractmethod, pendingdeprecation
 
 class AbstractSceneWrapper(object):
@@ -32,6 +32,21 @@ class AbstractSceneWrapper(object):
 		NOTE: If uniqueId is not implemented for a software implemenation all objects will have a hash of 0
 		"""
 		return self.uniqueId()
+
+	def __call__(self, retType=PointerTypes.Pointer):
+		""" Returns the native pointer for the object.
+		
+		Depending on the software and what you pass into retType, you will get a diffrent object.
+		By default this simply returns self.nativePointer().
+		
+		Args:
+			retType (blur3d.constants.PointerTypes): Used to request a specific native object.
+					Defaults to blur3d.constants.PointerTypes.Pointer.
+		
+		Returns:
+			Variant: Returns a native pointer object specific to the software.
+		"""
+		return self._nativePointer
 
 	def __init__(self, scene, nativePointer=None):
 		"""

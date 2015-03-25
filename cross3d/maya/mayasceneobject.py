@@ -2,7 +2,7 @@ import re
 import maya.OpenMaya as om
 import maya.cmds as cmds
 import blurdev
-from blur3d.constants import ObjectType, RotationOrder
+from blur3d.constants import ObjectType, RotationOrder, PointerTypes
 from blur3d.api import application, UserProps, ExceptionRouter
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
 						
@@ -57,9 +57,6 @@ class MayaSceneObject( AbstractSceneObject ):
 		with ExceptionRouter():
 			nativeObject = self._getShapeNode(mObj)
 		super(MayaSceneObject, self).__init__(scene, nativeObject)
-		# _nativeTypePointer stores the specific MFn* object representation of MObject this is
-		# used mostly by subclasses of SceneObject
-		self._nativeTypePointer = mObj
 		# store the transform node so we can access it later
 		self._nativeTransform = self._getTransformNode(mObj)
 	
@@ -160,6 +157,43 @@ class MayaSceneObject( AbstractSceneObject ):
 	@_nativeTransform.setter
 	def _nativeTransform(self, nativePointer):
 		self._nativeTypeHandle = om.MObjectHandle(nativePointer)
+	
+	@property
+	def _nativeTypePointer(self):
+		""" Returns a MFn wrapped version of self._nativePointer.
+		
+		This property is Read-Only.
+		
+		Returns:
+			maya.OpenMaya.MFn[type object].
+		"""
+		return self._genNativeTypePointer(self._nativePointer)
+		
+	def _genNativeTypePointer(self, mObj):
+		""" Generates a MFn object for the provided MObject.
+		"""
+		return getattr(om, 'MFn{}'.format(mObj.apiTypeStr()[1:]))(mObj)
+	
+	def __call__(self, retType=PointerTypes.Pointer):
+		""" Returns the native pointer for the object.
+		
+		Depending on the software and what you pass into retType, you will get a diffrent object.
+		By default this simply returns self.nativePointer().
+		
+		Args:
+			retType (blur3d.constants.PointerTypes): Used to request a specific native object.
+					Defaults to blur3d.constants.PointerTypes.Pointer.
+		
+		Returns:
+			Variant: Returns a native pointer object specific to the software.
+		"""
+		# Make sure we have a valid PointerType
+		retType = PointerTypes[retType]
+		if retType == PointerTypes.Transform:
+			return self._genNativeTypePointer(self._nativeTransform)
+		elif retType == PointerTypes.Shape:
+			return self._nativeTypePointer
+		return self._nativePointer
 	
 	@classmethod
 	def _typeOfNativeObject(cls, nativeObject):
