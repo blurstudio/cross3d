@@ -10,6 +10,7 @@
 
 from Py3dsMax import mxs
 from blur3d.api.abstract.abstractscenelayer	import AbstractSceneLayer
+from blur3d.api import SceneObject
 
 #-----------------------------------------------------------------------------
 
@@ -826,6 +827,40 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			return 'World Layer'
 		return name
 
+	def refreshMetaData(self):
+		""" Refreshes the current layer metadata.  If any new params are added,
+		this will allow the new params to be ingested in already created
+		metadata. Essentially, creates a new metadata object and stores all the
+		properties into it.
+		"""
+		get_attr = mxs.custAttributes.get
+		rem_attr = mxs.cutAttributes.delete
+		root = mxs.rootNode
+		count = mxs.custAttributes.count(root)
+		mxsinst = ()
+		for i in range(count, 0, -1):
+			attr = get_attr(root,i)
+			if str(attr.name).lower() == 'oniondata':
+				layer = None
+				# Only retrieve the current layers attribute
+				if mxs.isproperty(attr, 'lnm') and attr.lnm == self.name():
+					mxsinst = (i, attr)
+					break
+		if mxsinst:
+			inst = mxsinst[0]
+			oldmxs = mxsinst[1]
+			# Create a new metadata object and copy all the old
+			# mxs instance properties to the new one.  This will
+			# retain all the information while allowing for
+			# additional properties to be added later on.
+			newMetaData = LayerMetaData.createUnique(root)
+			for prop in mxs.getPropNames(oldmxs):
+				propval = mxs.getproperty(oldmxs, prop)
+				mxs.setproperty(newMetaData._mxsInstance, prop, propval)
+			rem_attr(root, inst)
+			LayerMetaData.register()
+			self._metaData = newMetaData
+
 	def remove( self, removeObjects = False ):
 		"""
 			\remarks	implements the AbstractSceneObjectGroup.remove method to remove the layer from the scene (objects included when desired)
@@ -926,6 +961,14 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		if ( self.altPropSetCount() > 1 ):
 			return AbstractSceneLayer.removeAltPropSetAt( self, index )
 		return False
+
+	def saveCurrentLightProperty(self, propSet):
+		for obj in self._nativeObjects():
+			if mxs.classOf(obj) == mxs.VRayLight:
+				if propSet.value('primaryVisibility'):
+					so = SceneObject(self._scene, obj)
+					so.userProps()['previousInvisibleState'] = obj.invisible
+					obj.invisible = True
 
 	def setActive( self, state ):
 		"""
