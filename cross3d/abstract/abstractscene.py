@@ -46,12 +46,13 @@ class AbstractScene(QObject):
 	# create the scene instance
 	_instance = None
 	_currentFileName = ''
+	
+	_updatesDisabled = 0
 
 	def __init__(self):
 		QObject.__init__(self)
 
 		# create custom properties
-		self._updatesDisabled 	 = 0
 		self._materialCache		 = None
 		self._mapCache			 = None
 		self._metaData 		     = None
@@ -2349,17 +2350,17 @@ class AbstractScene(QObject):
 		"""
 		if (state):
 			# dequeue an update call
-			self._updatesDisabled -= 1
+			self.__class__._updatesDisabled -= 1
 
 			# if the updates have been fully dequeued
-			if (not self._updatesDisabled):
+			if not self.__class__._updatesDisabled:
 				self._setNativeUpdatesEnabled(True)
 		else:
 			# if the scene is still able to update
-			if (not self._updatesDisabled):
+			if not self.__class__._updatesDisabled:
 				self._setNativeUpdatesEnabled(False)
 
-			self._updatesDisabled += 1
+			self.__class__._updatesDisabled += 1
 
 		return self.updatesEnabled()
 
@@ -2408,12 +2409,13 @@ class AbstractScene(QObject):
 			return self._nativeRefresh()
 		return False
 
-	def updatesEnabled(self):
+	@classmethod
+	def updatesEnabled(cls):
 		"""
 			\remarks	returns whether or not the scene has updates enabled
 			\return		<bool> state
 		"""
-		return self._updatesDisabled == 0
+		return cls._updatesDisabled == 0
 
 	def uniqueLayerName(self, basename):
 		"""

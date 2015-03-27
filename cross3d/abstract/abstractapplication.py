@@ -276,6 +276,7 @@ class AbstractApplication(QObject):
 		"""
 		if self._blockRefresh != blockRefresh:
 			self._blockRefresh = blockRefresh
+			api.Scene().setUpdatesEnabled(not blockRefresh)
 			return True
 		return False
 
