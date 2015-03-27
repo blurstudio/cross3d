@@ -22,10 +22,12 @@ from blurdev import debug
 from PyQt4.QtCore import QTimer
 from blur3d.api import UserProps
 from blur3d.api import application
+
 from blur3d.lib.tmclib import TMCInfo
 from blur3d.constants import UpVector
 from blur3d.constants import ControllerType
 from blur3d.lib.pclib import PointCacheInfo
+from blur3d.lib.xmeshhandler import XMESHHandler
 from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
 
@@ -1572,7 +1574,7 @@ class StudiomaxScene(AbstractScene):
 	def _isolateNativeObjects(self, nativeObjects):
 		selection = self._nativeSelection()
 		self._setNativeSelection(nativeObjects)
-		if application.nameAndVersion() == 'Max2014':
+		if self.application().nameAndVersion() == 'Max2014':
 			if nativeObjects:
 				mxs.IsolateSelection.EnterIsolateSelectionMode()
 			else:
@@ -1587,7 +1589,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
 			\return		<bool>
 		"""
-		if application.nameAndVersion() == 'Max2014':
+		if self.application().nameAndVersion() == 'Max2014':
 			mxs.IsolateSelection.ExitIsolateSelectionMode()
 			application.refresh()
 			return True
@@ -2168,12 +2170,61 @@ class StudiomaxScene(AbstractScene):
 		fumes = mxs.getClassInstances(mxs.FumeFX)
 
 		if xMeshes or rayFireCaches or fumes:
+											  
+			# Handling XMesh caches.
+			for xMesh in xMeshes:
 
-			# Creating the XMesh and RayFire and Fume instanciated time script controller.
+				# Getting the FPS of that XMesh.
+				fileName = xMesh.renderSequence
+				if os.path.exists(fileName):
+
+					# Getting the FPS at which the XMesh was generated.
+					xMeshFrameRate = XMESHHandler(fileName).fps()
+
+					# Creating the XMesh and RayFire and Fume instanciated time script controller.
+					timeScriptController= mxs.Float_Script()
+					timeScriptController.addtarget('Time', nativeController)
+					timeScriptController.script = 'Time * %f' % xMeshFrameRate
+
+					# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+					dependents = mxs.refs.dependents(xMesh)
+
+					for dependent in dependents:
+						if mxs.isProperty(dependent, 'name'):
+							name = dependent.name
+
+							# TODO: That check is a little lite.
+							if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+								# Setting the playback to curve.
+								xMesh.enablePlaybackGraph = True
+
+								# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+								mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
+
+			# Creating the and RayFire and Fume instanciated time script controller.
 			timeScriptController= mxs.Float_Script()
 			timeScriptController.addtarget('Time', nativeController)
 			timeScriptController.script = 'Time * %f' % cachesFrameRate
 
+			# Handling RayFire caches.
+			for rayFireCache in rayFireCaches:
+
+				# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+				dependents = mxs.refs.dependents(rayFireCache)
+				for dependent in dependents:
+					if mxs.isProperty(dependent, 'name'):
+						name = dependent.name
+
+						# TODO: That check is a little lite.
+						if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+							# Setting the playback to curve.
+							rayFireCache.playUseGraph = True
+
+							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+							mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
+		
 			if fumes:
 				
 				# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
@@ -2189,61 +2240,25 @@ class StudiomaxScene(AbstractScene):
 				# 								  c = b - a
 				# 								  c.y / c.x"""	
 				pass
-															  
-		# Handling XMesh caches.
-		for xMesh in xMeshes:
 
-			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-			dependents = mxs.refs.dependents(xMesh)
-			for dependent in dependents:
-				if mxs.isProperty(dependent, 'name'):
-					name = dependent.name
+			# Handling fumes.
+			for fume in fumes:
 
-					# TODO: That check is a little lite.
-					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+				# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+				dependents = mxs.refs.dependents(fume)
+				for dependent in dependents:
+					if mxs.isProperty(dependent, 'name'):
+						name = dependent.name
 
-						# Setting the playback to curve.
-						xMesh.enablePlaybackGraph = True
+						# TODO: That check is a little lite.
+						if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 
-						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
+							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+							mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
-		# Handling RayFire caches.
-		for rayFireCache in rayFireCaches:
-
-			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-			dependents = mxs.refs.dependents(rayFireCache)
-			for dependent in dependents:
-				if mxs.isProperty(dependent, 'name'):
-					name = dependent.name
-
-					# TODO: That check is a little lite.
-					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
-
-						# Setting the playback to curve.
-						rayFireCache.playUseGraph = True
-
-						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
-	
-		# Handling fumes.
-		for fume in fumes:
-
-			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-			dependents = mxs.refs.dependents(fume)
-			for dependent in dependents:
-				if mxs.isProperty(dependent, 'name'):
-					name = dependent.name
-
-					# TODO: That check is a little lite.
-					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
-
-						# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-						mxs.setPropertyController(fume, "TimeValue", timeScriptController)
-
-						# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
-						# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
-						# mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
+							# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
+							# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
+							# mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
 		return True
