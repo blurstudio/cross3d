@@ -23,7 +23,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 									'Thinking'      : ObjectType.Particle | ObjectType.Thinking,
 									'PF_Source'     : ObjectType.Particle,
 									'FumeFX'		: ObjectType.FumeFX,
-									'GeometryClass' : ObjectType.Geometry }
+									'GeometryClass' : ObjectType.Geometry,
+									'Targetobject'	: ObjectType.CameraInterest }
 
 	_abstractToNativeObjectType = dict((v,k) for k, v in _nativeToAbstractObjectType.iteritems())
 
