@@ -10,6 +10,7 @@
 
 from Py3dsMax 										import mxs
 from blur3d.api.abstract.abstractsceneatmospheric	import AbstractSceneAtmospheric
+from blur3d.constants import EnvironmentTypes
 
 class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -33,6 +34,26 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 		"""
 		return self._nativePointer.name
 	
+	def environmentType(self):
+		isAtmo = mxs.superClassOf(self._nativePointer) == mxs.Atmospheric
+		return EnvironmentTypes.Atmospheric if isAtmo else EnvironmentTypes.Effect
+	
+	def index(self):
+		""" Returns the index of the atmosperhic
+		
+		Returns:
+			int:
+		"""
+		if self.environmentType() == EnvironmentTypes.Atmospheric:
+			for index in range(1, mxs.numAtmospherics + 1):
+				if mxs.getAtmospheric(index) == self._nativePointer:
+					return index
+		else:
+			for index in range(1, mxs.numEffects + 1):
+				if mxs.getEffect(index) == self._nativePointer:
+					return index
+		return -1
+	
 	def isEnabled( self ):
 		"""
 			\remarks	implements AbstractSceneAtmospheric.isEnabled method to check if this atmospheric is enabled in the scene
@@ -52,6 +73,22 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 			if ( uid in atm ):
 				return l
 		return None
+	
+	def remove(self):
+		""" Removes this atmosperhic from the scene
+		
+		Returns:
+			bool: Was the object removed
+		"""
+		index = self.index()
+		if self.index != -1:
+			if self.environmentType() == EnvironmentTypes.Atmospheric:
+				mxs.deleteAtmospheric(index)
+				return True
+			else:
+				mxs.deleteEffect(index)
+				return True
+		return False
 	
 	def setName( self, name ):
 		"""

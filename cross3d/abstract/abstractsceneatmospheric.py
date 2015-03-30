@@ -8,6 +8,7 @@ atmosperhics in a Scene environment for any DCC application
 from blur3d	import abstractmethod
 from blur3d.api import SceneWrapper
 from blur3d import api
+from blur3d.constants import EnvironmentTypes
 
 
 class AbstractSceneAtmospheric(SceneWrapper):
@@ -47,6 +48,17 @@ class AbstractSceneAtmospheric(SceneWrapper):
 		"""
 		return self.setEnabled(True)
 
+	def environmentType(self):
+		return EnvironmentTypes.Unknown
+
+	def index(self):
+		""" Returns the index of the atmosperhic
+		
+		Returns:
+			int: Returns -1 if invalid
+		"""
+		return -1
+
 	@abstractmethod
 	def isEnabled(self):
 		"""Return whether or not this atmospheric is currently 
@@ -70,6 +82,14 @@ class AbstractSceneAtmospheric(SceneWrapper):
 			from blur3d.api import SceneLayer
 			return SceneLayer(self._scene, nativeLayer)
 		return None
+
+	def remove(self):
+		""" Removes this atmosperhic from the scene
+		
+		Returns:
+			bool: Was the object removed
+		"""
+		return False
 
 	def scene(self):
 		"""Return the scene instance that this atmospheric is linked to

@@ -1574,7 +1574,7 @@ class StudiomaxScene(AbstractScene):
 	def _isolateNativeObjects(self, nativeObjects):
 		selection = self._nativeSelection()
 		self._setNativeSelection(nativeObjects)
-		if self.application().nameAndVersion() == 'Max2014':
+		if application.nameAndVersion() == 'Max2014':
 			if nativeObjects:
 				mxs.IsolateSelection.EnterIsolateSelectionMode()
 			else:
@@ -1589,7 +1589,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
 			\return		<bool>
 		"""
-		if self.application().nameAndVersion() == 'Max2014':
+		if application.nameAndVersion() == 'Max2014':
 			mxs.IsolateSelection.ExitIsolateSelectionMode()
 			application.refresh()
 			return True
