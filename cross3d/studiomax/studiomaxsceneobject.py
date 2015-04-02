@@ -321,7 +321,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 				# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
 				import cask
-				print alembicController.identifier
 				archive = cask.Archive(str(alembicController.path))
 				item = archive.top.children[str(alembicController.identifier)]
 

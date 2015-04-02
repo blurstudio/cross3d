@@ -20,7 +20,9 @@ class Dispatch(QObject):
 	scenePreInvalidated		 = pyqtSignal()			# linked signal before a import, open, or merge operation
 	sceneInvalidated		 = pyqtSignal()
 	sceneMergeRequested		 = pyqtSignal()
+	sceneReferenceRequested	 = pyqtSignal()
 	sceneMergeFinished		 = pyqtSignal()
+	sceneReferenceFinished   = pyqtSignal()
 	sceneNewRequested		 = pyqtSignal()
 	sceneNewFinished		 = pyqtSignal()
 	sceneOpenRequested		 = pyqtSignal(str)		# <str> The Filename

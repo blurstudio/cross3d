@@ -61,12 +61,14 @@ class AbstractApplication(QObject):
 		dispatch.linkSignals('sceneNewRequested', 'scenePreInvalidated')
 		dispatch.linkSignals('sceneOpenRequested', 'scenePreInvalidated')
 		dispatch.linkSignals('sceneMergeRequested', 'scenePreInvalidated')
+		# dispatch.linkSignals('sceneReferenceRequested', 'scenePreInvalidated')
 		dispatch.linkSignals('scenePreReset', 'scenePreInvalidated')
 		dispatch.linkSignals('sceneImportRequested', 'scenePreInvalidated')
 
 		dispatch.linkSignals('sceneNewFinished', 'sceneInvalidated')
 		dispatch.linkSignals('sceneOpenFinished', 'sceneInvalidated')
 		dispatch.linkSignals('sceneMergeFinished', 'sceneInvalidated')
+		# dispatch.linkSignals('sceneReferenceFinished', 'sceneInvalidated')
 		dispatch.linkSignals('sceneReset', 'sceneInvalidated')
 		dispatch.linkSignals('sceneImportFinished', 'sceneInvalidated')
 
