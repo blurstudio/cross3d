@@ -1345,7 +1345,12 @@ class AbstractScene(QObject):
 			\return		<bool> renderMissingFramesOnly
 		"""
 		return False
-		
+
+	@abstractmethod
+	def exportObjectsToOBJ(self, objects, path, **options):
+		return False
+
+	@abstractmethod	
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
@@ -2163,6 +2168,10 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self.saveFileAs(self.currentFileName())
+
+	@abstractmethod
+	def saveSelected(self, path, **options):
+		return None
 
 	def setEnvironmentMap(self, sceneMap):
 		"""

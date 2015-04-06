@@ -1599,6 +1599,10 @@ class StudiomaxScene(AbstractScene):
 				return True
 		return False
 
+	def exportObjectsToOBJ(self, objects, path, **options):
+		self.setSelection(objects)
+		mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True)
+
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y):
 		"""
 		Exports a given set of objects as FBX.
@@ -2382,6 +2386,17 @@ class StudiomaxScene(AbstractScene):
 			mxs.saveMaxFile(str(filename))
 			return True
 		return False
+
+	def saveSelected(self, path, **options):
+		"""
+			\remarks implements the saveSelected feature in 3dsMax
+		"""
+		selectedNodes = self._nativeSelection()
+		mxs.saveNodes(selectedNodes, path)
+		return True
+
+
+
 
 	def saveCopy(self, path):
 		"""
