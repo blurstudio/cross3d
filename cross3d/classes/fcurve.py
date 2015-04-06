@@ -242,10 +242,6 @@ class FCurve(object):
 
 	def read(self, path):
 		with open(path) as fle:
-			content = fle.read()
-
-			# TODO: This is unsufficient checking.
-			if content:
-				self.fromXML(fle.read())
+			self.fromXML(fle.read())
 		return True
 
