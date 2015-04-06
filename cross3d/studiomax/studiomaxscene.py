@@ -2051,6 +2051,69 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return mxs.rendsavefile
 
+	def realizeTimeControllers(self, cachesFrameRate=None):
+
+ 		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
+		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
+
+		# Handling XMeshes.
+		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
+		for xMesh in xMeshes:
+
+			# Getting the FPS of that XMesh.
+			fileName = xMesh.renderSequence
+			if os.path.exists(fileName):
+
+				# Getting the FPS at which the XMesh was generated.
+				xMeshFrameRate = XMESHHandler(fileName).fps()
+
+				# Setting up the playback curve.
+				timeScriptController= mxs.Float_Script()
+				timeScriptController.script = '{} / frameRate * F'.format(xMeshFrameRate)
+				xMesh.enablePlaybackGraph = True
+				mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
+
+		# Creating the and RayFireCaches, PCs, and TMCs instanciated controllers.
+
+
+		# Handling PCs and TMCs.
+		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
+		for nativeCache in nativeCaches:
+
+			# This optimizes the playback greatly.
+			if mxs.classOf(nativeCache) == mxs.Point_Cache:
+				nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
+
+
+			# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
+			fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
+			if os.path.exists(fileName):
+				
+				# Parsing the cache file. We need to extract the start frame.
+				if mxs.classof(nativeCache) == mxs.Point_Cache:
+					cacheInfo = PointCacheInfo.read(fileName, header_only=True)
+				elif mxs.classof(nativeCache) == mxs.Transform_Cache:
+					cacheInfo = TMCInfo.read(fileName, header_only=True)
+
+				# Setting the playback to curve.
+				timeScriptController = mxs.Float_Script()
+				timeScriptController.script = '{} / frameRate * F - {}'.format(cachesFrameRate, cacheInfo.start_frame)
+				nativeCache.playbackType = 3
+				mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
+
+		# Handling RayFire caches.
+		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
+
+		# We can instance this.
+		timeScriptController = mxs.Float_Script()
+		timeScriptController.script = '{} / frameRate * F'.format(cachesFrameRate)
+
+		for rayFireCache in rayFireCaches:
+
+			# Setting the playback curve.
+			rayFireCache.playUseGraph = True
+			mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
+
 	def resetTimeControllers(self):
 
 		# Resetting Alembics to normal playback by instantiating the same expression.
@@ -2096,9 +2159,7 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 		
-	def _applyRetimeNativeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
-		""" See abstract method for more info.
-		"""
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
 
  		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
@@ -2141,13 +2202,11 @@ class StudiomaxScene(AbstractScene):
 						if mxs.classOf(nativeCache) == mxs.Point_Cache:
 							nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
 
-						# Setting the playback to curve.
-						nativeCache.playbackType = 3
-
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
 						if os.path.exists(fileName):
 							
+							# Parsing the cache file. We need to extract the start frame.
 							if mxs.classof(nativeCache) == mxs.Point_Cache:
 								cacheInfo = PointCacheInfo.read(fileName, header_only=True)
 							elif mxs.classof(nativeCache) == mxs.Transform_Cache:
@@ -2155,6 +2214,9 @@ class StudiomaxScene(AbstractScene):
 
 							# Setting up the start frame.
 							# nativeCache.recordStart = cacheInfo.start_frame
+
+							# Setting the playback to curve.
+							nativeCache.playbackType = 3
 
 							# Creating the time script controller.
 							timeScriptController = mxs.Float_Script()

@@ -824,7 +824,7 @@ class AbstractScene(QObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def applyRetimeController(self, controller, cachesFrameRate=None, include='', exclude=''):
+	def applyTimeController(self, controller, cachesFrameRate=None, include='', exclude=''):
 		""" Applies a controller to all the time controller found in the scene.
 
 		The expected controller should express time in seconds and will be applied as is to alembic modifiers/controllers.
@@ -833,7 +833,7 @@ class AbstractScene(QObject):
 
 		Args:
 			controller(SceneAnimationController|FCurve): The controller we want to use for controlling time.
-			cacheFrameRate(float): For TMCs and PCs there is not way to detect the frame rate at which they have been created.
+			cacheFrameRate(float): For TMCs, PCs, RayFireCaches there is currently no way to detect the frame rate at which they have been created.
 			So if it happens to differ from the one set for that scene, the user will have to provide one.
 			include(str): All the objects which name can be found by that regex will be included.
 			exclude(str): All the objects which name can be found byt that regex will be excluded.
@@ -850,10 +850,10 @@ class AbstractScene(QObject):
 		elif not isinstance(controller, api.SceneAnimationController):
 			raise Exception('Argument 1 should be an instance of SceneAnimationController or FCurve.')
 
-		return self._applyRetimeNativeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude)
+		return self._applyNativeTimeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude)
 
 	@abstractmethod
-	def _applyRetimeNativeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
 		return False
 
 	@abstractmethod
@@ -1118,6 +1118,19 @@ class AbstractScene(QObject):
 		return default
 
 	@abstractmethod
+	def realizeTimeControllers(self, cachesFrameRate='None'):
+		""" Makes all cache play in real time.
+
+		Formats like PCs, TMCs, RayFireCaches, XMeshes are frame based.
+		Therefore they will not take scene frame rate into account and preserve duration when playing back.
+		This function forces these guys to play in real time by sticking a script in their playback controllers.
+
+		Args:
+			cacheFrameRate(float): For TMCs, PCs, RayFireCaches there is currently no way to detect the frame rate at which they have been created.
+		"""
+		return False
+
+	@abstractmethod
 	def renderOutputPath(self):
 		"""
 			\remarks	return the render output file path for the scene
@@ -1138,7 +1151,7 @@ class AbstractScene(QObject):
 	def resetTimeControllers(self):
 		""" Removes any alteration done to time controllers.
 
-		This currently supports alembic, TMC and PC caches.
+		This currently supports Alembic, TMCs, PCs, XMeshes, and RayFireCaches caches.
 
 		Returns: 
 			boolean: Whether or not the operation was a success.

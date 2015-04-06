@@ -281,12 +281,13 @@ class SoftimageScene(AbstractScene):
 		
 		# Storing the scene state.
 		self.storeState()
+		initialFrameRange = self.animationRange()
 
 		# Storing all the stuff we will be doing.
 		with application.undoContext('Plotting and Exporting to FBX'):
 
 			# Defining the range.
-			if isinstance(list, FrameRange):
+			if isinstance(frameRange, (list, FrameRange, tuple)):
 				self.setAnimationRange(frameRange)
 			elif frameRange is None:
 				frameRange = self.animationRange()
@@ -348,6 +349,7 @@ class SoftimageScene(AbstractScene):
 
 		# Restoring the scene state.
 		self.restoreState()
+		self.setAnimationRange(initialFrameRange)
 
 		return True
 		
