@@ -18,13 +18,14 @@
 from blur3d.api.abstract.abstractapplication import AbstractApplication
 from Py3dsMax import mxs
 from blurdev import debug, enum
+from PyQt4.QtCore import QTimer
 dispatch = None
 
 # initialize callback scripts
 _STUDIOMAX_CALLBACK_TEMPLATE = """
 global blur3d
-if ( blur3d == undefined ) then ( blur3d = python.import "blur3d" )
-if ( blur3d != undefined ) then ( 
+if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d != undefined ) do ( 
 	local ms_args = (callbacks.notificationParam())
 	blur3d.api.dispatch.%(function)s "%(signal)s" %(args)s 
 )
@@ -32,18 +33,34 @@ if ( blur3d != undefined ) then (
 _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS = """
 global blur3d
 print "Calling maxscript no args %(function)s, |%(signal)s|"
-if ( blur3d == undefined ) then ( blur3d = python.import "blur3d" )
-if ( blur3d != undefined ) then ( 
+if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d != undefined ) do ( 
 	blur3d.api.dispatch.%(function)s "%(signal)s"
 )
 """
 _STUDIOMAX_VIEWPORT_TEMPLATE = """
 fn blurfn_%(signal)s = 
 (
-	if ( blur3d == undefined ) then ( blur3d = python.import "blur3d" )
-	if ( blur3d != undefined ) then ( 
+	if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+	if ( blur3d != undefined ) do ( 
 		blur3d.api.dispatch.%(function)s "%(signal)s"
 	)
+)
+"""
+
+_STUDIOMAX_SCENEMERGE_REQUESTED_TEMPLATE = """
+global blur3d
+if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d != undefined ) do ( 
+	blur3d.api.application._sceneMergeRequested()
+)
+"""
+
+_STUDIOMAX_SCENEMERGE_FINISHED_TEMPLATE = """
+global blur3d
+if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d != undefined ) do ( 
+	blur3d.api.application._sceneMergeFinished()
 )
 """
 
@@ -110,6 +127,21 @@ class StudiomaxApplication(AbstractApplication):
 	_connectionMap.update(_ConnectionDef('objectUnparented', 'nodeUnlinked', 'ms_args', 'dispatchObject'))
 	_connectionMap.update(_ConnectionDef('viewportRedrawn', '', function='dispatchFunction', callbackType=_ConnectionDef.ConnectionType.Viewport))
 	
+	def __init__(self):
+		super(StudiomaxApplication, self).__init__()
+		self._sceneMergeFinishedTimer = QTimer(self)
+		self._sceneMergeFinishedTimer.setSingleShot(True)
+		self._sceneMergeFinishedTimer.timeout.connect(self._sceneMergeFinishedTimeout)
+	
+	def _sceneMergeFinished(self):
+		self._sceneMergeFinishedTimer.start(1000)
+	
+	def _sceneMergeRequested(self):
+		self._sceneMergeFinishedTimer.stop()
+	
+	def _sceneMergeFinishedTimeout(self):
+		dispatch.dispatch('sceneMergeFinished')
+	
 	def _connectStudiomaxSignal(self, connDef, blurdevSignal):
 		"""
 			\remarks	Responsible for connecting a signal to studiomax
@@ -123,6 +155,15 @@ class StudiomaxApplication(AbstractApplication):
 			mxs.execute(signal)
 			mxs.registerRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % blurdevSignal))
 		else:
+			if blurdevSignal == 'sceneMergeFinished':
+				script = _STUDIOMAX_SCENEMERGE_FINISHED_TEMPLATE % { 'function':connDef.function, 'signal': blurdevSignal }
+				mxs.callbacks.addScript( _n(connDef.callback), script, id = _n('blur3dcallbacks_merge') )
+				reqDefs = self._connectionMap.getConnectionsBySignalName('sceneMergeRequested')
+				# NOTE: for loop is probably not needed as there should only be one connection
+				for reqDef in reqDefs:
+					script = _STUDIOMAX_SCENEMERGE_REQUESTED_TEMPLATE % { 'function':reqDef.function, 'signal': 'sceneMergeRequested' }
+					mxs.callbacks.addScript( _n(reqDef.callback), script, id = _n('blur3dcallbacks_merge') )
+				return
 			if connDef.arguments:
 				script = _STUDIOMAX_CALLBACK_TEMPLATE % { 'function':connDef.function, 'signal': blurdevSignal, 'args': connDef.arguments }
 			else:
@@ -162,11 +203,16 @@ class StudiomaxApplication(AbstractApplication):
 		"""
 		if signal in self._connectionMap.getSignalNames():
 			connections = self._connectionMap.getConnectionsBySignalName(signal)
+			namify = mxs.pyhelper.namify
 			for connDef in connections:
 				if connDef.callbackType == connDef.ConnectionType.Viewport:
 					mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % connDef.signal))
+				elif connDef.signal == 'sceneMergeFinished':
+					# NOTE: This is a sort of hacky way to remove it
+					blurdevid 	= mxs.pyhelper.namify('blur3dcallbacks_merge')
+					mxs.callbacks.removeScripts(id = blurdevid)
+					return
 				else:
-					namify = mxs.pyhelper.namify
 					mxs.callbacks.removeScripts(namify(connDef.callback), id = namify('blur3dcallbacks'))
 		else:
 			debug.debugMsg('Disconnect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
@@ -179,6 +225,9 @@ class StudiomaxApplication(AbstractApplication):
 		# remove normal callbacks
 		blurdevid 	= mxs.pyhelper.namify('blur3dcallbacks')
 		mxs.callbacks.removeScripts(id = blurdevid)
+		blurdevid 	= mxs.pyhelper.namify('blur3dcallbacks_merge')
+		mxs.callbacks.removeScripts(id = blurdevid)
+		self._sceneMergeFinishedTimer.stop()
 		# undefine the add callback function
 		mxs.blur3daddcallback = None
 		# remove the callback pointer to blur3d
