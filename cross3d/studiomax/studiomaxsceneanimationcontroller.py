@@ -121,14 +121,11 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	def fCurve(self):
 		""" Returns a FCurve object to manipulate or save the curve data.
 		"""
-		fCurve = None
 		controllerType = self.type()
+		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 		
 		# We only support controllers that can have keys.
 		if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
-
-			# Creating a new fCurve object.
-			fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 
 			# Getting the slope distortion based on scene frame rate. On of Max's treats.
 			sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
@@ -183,10 +180,9 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	def setFCurve(self, fCurve):
 		""" Takes a fCurve object data and applies it to the controller.
 		"""
-
+		
 		tpe = fCurve.type()
 		keys = fCurve.keys()
-
 
 		if tpe and keys:
 

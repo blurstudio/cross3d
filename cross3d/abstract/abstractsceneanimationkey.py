@@ -14,57 +14,66 @@ from blur3d import api
 
 
 class AbstractSceneAnimationKey(SceneWrapper):
-	#--------------------------------------------------------------------------------
-	#								private methods
-	#--------------------------------------------------------------------------------
-	@abstractmethod
-	def _nativeValue(self):
-		"""
-			\remarks	return the value 
-			\return		<variant> value
-		"""
-		return 0
 
-	@abstractmethod
-	def _setNativeValue(self, nativeValue):
-		"""
-			\remarks	set the native value of this key to the inputed value
-			\param		nativeValue		<variant>
-			\return		<bool> success
-		"""
-		return False
+    #-------------------------------------------------------------------------
+    #								private methods
+    #-------------------------------------------------------------------------
 
-	#--------------------------------------------------------------------------------
-	#								public methods
-	#--------------------------------------------------------------------------------
-	@abstractmethod
-	def setTime(self, time):
-		"""Set the time value for this key.  *time* should be a float.  
-		Returns True if successful, False otherwise.
-		
-		"""
-		return False
+    @abstractmethod
+    def _nativeValue(self):
+        """
+                \remarks	return the value 
+                \return		<variant> value
+        """
+        return 0
 
-	def setValue(self, value):
-		"""Set the value of this key to the inputed value.  Returns True
-		if successful, False otherwise.
-		
-		"""
-		return self._setNativeValue(self._scene._toNativeValue(value))
+    @abstractmethod
+    def _setNativeValue(self, nativeValue):
+        """
+                \remarks	set the native value of this key to the inputed value
+                \param		nativeValue		<variant>
+                \return		<bool> success
+        """
+        return False
 
-	@abstractmethod
-	def time(self):
-		"""Return the time frame of this key
+    #-------------------------------------------------------------------------
+    #								public methods
+    #-------------------------------------------------------------------------
 
-		"""
-		return 0.0
+    @abstractmethod
+    def setTime(self, time):
+        """ Set the time value for this key.  *time* should be a float.  
+        Returns True if successful, False otherwise.
 
-	def value(self):
-		"""Return the value of this key
+        """
+        return False
 
-		"""
-		return self._scene._fromNativeValue(self._nativeValue())
+    def setValue(self, value):
+        """ Set the value of this key to the inputed value.  Returns True.
+        if successful, False otherwise.
 
+        """
+        return self._setNativeValue(self._scene._toNativeValue(value))
+
+    @abstractmethod
+    def time(self):
+        """ Return the time frame of this key.
+        """
+        return 0.0
+
+    def value(self):
+        """ Return the value of this key.
+        """
+        return self._scene._fromNativeValue(self._nativeValue())
+
+    @abstractmethod
+    def setTangentType(self, tangeantType):
+        return False
+
+    @abstractmethod
+    def tangentType(self):
+        return 0
 
 # register the symbol
-api.registerSymbol('SceneAnimationKey', AbstractSceneAnimationKey, ifNotFound=True)
+api.registerSymbol(
+    'SceneAnimationKey', AbstractSceneAnimationKey, ifNotFound=True)

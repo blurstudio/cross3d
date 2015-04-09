@@ -35,7 +35,10 @@ class FrameRange( list ):
 			\remarks	Affects the class representation.
 		"""
 		return 'blur3d.api.FrameRange( %s, %s )' % ( self[0], self[1] )
-		
+
+	def __nonzero__(self):
+		return bool(range(self[0], self[1]))
+
 	def string( self, separator='-' ):
 		"""
 			\remarks	Returns the range in its string form.

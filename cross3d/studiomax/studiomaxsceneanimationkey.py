@@ -8,10 +8,29 @@
 #	\date		03/15/10
 #
 
-from Py3dsMax											import mxs
-from blur3d.api.abstract.abstractsceneanimationkey 		import AbstractSceneAnimationKey
+from Py3dsMax import mxs
+from blur3d.constants import TangentType
+from blur3d.api.abstract.abstractsceneanimationkey import AbstractSceneAnimationKey
 
 class StudiomaxSceneAnimationKey( AbstractSceneAnimationKey ):
+
+	# TODO: Use these. But that has to be done between projects, since currently the tangent type is used to write retime curves on disk.
+	_abstractToNativeTangentTypes = { TangentType.Automatic: mxs.pyhelper.namify('auto'),
+									  TangentType.Bezier: mxs.pyhelper.namify('custom'),
+									  TangentType.Linear: mxs.pyhelper.namify('linear'),
+									  TangentType.Constant: mxs.pyhelper.namify('step')
+	}
+
+	# Some of the Max specific tangent types will be converted to bezier.
+	_nativeToAbstractTangentTypes = { 'auto': TangentType.Automatic,
+									   'bezier': TangentType.Bezier,
+									   'linear': TangentType.Linear,
+									   'step': TangentType.Constant,
+									   'slow': TangentType.Bezier,
+									   'fast': TangentType.Bezier,
+									   'smooth': TangentType.Automatic
+	}
+
 	#--------------------------------------------------------------------------------
 	#								private methods
 	#--------------------------------------------------------------------------------

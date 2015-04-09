@@ -329,7 +329,6 @@ class SoftimageScene(AbstractScene):
 			xsi.FBXExportCameras(True)
 			xsi.FBXExportAscii(True)
 			xsi.FBXExportLights(True)
-			xsi.FBXExportAnimation(True)
 			xsi.FBXExportShapes(True)
 			xsi.FBXExportFrameRate(self.animationFPS())
 			xsi.FBXExportEmbedMedias(False)

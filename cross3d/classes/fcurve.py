@@ -4,6 +4,7 @@ import hashlib
 import blurdev
 import xml.dom.minidom
 
+from framerange import FrameRange
 from blur3d.constants import ControllerType
 from blurdev.XML.xmldocument import XMLDocument
 from blurdev.XML.xmlelement import XMLElement

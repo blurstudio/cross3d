@@ -20,13 +20,11 @@ import traceback
 from Py3dsMax import mxs
 from blurdev import debug
 from PyQt4.QtCore import QTimer
-from blur3d.api import UserProps
-from blur3d.api import application
-
 from blur3d.lib.tmclib import TMCInfo
 from blur3d.constants import UpVector
 from blur3d.constants import ControllerType
 from blur3d.lib.pclib import PointCacheInfo
+from blur3d.api import UserProps, application
 from blur3d.lib.xmeshhandler import XMESHHandler
 from blur3d import pendingdeprecation, constants
 from blur3d.api.abstract.abstractscene import AbstractScene
@@ -2163,7 +2161,15 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 		
-	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
+
+		# Getting the range of the native controller in case we need to bake.
+		if bake:
+			from blur3d.api import SceneAnimationController
+			controller = SceneAnimationController(self, nativeController)
+			bakeRange = controller.fCurve().range()
+			if not bakeRange:
+				bake = False
 
  		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
@@ -2227,6 +2233,13 @@ class StudiomaxScene(AbstractScene):
 							timeScriptController.addtarget('Time', nativeController)
 							timeScriptController.script = 'Time * %f - %i' % (cachesFrameRate, cacheInfo.start_frame)
 
+							# Baking the controller requested.
+							if bake:
+								from blur3d.api import SceneAnimationController
+								wrappedController = SceneAnimationController(self, timeScriptController)
+								wrappedController.bake(rng=bakeRange)
+								timeScriptController = wrappedController.nativePointer()
+
 							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 							mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
 
@@ -2252,6 +2265,13 @@ class StudiomaxScene(AbstractScene):
 					timeScriptController.addtarget('Time', nativeController)
 					timeScriptController.script = 'Time * %f' % xMeshFrameRate
 
+					# Baking the controller requested.
+					if bake:
+						from blur3d.api import SceneAnimationController
+						wrappedController = SceneAnimationController(self, timeScriptController)
+						wrappedController.bake(rng=bakeRange)
+						timeScriptController = wrappedController.nativePointer()
+
 					# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
 					dependents = mxs.refs.dependents(xMesh)
 
@@ -2269,9 +2289,16 @@ class StudiomaxScene(AbstractScene):
 								mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
 
 			# Creating the and RayFire and Fume instanciated time script controller.
-			timeScriptController= mxs.Float_Script()
+			timeScriptController = mxs.Float_Script()
 			timeScriptController.addtarget('Time', nativeController)
 			timeScriptController.script = 'Time * %f' % cachesFrameRate
+
+			# Baking the controller requested.
+			if bake:
+				from blur3d.api import SceneAnimationController
+				wrappedController = SceneAnimationController(self, timeScriptController)
+				wrappedController.bake(rng=bakeRange)
+				timeScriptController = wrappedController.nativePointer()
 
 			# Handling RayFire caches.
 			for rayFireCache in rayFireCaches:
@@ -2293,19 +2320,24 @@ class StudiomaxScene(AbstractScene):
 		
 			if fumes:
 				
-				# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
-				# Creating instantiated speed controller for Fume caches.
-				# speedScriptController = mxs.Float_Script()
-				# speedScriptController.addObject('Time', nativeController)
+				# Creating speed controller for Fume caches.
+				speedScriptController = mxs.Float_Script()
+				speedScriptController.addObject('Time', nativeController)
 
 				# Making a float script that approximates the derivative of the time curve.
-				# speedScriptController.script = """t = F - 1
-				# 								  a = (at time t (point2 t (Time.value * frameRate)))
-				# 								  t = F + 1
-				# 							 	  b = (at time t (point2 t (Time.value * frameRate)))
-				# 								  c = b - a
-				# 								  c.y / c.x"""	
-				pass
+				speedScriptController.script = """t = F - 1
+												  a = (at time t (point2 t (Time.value * frameRate)))
+												  t = F + 1
+											 	  b = (at time t (point2 t (Time.value * frameRate)))
+												  c = b - a
+												  c.y / c.x"""
+
+				# Baking the controller requested.
+				if bake:
+					from blur3d.api import SceneAnimationController
+					wrappedController = SceneAnimationController(self, speedScriptController)
+					wrappedController.bake(rng=bakeRange)
+					speedScriptController = wrappedController.nativePointer()
 
 			# Handling fumes.
 			for fume in fumes:
@@ -2322,9 +2354,8 @@ class StudiomaxScene(AbstractScene):
 							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 							mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
-							# TODO: Commented speed curve controller because it prevents some scenes to be saved. Need to do more tests.
 							# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
-							# mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
+							mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 		mxs.redrawViews()
 		return True

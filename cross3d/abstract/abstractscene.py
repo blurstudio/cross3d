@@ -824,11 +824,11 @@ class AbstractScene(QObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def applyTimeController(self, controller, cachesFrameRate=None, include='', exclude=''):
+	def applyTimeController(self, controller, cachesFrameRate=None, include='', exclude='', bake=False):
 		""" Applies a controller to all the time controller found in the scene.
 
 		The expected controller should express time in seconds and will be applied as is to alembic modifiers/controllers.
-		Any PC and TMC modifiers/controllers will be wired to the alembic ones through a float script that will both reference the alembic controller
+		Any PC, TMC, XMesh or RayFireCache modifiers/controllers will be wired to the alembic ones through a float script that will both reference the alembic controller
 		and the frame rate at which we know these point cache have been made. Unfortunately this information cannot be deduced from parsing the PC or TMC file.
 
 		Args:
@@ -837,6 +837,7 @@ class AbstractScene(QObject):
 			So if it happens to differ from the one set for that scene, the user will have to provide one.
 			include(str): All the objects which name can be found by that regex will be included.
 			exclude(str): All the objects which name can be found byt that regex will be excluded.
+			bake(bool): If true the PC, TMC, XMesh and RayFireCache stuff will be baked to a curve instead of referencing the curve that drives alembic.
 
 		Return:
 			boolean: Wherther or not retime was applied with success.
@@ -850,10 +851,10 @@ class AbstractScene(QObject):
 		elif not isinstance(controller, api.SceneAnimationController):
 			raise Exception('Argument 1 should be an instance of SceneAnimationController or FCurve.')
 
-		return self._applyNativeTimeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude)
+		return self._applyNativeTimeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude, bake=bake)
 
 	@abstractmethod
-	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude=''):
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
 		return False
 
 	@abstractmethod
