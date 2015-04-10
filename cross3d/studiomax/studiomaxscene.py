@@ -2123,6 +2123,8 @@ class StudiomaxScene(AbstractScene):
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_UVW)
 		for alembicController in alembicControllers:
 			scriptController = mxs.Float_Script()
 			scriptController.script = 'S'
@@ -2179,6 +2181,13 @@ class StudiomaxScene(AbstractScene):
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_UVW)
+
+		# This is all based on having at least one alembic controller.
+		if not alembicControllers:
+			return False
+
 		for alembicController in alembicControllers:
 
 			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
