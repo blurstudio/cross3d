@@ -282,6 +282,23 @@ class AbstractApplication(QObject):
 			return True
 		return False
 
+	def shouldBlockSignal(self, signal, default):
+		""" Allows the Application to conditionally block a signal.
+		
+		Normally you should pass blur3d.api.dispatch.signalsBlocked() to default.
+		In general if default is True this method should just return True. This will
+		prevent unexpected signal emits when a script called
+		blur3d.api.dispatch.blockSignals(True) to block all signals.
+		
+		Args:
+			signal (str): The name of the signal to check if it should be blocked.
+			default (bool): Returned if signal doesn't match any requirements.
+		
+		Returns:
+			bool: If the signal should be blocked.
+		"""
+		return default
+
 # register the symbol
 api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
 

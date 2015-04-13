@@ -168,7 +168,7 @@ class Dispatch(QObject):
 							for key in self._linkedSignals:
 								if signal in self._linkedSignals[key]:
 									# Note: if at some point we need two linked signals to share a signal, this may need to be revised to only disconnect once the last signal is disconnected.
-									blur3d.api.application.connectCallback(key)
+									blur3d.api.application.disconnectCallback(key)
 						else:
 							# remove the application callback. this way callbacks that are not being used do not need to be processed
 							blur3d.api.application.disconnectCallback(signal)
@@ -187,7 +187,7 @@ class Dispatch(QObject):
 			\param		signal	<str>
 			\param		*args	<tuple> additional arguments
 		"""
-		if (self.signalsBlocked()):
+		if blur3d.api.application.shouldBlockSignal(signal, self.signalsBlocked()):
 			return
 
 		# emit a defined pyqtSignal
@@ -220,7 +220,7 @@ class Dispatch(QObject):
 			\param		signal	<str>
 			\param		*args	<tuple> additional arguments
 		"""
-		if (self.signalsBlocked()):
+		if blur3d.api.application.shouldBlockSignal(signal, self.signalsBlocked()):
 			return
 
 		# emit a defined pyqtSignal
