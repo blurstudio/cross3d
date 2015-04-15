@@ -525,7 +525,9 @@ class SoftimageScene(AbstractScene):
 			\remarks	implements AbstractScene.currentFrame method to return the current frame
 			\return		<int>
 		"""
-		return int(xsi.ActiveProject.Properties("Play Control").Parameters("Current").Value)
+		# XSI often returns extreamly small float values like 2.99999999999999956 for frame 3 
+		# at 30.0 fsp, so make sure to round the value before converting to a int
+		return int(round(xsi.ActiveProject.Properties("Play Control").Parameters("Current").Value))
 
 	def objectsKeyedFrames(self, objects, start=None, end=None):
 		frames = []
