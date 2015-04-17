@@ -18,17 +18,17 @@ class StudiomaxSceneAnimationKey( AbstractSceneAnimationKey ):
 	_abstractToNativeTangentTypes = { TangentType.Automatic: mxs.pyhelper.namify('auto'),
 									  TangentType.Bezier: mxs.pyhelper.namify('custom'),
 									  TangentType.Linear: mxs.pyhelper.namify('linear'),
-									  TangentType.Constant: mxs.pyhelper.namify('step')
+									  TangentType.Stepped: mxs.pyhelper.namify('step')
 	}
 
 	# Some of the Max specific tangent types will be converted to bezier.
 	_nativeToAbstractTangentTypes = { 'auto': TangentType.Automatic,
-									   'bezier': TangentType.Bezier,
-									   'linear': TangentType.Linear,
-									   'step': TangentType.Constant,
-									   'slow': TangentType.Bezier,
-									   'fast': TangentType.Bezier,
-									   'smooth': TangentType.Automatic
+									  'bezier': TangentType.Bezier,
+									  'linear': TangentType.Linear,
+									  'step': TangentType.Stepped,
+									  'slow': TangentType.Bezier,
+									  'fast': TangentType.Bezier,
+									  'smooth': TangentType.Automatic
 	}
 
 	#--------------------------------------------------------------------------------

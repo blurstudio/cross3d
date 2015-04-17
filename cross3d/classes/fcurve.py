@@ -186,18 +186,21 @@ class FCurve(object):
 
 		for element in fCurveElement.children():
 
-			kwargs = { 'time': element.attribute('time'),
-					   'value': element.attribute('value'),
-					   'inTangentAngle': element.findChild('inTangentAngle').value(),
-					   'outTangentAngle': element.findChild('outTangentAngle').value(),
-					   'inTangentType': element.findChild('inTangentType').value(),
-					   'outTangentType': element.findChild('outTangentType').value(),
-					   'inTangentLength': element.findChild('inTangentLength').value(), 
-					   'outTangentLength': element.findChild('outTangentLength').value(),
-					   'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
-					   'brokenTangents': element.findChild('brokenTangents').value() == 'True' }
+			# This guarantees that the XML is somehow valid.
+			if element.findChild('inTangentAngle'):
+				
+				kwargs = { 'time': element.attribute('time'),
+						   'value': element.attribute('value'),
+						   'inTangentAngle': element.findChild('inTangentAngle').value(),
+						   'outTangentAngle': element.findChild('outTangentAngle').value(),
+						   'inTangentType': element.findChild('inTangentType').value(),
+						   'outTangentType': element.findChild('outTangentType').value(),
+						   'inTangentLength': element.findChild('inTangentLength').value(), 
+						   'outTangentLength': element.findChild('outTangentLength').value(),
+						   'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
+						   'brokenTangents': element.findChild('brokenTangents').value() == 'True' }
 
-			self._keys.append(Key(**kwargs))
+				self._keys.append(Key(**kwargs))
 
 	def toXML(self):
 		""" Translate the curve data into a XML.

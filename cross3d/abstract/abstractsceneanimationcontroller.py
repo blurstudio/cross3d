@@ -13,6 +13,7 @@ from blur3d.api import FCurve
 from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
 from blurdev.decorators import pendingdeprecation
+from blur3d.constants import TangentType, FCurveExtrapolation
 
 class AbstractSceneAnimationController(SceneWrapper):
 	#--------------------------------------------------------------------------------
@@ -62,7 +63,9 @@ class AbstractSceneAnimationController(SceneWrapper):
 	#								public methods
 	#--------------------------------------------------------------------------------
 
-	def bake(self, rng=None):
+	def bake(self, rng=None, interpolation=TangentType.Automatic, extrapolation=FCurveExtrapolation.Constant):
+		""" TODO: Add support for extrapolation.
+		"""
 
 		# If the use does not provide a range we use the active range instead.
 		if not rng:
@@ -71,11 +74,16 @@ class AbstractSceneAnimationController(SceneWrapper):
 		# Creating a FCurve instead to store all the data.
 		fCurve = FCurve()
 
+		# Figuring the tangent type.
+		tangentType = interpolation
+
 		# Feeling up the FCurve data for the desired range.
 		for frame in range(rng[0], rng[1] + 1):
 
-			# Defining tangent types. We don't want automatic for last and first key.
-			tangentType = 'linear' if frame in (rng[0], rng[1]) else 'auto'
+			if interpolation == TangentType.Automatic:
+
+				# Defining tangent types. We don't want automatic for last and first key.
+				tangentType = TangentType.Linear if frame in (rng[0], rng[1]) else TangentType.Automatic
 			
 			# TODO: Use abstracted tangent types.
 			kwargs = {'time': frame, 'value': self.valueAtFrame(frame), 'inTangentType':tangentType, 'outTangentType':tangentType}

@@ -12,7 +12,7 @@ import math
 
 from Py3dsMax import mxs
 from blur3d.api import FCurve
-from blur3d.constants import ControllerType
+from blur3d.constants import ControllerType, TangentType
 from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
 class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
@@ -121,6 +121,11 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	def fCurve(self):
 		""" Returns a FCurve object to manipulate or save the curve data.
 		"""
+
+		# Importing SceneAnimationKey to get abstract types information.
+		from blur3d.api import SceneAnimationKey
+
+		# Getting what we need.
 		controllerType = self.type()
 		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 		
@@ -155,8 +160,8 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				# Bare in mind that inTangent and outTangent are the slopes.
 				kwargs['inTangentAngle'] = math.atan((key.inTangent * 0.1 / sd) * 10.0)
 				kwargs['outTangentAngle'] = math.atan((key.outTangent * 0.1 / sd) * 10.0)
-				kwargs['inTangentType'] = key.inTangentType
-				kwargs['outTangentType'] = key.outTangentType
+				kwargs['inTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(key.inTangentType, TangentType.Automatic)
+				kwargs['outTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(key.outTangentType, TangentType.Automatic)
 
 				# Bare in mind that Max tangent length is actually not the length but the length on the time axis.
 				kwargs['inTangentLength'] = key.inTangentLength / math.cos(kwargs['inTangentAngle']) if kwargs['inTangentAngle'] != 0.0 else key.inTangentLength
@@ -181,6 +186,10 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		""" Takes a fCurve object data and applies it to the controller.
 		"""
 		
+		# Importing SceneAnimationKey to get abstract types information.
+		from blur3d.api import SceneAnimationKey
+
+		# Getting what we need.
 		tpe = fCurve.type()
 		keys = fCurve.keys()
 
@@ -218,8 +227,14 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 					key.outTangent = (math.tan(k.outTangentAngle) / 10.0) * sd / 0.1
 							
 					# Restore other key properties.
-					key.inTangentType = mxs.pyhelper.namify(k.inTangentType)
-					key.outTangentType = mxs.pyhelper.namify(k.outTangentType)
+					# TODO: This is a temporary check to guarantee backward compatibility. It can be removed soon.
+					if k.inTangentType in ['auto', 'linear', 'step']:
+						key.inTangentType = k.inTangentType
+						key.outTangentType = k.outTangentType
+					else:
+						key.inTangentType = SceneAnimationKey._nativeToAbstractTangentTypes.get(TangentType.valueByLabel(k.inTangentType), 'auto')
+						key.outTangentType = SceneAnimationKey._nativeToAbstractTangentTypes.get(TangentType.valueByLabel(k.outTangentType), 'auto')
+
 					key.freeHandle = not k.normalizedTangents
 					key.x_locked = not k.brokenTangents
 

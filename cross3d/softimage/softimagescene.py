@@ -278,7 +278,7 @@ class SoftimageScene(AbstractScene):
 			frameRange(FrameRange|False|None): If a range is provided animation will be exported. If None is provided, 
 			the animation will be detected automatically. If False is provided animation will not be exported. 
 		"""
-		
+
 		# Storing the scene state.
 		self.storeState()
 		initialFrameRange = self.animationRange()
@@ -291,6 +291,8 @@ class SoftimageScene(AbstractScene):
 				self.setAnimationRange(frameRange)
 			elif frameRange is None:
 				frameRange = self.animationRange()
+			elif not frameRange in (True, False):
+				raise Exception('Argument "frameRange" should be of type list, tuple or FrameRange.')
 
 			# Handling the frame rate.
 			if frameRate and frameRange:
@@ -322,7 +324,7 @@ class SoftimageScene(AbstractScene):
 					xsi.PlotAndApplyActions(controllers, "plot", frameRange[0], frameRange[1], "", 20, 3, "", "", "", "", True, True)
 
 			# Setting the FBX export options.
-			xsi.FBXExportAnimation(frameRange is not False and controllers)
+			xsi.FBXExportAnimation(bool(frameRange) and bool(controllers))
 			xsi.FBXExportScaleFactor(1)
 			xsi.FBXExportGeometries(True)
 			xsi.FBXExportSkins(True)
