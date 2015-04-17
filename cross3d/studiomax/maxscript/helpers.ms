@@ -4,6 +4,8 @@
 	this file defines a struct of methods designed to help out the python integration
 	for methods that are not easily transferrable to python
 */
+_blurLibrary.load "blurPointCache"
+
 global blur3dhelper
 (
 	struct Blur3dHelperStruct (
@@ -165,7 +167,6 @@ global blur3dhelper
 
 		-- Visibility toggle for PC objects.
 		function togglePointCaches mods state = (
-			_blurLibrary.load "blurPointCache"
 			pcMods = #()
 			for i = 1 to mods.count do
 				if classOf mods[i] == Point_Cache do
