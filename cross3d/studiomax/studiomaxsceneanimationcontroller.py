@@ -2,7 +2,7 @@
 #	\namespace	blur3d.api.abstract.abstractsceneanimationcontroller
 #
 #	\remarks	The AbstractSceneAnimationController class provides an interface to editing controllers in a Scene environment for any DCC application
-#	
+#
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		09/08/10
@@ -12,36 +12,38 @@ import math
 
 from Py3dsMax import mxs
 from blur3d.api import FCurve
+from blur3d.constants import TimeUnit
 from blur3d.constants import ControllerType, TangentType
 from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
-class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
-	_nativeToAbstractTypes = { 'bezier_float'             : ControllerType.BezierFloat,
-							   'linear_float'             : ControllerType.LinearFloat,
-							   'script_float'             : ControllerType.ScriptFloat,
-							   'Alembic_Float_Controller' : ControllerType.AlembicFloat }
+class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 
-	_abstractToNativeTypes = { ControllerType.BezierFloat  : mxs.bezier_float,
-							   ControllerType.LinearFloat  : mxs.linear_float,
-							   ControllerType.ScriptFloat  : mxs.script_float,
-							   ControllerType.AlembicFloat : mxs.Alembic_Float_Controller }
+	_nativeToAbstractTypes = {'bezier_float': ControllerType.BezierFloat,
+                           'linear_float': ControllerType.LinearFloat,
+                           'script_float': ControllerType.ScriptFloat,
+                           'Alembic_Float_Controller': ControllerType.AlembicFloat}
 
-	_slopeDistortions = {24:0.12, 25:0.13, 30:0.187, 60:0.75}
+	_abstractToNativeTypes = {ControllerType.BezierFloat: mxs.bezier_float,
+                           ControllerType.LinearFloat: mxs.linear_float,
+                           ControllerType.ScriptFloat: mxs.script_float,
+                           ControllerType.AlembicFloat: mxs.Alembic_Float_Controller}
+
+	_slopeDistortions = {24: 0.12, 25: 0.13, 30: 0.187, 60: 0.75}
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def _createNativeKeyAt( self, time ):
+	def _createNativeKeyAt(self, time):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._nativeKeys method to create a new key at the inputed time
 			\param		time		<float>
 			\return		<Py3dsMax.mxs.Key> nativeKey || None
 		"""
-		return mxs.addNewKey( self._nativePointer, time )
-	
-	def _nativeKeys( self ):
+		return mxs.addNewKey(self._nativePointer, time)
+
+	def _nativeKeys(self):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._nativeKeys method to collect a list of the current keys
 						for this controller instance
@@ -52,7 +54,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		if mxs.classOf(self._nativePointer) in [mxs.bezier_float, mxs.linear_float]:
 			return self._nativePointer.keys
 		return []
-		
+
 	@classmethod
 	def _createNewNative(cls, scene, controllerType):
 		"""
@@ -66,7 +68,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		elif (controllerType == ControllerType.LinearFloat):
 			return mxs.linear_float()
 		return None
-	
+
 	def _setNativeKeyAt(self, time, nativeKey):
 		"""
 			\remarks	set the key at the inputed time to the given native key
@@ -88,7 +90,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 			if not key:
 				return False
 		return key.setValue(nativeKey)
-		
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -103,7 +105,7 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 	def displayName(self):
 		return self.name().split('.')[-1]
 
-	def name( self ):
+	def name(self):
 		"""
 			\remarks	implements AbstractSceneWrapper.name to return the name of this animation controller instance
 			\sa			setName
@@ -128,64 +130,73 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		# Getting what we need.
 		controllerType = self.type()
 		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
-		
+
 		# We only support controllers that can have keys.
 		if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
 
 			# Getting the slope distortion based on scene frame rate. On of Max's treats.
 			sd = self._slopeDistortions.get(int(self._scene.animationFPS()), 0.1)
 
+			# Getting keys.
+			keys = self.keys()
+			keyCount = len(keys)
 
-			for key in self.keys():
-				key = key.nativePointer()
-				
-				# Storing current key values.
-				freeHandle = key.freeHandle
-				inTangentLength = key.inTangentLength
-				inTangentType = key.inTangentType
-				outTangentLength = key.outTangentLength
-				outTangentType = key.outTangentType
-				
-				# It takes time to set and restore the free handles so I only do it if necessary.
-				needsFreeHandle = not (str(inTangentType) == 'linear' and str(outTangentType) == 'linear') and not freeHandle
-				if needsFreeHandle:
+			# Looping through keys.
+			for index in range(keyCount):
 
-					# We want the non normalized handle length values.
-					key.freeHandle = True
+				# Getting native key.
+				key = keys[index].nativePointer()
 
-				kwargs ={}
+				# Storing key data.
+				kwargs = {}
 				kwargs['value'] = key.value
 				kwargs['time'] = key.time
+				kwargs['normalizedTangents'] = not key.freeHandle
+
+				# Storing tangent type.
+				inTangentType = key.inTangentType
+				outTangentType = key.outTangentType
+
+				# If tangents are normalized calculating the tangent lenght is a bit more work.
+				# Do not try to bypass that by temporarly changing the key mode. This is the way I had it before.
+				# Restoring the key mode takes a lot of time somehow has a great impact on tools. Especialy with V-Ray cameras.
+				if kwargs['normalizedTangents']:
+
+					if index > 0:
+						pKey = keys[index - 1].nativePointer()
+						inTangentLength = (kwargs['time'] - pKey.time) * key.inTangentLength
+					else:
+						inTangentLength = 0.0
+
+					if index < keyCount - 1:
+						nKey = keys[index + 1].nativePointer()
+						outTangentLength = (nKey.time - kwargs['time']) * key.outTangentLength
+					else:
+						outTangentLength = 0.0
+
+				else:
+					inTangentLength = key.inTangentLength
+					outTangentLength = key.outTangentLength
 
 				# Bare in mind that inTangent and outTangent are the slopes.
 				kwargs['inTangentAngle'] = math.atan((key.inTangent * 0.1 / sd) * 10.0)
 				kwargs['outTangentAngle'] = math.atan((key.outTangent * 0.1 / sd) * 10.0)
-				kwargs['inTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(key.inTangentType, TangentType.Automatic)
-				kwargs['outTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(key.outTangentType, TangentType.Automatic)
+				kwargs['inTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(str(inTangentType), TangentType.Automatic)
+				kwargs['outTangentType'] = SceneAnimationKey._nativeToAbstractTangentTypes.get(str(outTangentType), TangentType.Automatic)
 
 				# Bare in mind that Max tangent length is actually not the length but the length on the time axis.
-				kwargs['inTangentLength'] = key.inTangentLength / math.cos(kwargs['inTangentAngle']) if kwargs['inTangentAngle'] != 0.0 else key.inTangentLength
-				kwargs['outTangentLength'] = key.outTangentLength / math.cos(kwargs['outTangentAngle']) if kwargs['outTangentAngle'] != 0.0 else key.outTangentLength
-				kwargs['normalizedTangents'] = not freeHandle
+				kwargs['inTangentLength'] = inTangentLength / math.cos(kwargs['inTangentAngle']) if kwargs['inTangentAngle'] != 0.0 else inTangentLength
+				kwargs['outTangentLength'] = outTangentLength / math.cos(kwargs['outTangentAngle']) if kwargs['outTangentAngle'] != 0.0 else outTangentLength
 				kwargs['brokenTangents'] = not key.x_locked
 				fCurve.addKey(**kwargs)
-
-				# It takes time to set and restore the free handles so I only do it if necessary.
-				if needsFreeHandle:
-
-					# Restoring the key settings.
-					key.freeHandle = freeHandle
-					key.inTangentType = inTangentType
-					key.outTangentType = outTangentType
-					key.inTangentLength = inTangentLength
-					key.outTangentLength = outTangentLength
 
 		return fCurve
 
 	def setFCurve(self, fCurve):
-		""" Takes a fCurve object data and applies it to the controller.
+		""" 
+			Takes a fCurve object data and applies it to the controller.
 		"""
-		
+
 		# Importing SceneAnimationKey to get abstract types information.
 		from blur3d.api import SceneAnimationKey
 
@@ -207,34 +218,26 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				for k in keys:
 					key = mxs.addNewKey(controller, k.time)
 					key.value = k.value
-				
+
 				# And then do a second pass to process the tangents.
 				for k in keys:
 					key = mxs.getKey(controller, mxs.getKeyIndex(controller, k.time))
-					
+
 					# The tangeants do not expected the same values if the are free.
 					key.freeHandle = True
 					key.x_locked = False
 					key.inTangentType = mxs.pyhelper.namify('custom')
 					key.outTangentType = mxs.pyhelper.namify('custom')
 
-					# The Max tangent lenght is actually the distance on the time axis.	
+					# The Max tangent lenght is actually the distance on the time axis.
 					key.inTangentLength = math.cos(k.inTangentAngle) * k.inTangentLength
 					key.inTangent = (math.tan(k.inTangentAngle) / 10.0) * sd / 0.1
 
 					# The Max tangent lenght is actually the distance on the time axis.
 					key.outTangentLength = math.cos(k.outTangentAngle) * k.outTangentLength
 					key.outTangent = (math.tan(k.outTangentAngle) / 10.0) * sd / 0.1
-							
-					# Restore other key properties.
-					# TODO: This is a temporary check to guarantee backward compatibility. It can be removed soon.
-					if k.inTangentType in ['auto', 'linear', 'step']:
-						key.inTangentType = k.inTangentType
-						key.outTangentType = k.outTangentType
-					else:
-						key.inTangentType = SceneAnimationKey._nativeToAbstractTangentTypes.get(TangentType.valueByLabel(k.inTangentType), 'auto')
-						key.outTangentType = SceneAnimationKey._nativeToAbstractTangentTypes.get(TangentType.valueByLabel(k.outTangentType), 'auto')
-
+					key.inTangentType = SceneAnimationKey._abstractToNativeTangentTypes.get(k.inTangentType, mxs.pyhelper.namify('auto'))
+					key.outTangentType = SceneAnimationKey._abstractToNativeTangentTypes.get(k.outTangentType, mxs.pyhelper.namify('auto'))
 					key.freeHandle = not k.normalizedTangents
 					key.x_locked = not k.brokenTangents
 
@@ -242,6 +245,22 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 
 				# It is essential to re-point the native pointer.
 				self._nativePointer = controller
+
+	def _nativeDerivatedController(self, timeUnit=TimeUnit.Seconds):
+		derivatedController = mxs.Float_Script()
+		derivatedController.addObject('Integral', self._nativePointer)
+
+		# We can have a time ratio based on seconds of frames.
+		t = 't / frameRate' if timeUnit == TimeUnit.Seconds else 't'
+
+		# Making a float script that approximates the derivative of the time curve.
+		derivatedController.script = """t = F - 1
+										a = (at time t (point2 ({t}) (Integral.value)))
+										t = F + 1
+									 	b = (at time t (point2 ({t}) (Integral.value)))
+										c = b - a
+										c.y / c.x""".format(t=t)
+		return derivatedController
 
 	def framesForValue(self, value, closest=True):
 
@@ -262,12 +281,12 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 				currentValue = self.valueAtFrame(frame)
 
 				if closest:
-					if abs(value-currentValue) < abs(value-closestValue):
+					if abs(value - currentValue) < abs(value - closestValue):
 						closestValue = currentValue
 						closestFrame = frame
-				
+
 				if round(currentValue) == round(value):
-					if previousValue is None or abs(value-currentValue) < abs(value-previousValue):
+					if previousValue is None or abs(value - currentValue) < abs(value - previousValue):
 						frames[index] = frame
 
 						# Saving value as previous value.
@@ -280,8 +299,8 @@ class StudiomaxSceneAnimationController( AbstractSceneAnimationController ):
 		if not frames and closest:
 			return [closestFrame]
 
-		return sorted(frames.values())		
+		return sorted(frames.values())
 
 # register the symbol
 from blur3d import api
-api.registerSymbol( 'SceneAnimationController', StudiomaxSceneAnimationController )
+api.registerSymbol('SceneAnimationController', StudiomaxSceneAnimationController)

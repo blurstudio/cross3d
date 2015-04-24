@@ -14,7 +14,6 @@ import glob
 import getpass
 import win32con
 import win32api
-import win32gui
 import traceback
 
 from Py3dsMax import mxs
@@ -22,7 +21,6 @@ from blurdev import debug
 from PyQt4.QtCore import QTimer
 from blur3d.lib.tmclib import TMCInfo
 from blur3d.constants import UpVector
-from blur3d.constants import ControllerType
 from blur3d.lib.pclib import PointCacheInfo
 from blur3d.api import UserProps, application
 from blur3d.lib.xmeshhandler import XMESHHandler
@@ -2116,7 +2114,7 @@ class StudiomaxScene(AbstractScene):
 			rayFireCache.playUseGraph = True
 			mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
 
-	def resetTimeControllers(self):
+	def resetTimeControllers(self, include='', exclude=''):
 
 		# Resetting Alembics to normal playback by instantiating the same expression.
 		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller) 
@@ -2125,53 +2123,91 @@ class StudiomaxScene(AbstractScene):
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_UVW)
+
+		# Looping through controllers.
 		for alembicController in alembicControllers:
-			scriptController = mxs.Float_Script()
-			scriptController.script = 'S'
-			mxs.setPropertyController(alembicController, 'time', scriptController) 
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(alembicController)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+						scriptController = mxs.Float_Script()
+						scriptController.script = 'S'
+						mxs.setPropertyController(alembicController, 'time', scriptController) 
 
 		# Resetting PCs and TMCs to default playback.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
 		for nativeCache in nativeCaches:
 
-			if mxs.classOf(nativeCache) == mxs.Point_Cache:
-				nativeCache.sampleRate = 1.0
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(nativeCache)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
 
-			nativeCache.playbackType = 0
-			mxs.setPropertyController(nativeCache, "playbackFrame", mxs.bezier_float())
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude) and mxs.classOf(self._findNativeObject(name)) != mxs.FumeFX:
+						if mxs.classOf(nativeCache) == mxs.Point_Cache:
+							nativeCache.sampleRate = 1.0
+						nativeCache.playbackType = 0
+						mxs.setPropertyController(nativeCache, "playbackFrame", mxs.bezier_float())
 
 		# Resetting XMeshes to default playback.
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
 		for xMesh in xMeshes:
-			xMesh.enablePlaybackGraph = False
-			mxs.setPropertyController(xMesh, "playbackGraphTime", mxs.bezier_float())
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(xMesh)
+
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+						xMesh.enablePlaybackGraph = False
+						mxs.setPropertyController(xMesh, "playbackGraphTime", mxs.bezier_float())
 
 		# Resetting XMeshes to default playback.
 		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
 		for rayFireCache in rayFireCaches:
-			rayFireCache.playUseGraph = False
-			mxs.setPropertyController(rayFireCache, "playFrame", mxs.bezier_float())
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(rayFireCache)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+						rayFireCache.playUseGraph = False
+						mxs.setPropertyController(rayFireCache, "playFrame", mxs.bezier_float())
 
 		# Resetting Fumes.
 		fumes = mxs.getClassInstances(mxs.FumeFX)
 		for fume in fumes:
-			mxs.setPropertyController(fume, 'TimeValue', mxs.bezier_float())
-			mxs.setPropertyController(fume, 'TimeScaleFactor', mxs.bezier_float())
-			fume.TimeScaleFactor = 1.0
-			mxs.setPropertyController(fume, 'timescale', mxs.bezier_float())
-			fume.timescale = 1.0
+
+			# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+			dependents = mxs.refs.dependents(fume)
+			for dependent in dependents:
+				if mxs.isProperty(dependent, 'name'):
+					name = dependent.name
+
+					# TODO: That check is a little lite.
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):		
+						mxs.setPropertyController(fume, 'TimeValue', mxs.bezier_float())
+						mxs.setPropertyController(fume, 'TimeScaleFactor', mxs.bezier_float())
+						fume.TimeScaleFactor = 1.0
+						mxs.setPropertyController(fume, 'timescale', mxs.bezier_float())
+						fume.timescale = 1.0
 
 		return True
-		
-	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
 
-		# Getting the range of the native controller in case we need to bake.
-		if bake:
-			from blur3d.api import SceneAnimationController
-			controller = SceneAnimationController(self, nativeController)
-			bakeRange = controller.fCurve().range()
-			if not bakeRange:
-				bake = False
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
 
  		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
@@ -2183,10 +2219,6 @@ class StudiomaxScene(AbstractScene):
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_UVW)
-
-		# This is all based on having at least one alembic controller.
-		if not alembicControllers:
-			return False
 
 		for alembicController in alembicControllers:
 
@@ -2202,7 +2234,20 @@ class StudiomaxScene(AbstractScene):
 
 		# Since the TMC and PC time controllers will take the form of a script that references the provided time controller.
 		# We need to make sure the provided controller is not "floating" otherwise we use a pointer the one we have instanciated on alembics.
-		nativeController = mxs.getPropertyController(alembicController, "Time") if not mxs.refs.dependents(nativeController) else nativeController
+		if not mxs.refs.dependents(nativeController):
+			nativeController = mxs.getPropertyController(alembicController, "Time")
+
+		# In the case where there is no alembic controller around, we cannot reference a "floating" controller and therefore have to bake.
+		else:
+			bake = True
+
+		# Getting the range of the native controller in case we need to bake.
+		if bake:
+			from blur3d.api import SceneAnimationController
+			controller = SceneAnimationController(self, nativeController)
+			bakeRange = controller.fCurve().range()
+			if not bakeRange:
+				bake = False
 
 		# TODO: Stop supporting PCs and TMCs, they suck, we need to move on.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
@@ -2252,52 +2297,53 @@ class StudiomaxScene(AbstractScene):
 							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 							mxs.setPropertyController(nativeCache, "playbackFrame", timeScriptController)
 
-		# Collecting other types of point caches.
+		# Handling XMesh caches.
 		xMeshes = mxs.getClassInstances(mxs.XMeshLoader)
+		for xMesh in xMeshes:
+
+			# Getting the FPS of that XMesh.
+			fileName = xMesh.renderSequence
+			if os.path.exists(fileName):
+
+				# Getting the FPS at which the XMesh was generated.
+				xMeshFrameRate = XMESHHandler(fileName).fps()
+
+				# Creating the XMesh and RayFire and Fume instanciated time script controller.
+				timeScriptController= mxs.Float_Script()
+				timeScriptController.addtarget('Time', nativeController)
+				timeScriptController.script = 'Time * %f' % xMeshFrameRate
+
+				# Baking the controller requested.
+				if bake:
+					from blur3d.api import SceneAnimationController
+					wrappedController = SceneAnimationController(self, timeScriptController)
+					wrappedController.bake(rng=bakeRange)
+					timeScriptController = wrappedController.nativePointer()
+
+				# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+				dependents = mxs.refs.dependents(xMesh)
+
+				for dependent in dependents:
+					if mxs.isProperty(dependent, 'name'):
+						name = dependent.name
+
+						# TODO: That check is a little lite.
+						if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+
+							# Setting the playback to curve.
+							xMesh.enablePlaybackGraph = True
+
+							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+							mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
+
+		# Handling the other cache formats.
 		rayFireCaches = mxs.getClassInstances(mxs.RF_Cache)
 		fumes = mxs.getClassInstances(mxs.FumeFX)
+		thinkings = mxs.getClassInstances(mxs.Thinking)
+		if rayFireCaches or fumes or thinkings:
 
-		if xMeshes or rayFireCaches or fumes:
-											  
-			# Handling XMesh caches.
-			for xMesh in xMeshes:
-
-				# Getting the FPS of that XMesh.
-				fileName = xMesh.renderSequence
-				if os.path.exists(fileName):
-
-					# Getting the FPS at which the XMesh was generated.
-					xMeshFrameRate = XMESHHandler(fileName).fps()
-
-					# Creating the XMesh and RayFire and Fume instanciated time script controller.
-					timeScriptController= mxs.Float_Script()
-					timeScriptController.addtarget('Time', nativeController)
-					timeScriptController.script = 'Time * %f' % xMeshFrameRate
-
-					# Baking the controller requested.
-					if bake:
-						from blur3d.api import SceneAnimationController
-						wrappedController = SceneAnimationController(self, timeScriptController)
-						wrappedController.bake(rng=bakeRange)
-						timeScriptController = wrappedController.nativePointer()
-
-					# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-					dependents = mxs.refs.dependents(xMesh)
-
-					for dependent in dependents:
-						if mxs.isProperty(dependent, 'name'):
-							name = dependent.name
-
-							# TODO: That check is a little lite.
-							if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
-
-								# Setting the playback to curve.
-								xMesh.enablePlaybackGraph = True
-
-								# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-								mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
-
-			# Creating the and RayFire and Fume instanciated time script controller.
+			# Creating the and RayFire, Fume and Thinking instanciated time script controller.
+			# Simply because I did not figured out a way to detect their respective FPS yet.
 			timeScriptController = mxs.Float_Script()
 			timeScriptController.addtarget('Time', nativeController)
 			timeScriptController.script = 'Time * %f' % cachesFrameRate
@@ -2326,47 +2372,62 @@ class StudiomaxScene(AbstractScene):
 
 							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
 							mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
-		
-			if fumes:
+			
+			# We are only creating a speed curve if fumes or thinking are present.
+			if fumes or thinkings:
 				
 				# Creating speed controller for Fume caches.
-				speedScriptController = mxs.Float_Script()
-				speedScriptController.addObject('Time', nativeController)
-
-				# Making a float script that approximates the derivative of the time curve.
-				speedScriptController.script = """t = F - 1
-												  a = (at time t (point2 t (Time.value * frameRate)))
-												  t = F + 1
-											 	  b = (at time t (point2 t (Time.value * frameRate)))
-												  c = b - a
-												  c.y / c.x"""
+				from blur3d.api import SceneAnimationController
+				wrappedController = SceneAnimationController(self, nativeController)
+				speedScriptController = wrappedController.derivatedController()
 
 				# Baking the controller requested.
 				if bake:
-					from blur3d.api import SceneAnimationController
-					wrappedController = SceneAnimationController(self, speedScriptController)
-					wrappedController.bake(rng=bakeRange)
-					speedScriptController = wrappedController.nativePointer()
+					speedScriptController.bake(rng=bakeRange)
 
-			# Handling fumes.
-			for fume in fumes:
+				# Getting the native speed controller.
+				speedScriptController = speedScriptController.nativePointer()
 
-				# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
-				dependents = mxs.refs.dependents(fume)
-				for dependent in dependents:
-					if mxs.isProperty(dependent, 'name'):
-						name = dependent.name
+				# Handling fumes.
+				for fume in fumes:
 
-						# TODO: That check is a little lite.
-						if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
+					# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
+					dependents = mxs.refs.dependents(fume)
+					for dependent in dependents:
+						if mxs.isProperty(dependent, 'name'):
+							name = dependent.name
 
-							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
-							mxs.setPropertyController(fume, "TimeValue", timeScriptController)
+							# TODO: That check is a little lite.
+							if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 
-							# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
-							mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
+								# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
+								mxs.setPropertyController(fume, "TimeValue", timeScriptController)
+
+								# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
+								mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
+
+				# Handling Thinking Particles objects.
+				for thinking in thinkings:
+
+					# For thinking we do not care for include and exclude since the user can simply unsubscribe by not using the pre-defined properties.
+					self._setThinkingPropertyController(thinking, "TimeCurve", timeScriptController)
+					self._setThinkingPropertyController(thinking, "SpeedCurve", speedScriptController)
 
 		mxs.redrawViews()
+		return True
+
+	def _setThinkingPropertyController(self, thinking, prop, controller):
+		def setControllerRecursively(operator, prop, controller):
+			if operator:
+				if mxs.hasProperty(operator, 'Value') and operator.getName() == prop:
+					mxs.setPropertyController(operator, mxs.pyHelper.namify('Value'), controller)
+				elif mxs.hasProperty(operator, 'Operators'):
+					for op in operator.Operators:
+						setControllerRecursively(op, prop, controller)
+
+		# Running the local recursive function on all dynamic sets.
+		for dynamicSet in thinking.MasterDynamic.DynamicSets:
+			setControllerRecursively(dynamicSet, prop, controller)
 		return True
 
 	def renderSize(self):

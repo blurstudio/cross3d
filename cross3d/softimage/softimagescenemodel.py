@@ -243,8 +243,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return True
 
 	def matchPose(self, model, objects=[]):
-
-		action = model.storeAnimation('Match', objects)
+		action = model.storePose('Match', objects)
 		xsi.ApplyAction(action, self._nativePointer)
 
 		for obj in objects:

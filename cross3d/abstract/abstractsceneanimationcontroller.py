@@ -9,11 +9,12 @@
 #
 
 from blur3d import api
-from blur3d.api import FCurve
 from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
+from blur3d.api import FCurve, FrameRange
 from blurdev.decorators import pendingdeprecation
 from blur3d.constants import TangentType, FCurveExtrapolation
+
 
 class AbstractSceneAnimationController(SceneWrapper):
 	#--------------------------------------------------------------------------------
@@ -84,9 +85,9 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 				# Defining tangent types. We don't want automatic for last and first key.
 				tangentType = TangentType.Linear if frame in (rng[0], rng[1]) else TangentType.Automatic
-			
+
 			# TODO: Use abstracted tangent types.
-			kwargs = {'time': frame, 'value': self.valueAtFrame(frame), 'inTangentType':tangentType, 'outTangentType':tangentType}
+			kwargs = {'time': frame, 'value': self.valueAtFrame(frame), 'inTangentType': tangentType, 'outTangentType': tangentType}
 			fCurve.addKey(**kwargs)
 
 		# Applying the FCurve to the controller.
@@ -102,7 +103,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 		"""
 		nativeKey = self._createNativeKeyAt(time)
-		if (nativeKey):
+		if nativeKey:
 			from blur3d.api import SceneAnimationKey
 			return SceneAnimationKey(self._scene, nativeKey)
 		return None
@@ -117,8 +118,19 @@ class AbstractSceneAnimationController(SceneWrapper):
 		return 0
 
 	@pendingdeprecation('Use type method instead.')
-	def controllerType( self ):
+	def controllerType(self):
 		return self.type()
+
+	@abstractmethod
+	def _nativeDerivatedController(self):
+		return None
+
+	def derivatedController(self):
+		from blur3d.api import SceneAnimationController
+		nativeController = self._nativeDerivatedController()
+		if nativeController:
+			return SceneAnimationController(self._scene, nativeController)
+		return None
 
 	def isKeyedAt(self, time):
 		"""Return whether or not a key exists at the inputed time frame
@@ -141,7 +153,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 		"""
 		for key in self.keys():
-			if (key.time() == time):
+			if key.time() == time:
 				return key
 		return None
 
@@ -154,12 +166,12 @@ class AbstractSceneAnimationController(SceneWrapper):
 		
 		"""
 		from blur3d.api import SceneAnimationKey
-		return [ SceneAnimationKey(self._scene, nativeKey) for nativeKey in self._nativeKeys() ]
+		return [SceneAnimationKey(self._scene, nativeKey) for nativeKey in self._nativeKeys()]
 
 	@abstractmethod
  	def valueAtFrame(self, frame):
  		return 0.0
- 		
+
  	@abstractmethod
  	def framesForValue(self, value):
  		return []
@@ -182,7 +194,7 @@ class AbstractSceneAnimationController(SceneWrapper):
  	@abstractmethod
  	def setFCurve(self, fCurve):
  		return False
- 		
+
 	def setKeyAt(self, time, key):
 		"""Set the key at the inputed time frame to the inputed key
 
@@ -195,7 +207,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 		"""
 		nativeKey = None
-		if (key):
+		if key:
 			nativeKey = key.nativePointer()
 		return self._setNativeKeyAt(time, nativeKey)
 
@@ -209,11 +221,28 @@ class AbstractSceneAnimationController(SceneWrapper):
 		
 		"""
 		nativeController = cls._createNewNative(scene, controllerType)
-		if (nativeController):
+		if nativeController:
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController(scene, nativeController)
 		return None
 
+	def frameRange(self):
+		keys = self.keys()
+		if len(keys) > 1:
+			return FrameRange([keys[0].time(), keys[-1].time()])
+		return FrameRange([0, 0])
+
+	def valueRange(self, frameRange=None):
+		frameRange = self.frameRange() if frameRange is None else frameRange
+		low = None
+		high = None
+		for frame in range(frameRange.start(), frameRange.end() + 1):
+			value = self.valueAtFrame(frame)
+			if low is None or value < low:
+				low = value
+			if high is None or value > high:
+				high = value
+		return (low, high)
 
 # register the symbol
 api.registerSymbol('SceneAnimationController', AbstractSceneAnimationController, ifNotFound=True)

@@ -5,9 +5,9 @@ import blurdev
 import xml.dom.minidom
 
 from framerange import FrameRange
-from blur3d.constants import ControllerType
-from blurdev.XML.xmldocument import XMLDocument
 from blurdev.XML.xmlelement import XMLElement
+from blurdev.XML.xmldocument import XMLDocument
+from blur3d.constants import ControllerType, TangentType
 
 class Key(object):
 
@@ -18,8 +18,8 @@ class Key(object):
 		# Tangent angles are sorted in radians.
 		self.inTangentAngle = float(kwargs.get('inTangentAngle', 0.0))
 		self.outTangentAngle = float(kwargs.get('outTangentAngle', 0.0))
-		self.inTangentType = str(kwargs.get('inTangentType', 0))
-		self.outTangentType = str(kwargs.get('outTangentType', 0))
+		self.inTangentType = int(kwargs.get('inTangentType', 0))
+		self.outTangentType = int(kwargs.get('outTangentType', 0))
 		self.outTangentLength = float(kwargs.get('outTangentLength', 0.0))
 		self.inTangentLength = float(kwargs.get('inTangentLength', 0.0))
 
@@ -143,15 +143,18 @@ class FCurve(object):
 		self._keys.append(key)
 		return self._keys
 	
+	def __len__(self):
+		return len(self.keys())
+
 	def __nonzero__(self):
-		return bool(self._keys)
+		return bool(self.__len__())
 
 	def __eq__(self, other):
 		""" Allows to compare to fCurve objects.
 		"""
 		if isinstance(other, FCurve):
 
-			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid: 
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
 				with open(r'C:\temp\fCurve.xml', 'w') as fle:
 					fle.write(self.toXML())
 				with open(r'C:\temp\otherFCurve.xml', 'w') as fle:
@@ -188,13 +191,24 @@ class FCurve(object):
 
 			# This guarantees that the XML is somehow valid.
 			if element.findChild('inTangentAngle'):
-				
+
+				# Getting tangent types.
+				inTangentType = element.findChild('inTangentType').value()
+				outTangentType = element.findChild('outTangentType').value()
+
+				# TODO: Remove in a few month. That's for backward compatibility.
+				tbc = {'custom': 'Bezier', 'linear': 'Linear', 'auto': 'Automatic', 'step': 'Stepped'}
+				if inTangentType in tbc:
+					inTangentType = tbc[inTangentType]
+				if outTangentType in tbc:
+					outTangentType = tbc[outTangentType]
+					
 				kwargs = { 'time': element.attribute('time'),
 						   'value': element.attribute('value'),
 						   'inTangentAngle': element.findChild('inTangentAngle').value(),
 						   'outTangentAngle': element.findChild('outTangentAngle').value(),
-						   'inTangentType': element.findChild('inTangentType').value(),
-						   'outTangentType': element.findChild('outTangentType').value(),
+						   'inTangentType': TangentType.valueByLabel(inTangentType),
+						   'outTangentType': TangentType.valueByLabel(outTangentType),
 						   'inTangentLength': element.findChild('inTangentLength').value(), 
 						   'outTangentLength': element.findChild('outTangentLength').value(),
 						   'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
@@ -222,8 +236,8 @@ class FCurve(object):
 
 			properties = { 'inTangentAngle': key.inTangentAngle,
 						   'outTangentAngle': key.outTangentAngle,
-						   'inTangentType': key.inTangentType,
-						   'outTangentType': key.outTangentType,
+						   'inTangentType': TangentType.labelByValue(key.inTangentType),
+						   'outTangentType': TangentType.labelByValue(key.outTangentType),
 						   'inTangentLength': key.inTangentLength, 
 						   'outTangentLength': key.outTangentLength,
 						   'normalizedTangents': key.normalizedTangents,

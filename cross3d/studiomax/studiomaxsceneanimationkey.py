@@ -23,7 +23,7 @@ class StudiomaxSceneAnimationKey( AbstractSceneAnimationKey ):
 
 	# Some of the Max specific tangent types will be converted to bezier.
 	_nativeToAbstractTangentTypes = { 'auto': TangentType.Automatic,
-									  'bezier': TangentType.Bezier,
+									  'custom': TangentType.Bezier,
 									  'linear': TangentType.Linear,
 									  'step': TangentType.Stepped,
 									  'slow': TangentType.Bezier,
