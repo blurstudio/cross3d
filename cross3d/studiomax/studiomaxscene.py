@@ -2346,7 +2346,7 @@ class StudiomaxScene(AbstractScene):
 			# Simply because I did not figured out a way to detect their respective FPS yet.
 			timeScriptController = mxs.Float_Script()
 			timeScriptController.addtarget('Time', nativeController)
-			timeScriptController.script = 'Time * %f' % cachesFrameRate
+			timeScriptController.script = 'Time * frameRate'
 
 			# Baking the controller requested.
 			if bake:
