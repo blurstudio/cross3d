@@ -2238,7 +2238,7 @@ class StudiomaxScene(AbstractScene):
 			nativeController = mxs.getPropertyController(alembicController, "Time")
 
 		# In the case where there is no alembic controller around, we cannot reference a "floating" controller and therefore have to bake.
-		else:
+		if not mxs.refs.dependents(nativeController):
 			bake = True
 
 		# Getting the range of the native controller in case we need to bake.
