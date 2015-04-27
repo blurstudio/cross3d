@@ -13,7 +13,7 @@ from blur3d import abstractmethod
 from blur3d.api import SceneWrapper
 from blur3d.api import FCurve, FrameRange
 from blurdev.decorators import pendingdeprecation
-from blur3d.constants import TangentType, FCurveExtrapolation
+from blur3d.constants import TangentType, ExtrapolationType
 
 
 class AbstractSceneAnimationController(SceneWrapper):
@@ -64,7 +64,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 	#								public methods
 	#--------------------------------------------------------------------------------
 
-	def bake(self, rng=None, interpolation=TangentType.Automatic, extrapolation=FCurveExtrapolation.Constant):
+	def bake(self, rng=None, interpolation=TangentType.Automatic, extrapolation=ExtrapolationType.Constant):
 		""" TODO: Add support for extrapolation.
 		"""
 
@@ -92,6 +92,9 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 		# Applying the FCurve to the controller.
 		self.setFCurve(fCurve)
+
+		# Setting extrapolation type.
+		self.setExtrapolation(extrapolation)
 
 	def createKeyAt(self, time):
 		"""Creates a new key at the inputed time
@@ -194,6 +197,13 @@ class AbstractSceneAnimationController(SceneWrapper):
  	@abstractmethod
  	def setFCurve(self, fCurve):
  		return False
+
+
+	def extrapolation(self):
+		return None
+
+	def setExtrapolation(self, extrapolation=[None, None]):
+		return False
 
 	def setKeyAt(self, time, key):
 		"""Set the key at the inputed time frame to the inputed key

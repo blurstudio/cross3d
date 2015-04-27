@@ -1195,15 +1195,6 @@ class AbstractScene(QObject):
 		pass
 
 	@abstractmethod
-	def setKeyInTangentType(self, tangentType):
-		"""
-			\remarks	sets the in tangent type for the scene
-			\sa			setKeyInTangentType, keyInTangentType, keyOutTangentType
-			\return		N/A
-		"""
-		pass
-
-	@abstractmethod
 	def saveFileAs(self, filename=''):
 		"""
 			\remarks	saves the current scene to the inputed name specified.  If no name is supplied, then the user should be prompted to pick a filename
@@ -1582,7 +1573,7 @@ class AbstractScene(QObject):
 			camera = self.createCamera(
 				name=name,
 				type=type,
-				Target=target,
+				target=target,
 			)
 		else:
 			camera = self.createCamera(
@@ -1613,7 +1604,7 @@ class AbstractScene(QObject):
 			\return		<blur3d.api.SceneCamera> || None
 		"""
 		nativeCamera = self._currentNativeCamera()
-		if (nativeCamera):
+		if nativeCamera:
 			from blur3d.api import SceneCamera
 			return SceneCamera(self, nativeCamera)
 		return None
@@ -1692,7 +1683,6 @@ class AbstractScene(QObject):
 			\remarks	emits the submit success signal if the signals are not blocked and cleans the submit process
 			\param		progressSection		<str>	the name of the progress section to be updated using emitProgressUpdated
 		"""
-		from PyQt4.QtCore import Qt
 		from PyQt4.QtGui import QApplication
 
 		QApplication.instance().restoreOverrideCursor()
@@ -1865,9 +1855,9 @@ class AbstractScene(QObject):
 			\return		<blur3d.api.Object> || None
 		"""
 		from blur3d.api import SceneObject
-		object = self._getNativeObject()
-		if (object):
-			return SceneObject(self, object)
+		obj = self._getNativeObject()
+		if obj:
+			return SceneObject(self, obj)
 		return None
 
 	def getMaterial(self):
@@ -2226,7 +2216,7 @@ class AbstractScene(QObject):
 			\param		sceneMaps		<list> [ <blur3d.api.SceneMap> map, .. ]
 			\return		<bool> success
 		"""
-		return self._setCachedNativeMaps([ sceneMap.nativePointer() for sceneMap in sceneMaps ])
+		return self._setCachedNativeMaps([sceneMap.nativePointer() for sceneMap in sceneMaps])
 
 	def setCachedMaterialAt(self, cacheType, index, material):
 		"""
@@ -2550,15 +2540,6 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self._removeNativeModels([ model.nativePointer() for model in models ])
-
-	@abstractmethod
-	def renameObjects(self, objects, names):
-		"""
-			\remarks	renames the given objects to the corresponding name in the names list
-			\param		objects [<SceneObject>, ...], names [<str>, ...]
-			\return		<bool> success
-		"""
-		return False
 
 	@abstractmethod
 	def retarget(self, inputRigPath, inputAnimationPath, outputRigPath, outputAnimationPath):

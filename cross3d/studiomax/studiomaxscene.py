@@ -20,11 +20,11 @@ from Py3dsMax import mxs
 from blurdev import debug
 from PyQt4.QtCore import QTimer
 from blur3d.lib.tmclib import TMCInfo
-from blur3d.constants import UpVector
 from blur3d.lib.pclib import PointCacheInfo
 from blur3d.api import UserProps, application
 from blur3d.lib.xmeshhandler import XMESHHandler
 from blur3d import pendingdeprecation, constants
+from blur3d.constants import UpVector, ExtrapolationType
 from blur3d.api.abstract.abstractscene import AbstractScene
 
 # register custom attriutes for MAXScript that hold scene persistent data
@@ -2291,7 +2291,7 @@ class StudiomaxScene(AbstractScene):
 							if bake:
 								from blur3d.api import SceneAnimationController
 								wrappedController = SceneAnimationController(self, timeScriptController)
-								wrappedController.bake(rng=bakeRange)
+								wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 								timeScriptController = wrappedController.nativePointer()
 
 							# We specifically reference the last alembic object's controller since you cannot do it with floating controllers.
@@ -2317,7 +2317,7 @@ class StudiomaxScene(AbstractScene):
 				if bake:
 					from blur3d.api import SceneAnimationController
 					wrappedController = SceneAnimationController(self, timeScriptController)
-					wrappedController.bake(rng=bakeRange)
+					wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 					timeScriptController = wrappedController.nativePointer()
 
 				# Figuring if the name of the object depending on that modifier meets the exclude and include criterias.
@@ -2352,7 +2352,7 @@ class StudiomaxScene(AbstractScene):
 			if bake:
 				from blur3d.api import SceneAnimationController
 				wrappedController = SceneAnimationController(self, timeScriptController)
-				wrappedController.bake(rng=bakeRange)
+				wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 				timeScriptController = wrappedController.nativePointer()
 
 			# Handling RayFire caches.
@@ -2383,7 +2383,7 @@ class StudiomaxScene(AbstractScene):
 
 				# Baking the controller requested.
 				if bake:
-					speedScriptController.bake(rng=bakeRange)
+					speedScriptController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 
 				# Getting the native speed controller.
 				speedScriptController = speedScriptController.nativePointer()

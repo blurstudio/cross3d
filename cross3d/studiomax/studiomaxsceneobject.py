@@ -384,7 +384,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			xMesh.enablePlaybackGraph = True
 
 			# Create a new bezier float controller for the time.
-			mxs.setPropertyController(cache, 'playbackGraphTime', mxs.bezier_float())
+			mxs.setPropertyController(xMesh, 'playbackGraphTime', mxs.bezier_float())
 			timeController = mxs.getPropertyController(xMesh, 'playbackGraphTime')
 
 			# Set keys on the playback in and out frames.
@@ -403,8 +403,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			xMesh.playUseGraph = True
 
 			# Create a new bezier float controller for the time.
-			mxs.setPropertyController(cache, 'playFrame', mxs.bezier_float())
-			timeController = mxs.getPropertyController(cache, 'playFrame')
+			mxs.setPropertyController(rayFireCache, 'playFrame', mxs.bezier_float())
+			timeController = mxs.getPropertyController(rayFireCache, 'playFrame')
 
 			# Set keys on the playback in and out frames.
 			frames = (xMesh.rangeFirstFrame, xMesh.rangeLastFrame)
@@ -414,9 +414,16 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				key.inTangentType = mxs.pyhelper.namify('linear')
 				key.outTangentType = mxs.pyhelper.namify('linear')
 
+		# Making the extrapolation linear.
+		linear = mxs.pyhelper.namify('linear')
+		mxs.setBeforeORT(timeController, linear)
+		mxs.setAfterORT(timeController, linear)
+
+		# Returning the time controller if defined.
 		if timeController:
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController(self._scene, timeController)
+
 		return None
 
 	def isBoxMode( self ):

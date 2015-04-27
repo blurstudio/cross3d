@@ -12,8 +12,7 @@ import math
 
 from Py3dsMax import mxs
 from blur3d.api import FCurve
-from blur3d.constants import TimeUnit
-from blur3d.constants import ControllerType, TangentType
+from blur3d.constants import ControllerType, TangentType, TimeUnit, ExtrapolationType
 from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
 
@@ -28,6 +27,19 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
                            ControllerType.LinearFloat: mxs.linear_float,
                            ControllerType.ScriptFloat: mxs.script_float,
                            ControllerType.AlembicFloat: mxs.Alembic_Float_Controller}
+
+	_nativeToAbstractExtrapolationType = {'constant': ExtrapolationType.Constant,
+                                       'linear': ExtrapolationType.Linear,
+                                       'cycle': ExtrapolationType.Cycled,
+                                       'loop': ExtrapolationType.Cycled,
+                                       'pingPong': ExtrapolationType.PingPong,
+                                       'relativeRepeat': ExtrapolationType.CycledWithOffset}
+
+	_abstractToNativeExtrapolationType = {ExtrapolationType.Constant: mxs.pyhelper.namify('constant'),
+                                       ExtrapolationType.Linear: mxs.pyhelper.namify('linear'),
+                                       ExtrapolationType.Cycled: mxs.pyhelper.namify('loop'),
+                                       ExtrapolationType.CycledWithOffset: mxs.pyhelper.namify('relativeRepeat'),
+                                       ExtrapolationType.PingPong: mxs.pyhelper.namify('pingPong')}
 
 	_slopeDistortions = {24: 0.12, 25: 0.13, 30: 0.187, 60: 0.75}
 
@@ -119,6 +131,21 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 			return controller.value
 		)""")
 		return mxs.getControllerValueAtFrame(self._nativePointer, frame)
+
+	def extrapolation(self):
+		extrapolation = [mxs.getBeforeORT(self._nativePointer), mxs.getAfterORT(self._nativePointer)]
+		return [self._nativeToAbstractExtrapolationType.get(e, mxs.pyhelper.namify('constant')) for e in extrapolation]
+
+	def setExtrapolation(self, extrapolation=[None, None]):
+		""" None will leave the the extrapolation unaffected.
+		"""
+		if not isinstance(extrapolation, (list, tuple)):
+			extrapolation = (extrapolation, extrapolation)
+		if extrapolation[0]:
+			mxs.setBeforeORT(self._nativePointer, self._abstractToNativeExtrapolationType.get(extrapolation[0], ExtrapolationType.Constant))
+		if extrapolation[1]:
+			mxs.setAfterORT(self._nativePointer, self._abstractToNativeExtrapolationType.get(extrapolation[1], ExtrapolationType.Constant))
+		return True
 
 	def fCurve(self):
 		""" Returns a FCurve object to manipulate or save the curve data.
@@ -257,7 +284,7 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		derivatedController.script = """t = F - 1
 										a = (at time t (point2 ({t}) (Integral.value)))
 										t = F + 1
-									 	b = (at time t (point2 ({t}) (Integral.value)))
+										b = (at time t (point2 ({t}) (Integral.value)))
 										c = b - a
 										c.y / c.x""".format(t=t)
 		return derivatedController
