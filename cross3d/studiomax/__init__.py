@@ -43,3 +43,4 @@ def init():
 	import studiomaxscenecache
 	import studiomaxscenesubmitter
 	import studiomaxsceneviewport
+	import collection

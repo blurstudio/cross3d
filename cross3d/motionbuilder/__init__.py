@@ -18,3 +18,4 @@ def init():
 	# Importing the layer's classes.
 	import motionbuilderapplication
 	import motionbuilderscene
+	import collection

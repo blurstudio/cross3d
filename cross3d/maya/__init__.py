@@ -27,3 +27,4 @@ def init():
 	import mayascenecamera
 	import mayasceneviewport
 	import mayascenematerial
+	import collection

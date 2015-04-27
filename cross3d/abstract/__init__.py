@@ -20,7 +20,6 @@ def init():
 	import abstractuserprops
 	import abstractundocontext
 	import abstractapplication
-	import abstractcollection
 	import abstractscene
 	import abstractscenewrapper
 	import abstractsceneobject
@@ -42,3 +41,4 @@ def init():
 	import abstractscenecache
 	import abstractscenesubmitter
 	import abstractscenepropset
+	import collection
