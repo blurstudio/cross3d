@@ -10,6 +10,12 @@ global blur3dhelper
 (
 	struct Blur3dHelperStruct (
 
+		function getXRefItems xref = (
+			xrefObjs = #()
+			xref.getItems #(#XRefObjectType) &xrefObjs
+			xrefObjs
+		),
+
 		function buildLightMeterBox position width:100 length:100 wSegs:3 lSegs:3 = (
 			lm1 = VRayLightMeter()
 			lm2 = VRayLightMeter()
