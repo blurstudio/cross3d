@@ -199,7 +199,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		nitrous = not mxs.gw.GetDriverString() and application.version() >= 15
 
 		# If the viewport is using Nitrous.
-		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
+		if camera and nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
 			# Storing and setting up Nitrous options.
 			nitrousSettings = mxs.NitrousGraphicsManager.GetActiveViewportSetting()
@@ -277,7 +277,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		self.setSlateIsActive( False )
 
 		# Restoring Nitrous settings.
-		if nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
+		if camera and nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
 
 			# Restoring Nitrous settings.
 			nitrousSettings.ProgressiveFadingFactor = initialFadingFactor
