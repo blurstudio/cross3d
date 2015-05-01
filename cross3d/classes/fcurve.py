@@ -253,7 +253,7 @@ class FCurve(object):
 		if path and isinstance(path, basestring):
 			dirname = os.path.dirname(path)
 			if not os.path.exists(dirname):
-				os.path.makedirs(dirname)
+				os.makedirs(dirname)
 
 			with open(path, 'w') as fle:
 				fle.write(self.toXML())
