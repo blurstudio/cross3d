@@ -318,6 +318,10 @@ class StudiomaxApplication(AbstractApplication):
 		:rtyp: str
 		"""
 		return mxs.pathConfig.resolvePathSymbols('$max')
+
+	def isSilent(self):
+		"""Returns whether 3ds Max is running in silent mode."""
+		return mxs.GetQuietMode()
 	
 	def preDeleteObject(self, callback, *args):
 		"""

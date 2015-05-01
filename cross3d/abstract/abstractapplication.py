@@ -233,6 +233,12 @@ class AbstractApplication(QObject):
 	@abstractmethod
 	def log(self, message):
 		print message
+
+	def isSilent(self):
+		"""
+		Returns whether the application is currently running in silent mode.
+		"""
+		return False
 	
 	def undoContext(self, name):
 		"""
