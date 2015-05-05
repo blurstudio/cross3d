@@ -414,13 +414,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				key.inTangentType = mxs.pyhelper.namify('linear')
 				key.outTangentType = mxs.pyhelper.namify('linear')
 
-		# Making the extrapolation linear.
-		linear = mxs.pyhelper.namify('linear')
-		mxs.setBeforeORT(timeController, linear)
-		mxs.setAfterORT(timeController, linear)
-
 		# Returning the time controller if defined.
 		if timeController:
+			# Making the extrapolation linear.
+			linear = mxs.pyhelper.namify('linear')
+			mxs.setBeforeORT(timeController, linear)
+			mxs.setAfterORT(timeController, linear)
 			from blur3d.api import SceneAnimationController
 			return SceneAnimationController(self._scene, timeController)
 
