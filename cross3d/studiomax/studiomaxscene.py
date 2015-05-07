@@ -212,7 +212,6 @@ class StudiomaxScene(AbstractScene):
 			# the same "unique" IDs. Now, I'm going to combine the two and start
 			# storing both the UID and the material name.  If they both match then
 			# we are at least more likely to be correct. <jbee>
-			print materialId
 			if (materialId == '{0}_{1}'.format(uid, unm) or materialId == uid or materialId == unm):
 				return mtl
 		return None
