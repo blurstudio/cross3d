@@ -203,16 +203,7 @@ class StudiomaxScene(AbstractScene):
 			uid = str(unique_id(mtl))
 			unm = str(mtl.name)
 
-			# Checking these in order of convention age.  In ye olden times, the
-			# material name was stored.  After that, the "uniqueId" of the
-			# material was stored, but the problem is that materials are special
-			# when it comes to UIDs, and there's no guarantee that they truly are
-			# unique.  This is because they're stored as metadata and once assigned
-			# are never changed, even if stuff is merged into the scene that have
-			# the same "unique" IDs. Now, I'm going to combine the two and start
-			# storing both the UID and the material name.  If they both match then
-			# we are at least more likely to be correct. <jbee>
-			if (materialId == '{0}_{1}'.format(uid, unm) or materialId == uid or materialId == unm):
+			if (materialId == uid or materialId == unm):
 				return mtl
 		return None
 
@@ -1209,14 +1200,13 @@ class StudiomaxScene(AbstractScene):
 				mid = get_userprop(obj, 'basematerial')
 
 			# record the base material if it is not already recorded
-			if (not mid or mid == 'undefined' or not re.match(r'^\d+_.+$', mid)):
+			if (not mid or mid == 'undefined'):
 				baseMaterial = obj.material
 
 				if (baseMaterial):
 					uid = unique_id(baseMaterial)
-					identifier = '{0}_{1}'.format(str(uid), baseMaterial.name)
-					set_appdata(obj, StudiomaxAppData.AltMtlIndex, identifier)
-					set_userprop(obj, 'basematerial', identifier)
+					set_appdata(obj, StudiomaxAppData.AltMtlIndex, str(uid))
+					set_userprop(obj, 'basematerial', str(uid))
 					self._cacheNativeMaterial(MaterialCacheType.BaseMaterial, baseMaterial)
 				else:
 					set_appdata(obj, StudiomaxAppData.AltMtlIndex, '0')
