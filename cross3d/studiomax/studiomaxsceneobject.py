@@ -3,7 +3,7 @@
 #
 #	\remarks	The StudiomaxSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to 3d Studio Max scenes
-#	
+#
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		03/15/10
@@ -15,7 +15,7 @@ from blur3d.lib.tmclib import TMCInfo
 from blur3d.constants import ObjectType
 from blur3d.lib.pclib import PointCacheInfo
 from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
-						
+
 class StudiomaxSceneObject( AbstractSceneObject ):
 
 	_nativeToAbstractObjectType = { 'light'         : ObjectType.Light,
@@ -30,28 +30,28 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 	AppDataAltMtlIndex		= 1108
 	AppDataAltPropIndex 	= 1110
-	
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def _nativeType(self):
 		"""
-			\remarks	implements the AbstractSceneObject._findNativeChild method as a convinance function to return class 
+			\remarks	implements the AbstractSceneObject._findNativeChild method as a convinance function to return class
 			information as  string
-						
-			
+
+
 			\param		parent		<Py3dsMax.mxs.Object> nativeObject	(used for recursive searches when necessary)
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
 		classof 	= mxs.classof
 		classN = str(classof (self._nativePointer))
-		
+
 		return classN
 
 	def _findNativeChild( self, name, recursive = False, parent = None ):
 		"""
-			\remarks	implements the AbstractSceneObject._findNativeChild method to find 
+			\remarks	implements the AbstractSceneObject._findNativeChild method to find
 						the child by the name and returns it
 			\sa			findChild
 			\param		name		<str>
@@ -61,20 +61,20 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		if ( not parent ):
 			parent = self._nativePointer
-		
+
 		# loop through all the objects
 		for child in parent.children:
 			if ( child.name == name ):
 				return child
-			
+
 			# if recursive, lookup child nodes
 			if ( recursive ):
 				found = self._findNativeChild( name, recursive = True, parent = child )
 				if ( found ):
 					return found
-		
+
 		return None
-	
+
 	def _nativeCaches( self, cacheType = 0 ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeCaches method to return a list of the native caches that are applied to this object
@@ -82,19 +82,19 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<list> [ <variant> nativeCache, .. ]
 		"""
 		output = []
-		
+
 		from blur3d.constants import CacheType
-		
+
 		# store maxscript methods used
 		classof 	= mxs.classof
-		
+
 		# collect point cache modifiers
 		if ( not cacheType or cacheType & CacheType.Point_Cache ):
 			cls 	= mxs.Point_Cache
 			for modifier in self._nativePointer.modifiers:
 				if ( classof(modifier) == cls ):
 					output.append(modifier)
-		
+
 		# collect transform cache controllers
 		if ( not cacheType or cacheType & CacheType.Transform_Cache ):
 			cls 		= mxs.Transform_Cache
@@ -102,9 +102,9 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			while ( classof( controller ) == cls ):
 				output.append( controller )
 				controller = controller.basecontroller
-		
+
 		return output
-	
+
 	def _nativeChildren( self, recursive = False, parent = None, childrenCollector = [] ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeChildren method to look up the native children for this object
@@ -122,7 +122,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			return childrenCollector
 		else:
 			return self._nativePointer.children
-	
+
 	def _nativeLayer( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeLayer method to return the native application's layer that the object is on
@@ -130,7 +130,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<Py3dsMax.mxs.Layer> nativeLayer || None
 		"""
 		return self._nativePointer.layer
-	
+
 	def _nativeMaterial( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeMaterial method to return the native material for this object
@@ -138,7 +138,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<Py3dsMax.mxs.Material> nativeMaterial || None
 		"""
 		return self._nativePointer.material
-	
+
 	def _nativeModel( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeModel method to look up the native model for this object
@@ -149,7 +149,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		if ( '.' in fullname ):
 			return mxs.getNodeByName( fullname.split('.')[0] )
 		return None
-	
+
 	def _nativeParent( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeParent method to look up the native parent for this object
@@ -157,7 +157,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
 		return self._nativePointer.parent
-	
+
 	def _nativeWireColor( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeWireColor to return the color for the wireframe of this object in the scene
@@ -165,7 +165,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<QColor>
 		"""
 		return self._nativePointer.wireColor
-	
+
 	def _setNativeController( self, name, nativeController ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeController method to set the controller type at the inputed name to the given controller
@@ -181,11 +181,11 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			for cache in self.caches( CacheType.Point_Cache ):
 				if ( cache._setNativeController( name.replace( 'modifiers[#Point_Cache].', '' ), nativeController ) ):
 					success = True
-			
+
 			return success
-		
+
 		return AbstractSceneObject._setNativeController( self, name, nativeController )
-		
+
 	def _setNativeLayer( self, nativeLayer ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeLayer method to set the native layer for this object
@@ -198,9 +198,9 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			worldlayer.addNodes( [ self._nativePointer ] )
 		else:
 			nativeLayer.addNodes( [ self._nativePointer ] )
-		
+
 		return True
-	
+
 	def _setNativeMaterial( self, nativeMaterial ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeMaterial method to set the native material for this object
@@ -210,7 +210,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		self._nativePointer.material = nativeMaterial
 		return True
-		
+
 	def _setNativeModel( self, nativeModel ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeModel method to set the native model for this object
@@ -219,25 +219,25 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		model = self._nativeModel()
-		
+
 		# don't process when we need to reset this model
 		if ( nativeModel == model ):
 			return True
-		
+
 		# otherwise, we need to reparent this node and reset its name
 		obj 		= self._nativePointer
 		obj.parent 	= nativeModel
 		splt 		= obj.name.split( '.' )
-		
+
 		if ( nativeModel and len( splt ) == 2 ):
 			obj.name = nativeModel.name + '.' + splt[1]
 		elif ( nativeModel ):
 			obj.name = nativeModel.name + '.' + obj.name
 		elif ( splt == 2 ):
 			obj.name = splt[1]
-		
+
 		return True
-	
+
 	def _setNativeParent( self, nativeParent ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeParent method to set the native parent for this object
@@ -247,7 +247,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		self._nativePointer.parent = nativeParent
 		return True
-	
+
 	def _setNativeWireColor( self, color ):
 		"""
 			\remarks	implements the AbstractSceneObject._setNativeWireColor to sets the wirecolor for the object to the inputed QColor
@@ -257,7 +257,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		self._nativePointer.wireColor = color
 		return True
-		
+
 	def _nativeModel( self ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeModel method to look up the native model for this object
@@ -272,7 +272,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			scene = Scene()
 			return scene._findNativeObject( modelName )
 		return None
-	
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -310,8 +310,8 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		frameRate = self._scene.animationFPS()
 
 		# Processing Alembic controllers.
-		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller, target=np) 
-		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform, target=np) 
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller, target=np)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform, target=np)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry, target=np)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals, target=np)
 		for alembicController in alembicControllers:
@@ -358,7 +358,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				cacheInfo = PointCacheInfo.read(nativeCache.filename, header_only=True)
 
 			elif mxs.classof(nativeCache) == mxs.Transform_Cache:
-				cacheInfo = TMCInfo.read(nativeCache.filename, header_only=True)
+				# Ensure file exists
+				try:
+					cacheInfo = TMCInfo.read(nativeCache.CacheFile, header_only=True)
+				except IOError as e:
+					print "Cache file does not exist: {0}".format(nativeCache.CacheFile)
+					continue
 
 			# Playback type 3 is "Playback Graph".
 			nativeCache.playbackType = 3
@@ -366,7 +371,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			# Set the playback frame to a float controller with start and end values pulled from the cache.
 			mxs.setPropertyController(nativeCache, 'playbackFrame', mxs.bezier_float())
 			timeController = mxs.getPropertyController(nativeCache, 'playbackFrame')
-			
+
 			# Set keys on the playback frame cache that matches the current frame rate.
 			duration = cacheInfo.start_frame - cacheInfo.end_frame + 1
 			frames = [(cacheInfo.start_frame, 0), (cacheInfo.end_frame, duration)]
@@ -377,7 +382,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 				key.outTangentType = mxs.pyhelper.namify('linear')
 
 		# Processing XMeshes.
-		xMeshes = mxs.getClassInstances(mxs.Transform_Cache, target=np)
+		xMeshes = mxs.getClassInstances(mxs.XMeshLoader, target=np)
 		for xMesh in xMeshes:
 
 			# Enable curve playback.
@@ -432,7 +437,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> boxMode
 		"""
 		return self._nativePointer.boxmode
-	
+
 	def isFrozen( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.isFrozen to return whether or not this object is frozen(locked)
@@ -440,7 +445,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> frozen
 		"""
 		return self._nativePointer.isfrozen
-		
+
 	def isHidden( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.isHidden to return whether or not this object is hidden
@@ -448,7 +453,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\return		<bool> hidden
 		"""
 		return self._nativePointer.ishiddeninvpt
-		
+
 	def isSelected( self ):
 		"""
 			\remarks	implements the AbstractSceneObject.isSelected to return whether or not this object is selected
@@ -463,7 +468,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			group = 'Custom_Attributes'
 
 		types = {float: 'float', int:'integer'}
-		
+
 		if tpe in [float, int] and isinstance(default, tpe):
 
 			maxScript = """fn addAttributeToObject obj = (
@@ -509,37 +514,37 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		return False
 
 	def setTransformsLocks(self, position=None, rotation=None, scale=None, manipulation=True, keyability=False):
-		
+
 		if manipulation:
-			
+
 			position = 'XYZ' if position is True else position
 			rotation = 'XYZ' if rotation is True else rotation
 			scale = 'XYZ' if scale is True else scale
-			
+
 			position = 'xyz' if position is False else position
 			rotation = 'xyz' if rotation is False else rotation
 			scale = 'xyz' if scale is False else scale
-			
+
 			position = '' if position is None else position
 			rotation = '' if rotation is None else rotation
 			scale = '' if scale is None else scale
-			
+
 			flags = []
 			initialFlags = mxs.getTransformLockFlags(self._nativePointer)
-			
+
 			for i, transform in enumerate((position, rotation, scale)):
 				for j, key in enumerate(('x', 'y', 'z')):
 					index = j+3*i
 					if key.upper() in transform:
-						flags.append(index+1)		
+						flags.append(index+1)
 					elif not key in transform:
 						if initialFlags[index]:
 							flags.append(index+1)
-					
+
 			return mxs.setTransformLockFlags(self._nativePointer, mxs.pyHelper.tobits(flags))
-			
+
 		return False
-		
+
 	def setBoxMode( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setBoxMode to set whether this object is in boxMode or not
@@ -558,7 +563,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		self._nativePointer.isfrozen = state
 		return True
-		
+
 	def setHidden( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setHidden to hides/unhides this object
@@ -568,7 +573,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		self._nativePointer.ishidden = state
 		return True
-		
+
 	def setSelected( self, state ):
 		"""
 			\remarks	implements the AbstractSceneObject.setSelected to selects/deselects this object
@@ -585,12 +590,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\sa			displayName, setDisplayName, setName
 			\return		<str> name
 		"""
-		return mxs.blurUtil.uniqueId( self._nativePointer )	
+		return mxs.blurUtil.uniqueId( self._nativePointer )
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods
 	#------------------------------------------------------------------------------------------------------------------------
-	
+
 	@classmethod
 	def _typeOfNativeObject(cls, nativeObject):
 		"""
@@ -600,12 +605,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 
 		# Checking for model.
-		if mxs.classOf(nativeObject) == mxs.Point: 
+		if mxs.classOf(nativeObject) == mxs.Point:
 			userProps = UserProps(nativeObject)
 			if 'model' in userProps:
 				return ObjectType.Model
 
-		output = 	cls._nativeToAbstractObjectType.get(str(mxs.classOf(nativeObject)), 
+		output = 	cls._nativeToAbstractObjectType.get(str(mxs.classOf(nativeObject)),
 					cls._nativeToAbstractObjectType.get(str(mxs.superClassOf(nativeObject)),
 					AbstractSceneObject._typeOfNativeObject(nativeObject)))
 		return output
