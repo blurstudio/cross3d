@@ -16,6 +16,7 @@ import os
 import subprocess
 import xml.etree.cElementTree as ET
 
+from blurdev import osystem
 from blur3d.api import Exceptions
 from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
@@ -91,7 +92,7 @@ class External(AbstractExternal):
 		ret = None
 		if version == None:
 			# Find the latest version
-			versions = cls._listRegKeyValues(hive, hkey, architecture=architecture)
+			versions = osystem.listRegKeyValues(hive, hkey, architecture=architecture)
 			for version in sorted(versions, key= lambda i: i[0], reverse=True):
 				if version[0] not in cls._ignoredVersions:
 					ret = version[1]
@@ -99,7 +100,7 @@ class External(AbstractExternal):
 		else:
 			version = cls._yearForVersion.get(unicode(version), version)
 			try:
-				ret = cls._registryValue(hive, hkey, unicode(version), architecture)[0]
+				ret = osystem.registryValue(hive, hkey, unicode(version), architecture)[0]
 			except WindowsError:
 				raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

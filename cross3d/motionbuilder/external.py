@@ -14,6 +14,7 @@
 
 import os
 
+from blurdev import osystem
 from blur3d.api import Exceptions
 from blur3d.api.abstract.external import External as AbstractExternal
 
@@ -38,14 +39,14 @@ class External(AbstractExternal):
 		hive = 'HKEY_LOCAL_MACHINE'
 		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = cls._listRegKeys(hive, cls._hkeyBase, architecture=architecture)
+			versions = osystem.listRegKeys(hive, cls._hkeyBase, architecture=architecture)
 			for v in sorted(versions, reverse=True):
 				if v not in cls._ignoredVersions:
 					version = v
 					break
 		hkey = r'{hkeyBase}\{version}'.format(hkeyBase=cls._hkeyBase, version=version)
 		try:
-			ret = cls._registryValue(hive, hkey, 'InstallPath', architecture)[0]
+			ret = osystem.registryValue(hive, hkey, 'InstallPath', architecture)[0]
 		except WindowsError:
 			raise Exceptions.SoftwareNotInstalled('MotionBuilder', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

@@ -13,6 +13,7 @@
 import os
 import subprocess
 
+from blurdev import osystem
 from blur3d.api import Exceptions
 from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
@@ -22,10 +23,10 @@ from blur3d.api.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 	
 	_hkeyBase = r'Software\Autodesk\3dsMax'
-	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_STUDIOMAX', '2011,2013,2015').split(','))
+	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_STUDIOMAX', '2011,2013,2015,2016').split(','))
 	# map years to version numbers
 	_versionForYear = {'2008': '10', '2009': '11', '2010': '12', '2011': '13', '2012': '14', 
-						'2013': '15', '2014': '16', '2015': '17'}
+						'2013': '15', '2014': '16', '2015': '17', '2016': '18'}
 	_yearForVersion = dict((v, k) for k,v in _versionForYear.iteritems())
 
 	@classmethod
@@ -102,17 +103,22 @@ class External(AbstractExternal):
 		version = cls._versionForYear.get(unicode(version), version)
 		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = set(cls._listRegKeys(hive, cls._hkeyBase, architecture=architecture))
+			versions = set(osystem.listRegKeys(hive, cls._hkeyBase, architecture=architecture))
 			# Years to ignore isnt very useful, convert them to version numbers ('14.0').
 			# This allows the environment variable to remain the same for all of the software implemntations
 			ignoredVersions = set(['{}.0'.format(cls._versionForYear[year]) for year in cls._ignoredVersions if year in cls._versionForYear])
 			for v in sorted(versions, reverse=True):
 				if v in versions and v not in ignoredVersions:
 					version = v.replace('.0', '')
+					try:
+						float(version)
+					except ValueError:
+						# Not a valid version number. Most likely something like RegistryVersion19.0
+						continue
 					# Ignore all keys that don't store Installdir info.
 					hkey = cls._getHkey(version, langId)
 					try:
-						ret = cls._registryValue(hive, hkey, 'Installdir', architecture)[0]
+						ret = osystem.registryValue(hive, hkey, 'Installdir', architecture)[0]
 						if not ret:
 							continue
 					except WindowsError:
@@ -121,7 +127,7 @@ class External(AbstractExternal):
 		dispVersion = cls._yearForVersion.get(unicode(version), version)
 		hkey = cls._getHkey(version, langId)
 		try:
-			ret = cls._registryValue(hive, hkey, 'Installdir', architecture)[0]
+			ret = osystem.registryValue(hive, hkey, 'Installdir', architecture)[0]
 		except WindowsError:
 			raise Exceptions.SoftwareNotInstalled('Studiomax', version=dispVersion, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.
