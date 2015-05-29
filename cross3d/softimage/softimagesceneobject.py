@@ -107,6 +107,18 @@ class SoftimageSceneObject(AbstractSceneObject):
 
 		return model
 
+	def _setNativeModel(self, nativeModel):
+		"""
+		"""
+		if self._nativePointer.Model.IsEqualTo(nativeModel):
+			return True
+
+		# Making sure the object is not already a child of the parent, otherwise Softimage throws an error
+		if not self._nativePointer.Parent3DObject.IsEqualTo(nativeModel):
+			nativeModel.AddChild(self._nativePointer)
+
+		return True
+
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------

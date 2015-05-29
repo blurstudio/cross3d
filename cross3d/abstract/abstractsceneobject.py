@@ -585,12 +585,10 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 
 		# set the model in particular
-		if (parent and parent.isObjectType(ObjectType.Model)):
-			return self._setNativeModel(parent.nativePointer())
+		if parent and parent.isObjectType(ObjectType.Model):
+			self._setNativeModel(parent.nativePointer())
 
-		nativeParent = None
-		if (parent):
-			nativeParent = parent.nativePointer()
+		nativeParent = parent.nativePointer() if parent else None
 		return self._setNativeParent(nativeParent)
 
 	def setRotation(self, axes, relative=False):
