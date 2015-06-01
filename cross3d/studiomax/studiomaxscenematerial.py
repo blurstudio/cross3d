@@ -38,6 +38,32 @@ class StudiomaxSceneMaterial(AbstractSceneMaterial):
 		mxs.matEditor.open()
 
 	@classmethod
+	def editMaterials(self, materials=[]):
+		""" Clear any existing and display the provided materials.
+		
+		Args:
+			materials (list): A list of materials. Defaults to a empty list.
+		
+		Returns:
+			bool: Success.
+		"""
+		# Clear the material editor by inserting default materials.
+		for index in range(0, 24):
+			tStandardMat = mxs.standardMaterial()
+			tStandardMat.name = "%s - Default" % '{0:02d}'.format(index)
+			mxs.meditMaterials[index] = tStandardMat
+		mxs.medit.UpdateMtlEditorBrackets()
+		
+		mxs.medit.SetActiveMtlSlot(1, False)
+		for index, mat in enumerate(materials):
+			if index > 23:
+				#Maximum of 24 slots in the material editor
+				break
+			mxs.medit.PutMtlToMtlEditor(mat.nativePointer(), index + 1)
+		mxs.matEditor.open()
+		return False
+
+	@classmethod
 	def fromDictionary(
 			self,
 			dictionary,

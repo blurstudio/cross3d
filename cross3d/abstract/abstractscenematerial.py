@@ -38,6 +38,18 @@ class AbstractSceneMaterial(SceneWrapper):
 		"""Allow the user to edit the material."""
 		return False
 
+	@classmethod
+	def editMaterials(self, materials=[]):
+		""" Clear any existing and display the provided materials.
+		
+		Args:
+			materials (list): A list of materials. Defaults to a empty list.
+		
+		Returns:
+			bool: Success.
+		"""
+		return False
+
 	def materialType(self):
 		"""The material type for this material instance
 		
