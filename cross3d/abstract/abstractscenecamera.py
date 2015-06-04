@@ -48,6 +48,9 @@ class AbstractSceneCamera(SceneObject):
 	def addProceduralShake(self):
 		return False
 
+	def add3NodeRig(self):
+		return False
+
 	def target(self):
 		return self._target
 
