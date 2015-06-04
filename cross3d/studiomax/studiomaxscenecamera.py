@@ -53,6 +53,55 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
         return True
 
+    def add3NodeRig(self):
+        """
+            \remarks    implements the AbstractScene._createNativeCamera3NodeRig method to return a new 3 node rig
+            \param      name            <str>
+            \return     <variant> top node of rig
+        """
+        cam = self.nativePointer()
+        # create controls
+        pos = mxs.star(radius1 = 6.5, radius2 = 5.5, points=16)
+        trans = mxs.rectangle(length=10.2, width=4.5)
+        rot = mxs.ngon(radius=2.0, nSides=3, corner_radius=0.5)
+        # rename controls
+        pos.name = str(cam.name) + 'position'
+        trans.name = str(cam.name) + 'translation'
+        rot.name = str(cam.name) + 'rotation'
+        # rotate controls into place
+        pos.rotation = mxs.eulerangles(90, 0 , 0)
+        trans.rotation = mxs.eulerangles(90, 0 , 0)
+        rot.rotation = mxs.eulerangles(0, 0, -90)
+        # reset xforms
+        mxs.resetxform(pos)
+        mxs.resetxform(trans)
+        mxs.resetxform(rot)
+        #collapse xforms
+        mxs.maxOps.CollapseNode(pos, True)
+        mxs.maxOps.CollapseNode(trans, True)
+        mxs.maxOps.CollapseNode(rot, True)
+
+        rot.parent = trans
+        trans.parent = pos
+
+        pos.wirecolor = rot.wirecolor = trans.wirecolor = mxs.color(0, 230, 250)
+
+        # Move the rig to align with the cam
+        pivrot=cam.rotation
+        pos.rotation*=pivrot;
+        #pos.objectoffsetrot*=pivrot;
+        #pos.objectoffsetpos*=pivrot;
+
+        pos.position = cam.position
+        #mxs.resetxform(pos)
+        #pos.rotation = cam.rotation
+
+
+        # parent the cam to to rig
+        cam.parent = rot
+
+        return True
+
     def animateTurntable(self, objects=[], startFrame=0, endFrame=100):
         """
                 \remarks	Animates the camera around (and properly framing) the given object(s).
