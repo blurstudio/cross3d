@@ -421,6 +421,7 @@ class StudiomaxScene(AbstractScene):
 		nativeCamera.name = name
 		return nativeCamera
 
+
 	def _createNativeRenderer(self, rendererType):
 		"""
 			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed rendererType for this scene
@@ -1245,6 +1246,23 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 
+	def _setNativeFocus(self, objects):
+		"""
+			\remarks	sets viewport camera to focus on object
+			\param		objects	<list>
+			\return		<bool> success
+		"""
+		#save current selection
+		selection = self._nativeSelection()
+		#set the objects passed in as the selection
+		self._setNativeSelection(objects)
+		#focus
+		mxs.blur3dHelper.maxZoomExtents()
+		#restore previous selection
+		self._setNativeSelection(selection)
+
+
+
 	def _setNativeSelection(self, selection):
 		"""
 			\remarks	implements the AbstractScene._setNativeSelection to select the inputed native objects in the scene
@@ -2012,6 +2030,13 @@ class StudiomaxScene(AbstractScene):
 			self._metaData = data
 
 		return self._metaData
+
+	def mergeScene(self, path, **options):
+		"""
+			\remarks	merges a scene file with the current scene.
+			\return		<bool> success
+		"""
+		return mxs.mergeMAXFile(path)
 
 	def openRenderSceneDialog(self):
 		"""
