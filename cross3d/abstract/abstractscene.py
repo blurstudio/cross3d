@@ -650,6 +650,15 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def _setNativeFocus(self, objects):
+		"""
+			\remarks	sets viewport camera to focus on object
+			\param		objects	<list>
+			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
 	def _addToNativeSelection(self, nativeObjects):
 		"""
 			\remarks	add the inputed native objects to the selection in the scene. added by douglas
@@ -1224,6 +1233,15 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return False
+
+	def setFocus(self, objects):
+		"""
+			\remarks	sets viewport camera to focus on object
+			\param		objects	<list>
+			\return		N/A
+		"""
+		return self._setNativeFocus([obj.nativePointer() for obj in objects])
+
 
 	@abstractmethod
 	def setRenderSavesFile(self, state):
@@ -1961,6 +1979,14 @@ class AbstractScene(QObject):
 		"""
 		from blur3d.api import SceneMap
 		return [ SceneMap(self, obj) for obj in self._nativeMaps() ]
+
+	@abstractmethod
+	def mergeScene(self, path, **options):
+		"""
+			\remarks	merges a scene file with the current scene.
+			\return		<bool> success
+		"""
+		return None
 
 	def _objects(self, getsFromSelection=False, wildcard='', type=0):
 		"""
