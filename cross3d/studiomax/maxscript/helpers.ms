@@ -457,6 +457,9 @@ global blur3dhelper
 		),
 		function maxQuickRender = (
 			max quick render
+		),
+		function maxZoomExtents = (
+			max zoomext sel
 		)
 	)
 
