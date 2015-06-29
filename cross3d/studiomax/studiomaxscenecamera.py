@@ -33,8 +33,9 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
     def addProceduralShake(self):
 
-        listController = mxs.rotation_list()
-        mxs.setPropertyController(self._nativePointer.controller, 'rotation', listController)
+        #listController = mxs.rotation_list()
+        #mxs.setPropertyController(self._nativePointer.controller, 'rotation', listController)
+        listController = mxs.getPropertyController(self._nativePointer.controller, 'rotation')
 
         noise = mxs.Noise_rotation()
         noise.frequency = 0.05
