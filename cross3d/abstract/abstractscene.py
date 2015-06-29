@@ -806,6 +806,15 @@ class AbstractScene(QObject):
 		return pyValue
 
 	@abstractmethod
+	def _viewNativeObjectTrajectory(self, obj):
+		"""
+			\remarks 	creates a null that allows the user to view an objects trajectory
+			\param 		<scene object>	object to get trajectory of
+			\return 	<bool> 			success
+		"""
+		return False
+
+	@abstractmethod
 	def _unisolate(self):
 		r"""
 			\remarks	Exits the isolation mode if it is enabled and returns if it had to exit.
@@ -1036,6 +1045,15 @@ class AbstractScene(QObject):
 		return cls._currentFileName
 
 	@abstractmethod
+	def deleteSceneState(self, stateName):
+		"""
+			\reamrks 	deletes a scene state based on the name given
+			\param 		<str>	stateName
+			\return 	<boo>	Success
+		"""
+		return False
+
+	@abstractmethod
 	def exportFile(self):
 		"""
 			\remarks	exports objects from the scene to a file on disk
@@ -1058,6 +1076,15 @@ class AbstractScene(QObject):
 			\return		<list> [ <str>, .. ]
 		"""
 		return []
+
+	@abstractmethod
+	def getSceneState(self, shotName):
+		"""
+			\remarks	gets the scene state based on name
+			\param 		<string> shotName
+			\return		<string> name of scene state
+		"""
+		return False
 
 	@abstractmethod
 	def holdCurrentState(self):
@@ -1195,6 +1222,16 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def restoreSceneState(self, stateName, parts):
+		"""
+			\reamrks 	restores the given aspects of a scene state with the given name
+			\param 		<string> 	stateName
+			\param 		<list> 		list of apects of state to restore
+			\return 	<boo>		success
+		"""
+		return False
+
+	@abstractmethod
 	def setKeyInTangentType(self, tangentType):
 		"""
 			\remarks	sets the in tangent type for the scene
@@ -1218,6 +1255,15 @@ class AbstractScene(QObject):
 			\remarks	Saves a copy of the current scene to the inputed name specified.
 			\param		filename 	<str>
 			\return		<bool> success
+		"""
+		return False
+
+	@abstractmethod
+	def saveSceneState(self, stateName, parts):
+		"""
+			\remarks	Saves the current scene state with the name given
+			\param 		<string> stateName
+			\return 	<bool> success
 		"""
 		return False
 
@@ -1460,6 +1506,16 @@ class AbstractScene(QObject):
 
 	@abstractmethod
 	def importFBX(self, path, **kwargs):
+		return False
+
+	@abstractmethod
+	def importMocapToBiped(self, path, bipedCtrl):
+		"""
+			\remarks	imports mocap bip file to selected biped
+			\param 		path	<string> file path to bip
+			\param 		bipedCtrl	<Biped_Object> any part of the biped rig
+			\return		<bool> success
+		"""
 		return False
 
 	def importModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
@@ -2486,6 +2542,14 @@ class AbstractScene(QObject):
 		# Note currentFileName is ignored by most software specific implementations. It is used only
 		# for the abstract implementation as we have no application to ask for the current file
 		return FileProps(self.currentFileName())
+
+	def viewObjectTrajectory(self, obj):
+		"""
+			\remarks 	calls the native object trajectory method
+			\param 		<scene object>	object to get trajectory of
+			\return 	<bool> 			success
+		"""
+		return self._viewNativeObjectTrajectory(obj.nativePointer())
 
 	def visibleObjects(self):
 		"""
