@@ -313,6 +313,57 @@ global blur3dhelper
 		function setTransformController object controller = (
 			object.transform.controller = controller
 		),
+		function getMixerController object = (
+			objectRoot = object.controller.rootNode
+			return objectRoot.transform.controller.mixer
+		),
+		function getMixerTrackGroup obj index = (
+			getTrackGroup obj index
+		),
+		function getMixerTrack object trackIndex = (
+			return getTrack object trackIndex
+		),
+
+		function appendMixerClip mxTrack filePath footHeight mxInterval = (
+			appendclip mxTrack filePath footHeight mxInterval
+		), 
+
+		function findSceneState shotName = (
+			sceneStateMgr.findscenestate shotName
+		),
+
+		function getSceneState stateIndex = (
+			sceneStateMgr.getSceneState stateIndex
+		), 
+
+		function toggleTrajectories = (
+			max trajectories
+		),
+
+		function captureSceneState stateName parts = (
+			bitArrParts = #{}
+			for i=1 to 10 do(
+				if parts[i] do(
+					append bitArrParts i
+				)
+			)
+			
+			sceneStateMgr.Capture stateName bitArrParts
+		),
+
+		function deleteSceneState stateName = (
+			sceneStateMgr.Delete stateName
+		),
+
+		function restoreSceneState stateName parts = (
+			bitArrParts = #{}
+			for i=1 to 10 do(
+				if parts[i] do(
+					append bitArrParts i
+				)
+			)
+			sceneStateMgr.Restore stateName bitArrParts
+		), 
 
 		function replaceTransformController source target frame swapHandedness:false = (
 			at time frame (
