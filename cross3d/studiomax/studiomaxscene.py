@@ -417,7 +417,14 @@ class StudiomaxScene(AbstractScene):
 			else:
 				nativeCamera = mxs.VRayPhysicalCamera()
 		else:
-			nativeCamera = mxs.FreeCamera()
+			#nativeCamera = mxs.FreeCamera()
+			camPath = 'K:\\library\\presets\\StudioMax\\Models\\Layout_Camera_Simple.max'
+			if self.mergeScene(camPath):
+				camObj = self.findObject('L_Cam_Simple')
+				nativeCamera = camObj.nativePointer()
+			else:
+				nativeCamera = mxs.FreeCamera()
+
 		nativeCamera.name = name
 		return nativeCamera
 
@@ -1528,6 +1535,21 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 
+	def importMocapToBiped(self, path, bipedCtrl):
+
+		# Get the root node of the biped
+		if bipedCtrl and 'Rig' in bipedCtrl.name():
+
+			mix = mxs.blur3dhelper.getMixerController(bipedCtrl)
+			trackGrp = mxs.blur3dhelper.getMixerTrackGroup(mix, 1)
+			track = mxs.blur3dhelper.getMixerTrack(trackGrp, 1)
+			mxs.blur3dhelper.appendMixerClip(track, path, False, 0)
+
+			return True
+
+		return False
+
+
 	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
 			\remarks	implements the AbstractScene._importNativeModel to import and return a native model from an external file. added by douglas.
@@ -1597,6 +1619,35 @@ class StudiomaxScene(AbstractScene):
 			mxs.macros.run('Tools', 'Isolate_Selection')
 		self._setNativeSelection(selection)
 		return True
+
+	def _viewNativeObjectTrajectory(self, obj):
+		"""
+			\remarks 	creates a null that allows the user to view an objects trajectory
+			\param 		<scene object>	object to get trajectory of
+			\return 	<bool> 			success
+		"""
+		objType = unicode(mxs.classOf(obj))
+		selectionSave = self._nativeSelection()
+		self.clearSelection()
+
+		if objType == 'Biped_Object':
+			#get the pelvis and attach point
+			tPoint = mxs.Point(cross=True, box=False)
+			tPoint.name = obj.name.split('.')[0] + '._Trajectory'
+			tPoint.wirecolor  = mxs.color(0, 230, 250)
+
+
+			# align the point to the biped obj
+			tPoint.transform = obj.transform
+			
+			self.setSelection(tPoint.name)
+			tPoint.parent = obj
+			
+		else:
+			self.setSelection(obj.name)
+
+		mxs.blur3dHelper.toggleTrajectories()
+		self._setNativeSelection(selectionSave)
 
 	def _unisolate(self):
 		"""
@@ -1905,6 +1956,14 @@ class StudiomaxScene(AbstractScene):
 		"""
 		return mxs.maxFilePath + mxs.maxFileName
 
+	def deleteSceneState(self, stateName):
+		"""
+			\reamrks 	deletes a scene state based on the name given
+			\param 		<str>	stateName
+			\return 	<boo>	Success
+		"""
+		return mxs.blur3dHelper.deleteSceneState(stateName)
+
 	def exportFile(self, file, using=None, prompt=False, selectedOnly=True):
 		"""
 			\remarks	implements AbstractScene.exportFile method to export objects from the scene to a file on disk
@@ -1957,6 +2016,20 @@ class StudiomaxScene(AbstractScene):
 			\return		<list> [ <str>, .. ]
 		"""
 		return [ 'Max files (*.max)' ]
+
+	def getSceneState(self, shotName):
+		"""
+			\remarks	gets the scene state based on name
+			\param 		<string> shotName
+			\return		<string> name of scene state
+		"""
+		if shotName:
+			index = mxs.blur3dhelper.findSceneState(shotName)
+			if index > 0:
+				return mxs.blur3dhelper.getSceneState(index)
+
+		return False
+
 
 	def isIsolated(self):
 		r"""
@@ -2231,6 +2304,13 @@ class StudiomaxScene(AbstractScene):
 						fume.timescale = 1.0
 
 		return True
+
+
+	def restoreSceneState(self, stateName, parts):
+		return mxs.blur3dHelper.restoreSceneState(stateName, parts)
+
+	def saveSceneState(self, stateName, parts):
+		return mxs.blur3dhelper.captureSceneState(stateName, parts)
 
 	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
 
