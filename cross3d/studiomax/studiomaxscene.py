@@ -2312,7 +2312,7 @@ class StudiomaxScene(AbstractScene):
 	def saveSceneState(self, stateName, parts):
 		return mxs.blur3dhelper.captureSceneState(stateName, parts)
 
-	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False, rnd=0.0):
 
  		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
