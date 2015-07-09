@@ -158,6 +158,9 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		controllerType = self.type()
 		fCurve = FCurve(name=self.displayName(), tpe=controllerType)
 
+		# Writing the extrapolation.
+		fCurve.setExtrapolation(self.extrapolation())
+
 		# We only support controllers that can have keys.
 		if controllerType in (ControllerType.BezierFloat, ControllerType.LinearFloat):
 
@@ -272,6 +275,11 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 
 				# It is essential to re-point the native pointer.
 				self._nativePointer = controller
+
+		# Setting the extrapolation.
+		print fCurve.extrapolation()
+		self.setExtrapolation(fCurve.extrapolation())
+		return True
 
 	def _nativeDerivatedController(self, timeUnit=TimeUnit.Seconds):
 		derivatedController = mxs.Float_Script()

@@ -7,7 +7,7 @@ import xml.dom.minidom
 from framerange import FrameRange
 from blurdev.XML.xmlelement import XMLElement
 from blurdev.XML.xmldocument import XMLDocument
-from blur3d.constants import ControllerType, TangentType
+from blur3d.constants import ControllerType, TangentType, ExtrapolationType
 
 class Key(object):
 
@@ -18,8 +18,8 @@ class Key(object):
 		# Tangent angles are sorted in radians.
 		self.inTangentAngle = float(kwargs.get('inTangentAngle', 0.0))
 		self.outTangentAngle = float(kwargs.get('outTangentAngle', 0.0))
-		self.inTangentType = int(kwargs.get('inTangentType', 0))
-		self.outTangentType = int(kwargs.get('outTangentType', 0))
+		self.inTangentType = int(kwargs.get('inTangentType', TangentType.Automatic))
+		self.outTangentType = int(kwargs.get('outTangentType', TangentType.Automatic))
 		self.outTangentLength = float(kwargs.get('outTangentLength', 0.0))
 		self.inTangentLength = float(kwargs.get('inTangentLength', 0.0))
 
@@ -31,10 +31,12 @@ class Key(object):
 
 class FCurve(object):
 
-	def __init__(self, name='', tpe=ControllerType.BezierFloat):
-		self._name = name
-		self._type = tpe
+	def __init__(self, **kwargs):
+		self._name = unicode(kwargs.get('name', ''))
+		self._type = int(kwargs.get('tpe', ControllerType.BezierFloat))
 		self._keys = []
+		self._inExtrapolation = int(kwargs.get('inExtrapolation', ExtrapolationType.Constant))
+		self._outExtrapolation = int(kwargs.get('outExtrapolation', ExtrapolationType.Constant))
 		
 	def offset(self, value, attr='time', rnd=False):
 		for key in self._keys:
@@ -126,6 +128,13 @@ class FCurve(object):
 			rng = (0, 0)
 		return FrameRange(rng)
 
+	def setExtrapolation(self, extrapolation=[None, None]):
+		self._inExtrapolation = extrapolation[0] or self._inExtrapolation
+		self._outExtrapolation = extrapolation[1] or self._outExtrapolation
+
+	def extrapolation(self):
+		return (self._inExtrapolation, self._outExtrapolation)
+
 	def name(self):
 		return self._name
 
@@ -185,6 +194,8 @@ class FCurve(object):
 
 		self._name = fCurveElement.attribute('name')
 		self._type = ControllerType.valueByLabel(fCurveElement.attribute('type'))
+		self._inExtrapolation = ExtrapolationType.valueByLabel(fCurveElement.attribute('inExtrapolation'))
+		self._outExtrapolation = ExtrapolationType.valueByLabel(fCurveElement.attribute('outExtrapolation'))
 		self._keys = []
 
 		for element in fCurveElement.children():
@@ -227,6 +238,8 @@ class FCurve(object):
 		fCurveElement = document.addNode('fCurve')
 		fCurveElement.setAttribute('name', self._name)
 		fCurveElement.setAttribute('type', ControllerType.labelByValue(self._type))
+		fCurveElement.setAttribute('inExtrapolation', ExtrapolationType.labelByValue(self._inExtrapolation))
+		fCurveElement.setAttribute('outExtrapolation', ExtrapolationType.labelByValue(self._outExtrapolation))
 
 		for key in self._keys:
 
