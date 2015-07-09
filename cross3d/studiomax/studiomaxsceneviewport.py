@@ -76,12 +76,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 
 	def createCamera(self, name='Camera', type='Standard'):
 		camera = self._scene.createCamera(name, type)
-		nativeCamera = camera.nativePointer()
-		nativeCamera.fov = self._nativePointer.getFOV()
-		if application.version() >= 16:
-			nativeCamera.transform = mxs.InverseHighPrecision(self._nativePointer.getTM())
-		else: 
-			nativeCamera.transform = mxs.Inverse(self._nativePointer.getTM())
+		camera.match(self)
 		return camera
 
 	def safeFrameSize( self ):

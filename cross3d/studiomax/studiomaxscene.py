@@ -417,17 +417,10 @@ class StudiomaxScene(AbstractScene):
 			else:
 				nativeCamera = mxs.VRayPhysicalCamera()
 		else:
-			#nativeCamera = mxs.FreeCamera()
-			camPath = 'K:\\library\\presets\\StudioMax\\Models\\Layout_Camera_Simple.max'
-			if self.mergeScene(camPath):
-				camObj = self.findObject('L_Cam_Simple')
-				nativeCamera = camObj.nativePointer()
-			else:
-				nativeCamera = mxs.FreeCamera()
+			nativeCamera = mxs.FreeCamera()
 
 		nativeCamera.name = name
 		return nativeCamera
-
 
 	def _createNativeRenderer(self, rendererType):
 		"""
@@ -1268,8 +1261,6 @@ class StudiomaxScene(AbstractScene):
 		#restore previous selection
 		self._setNativeSelection(selection)
 
-
-
 	def _setNativeSelection(self, selection):
 		"""
 			\remarks	implements the AbstractScene._setNativeSelection to select the inputed native objects in the scene
@@ -2109,7 +2100,14 @@ class StudiomaxScene(AbstractScene):
 			\remarks	merges a scene file with the current scene.
 			\return		<bool> success
 		"""
-		return mxs.mergeMAXFile(path)
+		objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
+		mxs.mergeMAXFile(path)
+		objects = []
+		for name in objectNames:
+			obj = self.findObject(name)
+			if obj:
+				objects.append(obj)
+		return objects
 
 	def openRenderSceneDialog(self):
 		"""

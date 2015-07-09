@@ -11,10 +11,12 @@
 
 import os
 import random
+import blur3d.api
+
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
+from blur3d.api import application
 from blur3d.constants import CameraType
-import blur3d.api
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
 #-------------------------------------------------------------------------
@@ -54,30 +56,44 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
         return True
 
-    def add3NodeRig(self):
+    def matchViewport(self, viewport):
+        nativeCamera = self.nativePointer()
+        nativeTarget = viewport.nativePointer()
+        nativeCamera.fov = nativeTarget.getFOV()
+        if application.version() >= 16:
+            nativeCamera.transform = mxs.InverseHighPrecision(nativeTarget.getTM())
+        else: 
+            nativeCamera.transform = mxs.Inverse(nativeTarget.getTM())
+
+    def addThreeNodesRig(self):
         """
             \remarks    implements the AbstractScene._createNativeCamera3NodeRig method to return a new 3 node rig
             \param      name            <str>
             \return     <variant> top node of rig
         """
         cam = self.nativePointer()
+
         # create controls
         pos = mxs.star(radius1 = 6.5, radius2 = 5.5, points=16)
         trans = mxs.rectangle(length=10.2, width=4.5)
         rot = mxs.ngon(radius=2.0, nSides=3, corner_radius=0.5)
+
         # rename controls
         pos.name = str(cam.name) + 'position'
         trans.name = str(cam.name) + 'translation'
         rot.name = str(cam.name) + 'rotation'
+
         # rotate controls into place
         pos.rotation = mxs.eulerangles(90, 0 , 0)
         trans.rotation = mxs.eulerangles(90, 0 , 0)
         rot.rotation = mxs.eulerangles(0, 0, -90)
+
         # reset xforms
         mxs.resetxform(pos)
         mxs.resetxform(trans)
         mxs.resetxform(rot)
-        #collapse xforms
+
+        # collapse xforms
         mxs.maxOps.CollapseNode(pos, True)
         mxs.maxOps.CollapseNode(trans, True)
         mxs.maxOps.CollapseNode(rot, True)
