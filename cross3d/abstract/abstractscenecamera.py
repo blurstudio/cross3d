@@ -48,7 +48,12 @@ class AbstractSceneCamera(SceneObject):
 	def addProceduralShake(self):
 		return False
 
-	def add3NodeRig(self):
+	@abstractmethod
+	def matchViewport(self, viewport):
+		return False
+
+	@abstractmethod
+	def addThreeNodesRig(self):
 		return False
 
 	def target(self):

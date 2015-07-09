@@ -82,6 +82,9 @@ class MayaSceneCamera(AbstractSceneCamera):
 	def setLens(self, value):
 		self._nativeTypePointer.setFocalLength(value)
 	
+	def matchViewport(self, viewport):
+		return self.matchCamera(viewport.camera())
+
 	def matchCamera(self, camera):
 		""" Match this camera to another one. """
 		self.setParameters(camera.parameters())

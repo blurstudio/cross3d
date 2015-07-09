@@ -41,6 +41,9 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			return int(round(fov))
 		return fov
 
+	def matchViewport(self, viewport):
+		return self.matchCamera(viewport.camera())
+
 	def matchCamera(self, camera):
 		"""
 			Match this camera to another one.
