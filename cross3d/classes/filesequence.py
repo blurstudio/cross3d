@@ -75,12 +75,12 @@ class FileSequence(object):
 		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 
 	def nameTokens(self):
-		regex = re.compile(r'^((?P<extension>[A-Za-z][A-Za-z0-9][A-Za-z]).)((?P<range>(?P<end>[0-9]+)\-(?P<start>[0-9]+))(?P<separator>.))(?P<baseName>[A-Za-z0-9_.\-]+)$')
-		match = regex.match(self.name()[::-1])
+		regex = re.compile(r'^(?P<baseName>[A-Za-z0-9_.\-]+)((?P<separator>[^\da-zA-Z])(?P<range>(?P<start>[0-9]+)\-(?P<end>[0-9]+)))(\.(?P<extension>[a-zA-Z0-9]+))$')
+		match = regex.match( self.name() )
 		if match:
 			dict = match.groupdict()
 			for key in dict.keys():
-				dict[key] = dict[key][::-1]
+				dict[key] = dict[key]
 			return dict
 		return {}
 
