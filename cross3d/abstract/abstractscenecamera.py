@@ -56,6 +56,18 @@ class AbstractSceneCamera(SceneObject):
 	def addThreeNodesRig(self):
 		return False
 
+	def setPlatePath(self, path):
+		return False
+
+	def platePath(self):
+		return ''
+
+	def setPlateEnabled(self, enabled):
+		return False
+
+	def plateEnabled(self):
+		return False
+		
 	def target(self):
 		return self._target
 

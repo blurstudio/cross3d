@@ -9,11 +9,14 @@
 #	\date		03/15/10
 #
 
+import os
+import re
 import traceback
+import blur3d.api
 
 from PySoftimage import xsi
+from blur3d.api import FileSequence
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
-import blur3d.api
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +43,64 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		if rounded:
 			return int(round(fov))
 		return fov
+
+	def setPlatePath(self, path):
+		"""
+			TODO: This is currently only handling FileSequence path defined by the blur3d.api.FileSequence class.
+				  It does not support static images or movies.
+		"""
+		fs = FileSequence(path)
+		start = fs.start()
+		end = fs.end()
+
+		# Example: S:\\Deadpool\\Footage\\Sc000\\S0000.00\\Plates\\Sc000_S0000.00.[100..190;4].jpg
+		fileName = '%s.[%i..%i;%i].%s' % (fs.baseName(), start, end, fs.padding(), fs.extension())
+		path = os.path.join(fs.basePath(), fileName)
+		clip = xsi.Dictionary.GetObject('Clips.%s_Plate' % self.name(), False)
+		if not clip:
+			clip = xsi.SICreateImageClip2(path, '%s_Plate' % self.name())(0)
+		else:
+			clip.Source.FileName.Value = path
+
+			# TODO: Do not get why this does not work!
+			# clip.TimeControl.clipin = start
+			# clip.TimeControl.clipout= end
+			# clip.TimeControl.startoffset = start
+
+			xsi.setValue('%s.timectrl.clipin' % clip.FullName, start)
+			xsi.setValue('%s.timectrl.clipout' % clip.FullName, end)
+			xsi.setValue('%s.timectrl.startoffset' % clip.FullName, start)
+
+		xsi.SetValue("%s.rotoscope.imagename" % self.name(), clip.FullName, "")
+		return False
+
+	def platePath(self):
+		"""
+			TODO: This is currently only handling FileSequence path defined by the blur3d.api.FileSequence class.
+				  It does not support static images or movies.
+		"""
+
+		# If not plate is assigned the clip name will be and empty string.
+		clipName = xsi.GetValue("%s.rotoscope.imagename" % self.name())
+		if clipName:
+			clip = xsi.Dictionary.GetObject(clipName, False)
+			path = clip.Source.FileName.Value
+			match = re.match(blur3d.api.application.imageSequenceRegex(), path)
+			if match:
+				t = match.groupdict()
+				fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
+				fileSequence.setPadding(int(t['padding']))
+				return fileSequence.path()
+
+		# Fallback.
+		return ''
+
+	def setPlateEnabled(self, enabled):
+		self._nativePointer.Properties('Camera Display').Parameters('rotoenable').Value = enabled
+		return True
+
+	def plateEnabled(self):
+		return self._nativePointer.Properties('Camera Display').Parameters('rotoenable').Value
 
 	def matchViewport(self, viewport):
 		return self.matchCamera(viewport.camera())

@@ -12,11 +12,12 @@ the method.  All @abstractmethod methods MUST be implemented in a subclass.
 
 """
 
-from contextlib import contextmanager
+import re
 
+from blur3d import api
 from PyQt4.QtCore import QObject
 from blur3d import abstractmethod
-from blur3d import api
+from contextlib import contextmanager
 
 dispatch = None
 
@@ -76,6 +77,10 @@ class AbstractApplication(QObject):
 		dispatch.linkSignals('objectCloned', 'newObject')
 		dispatch.linkSignals('objectAdded', 'newObject')
 		return True
+
+	@abstractmethod
+	def imageSequenceRegex(self):
+		return re.compile('')
 
 	@abstractmethod
 	def allowedCharacters(self):

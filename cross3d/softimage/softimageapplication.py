@@ -16,18 +16,24 @@
 #
 
 import os
+import re
 
-from blur3d.api.abstract.abstractapplication import AbstractApplication
-from PySoftimage import xsi, constants
 from blur3d import api
+from PySoftimage import xsi, constants
+from blur3d.api.abstract.abstractapplication import AbstractApplication
 
 dispatch = None
 
 class SoftimageApplication(AbstractApplication):
+
 	# Only process these functions when we actually care about them. This is required because xsi doesnt generate individual signals for objects
 	# it generates a single event and requires the scripter to figure out if they need to do anything with the event.
 	objectCallbacks = set(['objectRenamed', 'objectUnHide', 'objectHide', 'objectUnfreeze', 'objectFreeze', 'objectParented'])
 	_objectsConnectedCount = 0
+	_imageSequenceRegex = re.compile(r'(?P<path>.+)\[(?P<start>\d+)\.\.(?P<end>\d+)\;(?P<padding>\d+)].(?P<extension>\w{3})')
+
+	def imageSequenceRegex(self):
+		return self._imageSequenceRegex
 	
 	def clipboardCopyText(self, text):
 		""" Set the provided text to the system clipboard so it can be pasted
