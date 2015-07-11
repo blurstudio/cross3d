@@ -326,7 +326,7 @@ global blur3dhelper
 
 		function appendMixerClip mxTrack filePath footHeight mxInterval = (
 			appendclip mxTrack filePath footHeight mxInterval
-		), 
+		),
 
 		function findSceneState shotName = (
 			sceneStateMgr.findscenestate shotName
@@ -334,7 +334,7 @@ global blur3dhelper
 
 		function getSceneState stateIndex = (
 			sceneStateMgr.getSceneState stateIndex
-		), 
+		),
 
 		function toggleTrajectories = (
 			max trajectories
@@ -347,7 +347,7 @@ global blur3dhelper
 					append bitArrParts i
 				)
 			)
-			
+
 			sceneStateMgr.Capture stateName bitArrParts
 		),
 
@@ -363,7 +363,7 @@ global blur3dhelper
 				)
 			)
 			sceneStateMgr.Restore stateName bitArrParts
-		), 
+		),
 
 		function replaceTransformController source target frame swapHandedness:false = (
 			at time frame (
@@ -511,6 +511,9 @@ global blur3dhelper
 		),
 		function maxZoomExtents = (
 			max zoomext sel
+		),
+		function convertToTime value = (
+			return value as time
 		)
 	)
 
