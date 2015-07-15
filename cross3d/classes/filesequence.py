@@ -75,7 +75,7 @@ class FileSequence(object):
 		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 
 	def nameTokens(self):
-		regex = re.compile(r'^(?P<baseName>[A-Za-z0-9_.\-]+)((?P<separator>[^\da-zA-Z])(?P<range>(?P<start>[0-9]+)\-(?P<end>[0-9]+)))(\.(?P<extension>[a-zA-Z0-9]+))$')
+		regex = re.compile(r'^(?P<baseName>[A-Za-z0-9_.\-]+?)((?P<separator>[^\da-zA-Z]?)(?P<range>(?P<start>[0-9]+)\-(?P<end>[0-9]+)))(\.(?P<extension>[a-zA-Z0-9]+))$')
 		match = regex.match( self.name() )
 		if match:
 			dict = match.groupdict()
