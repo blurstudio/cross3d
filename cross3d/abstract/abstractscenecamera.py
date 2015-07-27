@@ -45,6 +45,24 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
+	def frustrumPlaneTexture(self, name):
+		return False
+
+	@abstractmethod
+	def setFrustrumPlaneTexture(self, name, texture):
+		return False
+
+	@abstractmethod
+	def removeFrustrumPlane(self, name):
+		return False
+
+	@abstractmethod
+	def createFrustumPlane(self, name='', path='', position=1.0):
+		""" Will create a 3D plane attached to the camera and matching the camera view frustum.
+		"""
+		return False
+
+	@abstractmethod
 	def addProceduralShake(self):
 		return False
 

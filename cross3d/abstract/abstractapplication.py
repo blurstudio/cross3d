@@ -82,9 +82,12 @@ class AbstractApplication(QObject):
 	def imageSequenceRegex(self):
 		return re.compile('')
 
+	def conformObjectName(self, name):
+		return re.sub('[^%s]' % self.allowedCharacters(), '_', name)
+
 	@abstractmethod
 	def allowedCharacters(self):
-		return 'A-Za-z0-9'
+		return '.'
 
 	def clipboardCopyText(self, text):
 		""" Set the provided text to the system clipboard so it can be pasted

@@ -23,6 +23,20 @@ from blur3d.constants import VideoCodec
 
 class FileSequence(object):
 
+	# This regurlar expression is supporting the following things.
+
+	# Path/Sequence0-100.jpg
+	# Path/Sequence0:100.jpg
+
+	# Path/Sequence.0-100.jpg
+	# Path/Sequence.0:100.jpg
+
+	# Path/Sequence[0:100].jpg
+	# Path/Sequence[0-100].jpg
+
+	_regex = re.compile(r'^(?P<baseName>[A-Za-z0-9 _.\-]+?)((?P<separator>[^\da-zA-Z]?)\[?(?P<range>(?P<start>[0-9]+)[\-\:](?P<end>[0-9]+)))\]?(\.(?P<extension>[a-zA-Z]{3}))$')
+
+
 	@classmethod
 	def sequenceForPath(cls, fileName, step=1):
 		"""
@@ -43,6 +57,10 @@ class FileSequence(object):
 		self._step = step
 
 	@classmethod
+	def isValidSequencePath(cls, path):
+		return bool(cls._regex.match(os.path.basename(path)))
+
+	@classmethod
 	def buildPath(cls, uniquePath, frameRange):
 		extension = os.path.splitext(uniquePath)[1]
 		if extension:
@@ -50,6 +68,8 @@ class FileSequence(object):
 		raise Exception('Path needs an extension.')
 
 	def path(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "Path/Sequence.0-100.jpg".
+		'''
 		return os.path.abspath(self._path)
 
 	def step(self):
@@ -75,8 +95,7 @@ class FileSequence(object):
 		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 
 	def nameTokens(self):
-		regex = re.compile(r'^(?P<baseName>[A-Za-z0-9_.\-]+?)((?P<separator>[^\da-zA-Z]?)(?P<range>(?P<start>[0-9]+)\-(?P<end>[0-9]+)))(\.(?P<extension>[a-zA-Z0-9]+))$')
-		match = regex.match( self.name() )
+		match = self._regex.match( self.name() )
 		if match:
 			dict = match.groupdict()
 			for key in dict.keys():
@@ -84,13 +103,20 @@ class FileSequence(object):
 			return dict
 		return {}
 
+	def separator(self):
+		return self.nameTokens().get('separator', '')
+
 	def nameToken(self, key):
 		return self.nameTokens().get(key, '')
 
 	def baseName(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "Sequence".
+		'''
 		return self.nameToken('baseName')
 
 	def uniqueName(self, rangePlaceHolder=None):
+		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.jpg".
+		'''
 		nameSplit = [self.baseName(), self.extension()]
 		if rangePlaceHolder is not None:
 			nameSplit.insert(1, rangePlaceHolder)
@@ -114,6 +140,8 @@ class FileSequence(object):
 			return 0
 
 	def extension(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "jpg".
+		'''
 		return self.nameToken('extension')
 
 	def count(self):
@@ -143,15 +171,21 @@ class FileSequence(object):
 		return True
 
 	def basePath(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "Path".
+		'''
 		return os.path.split(self._path)[0]
 
 	def paddingCode(self):
 		return '%0' + str(self.padding()) + 'd'
 
 	def codeName(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.%0d.jpg".
+		'''
 		return self.baseName() + self.nameToken('separator') + self.paddingCode() + '.' + self.extension()
 
 	def codePath(self):
+		''' From "Path/Sequence.0-100.jpg" it will return "Path/Sequence.%0d.jpg".
+		'''
 		return os.path.join(self.basePath(), self.codeName())
 
 	def framePath(self, frame):
