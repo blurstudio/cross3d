@@ -12,11 +12,14 @@
 
 import os
 import re
+import glob
+import shutil
 import blurdev
 import subprocess
 
 from framerange import FrameRange
 from blur3d.constants import VideoCodec
+from blurdev.decorators import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -25,20 +28,24 @@ class FileSequence(object):
 
 	# This regurlar expression is supporting the following things.
 
-	# Path/Sequence0-100.jpg
-	# Path/Sequence0:100.jpg
+	# Path/Sequence0-100.abc
+	# Path/Sequence0:100.abc
 
-	# Path/Sequence.0-100.jpg
-	# Path/Sequence.0:100.jpg
+	# Path/Sequence.0-100.abc
+	# Path/Sequence.0:100.abc
 
-	# Path/Sequence[0:100].jpg
-	# Path/Sequence[0-100].jpg
+	# Path/Sequence[0:100].abc
+	# Path/Sequence[0-100].abc
 
 	_regex = re.compile(r'^(?P<baseName>[A-Za-z0-9 _.\-]+?)((?P<separator>[^\da-zA-Z]?)\[?(?P<range>(?P<start>[0-9]+)[\-\:](?P<end>[0-9]+)))\]?(\.(?P<extension>[a-zA-Z0-9]+))$')
 
+	@classmethod
+	@pendingdeprecation('Use fromFileName instead.')
+	def sequenceForPath(cls, fileName, step=1):
+		return cls.fromFileName(fileName, step)
 
 	@classmethod
-	def sequenceForPath(cls, fileName, step=1):
+	def fromFileName(cls, fileName, step=1):
 		"""
 		Given a single file in a file sequence, create a FileSequence object that represents the current sequence on disk.
 		:param fileName: the filename to pull the image sequence from.
@@ -49,7 +56,32 @@ class FileSequence(object):
 		import blurdev.media
 		return cls(blurdev.media.imageSequenceReprFromFileName(fileName, '{pre}{firstNum}-{lastNum}{post}'), step)
 
-	def __init__(self, path, step=1, frameRange=None):
+	@classmethod
+	def fromMovie(cls, inpt, output, padding=4, ffmpeg='ffmpeg', shell=False):
+		''' Output is a path like this "C:\Output.jpg
+		'''
+		if os.path.exists(inpt):
+
+			# Creating the output directory if it does not exist.
+			directoryPath, fileName = os.path.split(output)
+			if not os.path.exists(directoryPath):
+				os.makedirs(directoryPath)
+
+			baseName, extension = os.path.splitext(fileName)
+			output = os.path.join(directoryPath, r'{}.%{}d{}'.format(baseName, padding, extension))
+			command = [ffmpeg, '-i', inpt, '-an', '-f', 'image2', output]
+
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+				print 'MOVIE TO SEQUENCE COMMAND: {}'.format(' '.join(command))
+
+			process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+			process.communicate()
+			files = glob.glob(os.path.join(directoryPath, r'{}.*{}'.format(baseName, extension)))
+			return FileSequence.fromFileName(files[0])
+
+		raise Exception('Provide and existing input.')
+
+	def __init__(self, path='', step=1, frameRange=None):
 		"""
 			\remarks	Initialize the class.
 		"""
@@ -95,7 +127,7 @@ class FileSequence(object):
 		return '%(baseName)s%(separator)s%(start)s-%(end)s.%(extension)s'
 
 	def nameTokens(self):
-		match = self._regex.match( self.name() )
+		match = self._regex.match(self.name())
 		if match:
 			dict = match.groupdict()
 			for key in dict.keys():
@@ -113,6 +145,9 @@ class FileSequence(object):
 		''' From "Path/Sequence.0-100.jpg" it will return "Sequence".
 		'''
 		return self.nameToken('baseName')
+
+	def setBaseName(self, baseName):
+		self.setName(baseName=baseName)
 
 	def uniqueName(self, rangePlaceHolder=None):
 		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.jpg".
@@ -147,10 +182,10 @@ class FileSequence(object):
 	def count(self):
 		return self.end() - self.start() + 1
 
-	def setRange(self, range):
+	def setRange(self, rng):
 		tokens = self.nameTokens()
-		tokens['start'] = str(range[0])
-		tokens['end'] = str(range[1])
+		tokens['start'] = str(rng[0])
+		tokens['end'] = str(rng[1])
 		fileName = self.nameMask() % tokens
 		self._path = os.path.join(self.basePath(), fileName)
 		return True
@@ -174,6 +209,9 @@ class FileSequence(object):
 		''' From "Path/Sequence.0-100.jpg" it will return "Path".
 		'''
 		return os.path.split(self._path)[0]
+
+	def setBasePath(self, basePath):
+		self._path = os.path.join(basePath, os.path.split(self._path)[1])
 
 	def paddingCode(self):
 		return '%0' + str(self.padding()) + 'd'
@@ -199,7 +237,6 @@ class FileSequence(object):
 		return os.path.join(self.basePath(), self.uniqueName(rangePlaceHolder))
 
 	def exists(self):
-		import glob
 		paths = glob.glob(os.path.join(self.basePath(), self.baseName() + self.nameToken('separator') + '*.' + self.extension()))
 		if len(paths) > 0:
 			return True
@@ -209,7 +246,7 @@ class FileSequence(object):
 		paths = []
 		for frame in range(self.start(), self.end() + 1, self._step):
 			name = self.baseName() + self.nameToken('separator') + str(frame).zfill(self.padding()) + '.' + self.extension()
-			paths.append(os.path.join(self.basePath(), name))
+			paths.append(os.path.normpath(os.path.join(self.basePath(), name)))
 		return paths
 
 	def isComplete(self):
@@ -226,17 +263,21 @@ class FileSequence(object):
 				frames.append(frame)
 		return frames
 
+	def offsetRange(self, offset):
+		self.setRange(self.frameRange().offset(offset))
+		return True
+
 	def copy(self, output):
-		if self.isComplete():
-			if self.count() == output.count():
-				import shutil
-				for i, o in zip(self.paths(), output.paths()):
-					shutil.copy(i, o)
-				return True
-			else:
-				raise Exception('FileSequence.copy only supports outputting to a sequence with the same amount of frames.')
-		else:
-			raise Exception('FileSequence.copy only supports outputting to a complete sequence.')
+		if output.path() == self.path() and output.frameRange().overlaps(self.frameRange()):
+			raise Exception('Cannot copy to same location.')
+
+		if self.count() != output.count():
+			Exception('Cannot copy to sequence with different frame count.')
+
+		for source, copy in zip(self.paths(), output.paths()):
+			shutil.copy(source, copy)
+
+		return True
 
 	def convert(self, output):
 		if self.isComplete():
@@ -267,13 +308,10 @@ class FileSequence(object):
 	def generateMovie(self, outputPath=None, fps=30, ffmpeg='ffmpeg', videoCodec=VideoCodec.PhotoJPEG):
 		if not outputPath:
 			outputPath = os.path.join((self.basePath()), self.baseName() + '.mov')
-		extension = os.path.splitext(outputPath)[1]
 		if self.isComplete():
-			normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + self.extension())
-			normalisedSequence = FileSequence(normalisedSequencePath)
 
 			# Managing EXR sequences.
-			if (self.extension().lower() == 'exr'):
+			if self.extension().lower() == 'exr':
 				normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + 'jpg')
 				normalisedSequence = FileSequence(normalisedSequencePath)
 				self.convert(normalisedSequence)
@@ -284,8 +322,10 @@ class FileSequence(object):
 				normalisedSequence = FileSequence(normalisedSequencePath)
 				self.copy(normalisedSequence)
 
+			# Sometimes there is delay due to the servers.
 			while not normalisedSequence.isComplete():
 				continue
+
 			outputBasePath = os.path.split(outputPath)[0]
 			if not os.path.exists(outputBasePath):
 				os.makedirs(outputBasePath)
@@ -317,10 +357,9 @@ class FileSequence(object):
 
 	def link(self, output):
 		if self.isComplete():
-			if input.count() == output.count():
-				import subprocess
-				for input, ouput in zip(input.paths(), output.paths()):
-					command = " ".join(["mklink", output, input])
-					process = subprocess.Popen(command, shell=True)
+			if self.count() == output.count():
+				for inp, output in zip(self.paths(), output.paths()):
+					command = " ".join(["mklink", output, inp])
+					subprocess.Popen(command, shell=True)
 				return True
 		return False
