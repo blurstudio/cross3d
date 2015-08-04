@@ -19,6 +19,7 @@ import subprocess
 
 from framerange import FrameRange
 from blur3d.constants import VideoCodec
+from blur3d.constants import PaddingStyle
 from blurdev.decorators import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -85,7 +86,7 @@ class FileSequence(object):
 		"""
 			\remarks	Initialize the class.
 		"""
-		self._path = self.buildPath(path, frameRange) if frameRange else path
+		self._path = unicode(self.buildPath(path, frameRange) if frameRange else path)
 		self._step = step
 
 	@classmethod
@@ -149,13 +150,13 @@ class FileSequence(object):
 	def setBaseName(self, baseName):
 		self.setName(baseName=baseName)
 
-	def uniqueName(self, rangePlaceHolder=None):
+	def uniqueName(self, paddingStyle=None):
 		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.jpg".
 		'''
-		nameSplit = [self.baseName(), self.extension()]
-		if rangePlaceHolder is not None:
-			nameSplit.insert(1, rangePlaceHolder)
-		return '.'.join(nameSplit)
+		padding = unicode(self.padding(paddingStyle)) if paddingStyle else ''
+		if padding:
+			return '{}{}{}.{}'.format(self.baseName(), self.separator(), self.padding(paddingStyle), self.extension())
+		return '{}.{}'.format(self.baseName(), self.extension())
 
 	def frameRange(self, returnsAsString=False):
 		if returnsAsString:
@@ -190,9 +191,23 @@ class FileSequence(object):
 		self._path = os.path.join(self.basePath(), fileName)
 		return True
 
-	def padding(self):
+	def padding(self, style=PaddingStyle.Number):
 		try:
-			return len(str(self.nameTokens()['start']))
+			padding = len(str(self.nameTokens()['start']))
+
+			# This will return something like "####".
+			if style == PaddingStyle.Pound:
+				pounded = ''
+				for i in range(padding):
+					pounded += '#'
+				return pounded
+				
+			# This will return something like "%4d".
+			elif style == PaddingStyle.Percent:
+				return '%{}d'.format(padding)
+
+			return padding
+
 		except KeyError:
 			return 0
 
@@ -213,14 +228,17 @@ class FileSequence(object):
 	def setBasePath(self, basePath):
 		self._path = os.path.join(basePath, os.path.split(self._path)[1])
 
+	@pendingdeprecation('Use padding method instead using the padding style argument.')
 	def paddingCode(self):
 		return '%0' + str(self.padding()) + 'd'
 
+	@pendingdeprecation('Use uniqueName instead with paddingStyle argument.')
 	def codeName(self):
 		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.%0d.jpg".
 		'''
 		return self.baseName() + self.nameToken('separator') + self.paddingCode() + '.' + self.extension()
 
+	@pendingdeprecation('Use uniquePath instead with paddingStyle argument.')
 	def codePath(self):
 		''' From "Path/Sequence.0-100.jpg" it will return "Path/Sequence.%0d.jpg".
 		'''
@@ -233,8 +251,8 @@ class FileSequence(object):
 			return self.codePath() % frame
 		raise ValueError('The frame provided is outside the range of the FileSequence. {start}, {end}'.format(start=start, end=end))
 
-	def uniquePath(self, rangePlaceHolder=None):
-		return os.path.join(self.basePath(), self.uniqueName(rangePlaceHolder))
+	def uniquePath(self, paddingStyle=None):
+		return os.path.join(self.basePath(), self.uniqueName(paddingStyle))
 
 	def exists(self):
 		paths = glob.glob(os.path.join(self.basePath(), self.baseName() + self.nameToken('separator') + '*.' + self.extension()))
