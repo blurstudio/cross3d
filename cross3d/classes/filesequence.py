@@ -175,6 +175,18 @@ class FileSequence(object):
 		except ValueError:
 			return 0
 
+	def setExtension(self, extension):
+		if not extension:
+			return False
+			
+		# Removing the dot if provided.
+		if len(extension) > 1:
+			extension = extension[1:] if extension[0] == '.' else extension
+
+		split = os.path.splitext(self._path)
+		self._path = '{}.{}'.format(split[0], extension)
+		return True
+
 	def extension(self):
 		''' From "Path/Sequence.0-100.jpg" it will return "jpg".
 		'''
