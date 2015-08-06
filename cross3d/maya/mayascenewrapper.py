@@ -278,7 +278,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 				dagPath = om.MDagPath.getAPathTo(nativeObject)
 				if fullName:
 					return dagPath.fullPathName()
-				return dagPath.partialPathName()
+				return dagPath.partialPathName().split("|")[-1]
 			return om.MFnDependencyNode(nativeObject).name()
 
 	#--------------------------------------------------------------------------------
