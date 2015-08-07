@@ -110,9 +110,16 @@ class MayaSceneObject( AbstractSceneObject ):
 			\sa			model, setModel, _setNativeModel
 			\return		<variant> nativeObject || None
 		"""
-		namespace = self._namespace(self._nativePointer)['namespace']
-		if namespace:
-			return self._scene._findNativeObject(name=namespace)
+		parent = self.parent()
+		while parent is not None:
+			if isinstance(parent, api.SceneModel):
+				return parent.nativePointer()
+			parent = parent.parent()
+
+		# namespace = self._namespace(self._nativePointer)['namespace']
+		# if namespace:
+		# 	return self._scene._findNativeObject(name=namespace)
+		
 		return None
 	
 	def _nativeName(self):
