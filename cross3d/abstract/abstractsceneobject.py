@@ -191,13 +191,6 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		return False
 
-	def _nativeModel(self):
-		"""
-			\remarks	returns the native model this object belongs to.
-			\return		<variant> model
-		"""
-		return None
-
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -685,18 +678,6 @@ class AbstractSceneObject(SceneWrapper):
 	@abstractmethod
 	def setParameters(self, parameters):
 		return False
-
-	def model(self):
-		"""Returns the model this object belongs to.
-		
-		:return: :class:`blur3d.api.SceneModel` or None
-			
-		"""
-		nativeModel = self._nativeModel()
-		if nativeModel:
-			from blur3d.api import SceneModel
-			return SceneModel(self._scene, nativeModel)
-		return None
 
 	def deleteProperty(self, propertyName):
 		"""Deletes the property of an object.
