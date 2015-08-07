@@ -114,6 +114,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		while parent is not None:
 			if isinstance(parent, api.SceneModel):
 				return parent.nativePointer()
+
 			parent = parent.parent()
 
 		# namespace = self._namespace(self._nativePointer)['namespace']
@@ -132,7 +133,7 @@ class MayaSceneObject( AbstractSceneObject ):
 			\sa			parent, setParent, _setNativeParent
 			\return		<variant> nativeObject || None
 		"""
-		ret = cmds.listRelatives(self.path(), parent=True)
+		ret = cmds.listRelatives(self.path(), parent=True, fullPath=True)
 		if ret:
 			return self._asMOBject(ret[0])
 		return None
