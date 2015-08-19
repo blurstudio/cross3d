@@ -327,6 +327,12 @@ global blur3dhelper
 		function appendMixerClip mxTrack filePath footHeight mxInterval = (
 			appendclip mxTrack filePath footHeight mxInterval
 		),
+		function clearMixerTrack mxTrack = (
+			cleartrack mxTrack
+		),
+		function setMixerMode rigObj value = (
+			rigObj.controller.mixermode = value
+		), 
 
 		function findSceneState shotName = (
 			sceneStateMgr.findscenestate shotName
