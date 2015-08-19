@@ -153,10 +153,10 @@ class FileSequence(object):
 	def uniqueName(self, paddingStyle=None):
 		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.jpg".
 		'''
-		padding = unicode(self.padding(paddingStyle)) if paddingStyle else ''
-		if padding:
-			return '{}{}{}.{}'.format(self.baseName(), self.separator(), self.padding(paddingStyle), self.extension())
-		return '{}.{}'.format(self.baseName(), self.extension())
+		padding = paddingStyle if paddingStyle is None else unicode(self.padding(paddingStyle))
+		if padding is None:
+			return '{}.{}'.format(self.baseName(), self.extension())
+		return '{}{}{}.{}'.format(self.baseName(), self.separator(), self.padding(paddingStyle), self.extension())
 
 	def frameRange(self, returnsAsString=False):
 		if returnsAsString:
@@ -218,6 +218,11 @@ class FileSequence(object):
 			elif style == PaddingStyle.Percent:
 				return '%{}d'.format(padding)
 
+			# This will return something like "".
+			elif style == PaddingStyle.Blank:
+				return ''
+
+			# This will return something like "4".
 			return padding
 
 		except KeyError:
