@@ -248,6 +248,10 @@ class RescaleTime(QObject):
 			self.clearInput()
 			self.typeNumber(self.endTimeValue)
 			self.clickPoint(okBtn)
+			# This is neccissary to allow Thinking Particles time to update when the endTimeValue
+			# is updated.
+			# TODO: Investigate if this can replace the QTimers.
+			mxs.windows.processPostedMessages()
 			# Allow the window to appear before continuing
 			if self.useTimers:
 				QTimer.singleShot(self.timerDelay, self.mouseToTimeConfigOk)
