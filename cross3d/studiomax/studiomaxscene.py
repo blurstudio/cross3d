@@ -1501,29 +1501,24 @@ class StudiomaxScene(AbstractScene):
 
 	def importFBX(self, path, **kwargs):
 
-		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
+		# TODO: We need to support more options.
 		args = { "animation":True, 
 				 "cameras":True,
 				 "lights":True,
 				 "envelopes":True,
 				 "forceNormEnvelope":False,
-				 "keepXSIEffectors":True,
-				 "skeletonsAsNulls":True,
-				 "scaleFactor":1.0,
-				 "fillTimeline":True,
-				 'scaleConversion': False,
-				 'converUnit': 'cm' }
+				 "fillTimeline":True }
 
 		args.update(kwargs)
 
 		mxs.FbxImporterSetParam("ResetImport")
 		mxs.FbxImporterSetParam("Animation", args['animation'])
-		mxs.FbxImporterSetParam("ScaleConversion", args['scaleConversion'])
-		mxs.FbxImporterSetParam("ConvertUnit", args['converUnit'])
-		mxs.FbxImporterSetParam("ScaleFactor", args['scaleFactor'])
+		mxs.FbxImporterSetParam("FillTimeline", args['fillTimeline'])
+		mxs.FbxImporterSetParam("Skin", args['envelopes'])
 		
 		mxs.importfile(path, mxs.pyhelper.namify("noPrompt"))
 
+		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
 		return True
 
 	def importMocapToBiped(self, path, bipedCtrl):
