@@ -452,7 +452,6 @@ class SoftimageScene(AbstractScene):
 		return False
 	
 	def importFBX(self, path, **kwargs):
-
 		args = { "animation":True, 
 				 "cameras":True,
 				 "lights":True,
@@ -463,10 +462,22 @@ class SoftimageScene(AbstractScene):
 				 "frameRate":True,
 				 "scaleFactor":1.0,
 				 "fillTimeline":True,
-				 'scaleConversion': False,
-				 'converUnit': 'cm' }
+				 'convertUnit': None }
+
+		units = {"mm":"Millimeters",
+				 "cm":"Centimeters",
+				 "dm":"Decimeters",
+				 "m":"Meters",
+				 "km":"Kilometers",
+				 "in":"Inches",
+				 "ft":"Feet",
+				 "yd":"Yards",
+				 "mi":"Miles"}
 
 		args.update( kwargs )
+
+		if args["convertUnit"] is not None and args["convertUnit"] not in units.keys():
+			raise ValueError("FBX invalid unit '%s'. Must be %s"%(args["convertUnit"], units.keys()))
 
 		xsi.FBXImportAnimation( args["animation"] ) 
 		xsi.FBXImportCameras( args["cameras"] ) 
@@ -475,6 +486,9 @@ class SoftimageScene(AbstractScene):
 		xsi.FBXImportForceNormEnvelope( args["forceNormEnvelope"] ) 
 		xsi.FBXImportKeepXSIEffectors( args["keepXSIEffectors"] ) 
 		xsi.FBXImportSkeletonsAsNulls( args["skeletonsAsNulls"] ) 
+		xsi.FBXImportAutomaticUnit( args["convertUnit"] is None ) 
+		if args["convertUnit"] is not None:
+			xsi.FBXImportUnit( units[args["convertUnit"]] ) 
 
 		xsi.FBXImport("options" )
 		xsi.SetValue("ImportFBXOptions.ImportFrameRate", args["frameRate"] )
