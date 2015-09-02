@@ -2194,7 +2194,7 @@ class AbstractScene(QObject):
 			progress.setLabelText('Hiding %s...' % layer.name())
 
 			watch.startLap('Hiding %s' % layer.name())
-			layer.setVisible(False)
+			layer.setHidden(True, affectObjects=True)
 			watch.stopLap()
 
 		self._materialCache = None

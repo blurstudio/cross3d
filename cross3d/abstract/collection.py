@@ -62,7 +62,7 @@ class Collection(MutableSequence):
 		super(Collection, self).__init__()
 
 	@abstractmethod
-	def setHidden(self):
+	def setHidden(self, hidden):
 		return False
 
 # Registering the symbol.

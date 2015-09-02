@@ -1151,43 +1151,45 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		self.metaData().setValue( 'groupOrder', index + 1 )
 		return True
 
-	def setFrozen( self, state ):
+	def setFrozen(self, state, affectObjects=False):
 		"""
 			\remarks	reimplements the AbstractSceneLayer.setFrozen method to set the frozen state for this layer
 			\return		<bool> success
 		"""
 		self._nativePointer.isfrozen = state
 
-		# sync object frozen properties
-		for obj in self._nativeObjects():
-			obj.isfrozen = state
+		if affectObjects:
+			# sync object frozen properties
+			for obj in self._nativeObjects():
+				obj.isfrozen = state
 
 		return True
 
-	def setHidden( self, state, toggleOptions=None ):
+	def setHidden(self, state, options=None, affectObjects=False):
 		"""
 			\remarks	reimplements the AbstractSceneLayer.setHidden method to set the hidden state for this layer
 			\return		<bool> success
 		"""
 		self._nativePointer.ishidden = state
 
-		# update the objects on this layer
-		nativeObjects = self._nativeObjects()
-		if ( state ):
-			mxs.hide( nativeObjects )
-		else:
-			mxs.unhide( nativeObjects )
+		if affectObjects:
+			# update the objects on this layer
+			nativeObjects = self._nativeObjects()
+			if ( state ):
+				mxs.hide( nativeObjects )
+			else:
+				mxs.unhide( nativeObjects )
 
-		# toggle visible rendering options
-		self._scene._toggleNativeVisibleState(nativeObjects, toggleOptions)
+			# toggle visible rendering options
+			self._scene._toggleNativeVisibleState(nativeObjects, options)
 
-		# update the atmospherics on this layer
-		for atmos in self.atmospherics():
-			atmos.setEnabled( not state )
+			# update the atmospherics on this layer
+			for atmos in self.atmospherics():
+				atmos.setEnabled( not state )
 
-		# update the fx instances on this layer
-		for fx in self.fxs():
-			fx.setEnabled( not state )
+			# update the fx instances on this layer
+			for fx in self.fxs():
+				fx.setEnabled( not state )
 
 		return True
 

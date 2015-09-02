@@ -8,10 +8,11 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.constants import ObjectType
-from blur3d.api import SceneWrapper
 from blur3d import api
+from blur3d import abstractmethod
+from blur3d.api import SceneWrapper
+from blur3d.constants import ObjectType
+from blurdev.decorators import pendingdeprecation
 
 class AbstractContainer(SceneWrapper):
 	"""
@@ -255,14 +256,14 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return self.setSelected(False)
 
-	def freeze(self):
+	def freeze(self, affectObjects=False):
 		"""
 		Freezes (locks) the objects on this object group in the scene
 		
 		:return: bool
 		
 		"""
-		return self.setFrozen(True)
+		return self.setFrozen(True, affectObjects=affectObjects)
 
 	def fxs(self):
 		"""Return a list of the fxs that are part of this object group
@@ -283,14 +284,14 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return (self._materialOverrideFlags & flag) != 0
 
-	def hide(self):
+	def hide(self, options=None, affectObjects=False):
 		"""
 		Hides the objects on this object group in the scene
 		
 		:return: bool
 		
 		"""
-		return self.setHidden(True)
+		return self.setHidden(True, options=options, affectObjects=affectObjects)
 
 	def isEmpty(self):
 		"""
@@ -321,6 +322,7 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return False
 
+	@pendingdeprecation('Use isHidden instead.')
 	def isVisible(self):
 		"""
 		Return whether or not this object group is visible
@@ -538,7 +540,7 @@ class AbstractContainer(SceneWrapper):
 
 		return self._setNativePropSetOverride(nativePropSet)
 
-	def setFrozen(self, state):
+	def setFrozen(self, state, affectObjects=False):
 		"""
 		Set the frozen (locked) state for the objects on this object group
 		
@@ -548,7 +550,7 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return self._scene._freezeNativeObjects(self._nativeObjects(), state)
 
-	def setHidden(self, state, options=None):
+	def setHidden(self, state, options=None, affectObjects=False):
 		"""
 		Set the hidden state for the objects on this object group
 
@@ -571,7 +573,8 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return self._scene._setNativeSelection(self._nativeObjects())
 
-	def setVisible(self, state, options=None):
+	@pendingdeprecation('Use setHidden instead.')
+	def setVisible(self, state, options=None, affectObjects=False):
 		"""
 		Set whether or not this object group is visible
 		
@@ -580,23 +583,23 @@ class AbstractContainer(SceneWrapper):
 		:return: bool
 
 		"""
-		return self.setHidden(not state, options)
+		return self.setHidden(not state, options, affectObjects=affectObjects)
 
-	def unhide(self):
+	def unhide(self, options=None, affectObjects=False):
 		"""Unhides the objects on this object group
 		
 		:return: bool
 
 		"""
-		return self.setHidden(False)
+		return self.setHidden(False, options=options, affectObjects=affectObjects)
 
-	def unfreeze(self):
+	def unfreeze(self, affectObjects=False):
 		"""Unfreezes the objects on this object group
 		
 		:return: bool
 
 		"""
-		return self.setFrozen(False)
+		return self.setFrozen(False, affectObjects=affectObjects)
 
 
 # register the symbol

@@ -40,11 +40,11 @@ class AbstractGroup(AbstractContainer):
 		return False
 
 	@abstractmethod	
-	def setHidden(self, hidden, options=None):
+	def setHidden(self, hidden, options=None, affectObjects=False):
 		return False
 
 	@abstractmethod	
-	def setFrozen(self, frozen):
+	def setFrozen(self, frozen, affectObjects=False):
 		return False
 
 	@abstractmethod	

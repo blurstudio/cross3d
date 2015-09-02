@@ -48,14 +48,14 @@ class SoftimageGroup(AbstractGroup):
 		application.refresh()
 		return True
 
-	def setHidden(self, hidden, options=None):
+	def setHidden(self, hidden, options=None, affectObjects=False):
 		hidden = self._groupOptionsIn[hidden]
 		self._nativePointer.viewvis.Value = hidden
 		self._nativePointer.rendvis.Value = hidden
 		application.refresh()
 		return True
 
-	def setFrozen(self, frozen):
+	def setFrozen(self, frozen, affectObjects=False):
 		self._nativePointer.selectability.Value = self._groupOptionsIn[frozen]
 		application.refresh()
 		return True

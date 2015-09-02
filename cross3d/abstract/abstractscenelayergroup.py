@@ -75,11 +75,11 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""
 		return self.setSelected(False)
 
-	def freeze(self):
+	def freeze(self, affectObjects=False):
 		"""Freezes (locks) the layers on this layer in the scene
 
 		"""
-		return self.setFrozen(True)
+		return self.setFrozen(True, affectObjects=affectObjects)
 
 	@abstractmethod
 	def groupOrder(self):
@@ -88,11 +88,11 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""
 		return -1
 
-	def hide(self):
+	def hide(self, options=None, affectObjects=False):
 		"""Hides the layers on this layer in the scene
 
 		"""
-		return self.setHidden(True)
+		return self.setHidden(True, options=options, affectObjects=affectObjects)
 
 	def isEmpty(self):
 		"""Returns whether or not this layer is empty (contains no chidren)
@@ -154,12 +154,12 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""
 		return self.setSelected(True)
 
-	def setFrozen(self, state):
+	def setFrozen(self, state, affectObjects=False):
 		"""Set the frozen (locked) state for the layers in this layer group
 
 		"""
 		for layer in self.layers():
-			layer.setFrozen(state)
+			layer.setFrozen(state, affectObjects=affectObjects)
 		return True
 
 	@abstractmethod
@@ -169,12 +169,12 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""
 		return False
 
-	def setHidden(self, state):
+	def setHidden(self, state, options=None, affectObjects=False):
 		"""Set the hidden state for the layers on this layer
 
 		"""
 		for layer in self.layers():
-			layer.setHidden(state)
+			layer.setHidden(state, options=options, affectObjects=affectObjects)
 		return True
 
 	@abstractmethod
@@ -200,17 +200,17 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""
 		return False
 
-	def unhide(self):
+	def unhide(self, options=None, affectObjects=False):
 		"""Unhides the layers in this layer group
 
 		"""
-		return self.setHidden(False)
+		return self.setHidden(False, options=options, affectObjects=affectObjects)
 
-	def unfreeze(self):
+	def unfreeze(self, affectObjects=False):
 		"""Unfreezes the layers in this layer group
 
 		"""
-		return self.setFrozen(False)
+		return self.setFrozen(False, affectObjects=affectObjects)
 
 
 # register the symbol

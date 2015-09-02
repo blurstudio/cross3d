@@ -440,7 +440,7 @@ class AbstractSceneLayer(AbstractContainer):
 			return False
 
 		# set visible
-		self.setVisible(True)
+		self.setHidden(False, affectObjects=True)
 
 		# determine the alterante state for this layer
 		scene = self._scene
