@@ -26,7 +26,7 @@ dispatch = None
 # initialize callback scripts
 _STUDIOMAX_CALLBACK_TEMPLATE = """
 global blur3d
-if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
 if ( blur3d != undefined ) do ( 
 	local ms_args = (callbacks.notificationParam())
 	blur3d.api.%(cls)s.%(function)s "%(signal)s" %(args)s 
@@ -34,7 +34,7 @@ if ( blur3d != undefined ) do (
 """
 _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS = """
 global blur3d
-if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
 if ( blur3d != undefined ) do ( 
 	blur3d.api.%(cls)s.%(function)s "%(signal)s"
 )
@@ -42,7 +42,7 @@ if ( blur3d != undefined ) do (
 _STUDIOMAX_VIEWPORT_TEMPLATE = """
 fn blurfn_%(signal)s = 
 (
-	if ( blur3d == undefined ) do ( blur3d = python.import "blur3d" )
+	if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
 	if ( blur3d != undefined ) do ( 
 		blur3d.api.%(cls)s.%(function)s "%(signal)s"
 	)
