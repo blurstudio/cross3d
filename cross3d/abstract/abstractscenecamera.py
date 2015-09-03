@@ -17,8 +17,8 @@ import math
 
 class AbstractSceneCamera(SceneObject):
 	"""
-		The AbstractSceneObject class provides the base foundation for the 3d 
-		Object framework for the blur3d system.  This class will provide a 
+		The AbstractSceneObject class provides the base foundation for the 3d
+		Object framework for the blur3d system.  This class will provide a
 		generic overview structure for all manipulations of 3d objects.
 
 	"""
@@ -35,7 +35,7 @@ class AbstractSceneCamera(SceneObject):
 		""" Applies a alembic point cache modifier to the camera.
 
 		Args:
-			path(str): Path to the alembic file to apply. 
+			path(str): Path to the alembic file to apply.
 			transformID(str): Pointer to the transform data within the alembic file.
 			propertiesID(str): Pointer to the properties data within the alembic file.
 
@@ -85,7 +85,7 @@ class AbstractSceneCamera(SceneObject):
 
 	def plateEnabled(self):
 		return False
-		
+
 	def target(self):
 		return self._target
 
@@ -97,10 +97,10 @@ class AbstractSceneCamera(SceneObject):
 
 	def isCameraType(self, cameraType):
 		"""
-			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType. 
+			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType.
 		"""
 		return (self.cameraType() & cameraType) > 0
-	
+
 	def originalFilmWidth(self, storeWidth=False):
 		""" Returns the original Film width stored in userProps as 'overscanOrigFilmWidth'. If this is not
 		set it returns the cameras current filmWidth.
@@ -121,7 +121,7 @@ class AbstractSceneCamera(SceneObject):
 
 	def overscan(self, stored=True):
 		""" Returns the current overscan value of the camera.
-		:param stored: If false calculates the current overscan instead of returning the stored value. This is not the default 
+		:param stored: If false calculates the current overscan instead of returning the stored value. This is not the default
 					because the stored value is truncated so the value can not be guaranteed. Defaults to True
 		"""
 		if stored:
@@ -168,9 +168,9 @@ class AbstractSceneCamera(SceneObject):
 			if storeSize:
 				self.setOriginalRenderSize(size)
 		return size
-	
+
 	def setOriginalRenderSize(self, size):
-		""" Store the render size used for calculating 
+		""" Store the render size used for calculating
 		"""
 		self.userProps()['overscanOrigRenderSize'] = size
 
@@ -195,7 +195,7 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def filmWidth(self):
 		pass
-	
+
 	@abstractmethod
 	def filmHeight(self):
 		return None
@@ -404,11 +404,15 @@ class AbstractSceneCamera(SceneObject):
 			:return: True if successful
 		"""
 		return False
-	
+
 	@abstractmethod
 	def clippingEnabled(self):
 		return False
-	
+
+	@abstractmethod
+	def createFrustrumPlane(self, name="", imagePath="", distance=""):
+		pass
+
 	@abstractmethod
 	def setClippingEnabled(self, state):
 		return
@@ -425,17 +429,21 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
+	def frustrumPlaneImagePath(self, name):
+		return ""
+
+	@abstractmethod
 	def viewOptions(self):
 		return {}
 
 	@abstractmethod
 	def setViewOptions(self, viewOptions):
 		return False
-	
+
 	@abstractmethod
 	def isVrayCam(self):
-		""" 
-			Returns True if this is a vray camera, False otherwise. 
+		"""
+			Returns True if this is a vray camera, False otherwise.
 		"""
 		return False
 
