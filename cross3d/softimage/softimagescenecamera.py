@@ -52,7 +52,6 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		clip = xsi.Dictionary.GetObject('Clips.%s' % name, False)
 		if clip:
-			clip = xsi.Dictionary.GetObject(name, False)
 			path = clip.Source.FileName.Value
 
 			# This is the painful process of converting Softimage way to express path into our generic one.
