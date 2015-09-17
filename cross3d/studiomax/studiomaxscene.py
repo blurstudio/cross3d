@@ -1584,12 +1584,24 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		toRemove = []
+		layersToRemove = []
 
 		for model in models:
+
+			# Storing the corresponding layers.
+			for layer in self.layers():
+				if model.name in layer.name():
+					layersToRemove.append(layer)
+
 			toRemove += [model]
 			toRemove += self._nativeObjects(wildcard='.'.join([model.name.split('.')[0], '*']))
 
 		self._removeNativeObjects(toRemove)
+
+		# Removing the corresponding layers.
+		for layer in layersToRemove:
+			layer.remove()
+
 		application.refresh()
 		return True
 
