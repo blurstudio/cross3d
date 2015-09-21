@@ -177,7 +177,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			xsi.SIConnectShaderToCnxPoint(clip.FullName, "%s.Image.tex" % material.FullName)
 
 			# TODO: Ideally I would detect if the image has alpha.
-			if os.path.splitext(imagePath)[1] in ['.png', '.tga', '.exr']:
+			if os.path.splitext(imagePath)[1] in ['.png', '.tga', '.exr', '.tif', '.tiff']:
 				xsi.SIConnectShaderToCnxPoint("%s.Image.out" % material.FullName, "%s.Constant.transparency" % material.FullName, False)
 				xsi.SetValue("%s.Constant.usealphatrans"  % material.FullName, True)
 				xsi.SetValue("%s.Constant.inverttrans" % material.FullName, True)
