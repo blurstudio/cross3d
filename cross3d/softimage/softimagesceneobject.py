@@ -56,7 +56,7 @@ class SoftimageSceneObject(AbstractSceneObject):
 		if type != '':
 			nativeType = self._nativeTypeOfObjectType(type)
 		#return [ obj for obj in self._nativePointer.FindChildren( name, nativeType, parent, recursive ) ]
-		return self._nativePointer.FindChildren(wildcard, nativeType, '', recursive)
+		return self._nativePointer.FindChildren2(wildcard, nativeType, '', recursive)
 
 	def _nativeParent(self):
 		"""

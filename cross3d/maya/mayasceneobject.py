@@ -70,7 +70,7 @@ class MayaSceneObject( AbstractSceneObject ):
 			path = om.MDagPath.getAPathTo(mObj)
 			for index in range(path.childCount()):
 				child = path.child(index)
-				if child.apiType() == om.MFn.kTransform:
+				if child.apiType() in [om.MFn.kTransform, om.MFn.kJoint]:
 					if not regex or regex.match(api.SceneObject._mObjName(child, fullName=False)):
 						yield child
 					if recursive == True:
