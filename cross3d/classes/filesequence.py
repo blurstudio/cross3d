@@ -70,13 +70,24 @@ class FileSequence(object):
 
 			baseName, extension = os.path.splitext(fileName)
 			output = os.path.join(directoryPath, r'{}.%{}d{}'.format(baseName, padding, extension))
-			command = [ffmpeg, '-i', inpt, '-an', '-f', 'image2', output]
+			command = [ffmpeg, '-i', '"{}"'.format(inpt), '-an', '-f', 'image2', '"{}"'.format(output)]
+
+			# On some machines, if you pass a list, ffmpeg will fail. Converting to a string
+			# prevents this.
+			command = ' '.join(command)
 
 			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
-				print 'MOVIE TO SEQUENCE COMMAND: {}'.format(' '.join(command))
+				print 'MOVIE TO SEQUENCE COMMAND: {}'.format(command)
 
-			process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
-			process.communicate()
+			# Raises subprocess.CalledProcessError if ffmpeg errors out.
+			ffmpegOutput = subprocess.check_output(
+				command,
+				shell=shell,
+				stderr=subprocess.STDOUT
+			)
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+				print 'FFMPEG OUTPUT', '-'*50
+				print ffmpegOutput
 			files = glob.glob(os.path.join(directoryPath, r'{}.*{}'.format(baseName, extension)))
 			return FileSequence.fromFileName(files[0])
 
