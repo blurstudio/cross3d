@@ -83,7 +83,6 @@ class FileSequence(object):
 			ffmpegOutput = subprocess.check_output(
 				command,
 				shell=shell,
-				stdout=subprocess.PIPE,
 				stderr=subprocess.STDOUT,
 				stdin=subprocess.PIPE
 			)
