@@ -83,7 +83,9 @@ class FileSequence(object):
 			ffmpegOutput = subprocess.check_output(
 				command,
 				shell=shell,
-				stderr=subprocess.STDOUT
+				stdout=subprocess.PIPE,
+				stderr=subprocess.STDOUT,
+				stdin=subprocess.PIPE
 			)
 			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
 				print 'FFMPEG OUTPUT', '-'*50
