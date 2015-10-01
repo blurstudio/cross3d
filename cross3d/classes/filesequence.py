@@ -122,7 +122,7 @@ class FileSequence(object):
 	def name(self):
 		return os.path.split(self._path)[1]
 
-	def setName(self, baseName='', start='', end='', extension=''):
+	def setName(self, baseName='', start='', end='', extension='', separator=''):
 		nameTokens = self.nameTokens()
 		if baseName:
 			nameTokens['baseName'] = baseName
@@ -132,6 +132,8 @@ class FileSequence(object):
 			nameTokens['end'] = end
 		if extension:
 			nameTokens['extension'] = extension
+		if separator:
+			nameTokens['separator'] = separator
 		self._path = os.path.join(self.basePath(), self.nameMask() % nameTokens)
 		return True
 
@@ -149,6 +151,9 @@ class FileSequence(object):
 
 	def separator(self):
 		return self.nameTokens().get('separator', '')
+	
+	def setSeparator(self, separator):
+		self.setName(separator=separator)
 
 	def nameToken(self, key):
 		return self.nameTokens().get(key, '')
