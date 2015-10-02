@@ -49,13 +49,20 @@ class FileSequence(object):
 	def fromFileName(cls, fileName, step=1):
 		"""
 		Given a single file in a file sequence, create a FileSequence object that represents the current sequence on disk.
-		:param fileName: the filename to pull the image sequence from.
 		
-		.. seealso:: :func:`blurdev.media.imageSequenceFromFileName`
-		.. note:: This is subject to the notes for blurdev.media.imageSequenceFromFileName
+		Args:
+			fileName(str) : The filename to pull the image sequence from.
+			step(int) : The sequence step interval.
+		
 		"""
 		import blurdev.media
-		return cls(blurdev.media.imageSequenceReprFromFileName(fileName, '{pre}{firstNum}-{lastNum}{post}'), step)
+		sequence = blurdev.media.imageSequenceFromFileName(fileName)
+		# If we're dealing with a single file, we'll need to manually format it as a sequence Path/Sequence0-0.abc 
+		# instead of accepting the filename without sequence formatting (as imageSequenceRepr returns.)
+		if len(sequence) > 1:
+			return cls(blurdev.media.imageSequenceRepr(sequence, '{pre}{firstNum}-{lastNum}{post}'), step)
+		else:
+			return cls('{pre}{frame}-{frame}{post}'.format(**blurdev.media.imageSequenceInfo(fileName).groupdict()), step)
 
 	@classmethod
 	def fromMovie(cls, inpt, output, padding=4, ffmpeg='ffmpeg', shell=False):
