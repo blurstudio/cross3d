@@ -1,5 +1,6 @@
 import re
 import maya.OpenMaya as om
+import maya.OpenMayaAnim as oma
 import maya.cmds as cmds
 import blurdev
 from blur3d.constants import ObjectType, RotationOrder, PointerTypes
@@ -180,7 +181,16 @@ class MayaSceneObject( AbstractSceneObject ):
 	def _genNativeTypePointer(self, mObj):
 		""" Generates a MFn object for the provided MObject.
 		"""
-		return getattr(om, 'MFn{}'.format(mObj.apiTypeStr()[1:]))(mObj)
+		className = 'MFn{0}'.format(mObj.apiTypeStr()[1:])
+
+		# Yep Maya is so consistent !
+		if className == "MFnJoint":
+			className = "MFnIkJoint"
+
+		if hasattr(om, className):
+			return getattr(om, className)(mObj)
+		elif hasattr(oma, className):
+			return getattr(oma, className)(mObj)
 	
 	def __call__(self, retType=PointerTypes.Pointer):
 		""" Returns the native pointer for the object.
