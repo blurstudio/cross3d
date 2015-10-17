@@ -2922,6 +2922,24 @@ class StudiomaxScene(AbstractScene):
 		from blur3d.api import FileProps
 		return FileProps()
 
+	def animationMixers(self):
+		"""Finds all mixers present in the current MAX scene.
+
+		Returns:
+					list: A list of Mixer instances for each MxMixer in the
+						current MAX Scene.
+		"""
+		# Since Mixer is a Class in MAXScript, and not a MAXClass, we're not
+		# able to use getClassInstances to retrieve Mixers in the scene.
+		# Instead, we'll iterate over objects in the scene, and test to see if
+		# they have a controller with a Mixer attached.
+		from blur3d.api import Mixer
+		mixers = []
+		for obj in mxs.objects:
+			if hasattr(obj, 'controller') and hasattr(obj.controller, 'mixer'):
+				mixers.append(Mixer(obj.controller.mixer))
+		return mixers
+
 # register the symbol
 from blur3d import api
 api.registerSymbol('Scene', StudiomaxScene)

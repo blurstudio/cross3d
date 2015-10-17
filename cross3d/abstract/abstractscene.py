@@ -1425,6 +1425,15 @@ class AbstractScene(QObject):
 			return SceneLayer(self, lay)
 		return None
 
+	@abstractmethod
+	def animationMixers(self):
+		"""Finds all mixers present in the Scene.
+
+		Returns:
+					list: A list of Mixer instances for each Mixer in the Scene.
+		"""
+		return []
+
 	def atmospherics(self):
 		"""
 			\remarks	returns the atmospheric instances from this scene

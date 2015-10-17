@@ -41,4 +41,5 @@ def init():
 	import abstractscenecache
 	import abstractscenesubmitter
 	import abstractscenepropset
+	import mixer
 	import collection
