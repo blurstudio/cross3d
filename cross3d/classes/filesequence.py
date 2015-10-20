@@ -49,20 +49,28 @@ class FileSequence(object):
 	def fromFileName(cls, fileName, step=1):
 		"""
 		Given a single file in a file sequence, create a FileSequence object that represents the current sequence on disk.
-		
+
 		Args:
 			fileName(str) : The filename to pull the image sequence from.
 			step(int) : The sequence step interval.
-		
+
 		"""
 		import blurdev.media
 		sequence = blurdev.media.imageSequenceFromFileName(fileName)
-		# If we're dealing with a single file, we'll need to manually format it as a sequence Path/Sequence0-0.abc 
+		# If we're dealing with a single file, we'll need to manually format it as a sequence Path/Sequence0-0.abc
 		# instead of accepting the filename without sequence formatting (as imageSequenceRepr returns.)
 		if len(sequence) > 1:
 			return cls(blurdev.media.imageSequenceRepr(sequence, '{pre}{firstNum}-{lastNum}{post}'), step)
 		else:
-			return cls('{pre}{frame}-{frame}{post}'.format(**blurdev.media.imageSequenceInfo(fileName).groupdict()), step)
+			# If the provided filename is not a sequence, create an invalid file sequence
+			imageSequenceInfo = blurdev.media.imageSequenceInfo(fileName)
+			if imageSequenceInfo:
+				return cls('{pre}{frame}-{frame}{post}'.format(
+					**imageSequenceInfo.groupdict()),
+					step
+				)
+			else:
+				return cls(fileName)
 
 	@classmethod
 	def fromMovie(cls, inpt, output, padding=4, ffmpeg='ffmpeg', shell=False):
@@ -159,7 +167,7 @@ class FileSequence(object):
 
 	def separator(self):
 		return self.nameTokens().get('separator', '')
-	
+
 	def setSeparator(self, separator):
 		self.setName(separator=separator)
 
@@ -202,7 +210,7 @@ class FileSequence(object):
 	def setExtension(self, extension):
 		if not extension:
 			return False
-			
+
 		# Removing the dot if provided.
 		if len(extension) > 1:
 			extension = extension[1:] if extension[0] == '.' else extension
@@ -237,7 +245,7 @@ class FileSequence(object):
 				for i in range(padding):
 					pounded += '#'
 				return pounded
-				
+
 			# This will return something like "%4d".
 			elif style == PaddingStyle.Percent:
 				return '%{}d'.format(padding)
