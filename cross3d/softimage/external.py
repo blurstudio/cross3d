@@ -25,7 +25,7 @@ from blur3d.api.abstract.external import External as AbstractExternal
 
 class External(AbstractExternal):
 	# In case the software is installed but not used don't find it when not passing in a version
-	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_SOFTIMAGE', '2015').split(','))
+	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_SOFTIMAGE', '').split(','))
 	# map years to version numbers
 	_yearForVersion = {'8': '2010', '9': '2011', '10': '2012', '11': '2013', '12': '2014', '13': '2015'}
 
