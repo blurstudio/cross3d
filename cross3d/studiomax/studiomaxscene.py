@@ -411,11 +411,11 @@ class StudiomaxScene(AbstractScene):
 			\param		name			<str>
 			\return		<variant> nativeCamera || None
 		"""
-		if type == 'V-Ray':
-			if target:
-				nativeCamera = mxs.VRayPhysicalCamera(target=target)
+		if type == 'Physical':
+			if application.version() < 18:
+				nativeCamera = mxs.VRayPhysicalCamera(target=target) if target else mxs.VRayPhysicalCamera()
 			else:
-				nativeCamera = mxs.VRayPhysicalCamera()
+				nativeCamera = mxs.Physical(target=target) if target else mxs.Physical()
 		else:
 			nativeCamera = mxs.FreeCamera()
 
@@ -1713,19 +1713,21 @@ class StudiomaxScene(AbstractScene):
 		user_root = r'C:\Users'
 		users = os.listdir(user_root)
 				
-		# Add the primary User preset file to the list to be written.
-		if application.version() > 14:
-			preset_dir = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax%(year)i_X64\Presets\%(year)i.0.1\export' % {'user': cur_user, 'year':application.year()}
+		# Building the preset directory path. Somehow 2016 will still export the preset to 2014's folder.
+		if application.version() == 18:
+			presetDirectory = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax2014_X64\Presets\%(year)i.1\export' % {'user': cur_user, 'year':application.year()}
+		elif application.version() > 14:
+			presetDirectory = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax%(year)i_X64\Presets\%(year)i.0.1\export' % {'user': cur_user, 'year':application.year()}
 		else:
-			preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
+			presetDirectory = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
 			
-		primary_preset_path = os.path.join(preset_dir, 'User defined.fbxexportpreset')
+		primary_preset_path = os.path.join(presetDirectory, 'User defined.fbxexportpreset')
 		preset_paths.append(primary_preset_path)
 		
 		# Find all other preset files that could possibly be loaded.
 		for user in users:
-			preset_dir = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (user, application.year())
-			user_preset_paths = glob.glob(os.path.join(preset_dir, '*.fbxexportpreset'))
+			presetDirectory = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (user, application.year())
+			user_preset_paths = glob.glob(os.path.join(presetDirectory, '*.fbxexportpreset'))
 			preset_paths.extend(user_preset_paths)
 		
 		# Strip out duplicates
