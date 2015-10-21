@@ -16,6 +16,7 @@ import blur3d.api
 from Py3dsMax import mxs
 from PyQt4.QtCore import QSize
 from blur3d.api import application
+from blur3d import pendingdeprecation
 from blur3d.constants import CameraType
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
@@ -35,9 +36,11 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
     def addProceduralShake(self):
 
-        #listController = mxs.rotation_list()
-        #mxs.setPropertyController(self._nativePointer.controller, 'rotation', listController)
         listController = mxs.getPropertyController(self._nativePointer.controller, 'rotation')
+        print mxs.classOf(listController)
+        if not mxs.classOf(listController) == mxs.rotation_list:
+            listController = mxs.rotation_list()
+            mxs.setPropertyController(self._nativePointer.controller, 'rotation', listController)
 
         noise = mxs.Noise_rotation()
         noise.frequency = 0.05
@@ -179,11 +182,14 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 \return		<blur3d.api.constants.CameraType>
         """
         cls = mxs.classof(self._nativePointer)
-        if (cls in (mxs.FreeCamera, mxs.TargetCamera)):
+        if cls in (mxs.FreeCamera, mxs.TargetCamera):
             return CameraType.Standard
 
-        elif (cls == mxs.VRayPhysicalCamera):
-            return CameraType.VRayPhysical
+        elif cls == mxs.Physical:
+            return CameraType.Physical
+
+        elif cls == mxs.VRayPhysicalCamera:
+            return CameraType.Physical
         return 0
 
     def filmWidth(self):
@@ -191,12 +197,23 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 \remarks	Returns the film_width of the camera.
                 \return		film_width (float)
         """
-        width = None
-        if self.isVrayCam():
+        cls = mxs.classof(self._nativePointer)
+        if cls == mxs.VRayPhysicalCamera:
+
+            # TODO: Why is that wrapped in a try except?
             try:
                 width = self._nativePointer.film_width
             except AttributeError:
                 pass
+
+        elif cls == mxs.Physical:
+            width = self._nativePointer.film_width_mm
+
+        else:
+
+            # TODO: Should it return the scene aperture setting instead?
+            width = None
+
         return width
 
     def fov(self, rounded=False):
@@ -217,7 +234,10 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 \remarks	returns whether multipass effects are active on this camera
                 \return		<bool>
         """
-        if mxs.isProperty(self._nativePointer, 'mpassEnabled'):
+        cls = mxs.classOf(self._nativePointer)
+        if cls in (mxs.VRayPhysicalCamera, mxs.Physical):
+            return self._nativePointer.use_DOF
+        elif mxs.isProperty(self._nativePointer, 'mpassEnabled'):
             return self._nativePointer.mpassEnabled
         return False
 
@@ -439,7 +459,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         return True
 
     def clippingEnabled(self):
-        if self.isVrayCam():
+        if self.cameraType() in (CameraType.VRayPhysical, CameraType.Physical):
             return self.nativePointer().clip_on
         else:
             return self.nativePointer().clipManually
@@ -450,6 +470,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         else:
             self.nativePointer().clipManually = state
 
+    @pendingdeprecation('Use cameraType instead.')
     def isVrayCam(self):
         return unicode(mxs.classOf(self.nativePointer())).lower().startswith('vray')
 
