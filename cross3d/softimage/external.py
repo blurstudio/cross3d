@@ -57,9 +57,10 @@ class External(AbstractExternal):
 				fle.write(script)
 
 		binary = os.path.join(cls.binariesPath(version, architecture), 'xsibatch.exe' if headless else 'xsi.exe')
+		scriptArgumentName = '-script' if headless else '-uiscript'
 
 		# Contrinue makes sure there is no prompts.
-		command = [binary, '-continue', '-script', scriptPath]
+		command = [binary, '-continue', scriptArgumentName, scriptPath]
 
 		# Processing means that it will not shot the GUI and not grab a license.
 		if headless:
