@@ -373,7 +373,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			timeController = mxs.getPropertyController(nativeCache, 'playbackFrame')
 
 			# Set keys on the playback frame cache that matches the current frame rate.
-			duration = cacheInfo.start_frame - cacheInfo.end_frame + 1
+			duration = cacheInfo.end_frame - cacheInfo.start_frame + 1
 			frames = [(cacheInfo.start_frame, 0), (cacheInfo.end_frame, duration)]
 			for frame, value in frames:
 				key = mxs.addNewKey(timeController, frame)
