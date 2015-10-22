@@ -334,6 +334,11 @@ class FileSequence(object):
 		self.setRange(self.frameRange().offset(offset))
 		return True
 
+	def move(self, output):
+		self.copy(output)
+		self.delete()
+		self._path = output.path()
+
 	def copy(self, output):
 		if output.path() == self.path() and output.frameRange().overlaps(self.frameRange()):
 			raise Exception('Cannot copy to same location.')
