@@ -76,7 +76,7 @@
     <UnitsGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Units">
       <TotalUnitsScale UIH="0" UID="0" UIG="0" lbENU="Total Units Scale" dt="TextLine"/>
       <DynamicScaleConversion UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Automatic" dt="Bool" v="0"/>
-      <UnitsSelector UIH="0" UID="1" UIG="0" lbENU="Scene units converted to" dt="Enum" enumSelected="Inches" v="5" enumItem_0="Millimeters" enumItem_1="Centimeters" enumItem_2="Decimeters" enumItem_3="Meters" enumItem_4="Kilometers" enumItem_5="Inches" enumItem_6="Feet" enumItem_7="Yards" enumItem_8="Miles"/>
+      <UnitsSelector UIH="0" UID="1" UIG="0" lbENU="Scene units converted to" dt="Enum" enumSelected="Centimeters" v="1" enumItem_0="Millimeters" enumItem_1="Centimeters" enumItem_2="Decimeters" enumItem_3="Meters" enumItem_4="Kilometers" enumItem_5="Inches" enumItem_6="Feet" enumItem_7="Yards" enumItem_8="Miles"/>
     </UnitsGrp>
     <AxisConvGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Axis Conversion">
       <UpAxis UIH="0" UID="0" UIG="0" lbENU="Up Axis" dt="Enum" enumSelected="{upVector}-up" v="0" enumItem_0="Y-up" enumItem_1="Z-up"/>
