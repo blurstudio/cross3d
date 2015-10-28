@@ -88,7 +88,7 @@
     </UI>
     <Fbx UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="FBX File Format">
       <AsciiFbx UIH="0" UID="0" UIG="0" lbENU="Type" dt="Enum" enumSelected="ASCII" v="1" enumItem_0="Binary" enumItem_1="ASCII"/>
-      <ExportFileVersion UIH="0" UID="0" UIG="0" lbENU="Version" dt="Alias" enumSelected="FBX201000" v="2" enumItem_0="FBX201200" enumItem_1="FBX201100" enumItem_2="FBX201000" enumItem_3="FBX200900" enumItem_4="FBX200611"/>
+      <ExportFileVersion UIH="0" UID="0" UIG="0" lbENU="Version" dt="Alias" enumSelected="FBX201200" v="0" enumItem_0="FBX201200" enumItem_1="FBX201100" enumItem_2="FBX201000" enumItem_3="FBX200900" enumItem_4="FBX200611"/>
     </Fbx>
     <Dxf UIH="1" UID="0" UIG="1" UIX="0" UIP="0" lbENU="Dxf">
       <Deformation UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Deformed Models" dt="Bool" v="1"/>
