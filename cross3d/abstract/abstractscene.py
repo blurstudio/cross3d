@@ -472,7 +472,7 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
-	def _nativeLayers(self):
+	def _nativeLayers(self, wildcard=''):
 		"""
 			\remarks	returns a list of the native layers in this scene
 			\return		<list> [ <variant> nativeLayer, .. ]
