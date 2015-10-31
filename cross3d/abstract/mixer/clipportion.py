@@ -63,6 +63,18 @@ class AbstractClipPortion(object):
 	def start(self, value):
 		self._start = value
 
+	@property
+	def sourceEnd(self):
+		"""The number of frames from the beginning of the clip's file at which
+		this ClipPortion ends."""
+		return None
+
+	@property
+	def sourceStart(self):
+		"""The number of frames from the beginning of the clip's file at which
+		this ClipPortion starts."""
+		return None
+
 ################################################################################
 
 # register the symbol

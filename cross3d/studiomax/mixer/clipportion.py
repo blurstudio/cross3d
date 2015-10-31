@@ -27,7 +27,19 @@ class StudiomaxClipPortion(AbstractClipPortion):
 		start: The start of the region, in global frames.
 		clip: The Clip of which this ClipPortion is a portion.
 	"""
-	
+
+	@property
+	def sourceEnd(self):
+		"""The number of frames from the beginning of the clip's file at which
+		this ClipPortion ends."""
+		return mxs.globalToLocal(self.clip.clip, self.end)
+
+	@property
+	def sourceStart(self):
+		"""The number of frames from the beginning of the clip's file at which
+		this ClipPortion starts."""
+		return mxs.globalToLocal(self.clip.clip, self.start)
+
 	def __str__(self):
 		return '{}: {}-{}'.format(self.clip, self.start, self.end)
 
