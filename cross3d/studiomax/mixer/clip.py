@@ -252,19 +252,6 @@ class StudiomaxClip(AbstractClip):
 		return ClipPortions
 
 	def _occludeClipPortions(self, ClipPortions, occludedPortions):
-		"""Produces a list of ClipPortions, omitting areas occluded by 
-			TrackPortionsim or ClipPortions
-
-		Args:
-						index(int): Index of desired weight to retrieve a value
-							for.
-
-		Returns:
-						float: Value of the weight at the index specified.
-
-		Raises:
-						IndexError
-		"""
 		outputClips = []
 		while len(ClipPortions):
 			sc = ClipPortions.pop(0)
