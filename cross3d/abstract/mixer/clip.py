@@ -42,6 +42,12 @@ class AbstractClip(object):
 		self._clip = value
 
 	@property
+	def duration(self):
+		"""The number of frames in the mixer that the clip occupies after
+			scaling"""
+		return (self.globEnd - self.globStart)
+
+	@property
 	def filename(self):
 		""" The filename of the file used by the Clip. """
 		return None
@@ -63,11 +69,16 @@ class AbstractClip(object):
 		return None
 
 	@property
-	def orgStart(self):
+	def sourceEnd(self):
 		return None
 
 	@property
-	def orgEnd(self):
+	def sourceLength(self):
+		"""The length, in frames, of the input file."""
+		return (self.sourceEnd - self.sourceStart)	
+		
+	@property
+	def sourceStart(self):
 		return None
 
 	@property
@@ -83,26 +94,33 @@ class AbstractClip(object):
 		self._track = value
 
 	@property
-	def trimStart(self):
-		return float(self.clip.trimStart)
-
-	@property
 	def trimEnd(self):
 		return float(self.clip.trimEnd)
 
+	@property
+	def trimmedLength(self):
+		"""The number of frames in the used area of the clip."""
+		return (self.sourceLength - (self.trimEnd + self.trimStart))
+
+	@property
+	def trimStart(self):
+		return float(self.clip.trimStart)
+
 	@abstractmethod
-	def getWeightValue(self, index):
-		"""Retrieves the value of the weight at the specified index.
+	def analyzeWeights(self, occludedPortions):
+		"""Determines which portions of the Clip are used, and which portions of
+			the Clip will occlude Tracks below.
 
 		Args:
-						index(int): Index of desired weight to retrieve a value
-							for.
+						occludedPortions(list): A list of `TrackPortion` instances
+							for every portion of the Clip that will be occluded
+							by Tracks above it.
 
 		Returns:
-						float: Value of the weight at the index specified.
-
-		Raises:
-						IndexError
+						tuple: A tuple containing a list of `ClipPortion`
+							instances for every used portion of the Clip, and a
+							list of `TrackPortion` instances for every portion of
+							the Clip that will occlude tracks below it.
 		"""
 		return None
 
@@ -118,6 +136,22 @@ class AbstractClip(object):
 		Returns:
 						float: Global frame number for the position of the
 							weight.
+
+		Raises:
+						IndexError
+		"""
+		return None
+
+	@abstractmethod
+	def getWeightValue(self, index):
+		"""Retrieves the value of the weight at the specified index.
+
+		Args:
+						index(int): Index of desired weight to retrieve a value
+							for.
+
+		Returns:
+						float: Value of the weight at the index specified.
 
 		Raises:
 						IndexError
@@ -144,24 +178,6 @@ class AbstractClip(object):
 		Returns:
 						list: List of tuples for every weight on the Clip in
 						the form ((float)time, (float)value).
-		"""
-		return None
-
-	@abstractmethod
-	def analyzeWeights(self, occludedPortions):
-		"""Determines which portions of the Clip are used, and which portions of
-			the Clip will occlude Tracks below.
-
-		Args:
-						occludedPortions(list): A list of `TrackPortion` instances
-							for every portion of the Clip that will be occluded
-							by Tracks above it.
-
-		Returns:
-						tuple: A tuple containing a list of `ClipPortion`
-							instances for every used portion of the Clip, and a
-							list of `TrackPortion` instances for every portion of
-							the Clip that will occlude tracks below it.
 		"""
 		return None
 

@@ -56,25 +56,25 @@ class StudiomaxClip(AbstractClip):
 		return int(self.clip.numWeights)
 
 	@property
-	def orgStart(self):
-		return float(self.clip.orgStart)
-
-	@property
-	def orgEnd(self):
+	def sourceEnd(self):
 		return float(self.clip.orgEnd)
 
 	@property
+	def sourceStart(self):
+		return float(self.clip.orgStart)
+
+	@property
 	def scale(self):
-		return self.clip.scale
+		return float(self.clip.scale)
+
+	@property
+	def trimEnd(self):
+		return float(self.clip.trimEnd)
 
 	@property
 	def trimStart(self):
 		return float(self.clip.trimStart)
 
-	@property
-	def trimEnd(self):
-		return float(self.clip.trimEnd)
-	
 	def analyzeWeights(self, occludedPortions):
 		"""Determines which portions of the Clip are used, and which portions of
 			the Clip will occlude Tracks below.
@@ -252,6 +252,19 @@ class StudiomaxClip(AbstractClip):
 		return ClipPortions
 
 	def _occludeClipPortions(self, ClipPortions, occludedPortions):
+		"""Produces a list of ClipPortions, omitting areas occluded by 
+			TrackPortionsim or ClipPortions
+
+		Args:
+						index(int): Index of desired weight to retrieve a value
+							for.
+
+		Returns:
+						float: Value of the weight at the index specified.
+
+		Raises:
+						IndexError
+		"""
 		outputClips = []
 		while len(ClipPortions):
 			sc = ClipPortions.pop(0)
