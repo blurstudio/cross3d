@@ -109,7 +109,7 @@ class StudiomaxMixer(AbstractMixer):
 		"""
 		return [tg for tg in self.iterTrackGroups()]
 
-	def getClipPortions(self):
+	def getClipPortions(self, start=None, end=None):
 		"""Analyzes the weights for all tracks in all TrackGroups in the Mixer,
 			and compares the filters on each track group in order to generate a
 			list of ClipPortion instance for every used section of every clip on an
@@ -119,7 +119,7 @@ class StudiomaxMixer(AbstractMixer):
 						list: A list of ClipPortion instances for each used portion
 							of a Clip.
 		"""
-		ClipPortions = []
+		clipPortions = []
 		analyzedTrackGroups = []
 		for i, tg in enumerate(self.iterTrackGroups()):
 			tgInfo = {}
@@ -135,9 +135,26 @@ class StudiomaxMixer(AbstractMixer):
 			sc, occl = tg.getClipPortions(occludedPortions=occludedPortions)
 			tgInfo['occludedPortions'] = occl
 			tgInfo['i'] = i
-			ClipPortions.extend(sc)
+			clipPortions.extend(sc)
 			analyzedTrackGroups.append(tgInfo)
-		return ClipPortions
+		if start or end:
+			clipPortions = self._cropClipPortions(clipPortions, start, end)
+		return clipPortions
+
+	def _cropClipPortions(self, clipPortions, start, end):
+		cpReturn = []
+		for clipPortion in clipPortions:
+			if clipPortion.start < start:
+				if clipPortion.end < start:
+					continue
+				clipPortion.start = start
+			if clipPortion.end > end:
+				if clipPortion.start > end:
+					continue
+				clipPortion.end = end
+			cpReturn.append(clipPortion)
+		return cpReturn
+
 
 ################################################################################
 
