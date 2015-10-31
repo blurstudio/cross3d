@@ -234,7 +234,7 @@ class StudiomaxTrackGroup(AbstractTrackGroup):
 		ClipPortions = []
 		for track in self.iterEnabledTracks():
 			sc, occl = track.analyzeWeights(occludedPortions)
-			occludedPortions = occl
+			occludedPortions.extend(occl)
 			ClipPortions.extend(sc)
 
 		return ClipPortions, occludedPortions
