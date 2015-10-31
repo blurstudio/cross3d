@@ -208,6 +208,7 @@ class StudiomaxTrack(AbstractTrack):
 		trackStart = self.getClip(0).globStart
 		trackEnd = self.getClip(self.numClips - 1).globEnd
 		trackOcclPortions = []
+		usedPortions = []
 		if self.numWeights:
 			# Get start / end from first and last clip in the track -- this will
 			# give us the maximum range to analyze the track for.
@@ -219,8 +220,11 @@ class StudiomaxTrack(AbstractTrack):
 			# areas so we can test against them to update clip/track ranges
 			# later on.
 			occlStart, occlEnd = None, None
+			# initialize weight Value to 1.0, since if no weights are present
+			# the track defaults to a weight of 1.0.
+			wVal = 1.0
 			prevWVal = 0.0
-			for (wTime, wVal) in self.iterWeights():
+			for wi, (wTime, wVal) in enumerate(self.iterWeights()):
 				# Always move the end to the current position
 				rangeEnd = wTime
 				if wVal == 0.0:
@@ -235,9 +239,10 @@ class StudiomaxTrack(AbstractTrack):
 					rangeStart = wTime
 				if wVal == 1.0:
 					# If this is the first weight, start at the beggining of the
-					# clip, since the curve will extend back past this weight.
+					# first clip in the track, since the curve will extend back
+					# past this weight.
 					if wi == 0:
-						occlStart = trac
+						occlStart = trackStart
 					# If we already have a start stored for an occluding
 					# portion, store the current time as the occluding portion's
 					# end.
@@ -306,13 +311,32 @@ class StudiomaxTrack(AbstractTrack):
 		return outputPortions
 
 	def _findClipPortions(self, usedTrackPortions):
-		ClipPortions = []
-		for clip in self.iterClips:
+		clipPortions = []
+		for clip in self.iterClips():
+			currClipPortions = []
 			for tr in usedTrackPortions:
-				start = max(clip.start, tr.start)
-				end = min(clip.end, tr.end)
+				start = max(clip.globStart, tr.start)
+				end = min(clip.globEnd, tr.end)
 				if end > start:
-					ClipPortions.append(ClipPortion(clip, start, end))
+					currClipPortions.append(ClipPortion(clip, start, end))
+			# Coalesce ClipPortions for this clip before appending to the output
+			clipPortions.extend(self._coalesceClipPortions(currClipPortions))
+		return clipPortions
+
+	def _coalesceClipPortions(self, inputPortions):
+		ClipPortions = []
+		portion = inputPortions.pop(0)
+		scStart = portion.start
+		scEnd = portion.end
+		while len(inputPortions):
+			portion = inputPortions.pop(0)
+			if scEnd == portion.start:
+				scEnd = portion.end
+			else:
+				ClipPortions.append(ClipPortion(portion.clip, scStart, scEnd))
+				scStart, scEnd = portion.start, portion.end
+		ClipPortions.append(ClipPortion(portion.clip, scStart, scEnd))
+		return ClipPortions
 
 ################################################################################
 
