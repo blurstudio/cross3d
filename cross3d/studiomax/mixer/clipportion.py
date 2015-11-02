@@ -32,13 +32,17 @@ class StudiomaxClipPortion(AbstractClipPortion):
 	def sourceEnd(self):
 		"""The number of frames from the beginning of the clip's file at which
 		this ClipPortion ends."""
-		return mxs.globalToLocal(self.clip.clip, self.end)
+		# In Max, clips can't be trimmed to subframes, so we shouldn't have to
+		# worry about rounding.  All the same, int will take care of this for us
+		return mxs.globalToLocal(self.clip.clip, int(self.end))
 
 	@property
 	def sourceStart(self):
 		"""The number of frames from the beginning of the clip's file at which
 		this ClipPortion starts."""
-		return mxs.globalToLocal(self.clip.clip, self.start)
+		# In Max, clips can't be trimmed to subframes, so we shouldn't have to
+		# worry about rounding.  All the same, int will take care of this for us
+		return mxs.globalToLocal(self.clip.clip, int(self.start))
 
 	def __str__(self):
 		return '{}: {}-{}'.format(self.clip, self.start, self.end)
