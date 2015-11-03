@@ -34,7 +34,9 @@ class StudiomaxClipPortion(AbstractClipPortion):
 		this ClipPortion ends."""
 		# In Max, clips can't be trimmed to subframes, so we shouldn't have to
 		# worry about rounding.  All the same, int will take care of this for us
-		return mxs.globalToLocal(self.clip.clip, int(self.end))
+		sourceEnd = mxs.globalToLocal(self.clip.clip, int(self.end))
+		sourceIn = self.clip.clip.orgstart
+		return sourceEnd - sourceIn
 
 	@property
 	def sourceStart(self):
@@ -42,7 +44,9 @@ class StudiomaxClipPortion(AbstractClipPortion):
 		this ClipPortion starts."""
 		# In Max, clips can't be trimmed to subframes, so we shouldn't have to
 		# worry about rounding.  All the same, int will take care of this for us
-		return mxs.globalToLocal(self.clip.clip, int(self.start))
+		sourceStart = mxs.globalToLocal(self.clip.clip, int(self.start))
+		sourceIn = self.clip.clip.orgstart
+		return sourceStart - sourceIn
 
 	def __str__(self):
 		return '{}: {}-{}'.format(self.clip, self.start, self.end)
