@@ -18,6 +18,7 @@ from classes import FCurve
 from classes import Exceptions
 from classes import FrameRange
 from classes import FileSequence
+from classes import Timecode
 from classes import Clipboard
 from classes import Dispatch as _Dispatch
 

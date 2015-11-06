@@ -61,11 +61,13 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 				fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
 				fileSequence.setPadding(int(t['padding']))
 				return fileSequence.path()
+			else:
+				return path
 
 		# Otherwise return empty.
 		return ''
 
-	def setFrustrumPlaneImagePath(self, name, imagePath):
+	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
@@ -79,7 +81,13 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			clip.Source.FileName.Value = os.path.join(fs.basePath(), baseName)
 			xsi.setValue('%s.timectrl.clipin' % clip.FullName, fs.start())
 			xsi.setValue('%s.timectrl.clipout' % clip.FullName, fs.end())
-			xsi.setValue('%s.timectrl.startoffset' % clip.FullName, fs.start())
+			xsi.setValue('%s.timectrl.startoffset' % clip.FullName, fs.start() + offset)
+			xsi.setValue('%s.timectrl.scale' % clip.FullName, speed)
+
+		else:
+			clip.Source.FileName.Value = imagePath
+			xsi.setValue('%s.timectrl.startoffset' % clip.FullName, offset)
+			xsi.setValue('%s.timectrl.scale' % clip.FullName, speed)
 
 		# Finally returning the clip object.
 		return clip
@@ -105,7 +113,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			return True
 		return False
 
-	def createFrustrumPlane(self, name='', imagePath='', distance=1.0):
+	def createFrustrumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0):
 		""" Will create a 3D plane attached to the camera and matching the camera view frustum.
 		"""
 
@@ -162,7 +170,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			return True
 
 		# Getting or creating the clip.
-		clip = self.setFrustrumPlaneImagePath(name, imagePath)
+		clip = self.setFrustrumPlaneImagePath(name, imagePath, offset, speed)
 
 		# Getting or creating the material.
 		header = 'Sources.Materials.DefaultLib'
