@@ -9,7 +9,7 @@
 #	\date		04/04/11
 #
 
-from PySoftimage								import xsi
+from PySoftimage import xsi, constants as xsiConstants
 from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -64,8 +64,9 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 	
 	def hasProperty(self, key):
 		return (key in self.propertyNames())
-	
-	
+
+	def isReferenced(self):
+		return self._nativePointer.Model.ModelKind == xsiConstants.siModelKind_Reference
 
 # register the symbol
 from blur3d import api

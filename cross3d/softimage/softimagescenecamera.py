@@ -67,7 +67,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		# Otherwise return empty.
 		return ''
 
-	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0):
+	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0, ):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
@@ -97,8 +97,8 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		plane = self.nativePointer().findChild(name)
 		if plane:
 
-			# Removing the plane.
-			xsi.DeleteObj(plane.FullName)
+			# Removing the plane. I branch it cause there is cases where we have a plane parent.
+			xsi.DeleteObj('B:{}'.format(plane.FullName))
 
 			# Removing material.
 			material = xsi.Dictionary.GetObject('Sources.Materials.DefaultLib.%s' % name, False)
@@ -113,8 +113,9 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			return True
 		return False
 
-	def createFrustrumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0):
+	def createFrustrumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0, parent=None):
 		""" Will create a 3D plane attached to the camera and matching the camera view frustum.
+			Parent can be used when the plane should not be directly parented under the camera and constrained instead.
 		"""
 
 		from win32com.client import Dispatch
@@ -132,17 +133,28 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
+		anchor = xsi.ActiveSceneRoot.AddNull(name) if parent or self.isReferenced() else self._nativePointer
 
 		# Creating the Plane.
-		plane = xsi.CreatePrim("Grid", "MeshSurface", name, "")
+		plane = xsi.CreatePrim("Grid", "MeshSurface", '{}_Plane'.format(name), "")
 		plane.Properties("Visibility").Parameters("selectability").Value = False
-		self._nativePointer.AddChild(plane)
+
+		# Parenting the plane to the anchor.
+		anchor.AddChild(plane)
+
+		# If parent is defined.
+		if parent:
+			parent.nativePointer().addChild(anchor)
+
+		# If the anchor is not the camera we need to constrain the anchor to the camera. 
+		# This is mosty useful for cameras inside a reference model.
+		if not anchor == self._nativePointer():
+			anchor.Kinematics.AddConstraint('Pose', self.nativePointer())
 
 		# Setting dipslay options.
 		display = plane.AddProperty("Display Property")
 		parameters = ['staticsel', 'intsel', 'playbacksel', 'staticunselnear', 'intunselnear', 'staticunselfar', 'intunselfar', 'playbackunselfar']
 		for parameter in parameters:
-			print parameter
 			display.Parameters(parameter).Value = 9
 
 		# Setting the plane transform.
@@ -191,7 +203,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 				xsi.SetValue("%s.Constant.inverttrans" % material.FullName, True)
 
 		if material:
-			xsi.AssignMaterial(','.join([material.FullName, name]))
+			xsi.AssignMaterial(','.join([material.FullName, plane.FullName]))
 
 		# Returning.
 		return True

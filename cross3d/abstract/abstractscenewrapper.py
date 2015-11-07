@@ -158,6 +158,9 @@ class AbstractSceneWrapper(object):
 			return SceneAnimationController(self._scene, nativeController)
 		return None
 
+	def isReferenced(self):
+		return False
+		
 	def displayName(self):
 		"""
 		Returns the display name for this wrapper instance, if not 
