@@ -49,20 +49,20 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
+		if self.findChild(name):
+			clip = xsi.Dictionary.GetObject('Clips.%s' % name, False)
+			if clip:
+				path = clip.Source.FileName.Value
 
-		clip = xsi.Dictionary.GetObject('Clips.%s' % name, False)
-		if clip:
-			path = clip.Source.FileName.Value
-
-			# This is the painful process of converting Softimage way to express path into our generic one.
-			match = re.match(blur3d.api.application.imageSequenceRegex(), path)
-			if match:
-				t = match.groupdict()
-				fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
-				fileSequence.setPadding(int(t['padding']))
-				return fileSequence.path()
-			else:
-				return path
+				# This is the painful process of converting Softimage way to express path into our generic one.
+				match = re.match(blur3d.api.application.imageSequenceRegex(), path)
+				if match:
+					t = match.groupdict()
+					fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
+					fileSequence.setPadding(int(t['padding']))
+					return fileSequence.path()
+				else:
+					return path
 
 		# Otherwise return empty.
 		return ''
