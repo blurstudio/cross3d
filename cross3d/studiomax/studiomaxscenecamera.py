@@ -548,16 +548,22 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         if self.clippingEnabled() and allowClipping:
             origin = Vector(0,0,0) * xform
             nearClipNormal = Vector(0, 0, -1) * xform
+            nearClipNormal -= origin
+            nearClipNormal.normalize()
             nearClipPoint = Vector(0, 0, self.nearClippingPlane()) * xform
-            planes.append((nearClipNormal-origin, nearClipPoint))
-            farClipNormal = Vector(0, 0, 1)
-            farClipPoint = Vector(0, 0, self.farClippingPlane())
-            planes.append((farClipNormal-origin, farClipPoint))
+            planes.append((nearClipNormal, nearClipPoint))
+            farClipNormal = Vector(0, 0, 1) * xform
+            farClipNormal -= origin
+            farClipNormal.normalize()
+            farClipPoint = Vector(0, 0, self.farClippingPlane()) * xform
+            planes.append((farClipNormal, farClipPoint))
         else:
             # We'll hard code the near clipping plane since we don't need to calculate it.
             # Clipping is disabled, so there will be no far clipping
             origin = Vector(0,0,0) * xform
             nearClipNormal = Vector(0, 0, -1) * xform
+            nearClipNormal -= origin
+            nearClipNormal.normalize()
             nearClipPoint = Vector(0, 0, 0) * xform
             planes.append((nearClipNormal-origin, nearClipPoint))
 
@@ -611,6 +617,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         attime = None
         if frameRange == None:
             frameRange = [None]
+        else:
             attime = AtTime()
 
         # TODO implement step
