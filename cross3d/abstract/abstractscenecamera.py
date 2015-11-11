@@ -447,6 +447,23 @@ class AbstractSceneCamera(SceneObject):
 		"""
 		return False
 
+	@abstractmethod
+	def objectsInFrustrum(objects=[], considerVisibility=True, frameRange=None, step=1, allowClipping=True):
+		"""Returns a list of objects whose bounding boxes are contained within or intersect with the
+			camera's frustum.
+
+		Args:
+			objects(list):				A list of objects to test.  If empty list or None is passed,
+										all objects will be considered.
+			considerVisibility(bool):	If True, objects whose visibility is disabled will be omitted.
+			frameRange(FrameRange):		If provided, all frames within this range will be analyzed.
+										Otherwise, only the current frame will be analyzed.
+			step(int):					Step to use within frameRange for analysis.
+			allowClipping(bool):		Whether the camera's near/far clipping planes should be
+										considered for object culling.
+		"""
+		return []
+
 	def matchCamera(self, camera):
 		"""
 			Match this camera to another one.
