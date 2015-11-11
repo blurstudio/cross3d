@@ -25,8 +25,8 @@ from blur3d.lib.pclib import PointCacheInfo
 from blur3d.api import UserProps, application
 from blur3d.lib.xmeshhandler import XMESHHandler
 from blur3d import pendingdeprecation, constants
-from blur3d.constants import UpVector, ExtrapolationType
 from blur3d.api.abstract.abstractscene import AbstractScene
+from blur3d.constants import UpVector, ExtrapolationType, RendererType
 
 # register custom attriutes for MAXScript that hold scene persistent data
 from mxscustattribdef import MXSCustAttribDef
@@ -2545,6 +2545,18 @@ class StudiomaxScene(AbstractScene):
 			setControllerRecursively(dynamicSet, prop, controller)
 		return True
 
+	def rendererType(self):
+		nativeRenderer = mxs.renderers.current
+		if mxs.classOf(nativeRenderer) == mxs.Default_Scanline_Renderer:
+			return RendererType.Scanline
+		elif mxs.classOf(nativeRenderer) == mxs.Quicksilver_Hardware_Renderer:
+			return RendererType.Quicksilver
+		elif mxs.classOf(nativeRenderer) == mxs.V_Ray_Adv_3_25_01:
+			return RendererType.VRay
+		elif mxs.classOf(nativeRenderer) == mxs.mental_ray_renderer:
+			return RendererType.MentalRay
+		return 0
+		 
 	def renderSize(self):
 		"""
 			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders

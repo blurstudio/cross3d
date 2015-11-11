@@ -146,9 +146,8 @@ class SoftimageSceneObject(AbstractSceneObject):
 			# Looping through constraining object.
 			for constraining in constraint.Constraining:
 				if constraining.isEqualTo(self._nativePointer):
-					constrained = constraint.Constrained
-					if not constrained.isEqualTo(self._nativePointer):
-						constraineds.append(constrained)
+					constraineds.append(constraint.Constrained)
+					
 		return constraineds
    
 	def getCacheName(self, type):

@@ -1196,6 +1196,10 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod
+	def rendererType(self):
+		return 0
+
+	@abstractmethod
 	def renderSize(self):
 		"""
 			\remarks	return the render output size for the scene
