@@ -192,12 +192,37 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             return CameraType.Physical
         return 0
 
+    def filmHeight(self):
+        """
+                \remarks    Returns the film_height of the camera.
+                \return     film_height (float)
+        """
+        cls = mxs.classof(self._nativePointer)
+        height = None
+        if cls == mxs.VRayPhysicalCamera:
+
+            # TODO: Why is that wrapped in a try except?
+            try:
+                height = self._nativePointer.film_height
+            except AttributeError:
+                pass
+
+        elif cls == mxs.Physical:
+            height = self._nativePointer.film_height_mm
+
+        if not height:
+            # If we failed to get a width from a camera, return the scene aperture setting.
+            height = self.filmWidth() * (mxs.renderPixelAspect / mxs.getRendImageAspect())
+
+        return height
+
     def filmWidth(self):
         """
                 \remarks	Returns the film_width of the camera.
                 \return		film_width (float)
         """
         cls = mxs.classof(self._nativePointer)
+        width = None
         if cls == mxs.VRayPhysicalCamera:
 
             # TODO: Why is that wrapped in a try except?
@@ -209,10 +234,10 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         elif cls == mxs.Physical:
             width = self._nativePointer.film_width_mm
 
-        else:
-
-            # TODO: Should it return the scene aperture setting instead?
-            width = None
+        if not width:
+            # If we failed to get a width from a camera, return the scene
+            # aperture setting.
+            width = mxs.getRendApertureWidth()
 
         return width
 
@@ -494,6 +519,124 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             while target:
                 mxs.delete(target)
                 target = mxs.findObject(self._nativePointer.name + '.Target')
+
+    def nearClippingPlane(self):
+        if self.cameraType() in (CameraType.VRayPhysical, CameraType.Physical):
+            return self.nativePointer().clip_near
+        else:
+             return self.nativePointer().near_clip
+
+    def farClippingPlane(self):
+        if self.cameraType() in (CameraType.VRayPhysical, CameraType.Physical):
+            return self.nativePointer().clip_far
+        else:
+             return self.nativePointer().far_clip
+
+    def _getFrustumPlanes(self, frame=None, allowClipping=True):
+        """Get a list of normal, point tuples that defines the frustum clipping planes"""
+        from blur3d.mathutils import Vector
+        from Py3dsMax import AtTime
+        import math
+        attime = None
+        # Explicit comparison to None in case we need to query frame 0
+        if frame != None:
+            attime = AtTime()
+            attime(frame)
+        planes = []
+        if self.clippingEnabled() and allowClipping:
+            planes.append((Vector(0, 0, -1), Vector(0, 0, self.nearClippingPlane())))
+            planes.append((Vector(0, 0, 1), Vector(0, 0, self.farClippingPlane())))
+        else:
+            # We'll hard code the near clipping plane since we don't need to calculate it.
+            # Clipping is disabled, so there will be no far clipping
+            planes.append((Vector(0, 0, -1), Vector(0, 0, 0)))
+
+        fovh = float(self.fov())
+        # calculate the vertical fov using the aspect between vertical and horizontal filmback
+        fovv = fovh * self.filmHeight() / self.filmWidth()
+        # some simple trig to get out x/y coords for the camera view's top-right corner
+        x = -1.0 * math.tan(math.radians(fovh * 0.5))
+        y = -1.0 * math.tan(math.radians(fovv * 0.5))
+        z = -1.0
+        origin = Vector((0, 0, 0))
+        # From this we can calculate each corner and get it's plane's normal vector
+        # Screen-left clipping
+        v1 = Vector((x, y, z))
+        v2 = Vector((0, 1, 0))
+        normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
+        planes.append((normal, v1))
+        # Screen-bottom clipping
+        x *= -1
+        v1 = Vector((x, y, z))
+        v2 = Vector((-1, 0, 0))
+        normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
+        planes.append((normal, v1))
+        # Screen-right clipping
+        y *= -1
+        v1 = Vector((x, y, z))
+        v2 = Vector((0, -1, 0))
+        normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
+        planes.append((normal, v1))
+        # Screen-top clipping
+        x *= -1
+        v1 = Vector((x, y, z))
+        v2 = Vector((1, 0, 0))
+        normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
+        planes.append((normal, v1))
+        if attime:
+            del attime
+        return planes
+
+    def objectsInFrustrum(self, objects=[], considerVisibility=True, frameRange=None, step=1, allowClipping=True):
+        from blur3d.api import Scene, SceneCamera, SceneObject
+        from Py3dsMax import AtTime
+        from blur3d.mathutils import Vector
+        # TODO convert objects to SceneObjects?
+        
+        outputObjects = set()
+        if not objects:
+            # TODO fill in objects if not specified
+            objects = []
+
+        attime = None
+        if frameRange == None:
+            frameRange = [None]
+            attime = AtTime()
+
+        # TODO implement step
+        for frame in frameRange:
+            # Explicit comparison to None to allow querying frame 0
+            if frame != None:
+                attime(frame)
+
+            for obj in objects:
+                # TODO considerVisibility
+
+                boxPoints = [Vector(pnt.x, pnt.y, pnt.z) for pnt in obj.boundingBox().getCorners()]
+                frustumPlanes = self._getFrustumPlanes(frame=frame, allowClipping=allowClipping)
+
+                for normal, point in frustumPlanes:
+                    # false if fully outside, true if inside or intersects
+                    # based on code from the amazing iQ
+                    # http://www.iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm
+                    out = 0
+                    for j in range(8):
+                        #print boxPoints[j]
+                        # we want to know if dot(N, (P-A)) < 0
+                        # we'll get P-Ar
+                        vecToP = (boxPoints[j] - point)
+                        vecToP.normalize()
+                        # and now take the dot product of that vector with our plane's Normal vector
+                        out += int( normal.dot(vecToP) < 0 )
+                    if out == 8:
+                        break
+                else:
+                    # TODO add extra tests as in iq's pseudocode
+                    outputObjects.add(obj)
+        if attime:
+            del attime
+        return list(outputObjects)
+
 
 # register the symbol
 from blur3d import api
