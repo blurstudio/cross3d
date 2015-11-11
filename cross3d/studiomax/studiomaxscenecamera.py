@@ -559,7 +559,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             origin = Vector(0,0,0) * xform
             nearClipNormal = Vector(0, 0, -1) * xform
             nearClipPoint = Vector(0, 0, 0) * xform
-            planes.append((nearClipNormal-origin, nearClipPoint-origin))
+            planes.append((nearClipNormal-origin, nearClipPoint))
 
         fovh = float(self.fov())
         # calculate the vertical fov using the aspect between vertical and horizontal filmback
