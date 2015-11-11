@@ -575,30 +575,39 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         y = -1.0 * math.tan(math.radians(fovv * 0.5))
         z = -1.0
         origin = Vector((0, 0, 0)) * xform
-        # From this we can calculate each corner and get it's plane's normal vector
+        # From this we can calculate each corner and get its plane's normal vector
+        # We'll use the vector down the camera's frustum and the vector along the image back that
+        # define the plane to find a point and normal for that plane.  We'll use the calculated
+        # frustum vector for our point, although the camera origin would also be fine.
+
         # Screen-left clipping
         v1 = Vector((x, y, z)) * xform
         v2 = Vector((0, 1, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
+
         # Screen-bottom clipping
         x *= -1
         v1 = Vector((x, y, z)) * xform
         v2 = Vector((-1, 0, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
+
         # Screen-right clipping
         y *= -1
         v1 = Vector((x, y, z)) * xform
         v2 = Vector((0, -1, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
+
         # Screen-top clipping
         x *= -1
         v1 = Vector((x, y, z)) * xform
         v2 = Vector((1, 0, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
+
+        # Clean up our attime if we used it.
         if attime:
             del attime
         return planes
@@ -627,7 +636,8 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 attime(frame)
 
             for obj in objects:
-                # TODO considerVisibility
+                if considerVisibility and obj.isHidden():
+                    continue
 
                 boxPoints = [Vector(pnt.x, pnt.y, pnt.z) for pnt in obj.boundingBox().getCorners()]
                 frustumPlanes = self._getFrustrumPlanes(frame=frame, allowClipping=allowClipping)
