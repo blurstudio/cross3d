@@ -22,8 +22,8 @@
 import collections as _collections
 
 from blur3d import api
-from blur3d.constants import UpVector
 from PyQt4.QtCore import QObject, pyqtSignal
+from blur3d.constants import UpVector, ObjectType
 from blur3d	import abstractmethod, pendingdeprecation, constants
 
 class AbstractScene(QObject):
@@ -1562,6 +1562,14 @@ class AbstractScene(QObject):
 			\return		<bool> success
 		"""
 		return self.setSelection([])
+
+	def createObject(self, tpe=ObjectType.Null, name=''):
+		from blur3d.api import SceneObject
+		return SceneObject(self, self._createNativeObject(tpe, ObjectType.labelByValue(tpe)))
+
+	@abstractmethod
+	def _createNativeObject(self, tpe=ObjectType.Null, name=''):
+		return False
 
 	def createRenderer(self, rendererType):
 		"""

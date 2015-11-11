@@ -286,7 +286,23 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		from blur3d.api import SceneObject
 		scene = self._scene
-		return [ SceneObject(scene, native) for native in self._nativeChildren(recursive, wildcard, type) ]
+		return [SceneObject(scene, native) for native in self._nativeChildren(recursive, wildcard, type)]
+
+	def constrainedObjects(self):
+		from blur3d.api import SceneObject
+		return [SceneObject(self._scene, nativeObject) for nativeObject in self._constrainedNativeObjects()]
+
+	@abstractmethod
+	def _constrainedNativeObjects(self):
+		return []
+
+	def constrainingObjects(self):
+		from blur3d.api import SceneObject
+		return [SceneObject(self._scene, nativeObject) for nativeObject in self._constrainingNativeObjects()]
+
+	@abstractmethod
+	def _constrainingNativeObjects(self):
+		return []
 
 	def convertCachesOriginalPlaybackToCurvePlayback(self, alembic=True):
 		""" Takes all PC modifiers and TMC controllers and convert their original playback to a linear curve playback.

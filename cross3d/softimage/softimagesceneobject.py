@@ -126,6 +126,31 @@ class SoftimageSceneObject(AbstractSceneObject):
 	def isDeleted(self):
 		return (self._nativePointer.Parent is None)
 
+	def _constrainingNativeObjects(self):
+		constraining = []
+		for constraint in self.Kinematics.Constraints:
+			constraining += [obj for obj in constraint.Constraining]
+		return constraining
+
+	def _constrainedNativeObjects(self):
+		constraineds = []
+
+		# TODO: Currently we only support "Pose Constraints".
+		constraints = xsi.FindObjects(None, "{D42BBF71-3C47-11D2-8B42-00A024EE586F}")
+		for constraint in constraints:
+
+			# This is a weird thing when looking for all object type constraint.
+			if constraint.FullName.startswith("TransientObjectContainer"):
+				continue
+
+			# Looping through constraining object.
+			for constraining in constraint.Constraining:
+				if constraining.isEqualTo(self._nativePointer):
+					constrained = constraint.Constrained
+					if not constrained.isEqualTo(self._nativePointer):
+						constraineds.append(constrained)
+		return constraineds
+   
 	def getCacheName(self, type):
 		typeDic = {	"Pc":".pc2",
 					"Tmc":".tmc",

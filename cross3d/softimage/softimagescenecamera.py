@@ -49,7 +49,11 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
-		if self.findChild(name):
+
+		# This means the plane is present on the camera either by parenting or constraint.
+		if self._findNativeChild(name) or name in [obj.name for obj in self._constrainedNativeObjects()]:
+
+			# Now we are looking for the corresponding clip.
 			clip = xsi.Dictionary.GetObject('Clips.%s' % name, False)
 			if clip:
 				path = clip.Source.FileName.Value
@@ -136,7 +140,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		anchor = xsi.ActiveSceneRoot.AddNull(name) if parent or self.isReferenced() else self._nativePointer
 
 		# Creating the Plane.
-		plane = xsi.CreatePrim("Grid", "MeshSurface", '{}_Plane'.format(name), "")
+		plane = xsi.CreatePrim("Grid", "MeshSurface", '{}_Plane'.format(name) if parent or self.isReferenced() else name, "")
 		plane.Properties("Visibility").Parameters("selectability").Value = False
 
 		# Parenting the plane to the anchor.
@@ -148,8 +152,8 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		# If the anchor is not the camera we need to constrain the anchor to the camera. 
 		# This is mosty useful for cameras inside a reference model.
-		if not anchor == self._nativePointer():
-			anchor.Kinematics.AddConstraint('Pose', self.nativePointer())
+		if not anchor.isEqualTo(self._nativePointer):
+			anchor.Kinematics.AddConstraint('Pose', self._nativePointer)
 
 		# Setting dipslay options.
 		display = plane.AddProperty("Display Property")
@@ -219,7 +223,6 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 		# Example: S:\\Deadpool\\Footage\\Sc000\\S0000.00\\Plates\\Sc000_S0000.00.[100..190;4].jpg
 		fileName = '%s%s[%i..%i;%i].%s' % (fs.baseName(), fs.separator(), start, end, fs.padding(), fs.extension())
-		print fileName
 		path = os.path.join(fs.basePath(), fileName)
 		clip = xsi.Dictionary.GetObject('Clips.%s_Plate' % self.name(), False)
 		if not clip:

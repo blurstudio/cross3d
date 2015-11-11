@@ -11,6 +11,7 @@
 import os
 import re
 import glob
+import blurdev
 import getpass
 import win32con
 import win32api
@@ -1756,6 +1757,8 @@ class StudiomaxScene(AbstractScene):
 				# Ignore write permission errors, we can't do anything about them right now.
 				traceback.print_exc()
 				
+		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+			showUI = True
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or (preset_paths and os.path.getmtime(preset_paths[0]) > self._fbxExportPresetModifiedTime + 100):
