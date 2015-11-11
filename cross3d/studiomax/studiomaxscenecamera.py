@@ -532,9 +532,9 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         else:
              return self.nativePointer().far_clip
 
-    def _getFrustumPlanes(self, frame=None, allowClipping=True):
+    def _getFrustrumPlanes(self, frame=None, allowClipping=True):
         """Get a list of normal, point tuples that defines the frustum clipping planes"""
-        from blur3d.mathutils import Vector
+        from blur3d.mathutils import Vector, Matrix
         from Py3dsMax import AtTime
         import math
         attime = None
@@ -542,14 +542,24 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         if frame != None:
             attime = AtTime()
             attime(frame)
+        xform = Matrix.from_MxMatrix(self.nativePointer().objecttransform)
+
         planes = []
         if self.clippingEnabled() and allowClipping:
-            planes.append((Vector(0, 0, -1), Vector(0, 0, self.nearClippingPlane())))
-            planes.append((Vector(0, 0, 1), Vector(0, 0, self.farClippingPlane())))
+            origin = Vector(0,0,0) * xform
+            nearClipNormal = Vector(0, 0, -1) * xform
+            nearClipPoint = Vector(0, 0, self.nearClippingPlane()) * xform
+            planes.append((nearClipNormal-origin, nearClipPoint))
+            farClipNormal = Vector(0, 0, 1)
+            farClipPoint = Vector(0, 0, self.farClippingPlane())
+            planes.append((farClipNormal-origin, farClipPoint))
         else:
             # We'll hard code the near clipping plane since we don't need to calculate it.
             # Clipping is disabled, so there will be no far clipping
-            planes.append((Vector(0, 0, -1), Vector(0, 0, 0)))
+            origin = Vector(0,0,0) * xform
+            nearClipNormal = Vector(0, 0, -1) * xform
+            nearClipPoint = Vector(0, 0, 0) * xform
+            planes.append((nearClipNormal-origin, nearClipPoint-origin))
 
         fovh = float(self.fov())
         # calculate the vertical fov using the aspect between vertical and horizontal filmback
@@ -558,29 +568,29 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         x = -1.0 * math.tan(math.radians(fovh * 0.5))
         y = -1.0 * math.tan(math.radians(fovv * 0.5))
         z = -1.0
-        origin = Vector((0, 0, 0))
+        origin = Vector((0, 0, 0)) * xform
         # From this we can calculate each corner and get it's plane's normal vector
         # Screen-left clipping
-        v1 = Vector((x, y, z))
-        v2 = Vector((0, 1, 0))
+        v1 = Vector((x, y, z)) * xform
+        v2 = Vector((0, 1, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
         # Screen-bottom clipping
         x *= -1
-        v1 = Vector((x, y, z))
-        v2 = Vector((-1, 0, 0))
+        v1 = Vector((x, y, z)) * xform
+        v2 = Vector((-1, 0, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
         # Screen-right clipping
         y *= -1
-        v1 = Vector((x, y, z))
-        v2 = Vector((0, -1, 0))
+        v1 = Vector((x, y, z)) * xform
+        v2 = Vector((0, -1, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
         # Screen-top clipping
         x *= -1
-        v1 = Vector((x, y, z))
-        v2 = Vector((1, 0, 0))
+        v1 = Vector((x, y, z)) * xform
+        v2 = Vector((1, 0, 0)) * xform
         normal = Vector.PlaneNormal((v1, origin, v2), normalize=True)
         planes.append((normal, v1))
         if attime:
@@ -613,7 +623,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 # TODO considerVisibility
 
                 boxPoints = [Vector(pnt.x, pnt.y, pnt.z) for pnt in obj.boundingBox().getCorners()]
-                frustumPlanes = self._getFrustumPlanes(frame=frame, allowClipping=allowClipping)
+                frustumPlanes = self._getFrustrumPlanes(frame=frame, allowClipping=allowClipping)
 
                 for normal, point in frustumPlanes:
                     # false if fully outside, true if inside or intersects
