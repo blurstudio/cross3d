@@ -3,7 +3,8 @@
 		blur3d.api.classes.timecode
 
 	Remarks:
-		Module for dealing with timecode, including conversions.
+		Module containing Timcode class for dealing with timecode,
+			including conversions from/to different formats.
 
 	Author:
 		Will Cavanagh
@@ -18,6 +19,11 @@ import re
 import math
 
 class Timecode(object):
+	"""The Timecode class provides blah blah blah
+
+	Attributes:
+		blah: something
+	"""
 	FORMAT_KEY = {
 		'H' : '{hours:0.0f}',
 		'hh' : '{hours:02.0f}',
@@ -32,81 +38,155 @@ class Timecode(object):
 		'ss' : '(?P<seconds>\d{2})',
 		'ff' : '(?P<frames>\d{2})'
 	}
-	SEC_PER_HOUR = 3600
 	SEC_PER_MIN = 60
+	MIN_PER_HOUR = 60
+	SEC_PER_HOUR = 3600
+
 
 	def __init__(self, hours=0, minutes=0, seconds=0, frames=0, framerate=29.97):
 		# Initialize hmsf and framerate to 0 and then use property functions to
-		# set so that we can ensure we 
+		# set so that we can ensure we store a valid timecode.
 		self._hours = 0
 		self._minutes = 0
 		self._seconds = 0
 		self._frames = 0
-		self._framerate = 0
+		self._framerate = framerate
+		self._formatString = 'hh:mm:ss:ff'
 		self.hours = hours
 		self.minutes = minutes
 		self.seconds = seconds
 		self.frames = frames
-		self.framerate = framerate
-
-	@property
-	def hours(self):
-		return self._hours
-	@hours.setter
-	def hours(self, value):
-		if isinstance(value, int):
-			self._hours = value
-		else:
-			self._hours = math.floor(float(value))
-
-	@property
-	def minutes(self):
-		return self._minutes
-	@minutes.setter
-	def minutes(self, value):
-		if isinstance(value, int):
-			self._minutes = value
-		else:
-			# This is probably wrong...
-			self._hours = value // 60
-			self._minutes = value % 60
-			self._seconds = value * 60 % 60
-			self._frames = value * 60 * self.framerate % self.framerate
-
-	@property
-	def seconds(self):
-		return self._seconds
-	@seconds.setter
-	def seconds(self, value):
-		if isinstance(value, int):
-			self._seconds = value
-		else:
-			# This is probably wrong...
-			self._hours = int(value // self.SEC_PER_HOUR)
-			self._minutes = int(value // self.SEC_PER_MIN % self.SEC_PER_MIN)
-			self._seconds = int(value % self.SEC_PER_MIN)
-			self._frames = (value * self.framerate) % self.framerate
-
-	@property
-	def frames(self):
-		return self._frames
-	@frames.setter
-	def frames(self, value):
-		if isinstance(value, int):
-			self._frames = value
-		else:
-			# TODO THIS
-			pass
-
-	@property
-	def framerate(self):
-		return self._framerate
-	@framerate.setter
-	def framerate(self, value):
-		self._framerate = float(value)
 
 	def __str__(self):
 		return ':'.join([str(self.hours), str(self.minutes), str(self.seconds), str(self.frames)])
+
+	def __eq__(self, other):
+		"""Equivalency test.  For this we will compare all values directly.  This means that
+			two Timecode classes representing the same "time" value but in different
+			framerates will evaluate as unequal, and for this comparison to evaluate to True
+			(a.toSeconds() == b.toSeconds()) should be used instead.  Other comparison operators
+			will compare the time value, as this is the most likely expected behavior."""
+		if isinstance(other, Timecode):
+			return (
+				other.hours == self.hours and
+				other.minutes == self.minutes and
+				other.seconds == self.seconds and
+				other.frames == self.frames and 
+				other.framerate == self.framerate
+			)
+		return False
+
+	def __ne__(self, other):
+		return not self.__eq__(other)
+
+	def __lt__(self, other):
+		if isinstance(other, Timecode):
+			return self.toSeconds() < other.toSeconds()
+		return False
+
+	def __gt__(self, other):
+		if isinstance(other, Timecode):
+			return self.toSeconds() > other.toSeconds()
+		return False
+
+	def __le__(self, other):
+		if isinstance(other, Timecode):
+			return self.toSeconds() <= other.toSeconds()
+		return False
+
+	def __ge__(self, other):
+		if isinstance(other, Timecode):
+			return self.toSeconds() >= other.toSeconds()
+		return False
+
+	@property
+	def hours(self):
+		"""Get Timecode Hours place."""
+		return self._hours
+	@hours.setter
+	def hours(self, value):
+		"""Set Timecode Hours place.  If a non-integer value is passed it will be cast to a float,
+			converted to seconds and added to the current value before being converted to hmsf."""
+		if isinstance(value, int):
+			self._hours = value
+		else:
+			value = float(value)
+			# We're supposed to be overwriting our hours place, so reset it.
+			self._hours = 0
+			self.setFromSeconds(self.toSeconds() + (value * self.SEC_PER_HOUR))
+
+	@property
+	def minutes(self):
+		"""Get Timecode Minutes place."""
+		return self._minutes
+	@minutes.setter
+	def minutes(self, value):
+		"""Set Timecode Minutes place.  Any overflow or fractional part of the specified value will
+			be added to the appropriate timecode component."""
+		value = float(value)
+		# We're supposed to be overwriting our minutes place, so reset it.
+		self._minutes = 0
+		self.setFromSeconds(self.toSeconds() + (value * self.SEC_PER_MIN))
+
+	@property
+	def seconds(self):
+		"""Get Timecode Seconds place."""
+		return self._seconds
+	@seconds.setter
+	def seconds(self, value):
+		"""Set Timecode Seconds place.  Any overflow or fractional part of the specified value will
+			be added to the appropriate timecode component."""
+		value = float(value)
+		# We're supposed to be overwriting our seconds place, so reset it.
+		self._seconds = 0
+		self.setFromSeconds(self.toSeconds() + value)
+
+	@property
+	def frames(self):
+		"""Get Timecode Frames place."""
+		return self._frames
+	@frames.setter
+	def frames(self, value):
+		"""Set Timecode Frames place.  Any overflow or fractional part of the specified value will
+			be added to the appropriate timecode component."""
+		value = float(value)
+		# We're supposed to be overwriting our frames place, so reset it.
+		self._frames = 0
+		self.setFromSeconds(self.toSeconds() + (value / self.framerate))
+
+	def setFromSeconds(self, sec):
+		"""Set the timecode component values given a number of seconds.
+
+		Args:
+					secs(float): The number of seconds to set this Timecode instance based on.
+		"""
+		self._hours = int(sec // self.SEC_PER_HOUR)
+		self._minutes = int(sec // self.SEC_PER_MIN % self.MIN_PER_HOUR)
+		self._seconds = int(sec % self.SEC_PER_MIN)
+		self._frames = (sec * self.framerate) % self.framerate
+
+	@property
+	def framerate(self):
+		"""Get Timcode Framerate."""
+		return self._framerate
+
+	def setFramerate(self, newFramerate):
+		"""Sets the Timcode Framerate, leaving the frames value unaffected, but converting any
+			overflow created by the change into seconds."""
+		self._framerate = newFramerate
+
+	def convertToFramerate(self, newFramerate):
+		frames = float(self.frames) / self.framerate
+		self.frames = frames * newFramerate
+		self._framerate = newFramerate
+
+	@property
+	def formatString(self):
+		return self._formatString
+	@formatString.setter
+	def formatString(self, value):
+		# TODO validate format string?
+		self._formatString = value
 
 	@classmethod
 	def fromString(cls, string, formatString='hh:mm:ss:ff', framerate=29.97):
@@ -122,26 +202,18 @@ class Timecode(object):
 			):
 			raise ValueError('Invalid format string specified.')
 		return cls(
-			hours=int(groupdict['hours']),
-			minutes=int(groupdict['minutes']),
-			seconds=int(groupdict['seconds']),
-			frames=int(groupdict['frames']),
+			hours=groupdict['hours'],
+			minutes=groupdict['minutes'],
+			seconds=groupdict['seconds'],
+			frames=groupdict['frames'],
 			framerate=framerate
 		)
 
 	@classmethod
 	def fromSeconds(cls, sec, framerate=29.97):
-		nHours = int(sec // cls.SEC_PER_HOUR)
-		nMinutes = int(sec // cls.SEC_PER_MIN % cls.SEC_PER_MIN)
-		nSeconds = int(sec % cls.SEC_PER_MIN)
-		nFrames = (sec * framerate) % framerate
-		return cls(
-			hours=nHours,
-			minutes=nMinutes,
-			seconds=nSeconds,
-			frames=nFrames,
-			framerate=framerate
-		)
+		instance = cls(framerate=framerate)
+		instance.setFromSeconds(sec)
+		return instance
 
 	# @classmethod
 	# def fromFrames(cls, frm, framerate=29.97):
@@ -169,3 +241,9 @@ class Timecode(object):
 		secs += self.hours * self.SEC_PER_HOUR
 		secs += self.minutes * self.SEC_PER_MIN
 		return self.frames + self.framerate * secs
+
+def intmodf(value):
+	"""Convenience wrapper around math.modf that returns a float remainder and int
+		whole portion."""
+	modf = math.modf(value)
+	return (modf[0], int(modf[1]))
