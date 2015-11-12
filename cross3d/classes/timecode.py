@@ -99,6 +99,10 @@ class Timecode(object):
 			return self.toSeconds() >= other.toSeconds()
 		return False
 
+	def __add__(self, other):
+		# TODO if framerates don't match, raise exception?
+		return Timecode.fromSeconds(self.toSeconds() + other.toSeconds(), framerate=self.framerate)
+
 	@property
 	def hours(self):
 		"""Get Timecode Hours place."""
@@ -207,6 +211,17 @@ class Timecode(object):
 			seconds=groupdict['seconds'],
 			frames=groupdict['frames'],
 			framerate=framerate
+		)
+
+	def toString(self, formatString=None):
+		#if not formatString:
+		#	formatString = self.formatString
+		# TEMPORARY FIX FOR GENERATING REPORTS
+		return '{hours:0.0f}:{minutes:02.0f}:{seconds:02.0f}:{frames:02.0f}'.format(
+			hours=self.hours,
+			minutes=self.minutes,
+			seconds=self.seconds,
+			frames=self.frames
 		)
 
 	@classmethod
