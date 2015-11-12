@@ -140,9 +140,9 @@ class SoftimageSceneObject(AbstractSceneObject):
 		for constraint in constraints:
 
 			# This is a weird thing when looking for all object type constraint.
-			if constraint.FullName.startswith("TransientObjectContainer"):
+			if constraint.FullName.startswith("TransientObjectContainer") or constraint.Parent3DObject is None:
 				continue
-
+				
 			# Looping through constraining object.
 			for constraining in constraint.Constraining:
 				if constraining.isEqualTo(self._nativePointer):
