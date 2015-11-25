@@ -47,7 +47,7 @@ class External(AbstractExternal):
 					script = fle.read()
 
 		if language == ScriptLanguage.Python:
-			scriptTemplate = os.path.join(os.path.dirname(__file__), 'templates', 'external_python_script.mstempl')
+			scriptTemplate = os.path.join(os.path.dirname(__file__), 'templates', 'external_python_script.meltempl')
 			pythonScritpPath = os.path.splitext(cls.scriptPath())[0] + '.py'
 
 			with open(pythonScritpPath, 'w') as fle:
