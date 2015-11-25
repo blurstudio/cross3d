@@ -14,6 +14,7 @@ import random
 import blur3d.api
 
 from Py3dsMax import mxs
+from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QSize
 from blur3d.api import application
 from blur3d import pendingdeprecation
@@ -25,10 +26,14 @@ from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 
 class StudiomaxSceneCamera(AbstractSceneCamera):
 
+    # For V-Ray Cameras.
     _outputTypes = ['Still', 'Movie', 'Video']
-    _whiteBalances = ['Custom', 'Neutral', 'Daylight',
-                      'D75', 'D65', 'D55', 'D50', 'Temperature']
-    _distortionTypes = ['Quadratic', 'Cubic', 'File', 'Texture']
+    _vRayWhiteBalances = ['Custom', 'Neutral', 'Daylight', 'D75', 'D65', 'D55', 'D50', 'Temperature']
+    _vRayDistortionTypes = ['Quadratic', 'Cubic', 'File', 'Texture']
+
+    # For Physical Cameras.
+    _whiteBalances = ['Illuminant', 'Temperature', 'Custom']
+    _distortionTypes = ['None', 'Cubic', 'Texture']
 
     #-------------------------------------------------------------------------
     # 												public methods
@@ -323,80 +328,109 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 pass
 
     def outputType(self):
-        return self._outputTypes[self._nativePointer.type] if self.isCameraType(CameraType.VRayPhysical) else ''
+        return self._outputTypes[self._nativePointer.type] if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else ''
 
     def setOutputType(self, outputType):
-        if isinstance(outputType, basestring) and self.isCameraType(CameraType.VRayPhysical):
+        if isinstance(outputType, basestring) and mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.type = self._outputTypes.index(outputType)
             return True
         return False
 
     def exposureEnabled(self):
-        return self._nativePointer.exposure if self.isCameraType(CameraType.VRayPhysical) else False
+        return self._nativePointer.exposure if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else False
 
     def setExposureEnabled(self, exposureEnabled):
-        if isinstance(exposureEnabled, (bool, int, float)) and self.isCameraType(CameraType.VRayPhysical):
+        if isinstance(exposureEnabled, (bool, int, float)) and mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.exposure = exposureEnabled
             return True
         return False
 
     def vignettingEnabled(self):
-        return self._nativePointer.vignetting if self.isCameraType(CameraType.VRayPhysical) else False
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            return self._nativePointer.vignetting
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            return self._nativePointer.vignetting_enabled
+        return False
 
     def setVignettingEnabled(self, vignettingEnabled):
-        if isinstance(vignettingEnabled, (bool, int, float)) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.vignetting = vignettingEnabled
-            return True
+        if isinstance(vignettingEnabled, (bool, int, float)):
+            classOff = mxs.classOf(self._nativePointer)
+            if classOff == mxs.VRayPhysicalCamera:
+                self._nativePointer.vignetting = vignettingEnabled
+            elif classOff == mxs.Physical:
+                self._nativePointer.vignetting_enabled = vignettingEnabled
         return False
 
     def whiteBalance(self):
-        return self._whiteBalances[self._nativePointer.whiteBalance_preset] if self.isCameraType(CameraType.VRayPhysical) else ''
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            color = self._nativePointer.whiteBalance
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            color = self._nativePointer.white_balance_custom
+        return QColor(color.r, color.g, color.b, color.a) if color else ''
 
     def setWhiteBalance(self, whiteBalance):
-        if isinstance(whiteBalance, basestring) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.whiteBalance_preset = self._whiteBalances.index(
-                whiteBalance)
-            return True
+        if isinstance(whiteBalance, QColor):
+            if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+                self._nativePointer.whiteBalance = mxs.Color(*whiteBalance.getRgb())
+                return True
+            elif mxs.classOf(self._nativePointer) == mxs.Physical:
+                self._nativePointer.white_balance_custom = mxs.Color(*whiteBalance.getRgb())
+                return True
         return False
 
     def shutterAngle(self):
-        return self._nativePointer.shutter_angle if self.isCameraType(CameraType.VRayPhysical) else 180
+        return self._nativePointer.shutter_angle if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else 180
 
     def setShutterAngle(self, shutterAngle):
-        if isinstance(shutterAngle, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+        if isinstance(shutterAngle, (int, float)) and mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.shutter_angle = shutterAngle
             return True
         return False
 
     def shutterOffset(self):
-        return self._nativePointer.shutter_offset if self.isCameraType(CameraType.VRayPhysical) else 0
+        return self._nativePointer.shutter_offset if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else 0
 
     def setShutterOffset(self, shutterOffset):
-        if isinstance(shutterOffset, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
+        if isinstance(shutterOffset, (int, float)) and mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.shutter_offset = shutterOffset
             return True
         return False
 
     def bladesEnabled(self):
-        return self._nativePointer.use_blades if self.isCameraType(CameraType.VRayPhysical) else False
+        return self._nativePointer.use_blades if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else False
 
     def setBladesEnabled(self, bladesEnabled):
-        if self.isCameraType(CameraType.VRayPhysical):
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.use_blades = bladesEnabled
             return True
         return False
 
     def blades(self):
-        return self._nativePointer.blades_number if self.isCameraType(CameraType.VRayPhysical) else 0
+        classOf = mxs.classOf(self._nativePointer)
+        if classOf == mxs.VRayPhysicalCamera:
+            return self._nativePointer.blades_number
+        elif classOf == mxs.Physical:
+            return self._nativePointer.bokeh_blades_number
+        return 0
 
     def setBlades(self, blades):
-        if isinstance(blades, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.blades_number = int(blades)
-            return True
+        if isinstance(blades, (int, float)):
+            classOf = mxs.classOf(self._nativePointer)
+            if classOf == mxs.VRayPhysicalCamera:
+                self._nativePointer.blades_number = int(blades)
+                return True
+            elif classOf == mxs.Physical:
+                self._nativePointer.bokeh_blades_number = int(blades)
+                return True
         return False
 
     def anisotropy(self):
-        return self._nativePointer.anisotropy if self.isCameraType(CameraType.VRayPhysical) else False
+        classOf = mxs.classOf(self._nativePointer)
+        if classOf == mxs.VRayPhysicalCamera:
+            return self._nativePointer.anisotropy
+        elif classOf == mxs.Physical:
+            return self._nativePointer.bokeh_anisotropy
+        return False
 
     # TODO: See if we can do without specifying the identifiers.
     def applyCache(self, path, transformIdentifier, propertiesIdentifier):
@@ -452,52 +486,86 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         return True
 
     def setAnisotropy(self, anisotropy):
-        if isinstance(anisotropy, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.anisotropy = anisotropy
-            return True
+        if isinstance(anisotropy, (int, float)):
+            classOf = mxs.classOf(self._nativePointer)
+            if classOf == mxs.VRayPhysicalCamera:
+                self._nativePointer.anisotropy = anisotropy
+                return True
+            elif classOf == mxs.Physical:
+                self._nativePointer.bokeh_anisotropy = anisotropy
+                return True
         return False
 
     def distortionType(self):
-        return self._distortionTypes[self._nativePointer.distortion_type] if self.isCameraType(CameraType.VRayPhysical) else ''
+        classOf = mxs.classOf(self._nativePointer)
+        if classOf == mxs.VRayPhysicalCamera:
+            return self._vRayDistortionTypes[self._nativePointer.distortion_type]
+        elif classOf == mxs.Physical:
+            return self._distortionTypes[self._nativePointer.distortion_type]
+        return ''
 
     def setDistortionType(self, distortionType):
-        if isinstance(distortionType, basestring) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.distortion_type = self._distortionTypes.index(
-                distortionType)
-            return True
+        if isinstance(distortionType, basestring):
+            classOf = mxs.classOf(self._nativePointer)
+            if classOf == mxs.VRayPhysicalCamera:
+                self._nativePointer.distortion_type = self._vRayDistortionTypes.index(distortionType)
+                return True
+            elif classOf == mxs.Physical:
+                self._nativePointer.distortion_type = self._distortionTypes.index(distortionType)
+                return True
         return False
 
     def distortion(self):
-        return self._nativePointer.Distortion if self.isCameraType(CameraType.VRayPhysical) else False
+        classOf = mxs.classOf(self._nativePointer)
+        if classOf == mxs.VRayPhysicalCamera:
+            return self._nativePointer.distortion
+        elif classOf == mxs.Physical:
+            return self._nativePointer.distortion_cubic_amount
+        return False
 
     def setDistortion(self, distortion):
-        if isinstance(distortion, (int, float)) and self.isCameraType(CameraType.VRayPhysical):
-            self._nativePointer.Distortion = distortion
-            return True
+        if isinstance(distortion, (int, float)):
+            classOf = mxs.classOf(self._nativePointer)
+            if classOf == mxs.VRayPhysicalCamera:
+                self._nativePointer.distortion = distortion
+                return True               
+            elif classOf == mxs.Physical:
+                self._nativePointer.distortion_cubic_amount = distortion
+                return True
         return False
 
     def whiteBalancePreset(self):
-        return self._nativePointer.whiteBalance_preset
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            return self._vRayWhiteBalances[self._nativePointer.whiteBalance_preset]
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            return self._whiteBalances[self._nativePointer.whiteBalance_type]
+        return ''
 
-    def setWhiteBalancePreset(self, preset):
-        self._nativePointer.whiteBalance_preset = preset
-        return True
+    def setWhiteBalancePreset(self, whiteBalancePreset):
+        if isinstance(whiteBalancePreset, basestring):
+            if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+                self._nativePointer.whiteBalance_preset = self._vRayWhiteBalances.index(whiteBalancePreset)
+                return True
+            elif mxs.classOf(self._nativePointer) == mxs.Physical:
+                self._nativePointer.whiteBalance_type = self._whiteBalances.index(whiteBalancePreset)
+                return True
+        return False
 
     def clippingEnabled(self):
-        if self.cameraType() in (CameraType.VRayPhysical, CameraType.Physical):
-            return self.nativePointer().clip_on
+        if self.cameraType() == CameraType.Physical:
+            return self._nativePointer.clip_on
         else:
-            return self.nativePointer().clipManually
+            return self._nativePointer.clipManually
 
     def setClippingEnabled(self, state):
-        if self.isVrayCam():
-            self.nativePointer().clip_on = state
+        if self.cameraType() == CameraType.Physical:
+            self._nativePointer.clip_on = state
         else:
-            self.nativePointer().clipManually = state
+            self._nativePointer.clipManually = state
 
     @pendingdeprecation('Use cameraType instead.')
     def isVrayCam(self):
-        return unicode(mxs.classOf(self.nativePointer())).lower().startswith('vray')
+        return mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera
 
     def interest(self):
         if self._nativePointer.Target:
