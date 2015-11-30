@@ -13,9 +13,11 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 import os
+import subprocess
 
 from blurdev import osystem
 from blur3d.api import Exceptions
+from blur3d.constants import ScriptLanguage
 from blur3d.api.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -26,7 +28,7 @@ class External(AbstractExternal):
 	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_MOTIONBUILDER', '2013,2015').split(','))
 	# map years to version numbers 
 	# NOTE: I am guessing that these are correct based on 2014 being version 14000.0
-	_yearForVersion = {'12': '2012', '13': '2013', '14': '2014', '15': '2015'}
+	_yearForVersion = {'12': '2012', '13': '2013', '14': '2014', '15': '2015', '16': '2016'}
 	
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):
@@ -53,6 +55,25 @@ class External(AbstractExternal):
 		if ret:
 			return os.path.normpath(ret)
 		raise Exceptions.SoftwareNotInstalled('MotionBuilder', version=version, architecture=architecture, language=language)
+
+	@classmethod
+	def runScript(cls, script, version=None, architecture=64, language=ScriptLanguage.Python, debug=False, headless=True):
+
+		# If the script argument is a path to a file.
+		if os.path.exists(script):
+			with open(script, 'r') as fle:
+				script = fle.read()
+
+		scriptPath = os.path.splitext(cls.scriptPath())[0] + '.py'
+		with open(scriptPath, 'w') as fle:
+			fle.write(script)
+	
+		binary = os.path.join(cls.binariesPath(version, architecture), 'mayabatch.exe' if headless else 'maya.exe')
+		args = [binary, '-console', '-verbosePython', scriptPath]
+		subprocess.Popen(args, creationflags=subprocess.CREATE_NEW_CONSOLE, env=os.environ)
+
+		# TODO: Need to figure out a way to return False if the script has failed.
+		return True
 
 	@classmethod
 	def scriptPath(cls):
