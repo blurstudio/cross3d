@@ -8,7 +8,6 @@
 
 	Known Bugs:
 		- Doesn't support negative timecodes
-		- Perhaps should use more precision?  numpy float128?
 
 	Author:
 		Will Cavanagh
@@ -71,13 +70,12 @@ class Timecode(object):
 		TimeUnit.Milliseconds : 1000,
 		TimeUnit.Ticks : 46186158000,
 	}
-	_DROP_FRAME_RATES = {29.97 : 2, 59.94 : 4}
 
 	_SEC_PER_MIN = 60
 	_MIN_PER_HOUR = 60
 	_SEC_PER_HOUR = 3600
 
-	def __init__(self, hours=0, minutes=0, seconds=0, frames=0, framerate=29.97, dropFrame=False):
+	def __init__(self, hours=0, minutes=0, seconds=0, frames=0, framerate=29.97):
 		"""
 			Args:
 				hours(float):	The number of hours for the new Timecode instance.
@@ -89,26 +87,22 @@ class Timecode(object):
 		"""
 		# Initialize hmsf and framerate to 0 and then use property functions to
 		# set so that we can ensure we store a valid timecode.
+		self._hours = 0
+		self._minutes = 0
+		self._seconds = 0
 		self._frames = 0
 		self._framerate = framerate
-		self._dropFrame = dropFrame
 		self._formatString = 'hh:mm:ss:ff'
-		if dropFrame and framerate in self._DROP_FRAME_RATES:
-			if (seconds == 0) and (minutes % 10) and (frames < self._DROP_FRAME_RATES[framerate]):
-				raise ValueError('Invalid timecode specified -- ensure input is Drop Frame.')
-			self._nonDropFramerate = round(framerate)
-			f = hours * self._SEC_PER_HOUR * self._nonDropFramerate
-			f += minutes * self._SEC_PER_MIN * self._nonDropFramerate
-			f -= (minutes // 10) * self._DROP_FRAME_RATES[framerate] * 9
-			f -= (minutes % 10) * self._DROP_FRAME_RATES[framerate]
-			f += seconds * self._nonDropFramerate
-			f += frames
-		else:
-			f = hours * self._SEC_PER_HOUR * self.framerate
-			f += minutes * self._SEC_PER_MIN * self.framerate
-			f += seconds * self.framerate
-			f += frames
-		self._frames = f
+		secs = float(hours) * float(self._SEC_PER_HOUR)
+		secs += float(minutes) * float(self._SEC_PER_MIN)
+		secs += float(seconds)
+		secs += float(frames) / float(framerate)
+		self.setFromSeconds(secs)
+
+		self.hours = hours
+		self.minutes = minutes
+		self.seconds = seconds
+		self.frames = frames
 
 	def __str__(self):
 		return self.toString()
@@ -119,12 +113,7 @@ class Timecode(object):
 		# framerate information.
 		if other.framerate != self.framerate:
 			raise ValueError('Timecode framerates do not match.  Perhaps call convertToFramerate first.')
-		return Timecode.fromValue(
-			self.totalFrames + other.totalFrames,
-			timeUnit=TimeUnit.Frames,
-			framerate=self.framerate,
-			dropFrame=self.dropFrame
-		)
+		return Timecode.fromValue(self.toSeconds() + other.toSeconds(), framerate=self.framerate)
 
 	def __sub__(self, other):
 		# We don't need to operate only on timecodes with matching framerates, but it seems safest
@@ -132,12 +121,7 @@ class Timecode(object):
 		# framerate information.
 		if other.framerate != self.framerate:
 			raise ValueError('Timecode framerates do not match.  Perhaps call convertToFramerate first.')
-		return Timecode.fromValue(
-			self.totalFrames - other.totalFrames,
-			timeUnit=TimeUnit.Frames,
-			framerate=self.framerate,
-			dropFrame=self.dropFrame
-		)
+		return Timecode.fromValue(self.toSeconds() - other.toSeconds(), framerate=self.framerate)
 
 	def __div__(self, other):
 		# We don't need to operate only on timecodes with matching framerates, but it seems safest
@@ -145,12 +129,7 @@ class Timecode(object):
 		# framerate information.
 		if other.framerate != self.framerate:
 			raise ValueError('Timecode framerates do not match.  Perhaps call convertToFramerate first.')
-		return Timecode.fromValue(
-			self.totalFrames / other.totalFrames,
-			timeUnit=TimeUnit.Frames,
-			framerate=self.framerate,
-			dropFrame=self.dropFrame
-		)
+		return Timecode.fromValue(self.toSeconds() / other.toSeconds(), framerate=self.framerate)
 
 	def __mul__(self, other):
 		# We don't need to operate only on timecodes with matching framerates, but it seems safest
@@ -158,22 +137,20 @@ class Timecode(object):
 		# framerate information.
 		if other.framerate != self.framerate:
 			raise ValueError('Timecode framerates do not match.  Perhaps call convertToFramerate first.')
-		return Timecode.fromValue(
-			self.totalFrames * other.totalFrames,
-			timeUnit=TimeUnit.Frames,
-			framerate=self.framerate,
-			dropFrame=self.dropFrame
-		)
+		return Timecode.fromValue(self.toSeconds() * other.toSeconds(), framerate=self.framerate)
 
 	def __eq__(self, other):
-		"""Equivalency test.  For this we will compare the total frames and framerate directly.
-			This means that two Timecode classes representing the same "time" value but in different
+		"""Equivalency test.  For this we will compare all values directly.  This means that
+			two Timecode classes representing the same "time" value but in different
 			framerates will evaluate as unequal, and for this comparison to evaluate to True
 			(a.toSeconds() == b.toSeconds()) should be used instead.  Other comparison operators
 			will compare the time value, as this is the most likely expected behavior."""
 		if isinstance(other, Timecode):
 			return (
-				other.totalFrames == self.totalFrames and
+				other.hours == self.hours and
+				other.minutes == self.minutes and
+				other.seconds == self.seconds and
+				other.frames == self.frames and 
 				other.framerate == self.framerate
 			)
 		return False
@@ -204,14 +181,14 @@ class Timecode(object):
 
 	@classmethod
 	@pendingdeprecation('Use fromValue instead.')
-	def fromSeconds(cls, sec, framerate=29.97, dropFrame=False):
+	def fromSeconds(cls, sec, framerate=29.97):
 		"""DEPRECATED: Construct an instance of Timecode given a quantity of seconds."""
-		instance = cls(framerate=framerate, dropFrame=dropFrame)
+		instance = cls(framerate=framerate)
 		instance.setFromSeconds(sec)
 		return instance
 
 	@classmethod
-	def fromString(cls, timecodeString, formatString='hh:mm:ss:ff', framerate=29.97, dropFrame=False):
+	def fromString(cls, timecodeString, formatString='hh:mm:ss:ff', framerate=29.97):
 		"""Construct an instance of Timecode given a string representation of the desired timecode.
 
 			Args:
@@ -242,14 +219,13 @@ class Timecode(object):
 			minutes=groupdict['minutes'],
 			seconds=groupdict['seconds'],
 			frames=groupdict['frames'],
-			framerate=framerate,
-			dropFrame=dropFrame
+			framerate=framerate
 		)
 		instance.formatString = formatString
 		return instance
 
 	@classmethod
-	def fromValue(cls, value, timeUnit=TimeUnit.Seconds, framerate=29.97, dropFrame=False):
+	def fromValue(cls, value, timeUnit=TimeUnit.Seconds, framerate=29.97):
 		"""Construct an instance of Timecode given a float representation of the desired timecode
 			in a specified TimeUnit.
 
@@ -269,19 +245,9 @@ class Timecode(object):
 			value /= float(framerate)
 		else:
 			value /= float(cls._TIME_UNIT_CONVERSION[timeUnit])
-		instance = cls(framerate=framerate, dropFrame=dropFrame)
+		instance = cls(framerate=framerate)
 		instance.setFromSeconds(value)
 		return instance
-
-	@property
-	def dropFrame(self):
-		"""Get the current dropFrame."""
-		return self._dropFrame
-	@dropFrame.setter
-	def dropFrame(self, value):
-		"""Set the dropFrame, a boolean value that will determine whether the timecode is displayed
-			and calculated as Drop-Frame."""
-		self._dropFrame = bool(value)
 
 	@property
 	def formatString(self):
@@ -302,82 +268,57 @@ class Timecode(object):
 	@property
 	def frames(self):
 		"""Get Timecode Frames place."""
-		if self.dropFrame and self.framerate in self._DROP_FRAME_RATES:
-			return self._framesWithNonDrop() % self._nonDropFramerate
-		else:
-			return self._frames % self.framerate
+		return self._frames
 	@frames.setter
 	def frames(self, value):
 		"""Set Timecode Frames place.  Any overflow or fractional part of the specified value will
 			be added to the appropriate timecode component."""
-		self._frames += (value - self.frames)
+		value = float(value)
+		# We're supposed to be overwriting our frames place, so reset it.
+		self._frames = 0
+		self.setFromSeconds(self.toSeconds() + (value / float(self.framerate)))
 
 	@property
 	def hours(self):
 		"""Get Timecode Hours place."""
-		if self.dropFrame and self.framerate in self._DROP_FRAME_RATES:
-			return self._framesWithNonDrop() // self._nonDropFramerate // self._SEC_PER_HOUR
-		else:
-			return self._frames // self.framerate // self._SEC_PER_HOUR
+		return self._hours
 	@hours.setter
 	def hours(self, value):
 		"""Set Timecode Hours place.  If a non-integer value is passed it will be cast to a float,
 			converted to seconds and added to the current value before being converted to hmsf."""
-		self._frames += (value - self.hours) * self._SEC_PER_HOUR * self.framerate
+		if isinstance(value, int):
+			self._hours = value
+		else:
+			value = float(value)
+			# We're supposed to be overwriting our hours place, so reset it.
+			self._hours = 0
+			self.setFromSeconds(self.toSeconds() + (value * float(self._SEC_PER_HOUR)))
 
 	@property
 	def minutes(self):
 		"""Get Timecode Minutes place."""
-		if self.dropFrame and self.framerate in self._DROP_FRAME_RATES:
-			return self._framesWithNonDrop() // self._nonDropFramerate // self._SEC_PER_MIN % self._MIN_PER_HOUR
-		else:
-			return self._frames // self.framerate // self._SEC_PER_MIN % self._MIN_PER_HOUR
+		return self._minutes
 	@minutes.setter
 	def minutes(self, value):
 		"""Set Timecode Minutes place.  Any overflow or fractional part of the specified value will
 			be added to the appropriate timecode component."""
-		self._frames += (value - self.minutes) * self._SEC_PER_MIN * self.framerate
+		value = float(value)
+		# We're supposed to be overwriting our minutes place, so reset it.
+		self._minutes = 0
+		self.setFromSeconds(self.toSeconds() + (value * float(self._SEC_PER_MIN)))
 
 	@property
 	def seconds(self):
 		"""Get Timecode Seconds place."""
-		if self.dropFrame and self.framerate in self._DROP_FRAME_RATES:
-			return self._framesWithNonDrop() // self._nonDropFramerate % self._SEC_PER_MIN
-		else:
-			return self._frames // self.framerate % self._SEC_PER_MIN
+		return self._seconds
 	@seconds.setter
 	def seconds(self, value):
 		"""Set Timecode Seconds place.  Any overflow or fractional part of the specified value will
 			be added to the appropriate timecode component."""
-		self._frames += (value - self.seconds) * self.framerate
-
-	@property
-	def totalFrames(self):
-		"""Get the total number of frames represented by this timecode instance."""
-		return self._frames
-	@totalFrames.setter
-	def totalFrames(self, value):
-		"""Set the total number of frames for this timecode instance."""
-		self._frames = value
-
-	def _framesWithNonDrop(self):
-		"""Get the number of frames for this timecode isntance converted to non-dropframe.  For
-			example, for 29.97fps DF this will return the number of frames converted to 30fps."""
-		frames = self._frames
-		if self.dropFrame and self.framerate in self._DROP_FRAME_RATES:
-			df = self._DROP_FRAME_RATES[self.framerate]
-			framesPer10Min = round(self.framerate * 60 * 10)
-			framesPer1Min = round(self.framerate) * 60 - df
-			whole = self._frames // framesPer10Min
-			partial = self._frames % framesPer10Min
-			# 9 sets of DF for each 10 minute increment of frames that have passed
-			frames += df * 9 * whole
-			if partial > df:
-				# Add an additional set of df for each minute left over
-				# (we don't need to worry about the 10th minute here, because it
-				# will excluded since we're using a modulus.)
-				frames += df * ((partial - df) // framesPer1Min)
-		return frames
+		value = float(value)
+		# We're supposed to be overwriting our seconds place, so reset it.
+		self._seconds = 0
+		self.setFromSeconds(self.toSeconds() + value)
 
 	def convertToFramerate(self, newFramerate):
 		"""Sets the Timecode value for the new framerate, based on the time value calculated based
@@ -392,12 +333,16 @@ class Timecode(object):
 		self._framerate = newFramerate
 
 	def setFramerate(self, newFramerate):
-		"""Sets the Timcode Framerate, leaving the frames value unaffected.
+		"""Sets the Timcode Framerate, leaving the frames value unaffected, but converting any
+			overflow created by the change into seconds.
 
 		Args:
 					newFramerate(float): The new framerate to be set.
 		"""
 		self._framerate = newFramerate
+		# This will make sure that any overflow in our frames caused by a framerate change is
+		# accounted for.
+		self.setFromSeconds(self.toSeconds())
 
 	def setFromSeconds(self, sec):
 		"""Set the timecode component values given a number of seconds.
@@ -405,7 +350,10 @@ class Timecode(object):
 		Args:
 					secs(float): The number of seconds to set this Timecode instance based on.
 		"""
-		self._frames = int(sec * self.framerate)
+		self._hours = int(sec // self._SEC_PER_HOUR)
+		self._minutes = int(sec // self._SEC_PER_MIN % self._MIN_PER_HOUR)
+		self._seconds = int(sec % self._SEC_PER_MIN)
+		self._frames = (sec * self.framerate) % self.framerate
 
 	@pendingdeprecation('Use toValue instead.')
 	def toFrames(self):
@@ -419,7 +367,10 @@ class Timecode(object):
 		Returns:
 					float: This Timecode instance converted to a float quantity of seconds.
 		"""
-		secs = float(self._frames) / self.framerate
+		secs = self.seconds
+		secs += self.hours * self._SEC_PER_HOUR
+		secs += self.minutes * self._SEC_PER_MIN
+		secs += float(self.frames) / self.framerate
 		return secs
 
 	def toString(self, formatString=None):
@@ -454,9 +405,8 @@ class Timecode(object):
 		Returns:
 					float: This Timecode instance's value in the specified TimeUnit.
 		"""
-		# If frames are requested, we can pass that directly.  Otherwise, we'll need to
-		# convert from seconds to the desired time unit.
+		# We won't have framerate stored in our unit conversion dictionary since it depends on this
+		# instance's framerate.
 		if timeUnit == TimeUnit.Frames:
-			return self._frames
-		else:
-			return self.toSeconds() * self._TIME_UNIT_CONVERSION[timeUnit]
+			return self.toSeconds() * self.framerate
+		return self.toSeconds() * self._TIME_UNIT_CONVERSION[timeUnit]
