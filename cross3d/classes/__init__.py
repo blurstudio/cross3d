@@ -15,3 +15,4 @@ from clipboard import Clipboard
 from framerange import FrameRange
 from filesequence import FileSequence
 from timecode import Timecode
+from flipbook import FlipBook
