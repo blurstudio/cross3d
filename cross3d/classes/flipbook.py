@@ -45,7 +45,8 @@ class FlipBook(object):
 			command.append('{}'.format(source['path']))
 			
 			# I consider a None start to automatically queue sources.
-			command.append('--begin={}'.format(duration-enter+start if start is not None else duration-enter))
+			begin = duration-enter if start is None else start-enter 
+			command.append('--begin={}'.format(begin))
 
 			if source['enter']:
 				command.append('--in_point={}'.format(enter))
@@ -58,8 +59,9 @@ class FlipBook(object):
 			command.append('--layer_preload_into_cache')
 			command.append('--auto_update=1')
 			
-			duration = out - enter
-			duration = duration + start if start is not None else duration 
+			newDuration = begin + out
+			duration = newDuration if newDuration > duration else duration
+			print duration
 
 		# Command footer.
 		command.append('--fps={}'.format(self.fps))
