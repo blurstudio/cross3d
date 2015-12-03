@@ -3,13 +3,13 @@
 #
 #	\remarks	The StudiomaxApplication class will define all operations for application interaction. It is a singleton class, so calling blur3d.api.Application() will
 #				always return the same instance of Application. One of its main functions is connecting application callbacks to blur3d.api.Dispatch.
-#				
+#
 #				The StudiomaxApplication is a QObject instance and any changes to the scene data can be controlled by connecting to the signals defined here.
 #
 #				When subclassing the AbstractScene, methods tagged as @abstractmethod will be required to be overwritten.  Methods tagged with [virtual]
 #				are flagged such that additional operations could be required based on the needs of the method.  All @abstractmethod methods MUST be implemented
 #				in a subclass.
-#	
+#
 #	\author		Mikeh@blur.com
 #	\author		Blur Studio
 #	\date		06/07/11
@@ -27,23 +27,23 @@ dispatch = None
 _STUDIOMAX_CALLBACK_TEMPLATE = """
 global blur3d
 if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-if ( blur3d != undefined ) do ( 
+if ( blur3d != undefined ) do (
 	local ms_args = (callbacks.notificationParam())
-	blur3d.api.%(cls)s.%(function)s "%(signal)s" %(args)s 
+	blur3d.api.%(cls)s.%(function)s "%(signal)s" %(args)s
 )
 """
 _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS = """
 global blur3d
 if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-if ( blur3d != undefined ) do ( 
+if ( blur3d != undefined ) do (
 	blur3d.api.%(cls)s.%(function)s "%(signal)s"
 )
 """
 _STUDIOMAX_VIEWPORT_TEMPLATE = """
-fn blurfn_%(signal)s = 
+fn blurfn_%(signal)s =
 (
 	if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-	if ( blur3d != undefined ) do ( 
+	if ( blur3d != undefined ) do (
 		blur3d.api.%(cls)s.%(function)s "%(signal)s"
 	)
 )
@@ -55,7 +55,7 @@ class _ConnectionType(EnumGroup):
 
 class _ConnectionDef:
 	""" Class that stores all neccissary info to connect blur3d.api.dispatch to StudioMax
-	
+
 	Args:
 		signal str: The name of the blur3d.api.dispatch signal.
 		callback str: The name of StudioMax callback.
@@ -100,28 +100,28 @@ class StudiomaxApplication(AbstractApplication):
 	_connectionMap.update(_ConnectionDef('sceneNewFinished', 'systemPostNew'))
 	_connectionMap.update(
 		_ConnectionDef(
-			'sceneOpenRequested', 
-			'filePreOpen', 
-			'""', 
-			function='_prePostCallback', 
+			'sceneOpenRequested',
+			'filePreOpen',
+			'""',
+			function='_prePostCallback',
 			cls='application'
 		)
 	)
 	_connectionMap.update(
 		_ConnectionDef(
-			'sceneOpenFinished', 
-			'filePostOpen', 
-			'""', 
-			function='_prePostCallback', 
-			cls='application', 
+			'sceneOpenFinished',
+			'filePostOpen',
+			'""',
+			function='_prePostCallback',
+			cls='application',
 			associated=_connectionMap.getConnectionsBySignalName('sceneOpenRequested')
 		)
 	)
 	_connectionMap.update(
 		_ConnectionDef(
-			'sceneMergeRequested', 
-			'filePreMerge', 
-			function='_prePostCallback', 
+			'sceneMergeRequested',
+			'filePreMerge',
+			function='_prePostCallback',
 			cls='application'
 		)
 	)
@@ -129,10 +129,10 @@ class StudiomaxApplication(AbstractApplication):
 	_connectionMap.update(_ConnectionDef('sceneReferenceRequested', 'sceneXrefPreMerge'))
 	_connectionMap.update(
 		_ConnectionDef(
-			'sceneMergeFinished', 
-			'filePostMerge', 
-			function='_prePostCallback', 
-			cls='application', 
+			'sceneMergeFinished',
+			'filePostMerge',
+			function='_prePostCallback',
+			cls='application',
 			associated=_connectionMap.getConnectionsBySignalName('sceneMergeRequested')
 		)
 	)
@@ -161,7 +161,7 @@ class StudiomaxApplication(AbstractApplication):
 	_connectionMap.update(_ConnectionDef('objectParented', 'nodeLinked', 'ms_args', 'dispatchObject'))
 	_connectionMap.update(_ConnectionDef('objectUnparented', 'nodeUnlinked', 'ms_args', 'dispatchObject'))
 	_connectionMap.update(_ConnectionDef('viewportRedrawn', '', function='dispatchFunction', callbackType=_ConnectionType.Viewport))
-	
+
 	def __init__(self):
 		super(StudiomaxApplication, self).__init__()
 		self._sceneMergeFinishedTimer = QTimer(self)
@@ -170,7 +170,7 @@ class StudiomaxApplication(AbstractApplication):
 		# Variable used to prevent emiting signals when a file is being opened.
 		self._openingScene = False
 		self._disconnectNames = set()
-	
+
 	def _connectStudiomaxSignal(self, connDef, blurdevSignal):
 		"""
 			\remarks	Responsible for connecting a signal to studiomax
@@ -178,11 +178,11 @@ class StudiomaxApplication(AbstractApplication):
 		# store the maxscript methods needed
 		if connDef.callbackType == _ConnectionType.Viewport:
 			signal = _STUDIOMAX_VIEWPORT_TEMPLATE % {
-				'cls':'dispatch', 
-				'function':connDef.function, 
+				'cls':'dispatch',
+				'function':connDef.function,
 				'signal':blurdevSignal
 			}
-			# Ensure that if the old signal existed it is removed before redefining it. 
+			# Ensure that if the old signal existed it is removed before redefining it.
 			# If function is undefined it will do nothing
 			mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % blurdevSignal))
 			mxs.execute(signal)
@@ -194,24 +194,24 @@ class StudiomaxApplication(AbstractApplication):
 			# this signal without affecting any direct connections to the associated callbacks
 			for reqDef in connDef.associated:
 				self._addCallback(reqDef, reqDef.signal, 'blur3dcallbacks_{}'.format(connDef.callback))
-	
+
 	def _addCallback(self, connDef, blurdevSignal, callbackName='blur3dcallbacks'):
 		if connDef.arguments:
-			script = _STUDIOMAX_CALLBACK_TEMPLATE % { 
-				'cls':connDef.cls, 
-				'function':connDef.function, 
-				'signal': blurdevSignal, 
+			script = _STUDIOMAX_CALLBACK_TEMPLATE % {
+				'cls':connDef.cls,
+				'function':connDef.function,
+				'signal': blurdevSignal,
 				'args': connDef.arguments
 			}
 		else:
-			script = _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS % { 
-				'cls':connDef.cls, 
-				'function':connDef.function, 
-				'signal': blurdevSignal 
+			script = _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS % {
+				'cls':connDef.cls,
+				'function':connDef.function,
+				'signal': blurdevSignal
 			}
 		mxs.callbacks.addScript( _n(connDef.callback), script, id = _n(callbackName) )
 		self._disconnectNames.add(callbackName)
-	
+
 	def _prePostCallback(self, signal, *args):
 		""" Handle pre\post callbacks intelegently to reduce the number of callbacks.
 		"""
@@ -240,11 +240,11 @@ class StudiomaxApplication(AbstractApplication):
 		dispatch.dispatch(signal, *args)
 		# Note: This code doesn't handle custom functions, so if its needed by this system
 		# it will have to be added.
-	
+
 	def _sceneMergeFinishedTimeout(self):
 		""" Emit the sceneMergeFinished when the timeout expires. """
 		dispatch.dispatch('sceneMergeFinished')
-	
+
 	def allowedCharacters(self):
 		return 'A-Za-z0-9_. /+*<>=|-'
 
@@ -259,7 +259,7 @@ class StudiomaxApplication(AbstractApplication):
 		import blur3d.api
 		dispatch = blur3d.api.dispatch
 		return super(StudiomaxApplication, self).connect()
-	
+
 	def connectCallback(self, signal):
 		"""
 			\remarks	Connects a single callback. This allows blur3d to only have to respond to callbacks that tools actually
@@ -271,7 +271,7 @@ class StudiomaxApplication(AbstractApplication):
 				self._connectStudiomaxSignal(object, signal)
 		else:
 			debug.debugMsg('Connect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
-	
+
 	def disconnectCallback(self, signal):
 		"""
 			\remarks	Disconnect a single callback when it is no longer used.
@@ -287,7 +287,7 @@ class StudiomaxApplication(AbstractApplication):
 						mxs.callbacks.removeScripts(_n(reqDef.callback), id = _n('blur3dcallbacks_{}'.format(connDef.callback)))
 		else:
 			debug.debugMsg('Disconnect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
-	
+
 	def disconnect(self):
 		"""
 			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
@@ -304,16 +304,16 @@ class StudiomaxApplication(AbstractApplication):
 		# remove viewport callbacks
 		self.disconnectCallback('viewportRedraw')
 		return
-	
+
 	def log(self, message):
-		
+
 		# TODO: Can't seem to access the native log message.
 		print message
 		return True
 
 	def installDir(self):
 		""" Returns the path to the application's install directory
-		
+
 		:return: path string
 		:rtyp: str
 		"""
@@ -322,37 +322,37 @@ class StudiomaxApplication(AbstractApplication):
 	def isSilent(self):
 		"""Returns whether 3ds Max is running in silent mode."""
 		return mxs.GetQuietMode()
-	
+
 	def preDeleteObject(self, callback, *args):
 		"""
 			\remarks	Pre-process the object that is going to be deleted.
 		"""
 		if args:
 			self._objectToBeDeleted = args[0].name
-	
+
 	def postDeleteObject(self, callback, *args):
 		"""
 			\remarks	Emits the signal that a object has been deleted. This method is used for applications like max that generate a pre and post delete signal.
 		"""
 		if self._objectToBeDeleted:
 			dispatch.objectDeleted.emit(self._objectToBeDeleted)
-			
+
 	def name( self ):
 		return "StudioMax"
-		
+
 	def version(self, major=True):
 		version = mxs.maxVersion()
 		if major:
 			return int(version[0] / 1000)
 		else:
 			return '.'.join([unicode(token) for token in version])
-	
+
 	def refresh(self):
 		if not self._blockRefresh:
 			mxs.completeRedraw()
 			return True
 		return False
-		
+
 	def year(self):
 		return 1998 + self.version()
 
@@ -361,22 +361,22 @@ class StudiomaxApplication(AbstractApplication):
 
 	def animationClipExtension(self):
 		return 'xaf'
-		
+
 	def sceneFileExtension(self):
 		return 'max'
 
 	def shouldBlockSignal(self, signal, default):
 		""" Allows the Application to conditionally block a signal.
-		
+
 		Normally you should pass blur3d.api.dispatch.signalsBlocked() to default.
 		In general if default is True this method should just return True. This will
 		prevent unexpected signal emits when a script called
 		blur3d.api.dispatch.blockSignals(True) to block all signals.
-		
+
 		Args:
 			signal (str): The name of the signal to check if it should be blocked.
 			default (bool): Returned if signal doesn't match any requirements.
-		
+
 		Returns:
 			bool: If the signal should be blocked.
 		"""
@@ -403,6 +403,7 @@ class StudiomaxApplication(AbstractApplication):
 				'12000': "Max2010",
 				'14000': "Max2012",
 				'16000': "Max2014",
+				'18000': "Max2016",
 				'default': "Max2014"}
 		if jobTypeDic.has_key(str(version[0])):
 			jobType = jobTypeDic[str(version[0])]
@@ -410,7 +411,7 @@ class StudiomaxApplication(AbstractApplication):
 			jobType = jobTypeDic['default']
 
 		return jobType
-		
+
 	def id(self):
 		"""
 			\remarks	implements AbstractScene.softwareId to return a unique version/bits string information that will represent the exact
@@ -424,7 +425,7 @@ class StudiomaxApplication(AbstractApplication):
 		if ( mxs.is64BitApplication() ):
 			sixtyfour = '_64'
 		return 'MAX%i%s' % (mversion,sixtyfour)
-	
+
 # register the symbol
 from blur3d import api
 api.registerSymbol( 'Application', StudiomaxApplication)
