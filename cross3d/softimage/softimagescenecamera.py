@@ -15,7 +15,7 @@ import math
 import traceback
 import blur3d.api
 
-from PySoftimage import xsi
+from PySoftimage import xsi, constants as xsiConstants
 from blur3d.api import application
 from blur3d.api import FileSequence
 from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
@@ -181,6 +181,12 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		expression = '%s / %s.camera.aspect' % (expression, self.name())
 		plane.sclz.AddExpression(expression)
 
+		# Locking transforms.
+		for parameter in ['posx', 'posy', 'rotx', 'roty', 'rotz', 'sclx', 'scly', 'sclz']:
+			parameter = plane.Parameters(parameter)
+			parameter.Keyable = False
+			parameter.ReadOnly = True
+
 		# If a imagePath is provided we create a material.
 		if not imagePath:
 			return True
@@ -195,8 +201,6 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 			preset = '$XSI_DSPRESETS\\Shaders\\Material\\Constant.Preset'
 			material = xsi.Dictionary.GetObject(header).CreateMaterial(preset, 'Constant')
 			material.Name = name
-
-			# TODO: I need to finish to implement this.
 			xsi.SIApplyShaderToCnxPoint("Image", "%s.Constant.color" % material.FullName)
 			xsi.SIConnectShaderToCnxPoint(clip.FullName, "%s.Image.tex" % material.FullName)
 
