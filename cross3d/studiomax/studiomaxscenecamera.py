@@ -618,12 +618,12 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             nearClipNormal = Vector(0, 0, -1) * xform
             nearClipNormal -= origin
             nearClipNormal.normalize()
-            nearClipPoint = Vector(0, 0, self.nearClippingPlane()) * xform
+            nearClipPoint = Vector(0, 0, -self.nearClippingPlane()) * xform
             planes.append((nearClipNormal, nearClipPoint))
             farClipNormal = Vector(0, 0, 1) * xform
             farClipNormal -= origin
             farClipNormal.normalize()
-            farClipPoint = Vector(0, 0, self.farClippingPlane()) * xform
+            farClipPoint = Vector(0, 0, -self.farClippingPlane()) * xform
             planes.append((farClipNormal, farClipPoint))
         else:
             # We'll hard code the near clipping plane since we don't need to calculate it.
@@ -703,12 +703,12 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             if frame != None:
                 attime(frame)
 
+            frustumPlanes = self._getFrustrumPlanes(frame=frame, allowClipping=allowClipping)
             for obj in objects:
                 if considerVisibility and obj.isHidden():
                     continue
 
                 boxPoints = [Vector(pnt.x, pnt.y, pnt.z) for pnt in obj.boundingBox().getCorners()]
-                frustumPlanes = self._getFrustrumPlanes(frame=frame, allowClipping=allowClipping)
 
                 for normal, point in frustumPlanes:
                     # false if fully outside, true if inside or intersects
