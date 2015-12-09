@@ -27,12 +27,10 @@ from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
 class StudiomaxSceneCamera(AbstractSceneCamera):
 
     # For V-Ray Cameras.
-    _outputTypes = ['Still', 'Movie', 'Video']
-    _vRayWhiteBalances = ['Custom', 'Neutral', 'Daylight', 'D75', 'D65', 'D55', 'D50', 'Temperature']
+    _vRayOutputTypes = ['Still', 'Movie', 'Video']
     _vRayDistortionTypes = ['Quadratic', 'Cubic', 'File', 'Texture']
 
     # For Physical Cameras.
-    _whiteBalances = ['Illuminant', 'Temperature', 'Custom']
     _distortionTypes = ['None', 'Cubic', 'Texture']
 
     #-------------------------------------------------------------------------
@@ -229,19 +227,14 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         cls = mxs.classof(self._nativePointer)
         width = None
         if cls == mxs.VRayPhysicalCamera:
-
-            # TODO: Why is that wrapped in a try except?
-            try:
-                width = self._nativePointer.film_width
-            except AttributeError:
-                pass
+            width = self._nativePointer.film_width
 
         elif cls == mxs.Physical:
             width = self._nativePointer.film_width_mm
 
         if not width:
-            # If we failed to get a width from a camera, return the scene
-            # aperture setting.
+            
+            # If we failed to get a width from a camera, return the scene aperture setting.
             width = mxs.getRendApertureWidth()
 
         return width
@@ -321,18 +314,18 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 \param		width <float>
                 \return		n/a
         """
-        if self.isVrayCam():
-            try:
-                self._nativePointer.film_width = float(width)
-            except AttributeError:
-                pass
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            self._nativePointer.film_width = float(width)
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            self._nativePointer.film_width_mm = float(width)
+        return True
 
     def outputType(self):
-        return self._outputTypes[self._nativePointer.type] if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else ''
+        return self._vRayOutputTypes[self._nativePointer.type] if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else ''
 
     def setOutputType(self, outputType):
         if isinstance(outputType, basestring) and mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
-            self._nativePointer.type = self._outputTypes.index(outputType)
+            self._nativePointer.type = self._vRayOutputTypes.index(outputType)
             return True
         return False
 
@@ -371,9 +364,11 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
     def setWhiteBalance(self, whiteBalance):
         if isinstance(whiteBalance, QColor):
             if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+                self._nativePointer.whiteBalance_preset = 3
                 self._nativePointer.whiteBalance = mxs.Color(*whiteBalance.getRgb())
                 return True
             elif mxs.classOf(self._nativePointer) == mxs.Physical:
+                self._nativePointer.whiteBalance_type = 0
                 self._nativePointer.white_balance_custom = mxs.Color(*whiteBalance.getRgb())
                 return True
         return False
@@ -531,23 +526,6 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 return True               
             elif classOf == mxs.Physical:
                 self._nativePointer.distortion_cubic_amount = distortion
-                return True
-        return False
-
-    def whiteBalancePreset(self):
-        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
-            return self._vRayWhiteBalances[self._nativePointer.whiteBalance_preset]
-        elif mxs.classOf(self._nativePointer) == mxs.Physical:
-            return self._whiteBalances[self._nativePointer.whiteBalance_type]
-        return ''
-
-    def setWhiteBalancePreset(self, whiteBalancePreset):
-        if isinstance(whiteBalancePreset, basestring):
-            if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
-                self._nativePointer.whiteBalance_preset = self._vRayWhiteBalances.index(whiteBalancePreset)
-                return True
-            elif mxs.classOf(self._nativePointer) == mxs.Physical:
-                self._nativePointer.whiteBalance_type = self._whiteBalances.index(whiteBalancePreset)
                 return True
         return False
 
