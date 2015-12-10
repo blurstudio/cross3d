@@ -26,7 +26,6 @@ class FlipBook(object):
 		source['out'] = out + 1
 		source['position'] = position
 		source['scale'] = scale
-		print source
 		self._sources.append(source)
 		return True
 
@@ -61,7 +60,6 @@ class FlipBook(object):
 			
 			newDuration = begin + out
 			duration = newDuration if newDuration > duration else duration
-			print duration
 
 		# Command footer.
 		command.append('--fps={}'.format(self.fps))
