@@ -9,7 +9,7 @@
 #	\date		04/04/11
 #
 
-import os
+import os, re
 import copy
 
 from blur3d.api import application
@@ -154,6 +154,31 @@ class SoftimageSceneModel(AbstractSceneModel):
 	def export(self, fileName):
 		xsi.ExportModel(self._nativePointer, fileName, True, False)
 		return True
+
+	def setDisplayName(self, name):
+
+		oldName = self.displayName()
+
+		super(SoftimageSceneModel, self).setDisplayName(name)
+
+		# We need to add a fix to all the constrains pointing to that model.
+		regex = re.compile( "(?P<model>[A-Za-z0-9_-]+).(?P<object>[A-Za-z0-9_-]+)" )
+
+		# Get all the deltas of the scene 
+		deltas = xsi.FindObjects(None, "{6D906778-A713-40E3-A5FB-0F5CA3361370}")
+		for delta in deltas:
+
+			cns = delta.ActionDeltas("StoredConstraints")
+			if not cns:
+				continue
+
+			for item in cns.Items:
+				match = regex.match(item.Value)
+				if not match:
+					continue
+				tokens = match.groupdict()
+				if tokens["model"] == oldName:
+					item.Value = item.Value.replace(tokens["model"], name)
 	
 	@pendingdeprecation('Use loadAnimation instead with mixer flag true.')
 	def addAnimationClip(self, path, name=None):
