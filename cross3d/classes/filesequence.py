@@ -101,9 +101,11 @@ class FileSequence(object):
 				stderr=subprocess.STDOUT,
 				stdin=subprocess.PIPE
 			)
+			
 			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
 				print 'FFMPEG OUTPUT', '-'*50
 				print ffmpegOutput
+
 			files = glob.glob(os.path.join(directoryPath, r'{}.*{}'.format(baseName, extension)))
 			return FileSequence.fromFileName(files[0])
 
@@ -377,55 +379,63 @@ class FileSequence(object):
 			if os.path.exists(path):
 				os.remove(path)
 
-	def generateMovie(self, outputPath=None, fps=30, ffmpeg='ffmpeg', videoCodec=VideoCodec.PhotoJPEG):
+	def generateMovie(self, outputPath=None, fps=30, ffmpeg='ffmpeg', videoCodec=VideoCodec.PhotoJPEG, audioPath=''):
+
+		# If the output path is not provided we will put the movie in the same folder as the source.
 		if not outputPath:
 			outputPath = os.path.join((self.basePath()), self.baseName() + '.mov')
-		if self.isComplete():
 
-			# Managing EXR sequences.
-			if self.extension().lower() == 'exr':
-				normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + 'jpg')
-				normalisedSequence = FileSequence(normalisedSequencePath)
-				self.convert(normalisedSequence)
+		# This method does not support all formats.
+		if self.extension().lower() not in ['jpg','jpeg','png','tif','tiff', 'tga', 'exr']:
+			raise IOError('Input sequence %s cannot be converted to a movie.' % self._path)
 
-			# Managing all other cases.
-			else:
-				normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + self.extension())
-				normalisedSequence = FileSequence(normalisedSequencePath)
-				self.copy(normalisedSequence)
+		if not self.isComplete():
+			raise IOError('Input sequence %s is missing frames' % self._path)
 
-			# Sometimes there is delay due to the servers.
-			while not normalisedSequence.isComplete():
-				continue
+		# Managing EXR sequences.
+		if self.extension().lower() == 'exr':
+			normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + 'jpg')
+			normalisedSequence = FileSequence(normalisedSequencePath)
+			self.convert(normalisedSequence)
 
-			outputBasePath = os.path.split(outputPath)[0]
-			if not os.path.exists(outputBasePath):
-				os.makedirs(outputBasePath)
-
-			if videoCodec == VideoCodec.PhotoJPEG:
-				command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath(), '-vcodec', 'mjpeg', '-qscale', '1', '-y', outputPath]
-
-			# TODO: GIF Implementation is a bit wonky right now.
-			elif videoCodec == VideoCodec.GIF:
-				command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath(), '-pix_fmt', 'rgb24', '-y', outputPath.replace('.mov', '.gif')]
-
-			# TODO: Implement H264.
-			elif videoCodec == VideoCodec.H264:
-				command = [ffmpeg]
-
-			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
-				print 'SEQUENCE TO MOVIE COMMAND: {}'.format(' '.join(command))
-
-			process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
-			process.communicate()
-
-			if blurdev.debug.debugLevel() < blurdev.debug.DebugLevel.Mid:
-				normalisedSequence.delete()
-
-			return True
+		# Managing all other cases.
 		else:
-			raise Exception('Input sequence %s is missing frames' % self._path)
-		return False
+			normalisedSequencePath = os.path.join(self.basePath(), self.baseName() + '_Temp.1-' + str(self.count()) + '.' + self.extension())
+			normalisedSequence = FileSequence(normalisedSequencePath)
+			self.copy(normalisedSequence)
+
+		# Sometimes there is delay due to the servers.
+		while not normalisedSequence.isComplete():
+			continue
+
+		outputBasePath = os.path.split(outputPath)[0]
+		if not os.path.exists(outputBasePath):
+			os.makedirs(outputBasePath)
+
+		if videoCodec == VideoCodec.PhotoJPEG:
+			command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath()]
+			if os.path.exists(audioPath):
+				command += ['-i', audioPath, '-c:a', 'libvo_aacenc', '-b:a', '192k']
+			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', outputPath]
+
+		# TODO: GIF Implementation is a bit wonky right now.
+		elif videoCodec == VideoCodec.GIF:
+			command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath(), '-pix_fmt', 'rgb24', '-y', outputPath.replace('.mov', '.gif')]
+
+		# TODO: Implement H264.
+		elif videoCodec == VideoCodec.H264:
+			command = [ffmpeg]
+
+		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+			print 'SEQUENCE TO MOVIE COMMAND: {}'.format(' '.join(command))
+
+		process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+		process.communicate()
+
+		if blurdev.debug.debugLevel() < blurdev.debug.DebugLevel.Mid:
+			normalisedSequence.delete()
+
+		return True
 
 	def link(self, output):
 		if self.isComplete():
