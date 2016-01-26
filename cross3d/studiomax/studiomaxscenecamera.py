@@ -675,7 +675,8 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         else:
             attime = AtTime()
 
-        # TODO implement step
+        if isinstance(frameRange, blur3d.api.FrameRange):
+            frameRange = xrange(frameRange.start(), frameRange.end()+1, step)
         for frame in frameRange:
             # Explicit comparison to None to allow querying frame 0
             if frame != None:
