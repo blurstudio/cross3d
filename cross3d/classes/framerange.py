@@ -36,6 +36,11 @@ class FrameRange( list ):
 		"""
 		return 'blur3d.api.FrameRange( %s, %s )' % ( self[0], self[1] )
 
+	def __eq__(self, other):
+		if isinstance(other, FrameRange):
+			return self[0] == other[0] and self[1] == other[1]
+		return False
+
 	def __nonzero__(self):
 		return bool(range(self[0], self[1]))
 
