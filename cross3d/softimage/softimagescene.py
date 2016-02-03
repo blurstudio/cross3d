@@ -512,13 +512,13 @@ class SoftimageScene(AbstractScene):
 		"""
 		from blur3d.api import FrameRange
 		playControl = xsi.ActiveProject.Properties("Play Control")
-		return FrameRange([int(playControl.Parameters("In").Value), int(playControl.Parameters("Out").Value)])
+		return FrameRange([int(round(playControl.Parameters("In").Value)),int(round(playControl.Parameters("Out").Value))])
 
 	def globalRange(self):
 		""" Returns the global start and stop range. """
 		from blur3d.api import FrameRange
 		playControl = xsi.ActiveProject.Properties("Play Control")
-		return FrameRange([int(playControl.Parameters("GlobalIn").Value), int(playControl.Parameters("GlobalOut").Value)])
+		return FrameRange([int(round(playControl.Parameters("GlobalIn").Value)), int(round(playControl.Parameters("GlobalOut").Value))])
 
 	@classmethod
 	def animationFPS(cls):
