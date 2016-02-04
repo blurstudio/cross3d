@@ -205,6 +205,10 @@ class StudiomaxTrack(AbstractTrack):
 							Track, and a list of `TrackPortion` instances for
 							every occluding portion of the Track.
 		"""
+		if not len(self.clips()):
+			# If track is empty, return two empty lists (we're not occulding or
+			# using any ClipPortions.)
+			return ([], [])
 		trackStart = self.getClip(0).globStart
 		trackEnd = self.getClip(self.numClips - 1).globEnd
 		trackOcclPortions = []
