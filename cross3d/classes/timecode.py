@@ -353,7 +353,12 @@ class Timecode(object):
 		self._hours = int(sec // self._SEC_PER_HOUR)
 		self._minutes = int(sec // self._SEC_PER_MIN % self._MIN_PER_HOUR)
 		self._seconds = int(sec % self._SEC_PER_MIN)
-		self._frames = (sec * self.framerate) % self.framerate
+		f = (sec * self.framerate) % self.framerate
+		# check for floating point error in the mod function
+		if math.fabs(f - self.framerate) < 1E-10:
+			self._frames = 0.0
+		else:
+			self._frames = f
 
 	@pendingdeprecation('Use toValue instead.')
 	def toFrames(self):
