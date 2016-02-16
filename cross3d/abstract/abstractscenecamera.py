@@ -45,6 +45,14 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
+	def fovBased(self):
+		return False
+
+	@abstractmethod
+	def setFOVBased(self, fovBased):
+		return False
+
+	@abstractmethod
 	def frustrumPlaneTexture(self, name):
 		return False
 

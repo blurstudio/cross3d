@@ -1,4 +1,4 @@
-##
+    ##
 #	\namespace	blur3d.api.studiomax.studiomaxscenecamera
 #
 #	\remarks	The StudiomaxSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
@@ -61,6 +61,19 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         mxs.setPropertyController(listController, 'Available', noise)
 
         return True
+
+    def fovBased(self):
+        cls = mxs.classof(self._nativePointer)
+        if cls == mxs.VRayPhysicalCamera:
+            return self._nativePointer.specify_fov
+        return True
+
+    def setFOVBased(self, fovBased):
+        cls = mxs.classof(self._nativePointer)
+        if cls == mxs.VRayPhysicalCamera:
+            self._nativePointer.specify_fov = fovBased
+            return True
+        return False
 
     def matchViewport(self, viewport):
         nativeCamera = self.nativePointer()
