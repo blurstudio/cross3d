@@ -114,15 +114,17 @@ class FrameRange( list ):
 		"""
 		return FrameRange( [ min( self[0], frameRange[0] ), max( self[1], frameRange[1] ) ] )
 
-	def padded( self, padding ):
+	def padded(self, padding):
 		"""
 			\remarks	Returns the padded range.
 		"""
-		return FrameRange( [ self[0] - padding, self[1] + padding ] )
+		if isinstance(padding, (list, tuple)) and len(padding) >= 2:
+			return FrameRange([self[0] - padding[0], self[1] + padding[1]])
+		return FrameRange([self[0] - padding, self[1] + padding])
 		
-	def offset( self, offset ):
+	def offset(self, offset):
 		"""
-			\remarks	Returns the offset range.
+			\remarks Returns the offset range.
 		"""
-		return FrameRange( [ self[0] + offset, self[1] + offset ] )
+		return FrameRange([self[0] + offset, self[1] + offset])
 		
