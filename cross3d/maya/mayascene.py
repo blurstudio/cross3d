@@ -465,7 +465,7 @@ class MayaScene(AbstractScene):
 		""" Implements AbstractScene.currentFileName method to return the current filename for the scene that is active in the application
 			:return: The current File name as a string
 		"""
-		return cmds.file(query=True, sceneName=True)
+		return os.path.normpath(cmds.file(query=True, sceneName=True))
 	
 	def currentFrame(self):
 		""" returns the current frame
