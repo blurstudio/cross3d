@@ -348,6 +348,10 @@ class FileSequence(object):
 		if self.count() != output.count():
 			Exception('Cannot copy to sequence with different frame count.')
 
+		# We need to delete everything we are going to copy.
+		# Otherwise shutil might cry.
+		output.delete()
+
 		for source, copy in zip(self.paths(), output.paths()):
 			shutil.copy(source, copy)
 
