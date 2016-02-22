@@ -16,6 +16,7 @@ _modName = _blurdev.core.objectName()
 
 from classes import FCurve
 from classes import Exceptions
+from classes import ValueRange
 from classes import FrameRange
 from classes import FileSequence
 from classes import Timecode

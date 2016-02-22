@@ -12,6 +12,7 @@ from fcurve import FCurve
 from exceptions import Exceptions
 from dispatch import Dispatch
 from clipboard import Clipboard
+from valuerange import ValueRange
 from framerange import FrameRange
 from filesequence import FileSequence
 from timecode import Timecode
