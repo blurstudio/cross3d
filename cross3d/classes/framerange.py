@@ -2,7 +2,7 @@
 #   \namespace  blur3d.api.classes.framerange
 #
 #   \remarks    This module holds the FrameRange class to handle frame ranges.
-#   
+#
 #   \author     douglas@blur.com
 #   \author     Blur Studio
 #   \date       11/30/11
@@ -10,31 +10,34 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-class FrameRange( list ):
-	
-	def __init__( self, args=None ):
+from blurdev.decorators import pendingdeprecation
+
+
+class FrameRange(list):
+
+	def __init__(self, args=None):
 		"""
 			\remarks	Initialize the class.
 		"""
 		if not args:
-			args = [0,0]
-		elif len( args ) == 1:
-			args.append( args[0] )
+			args = [0, 0]
+		elif len(args) == 1:
+			args.append(args[0])
 		else:
 			args = args[0:2]
 		try:
-			args = list( args )
-			args[0] = int( args[0] )
-			args[1] = int( args[1] )
+			args = list(args)
+			args[0] = int(round(float(args[0])))
+			args[1] = int(round(float(args[1])))
 		except:
-			raise Exception( "Arguments %s are not valid." % str( args ) )	
-		super( FrameRange, self ).__init__( args )
+			raise Exception("Arguments %s are not valid." % str(args))
+		super(FrameRange, self).__init__(args)
 
-	def __repr__( self ):
+	def __repr__(self):
 		"""
 			\remarks	Affects the class representation.
 		"""
-		return 'blur3d.api.FrameRange( %s, %s )' % ( self[0], self[1] )
+		return 'blur3d.api.FrameRange( %s, %s )' % (self[0], self[1])
 
 	def __eq__(self, other):
 		if isinstance(other, FrameRange):
@@ -44,55 +47,59 @@ class FrameRange( list ):
 	def __nonzero__(self):
 		return bool(range(self[0], self[1]))
 
-	def string( self, separator='-' ):
+	def string(self, separator='-'):
 		"""
 			\remarks	Returns the range in its string form.
 			\param		separator <string>
 		"""
-		return '%i%s%i' % ( self[0], separator, self[1] )
-		
-	def start( self ):
+		return '%i%s%i' % (self[0], separator, self[1])
+
+	def start(self):
 		return self[0]
-		
-	def end( self ):
+
+	def end(self):
 		return self[1]
-		
-	def duration( self ):
+
+	def duration(self):
 		return self[1] - self[0] + 1
-		
-	def isWithin( self, frameRange ):
+
+	def isWithin(self, frameRange):
 		if self[0] >= frameRange[0] and self[1] <= frameRange[1]:
 			return True
 		return False
-		
-	def contains(self,frameRange):
+
+	def contains(self, frameRange):
 		if self[0] <= frameRange[0] and self[1] >= frameRange[1]:
 			return True
 		return False
-		
-	def offsets( self, frameRange ): 
-		return FrameRange( [ ( frameRange[0] - self[0] ), ( frameRange[1] - self[1] ) ] )
-				
-	def overlaps( self, frameRange ):
+
+	def offsets(self, frameRange):
+		return FrameRange([(frameRange[0] - self[0]), (frameRange[1] - self[1])])
+
+	def overlaps(self, frameRange, tolerance=0):
 		"""
 			\remarks	Returns weather the ranges overlaps.
 			\param		separator <string>
 		"""
-		if self[0] > frameRange[1] or self[1] < frameRange[0]:
+		if self[0] + round(tolerance) >= frameRange[1] or self[1] - round(tolerance) <= frameRange[0]:
 			return False
 		return True
-		
-	def extends( self, frameRange ):
+
+	def extends(self, frameRange):
 		"""
 			\remarks	Returns weather the range includes additional frames.
 		"""
 		return self[0] < frameRange[0] or self[1] > frameRange[1]
-		
-	def overlap( self, frameRange ):
+
+	def overlap(self, frameRange):
 		"""
 			\remarks	Returns the overlaping range if any.
 		"""
-		if self.overlaps( frameRange ):
+
+		if self.overlaps(frameRange):
+
+			# TODO: One frame overlap should be considered overlap. 
+			# Probably have to use lesser or equal.
 			if self[0] < frameRange[0]:
 				start = frameRange[0]
 			else:
@@ -101,18 +108,22 @@ class FrameRange( list ):
 				end = frameRange[1]
 			else:
 				end = self[1]
-			return FrameRange( [ start, end ] )
+			return FrameRange([start, end])
 		else:
 			None
 
 	def multiply(self, scalar):
 		return FrameRange([round(self[0] * scalar), round(self[1] * scalar)])
-			
-	def merge( self, frameRange ):
+
+	@pendingdeprecation('Use merged instead.')
+	def merge(self, frameRange):
+		return self.merged(frameRange)
+
+	def merged(self, frameRange):
 		"""
 			\remarks	Returns a range that covers both framerange.
 		"""
-		return FrameRange( [ min( self[0], frameRange[0] ), max( self[1], frameRange[1] ) ] )
+		return FrameRange([min(self[0], frameRange[0]), max(self[1], frameRange[1])])
 
 	def padded(self, padding):
 		"""
@@ -121,10 +132,13 @@ class FrameRange( list ):
 		if isinstance(padding, (list, tuple)) and len(padding) >= 2:
 			return FrameRange([self[0] - padding[0], self[1] + padding[1]])
 		return FrameRange([self[0] - padding, self[1] + padding])
-		
+
+	@pendingdeprecation('Use offseted instead.')
 	def offset(self, offset):
+		return self.offseted(offset)
+
+	def offseted(self, offset):
 		"""
 			\remarks Returns the offset range.
 		"""
 		return FrameRange([self[0] + offset, self[1] + offset])
-		
