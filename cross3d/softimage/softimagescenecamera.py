@@ -71,7 +71,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		# Otherwise return empty.
 		return ''
 
-	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0, ):
+	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0):
 
 		# Conforming the name. Non supported Softimage character will become underscores.
 		name = application.conformObjectName(name)
