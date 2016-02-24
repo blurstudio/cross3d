@@ -53,11 +53,11 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def frustrumPlaneTexture(self, name):
+	def frustrumPlaneImagePath(self, name):
 		return False
 
 	@abstractmethod
-	def setFrustrumPlaneTexture(self, name='', imagePath='', offset=0.0, speed=1.0):
+	def setFrustrumPlaneImagePath(self, name, imagePath, offset=0.0, speed=1.0):
 		return False
 
 	@abstractmethod
@@ -65,7 +65,7 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def createFrustumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0):
+	def createFrustrumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0):
 		""" Will create a 3D plane attached to the camera and matching the camera view frustum.
 		"""
 		return False
@@ -418,7 +418,7 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def createFrustrumPlane(self, name="", imagePath="", distance=""):
+	def createFrustrumPlane(self, name='', imagePath='', offset=0.0, speed=1.0, distance=1.0, parent=None):
 		pass
 
 	@abstractmethod
