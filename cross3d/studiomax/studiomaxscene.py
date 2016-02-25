@@ -1759,6 +1759,7 @@ class StudiomaxScene(AbstractScene):
 
 	def _restoreFBXIOPresets(self):
 		presetPaths = self._orignalFBXPresets.iteritems()
+		path = None
 		for path, preset in presetPaths:
 			try:
 				with open(path, 'w') as f:
@@ -1769,7 +1770,7 @@ class StudiomaxScene(AbstractScene):
 				traceback.print_exc()
 
 		# Storing the time of the FBX export preset modification.
-		if presetPaths:
+		if path:
 			self._fbxIOPresetModifiedTime = os.path.getmtime(path)
 
 	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y, **kwargs):
