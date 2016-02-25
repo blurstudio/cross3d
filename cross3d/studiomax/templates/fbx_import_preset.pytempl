@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Import UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Import">
+  <PlugInGrp UIH="1" UID="0" UIG="1" UIX="0" UIP="0" lbENU="Plugin Information">
+    <PlugInUIWidth UIH="1" UID="0" UIG="0" lbENU="Plugin UI Width" dt="Integer" v="700"/>
+    <PlugInUIHeight UIH="1" UID="0" UIG="0" lbENU="Plugin UI Height" dt="Integer" v="600"/>
+    <PlugInUIXpos UIH="1" UID="0" UIG="0" lbENU="Plugin UI X Position" dt="Integer" v="613"/>
+    <PlugInUIYpos UIH="1" UID="0" UIG="0" lbENU="Plugin UI Y Position" dt="Integer" v="272"/>
+    <PresetSelected UIH="1" UID="0" UIG="0" lbENU="Preset Selected" dt="KString" v="C:\Users\{user}\Documents\3dsmax\FBX\3dsMax2014_X64\Presets\2014.0.1\import\User defined.fbximportpreset"/>
+    <UILIndex UIH="1" UID="0" UIG="0" lbENU="UI language" dt="Enum" enumSelected="ENU" v="0" enumItem_0="ENU" enumItem_1="DEU" enumItem_2="FRA" enumItem_3="JPN" enumItem_4="KOR" enumItem_5="CHS"/>
+    <PluginProductFamily UIH="0" UID="0" UIG="0" lbENU="Plugin product family" dt="KString" v="3DS Max  ( API cut number: TekkenSP with PDBs T253_RL_x64 09-11-2013 22:54 196734 )"/>
+  </PlugInGrp>
+  <PresetsGrp UIH="0" UID="0" UIG="1" UIX="0" UIP="1" lbENU="Presets">
+    <Presets UIH="0" UID="0" UIG="0" lbENU="Current Preset" dt="Presets"/>
+  </PresetsGrp>
+  <StatisticsGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Statistics">
+    <Statistics UIH="0" UID="0" UIG="0" lbENU="Statistics" dt="Statistics"/>
+  </StatisticsGrp>
+  <IncludeGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Include">
+    <MergeMode UIH="0" UID="0" UIG="0" lbENU="File content" dt="Enum" enumSelected="Add and update animation" v="1" enumItem_0="Add" enumItem_1="Add and update animation" enumItem_2="Update animation"/>
+    <Geometry UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Geometry">
+      <SmoothingGroups UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Smoothing Groups" dt="Bool" v="1"/>
+    </Geometry>
+    <Animation UIH="0" UID="0" UIG="0" UIBG="1" UIX="1" lbENU="Animation" dt="Bool" v="1">
+      <ExtraGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Extra Options">
+        <Take UIH="0" UID="0" UIG="0" lbENU="Animation Take" dt="Enum" enumSelected="Take 001" v="1" enumItem_0="No animation" enumItem_1="Take 001"/>
+        <TimeLine UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Fill Timeline" dt="Bool" v="1"/>
+        <BakeAnimationLayers UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Bake Animation Layers" dt="Bool" v="1"/>
+        <Markers UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Optical Markers" dt="Bool" v="1"/>
+        <PointCache UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Point Cache File(s)" dt="Bool" v="1"/>
+      </ExtraGrp>
+      <Deformation UIH="0" UID="0" UIG="0" UIBG="1" UIX="1" lbENU="Deformations" dt="Bool" v="1">
+        <Skins UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Skins" dt="Bool" v="1"/>
+        <Shape UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Morphs" dt="Bool" v="1"/>
+      </Deformation>
+      <CurveFilter UIH="1" UID="0" UIG="0" UIBG="1" UIX="0" lbENU="Curve Filters" dt="Bool" v="0">
+        <CurveFilterApplyCstKeyRed UIH="0" UID="0" UIG="0" UIBG="1" UIX="0" lbENU="Constant Key Reducer" dt="Bool" v="0">
+          <CurveFilterCstKeyRedTPrec UIH="0" UID="0" UIG="0" lbENU="Translation Precision" dt="Number" v="9e-005" min="0" max="1"/>
+          <CurveFilterCstKeyRedRPrec UIH="0" UID="0" UIG="0" lbENU="Rotation Precision" dt="Number" v="0.009" min="0" max="1"/>
+          <CurveFilterCstKeyRedSPrec UIH="0" UID="0" UIG="0" lbENU="Scaling Precision" dt="Number" v="0.004" min="0" max="1"/>
+          <CurveFilterCstKeyRedOPrec UIH="0" UID="0" UIG="0" lbENU="Other Precision" dt="Number" v="0.009" min="0" max="1"/>
+          <AutoTangentsOnly UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Auto tangents only" dt="Bool" v="1"/>
+        </CurveFilterApplyCstKeyRed>
+        <CurveFilterApplyKeyReduce UIH="0" UID="0" UIG="0" UIBG="1" UIX="0" lbENU="Key Reducer" dt="Bool" v="0">
+          <CurveFilterKeyReducePrec UIH="0" UID="0" UIG="0" lbENU="Filter Intensity" dt="Number" v="1" min="0" max="1e+009"/>
+          <CurveFilterApplyKeySync UIH="0" UID="0" UIG="0" UIBG="0" lbENU="XYZ Curve Synchronisation" dt="Bool" v="0"/>
+        </CurveFilterApplyKeyReduce>
+        <CurveFilterApplyUnroll UIH="0" UID="0" UIG="0" UIBG="1" UIX="0" lbENU="Unroll Rotations" dt="Bool" v="0">
+          <CurveFilterUnrollPrec UIH="0" UID="0" UIG="0" lbENU="Precision" dt="Number" v="0.25" min="0" max="1000"/>
+          <CurveFilterUnrollPath UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Follow Y-Up" dt="Bool" v="1"/>
+        </CurveFilterApplyUnroll>
+      </CurveFilter>
+      <Bone UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Bone creation">
+        <BoneWidthHeightLock UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Lock width and height" dt="Bool" v="1"/>
+        <BoneAsDummy UIH="0" UID="0" UIG="0" lbENU="Bone conversion" dt="Enum" enumSelected="Leave as bones" v="0" enumItem_0="Leave as bones" enumItem_1="Convert as dummy"/>
+        <Max4BoneWidth UIH="0" UID="0" UIG="0" lbENU="Width" dt="Number" v="1" min="0" max="1e+009"/>
+        <Max4BoneHeight UIH="0" UID="0" UIG="0" lbENU="Height" dt="Number" v="1" min="0" max="1e+009"/>
+        <Max4BoneTaper UIH="0" UID="0" UIG="0" lbENU="Taper %" dt="Number" v="0.5" min="0" max="100"/>
+      </Bone>
+    </Animation>
+    <CameraGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Cameras">
+      <Camera UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Cameras" dt="Bool" v="1"/>
+    </CameraGrp>
+    <LightGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Lights">
+      <Light UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Lights" dt="Bool" v="1"/>
+      <Environment UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Sun and Sky" dt="Bool" v="1"/>
+      <GlobalAmbientColor UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Global Ambient Color" dt="Bool" v="1"/>
+    </LightGrp>
+  </IncludeGrp>
+  <AdvOptGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Advanced Options">
+    <UnitsGrp UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="Units">
+      <TotalUnitsScale UIH="0" UID="0" UIG="0" lbENU="Total Units Scale" dt="TextLine"/>
+      <DynamicScaleConversion UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Automatic" dt="Bool" v="1"/>
+      <UnitsSelector UIH="0" UID="1" UIG="0" lbENU="File units converted to" dt="Enum" enumSelected="Inches" v="5" enumItem_0="Millimeters" enumItem_1="Centimeters" enumItem_2="Decimeters" enumItem_3="Meters" enumItem_4="Kilometers" enumItem_5="Inches" enumItem_6="Feet" enumItem_7="Yards" enumItem_8="Miles"/>
+    </UnitsGrp>
+    <UI UIH="0" UID="0" UIG="1" UIX="1" UIP="0" lbENU="UI">
+      <ShowWarningsManager UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Show Warning Manager" dt="Bool" v="0"/>
+      <GenerateLogData UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Generate Log Data" dt="Bool" v="0"/>
+      <PluginVersionsURL UIH="1" UID="0" UIG="0" lbENU="Plugin Versions URL" dt="KString" v="http://download.autodesk.com/us/fbx/versions/fbxversion.xml"/>
+    </UI>
+    <Dxf UIH="1" UID="0" UIG="1" UIX="0" UIP="0" lbENU="Dxf">
+      <WeldVertices UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Weld Vertices" dt="Bool" v="1"/>
+      <ObjectDerivation UIH="0" UID="0" UIG="0" lbENU="Object Derivation" dt="Enum" enumSelected="By layer" v="0" enumItem_0="By layer" enumItem_1="By entity" enumItem_2="By block"/>
+      <ReferenceNode UIH="0" UID="0" UIG="0" UIBG="0" lbENU="Reference Node" dt="Bool" v="1"/>
+    </Dxf>
+  </AdvOptGrp>
+  <FBXExtentionsSDK UIH="1" UID="0" UIG="1" UIX="0" UIP="0" lbENU="FBX Extensions SDK">
+    <FBXExtentionsSDKWarning UIH="0" UID="0" UIG="0" lbENU="FBX Extensions SDK Warning" dt="Warning" v="Add your custom properties here."/>
+  </FBXExtentionsSDK>
+</Import>

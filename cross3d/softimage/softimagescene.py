@@ -271,7 +271,7 @@ class SoftimageScene(AbstractScene):
 		self.setSilentMode(False)
 		return renderPass
 	
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y, **kwargs):
 		""" Exports a given set of nativeObjects as FBX.
 		
 		Args:

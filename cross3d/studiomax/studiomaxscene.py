@@ -150,7 +150,8 @@ class StudiomaxScene(AbstractScene):
 	# This is the time at which the application FBX export preset was changed by our exportObjectsToFBX method.
 	# It allows use to detect if the preset file was changed in between two exports and make sure we reload the preset if necessary.
 	# After a long and painful research, showing the GUI of the native exporter seems to be the only way to have max load the preset file stored in the user folder.
-	_fbxExportPresetModifiedTime = 0
+	_fbxIOPresetModifiedTime = 0
+	_orignalFBXPresets = {}
 
 	def __init__(self):
 		AbstractScene.__init__(self)
@@ -1500,24 +1501,45 @@ class StudiomaxScene(AbstractScene):
 			selection = self._nativeObjects(wildcard=selection)
 		mxs.selectMore(selection)
 
-	def importFBX(self, path, **kwargs):
+	def importFBX(self, path, showUI=False, **kwargs):
 
-		# TODO: We need to support more options.
-		args = { "animation":True, 
-				 "cameras":True,
-				 "lights":True,
-				 "envelopes":True,
-				 "forceNormEnvelope":False,
-				 "fillTimeline":True }
+		# Setting up presets.
+		presetPaths = self._fbxIOPresetPaths(action='import')
+		templatePath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'fbx_import_preset.pytempl'))
 
-		args.update(kwargs)
+		# Setting up the FBX presets.
+		self._setupFBXIOPresets(presetPaths, templatePath, **{'user': getpass.getuser()})
 
-		mxs.FbxImporterSetParam("ResetImport")
-		mxs.FbxImporterSetParam("Animation", args['animation'])
-		mxs.FbxImporterSetParam("FillTimeline", args['fillTimeline'])
-		mxs.FbxImporterSetParam("Skin", args['envelopes'])
-		
-		mxs.importfile(path, mxs.pyhelper.namify("noPrompt"))
+		# We always show UI in debug mode.
+		showUI = True if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid else showUI
+
+		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
+		if showUI or (presetPaths and os.path.getmtime(presetPaths[0]) > self._fbxIOPresetModifiedTime + 100):
+
+			# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
+			if not showUI:
+
+				# Creating a method that presses enter.
+				def pressEnter():
+					win32api.keybd_event(0x0D, 0x0D, 0, 0)
+					win32api.keybd_event(0x0D, 0x0D, win32con.KEYEVENTF_KEYUP, 0)
+
+				# There will be a prompt for the FBX options.
+				QTimer.singleShot(200, pressEnter)
+
+				# There might be a second prompt if the file needs to be overwritten.
+				if os.path.exists(path):
+					QTimer.singleShot(400, pressEnter)
+				
+			# Exporting showin the UI.
+			mxs.importfile(path)
+
+		else:
+			# Calling the FBX exporter without GUI.
+			mxs.importfile(path, mxs.pyhelper.namify("noPrompt"))
+
+		# Restoring presets.
+		self._restoreFBXIOPresets()
 
 		# TODO: Softimage returns a model. Here we return a boolean. Do we want to make imported FBX into models or maybe return a list of objects?
 		return True
@@ -1667,18 +1689,36 @@ class StudiomaxScene(AbstractScene):
 		self.setSelection(objects)
 		mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True)
 
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y):
-		"""
-		Exports a given set of objects as FBX.
-		
-		:returns bool: Success
-		
-		"""
+	def _fbxIOPresetPaths(self, action='export'):
+
+		# Building the preset directory path. Somehow 2016 will still export the preset to 2014's folder.
+		if application.version() == 18:
+			presetPattern = r'C:\Users\{user}\Documents\3dsMax\FBX\3dsMax2014_X64\Presets\{year}.1\{action}\User defined.fbx{action}preset'
+		elif application.version() > 14:
+			presetPattern = r'C:\Users\{user}\Documents\3dsMax\FBX\3dsMax{year}_X64\Presets\{year}.0.1\{action}\User defined.fbx{action}preset'
+		else:
+			presetPattern = r'C:\Users\{user}\Documents\3dsmax\FBX\Presets\{year}.1\{action}\User defined.fbx{action}preset'
+
+		# This path is where the preset should be reading from.
+		presetPaths = [presetPattern.format(user=getpass.getuser(), year=application.year(), action=action)]
+
+		# In some cases, presets are being written to a different user folder
+		# than the currently logged in user. We will overwrite ALL user 
+		# settings preferences to make sure the settings are applied. They 
+		# will all be restored afterwards.
+		users = os.listdir(r'C:\Users')
+		for user in users:
+			presetPattern = r'C:\Users\{}\Documents\3dsmax\FBX\*.fbx{}preset'.format(user, action.lower())
+			presetPaths += glob.glob(presetPattern)
+		return presetPaths
+
+	def _setupFBXIOPresets(self, presetPaths, templatePath, **kwargs):
+
 		# Note on the hack implemented below:
 		# -----------------------------------
 		# In max, the FBX import/export settings API is broken. To get around
 		# this issue, we take advantage of the fact that the FBX plugin saves
-		# it's settings as a preset file in the user's directory. We have a 
+		# its settings as a preset file in the user's directory. We have a 
 		# template of the desired settings file and we overwrite the existing
 		# user settings file (making sure to cache the existing preset so that
 		# we can restore it afterwards).  After that settings file is written,
@@ -1688,80 +1728,84 @@ class StudiomaxScene(AbstractScene):
 		# Also, regardless of the frame range set in the export settings,
 		# the plugin will use the current animation range, so we have to set
 		# and then restore the animation range to the desired range as well.
-		
+
 		preset = ''
-		initialSelection = self._nativeSelection()
-		initialFrameRange = self.animationRange()
-		frameRange = initialFrameRange if not frameRange else frameRange
-
-		# Feedback on non-implemented arguments.
-		if frameRate:
-			debug.debugObject(self._findNativeObject, 'frameRate argument not implemented yet.')
-
-		self.setAnimationRange(frameRange)
-		self._setNativeSelection(nativeObjects)
-
-		script_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'fbx_export_preset.pytempl'))
-		with open(script_path, 'r') as f:
+		with open(templatePath, 'r') as f:
 			template = f.read()
 
-		# In some cases, presets are being written to a different user folder
-		# than the currently logged in user.  We will overwrite ALL user 
-		# settings preferences to make sure the settings are applied.  They 
-		# will all be restored afterwards.
-		cur_user = getpass.getuser()
-		preset_paths = []
-		user_root = r'C:\Users'
-		users = os.listdir(user_root)
-				
-		# Building the preset directory path. Somehow 2016 will still export the preset to 2014's folder.
-		if application.version() == 18:
-			presetDirectory = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax2014_X64\Presets\%(year)i.1\export' % {'user': cur_user, 'year':application.year()}
-		elif application.version() > 14:
-			presetDirectory = r'C:\Users\%(user)s\Documents\3dsMax\FBX\3dsMax%(year)i_X64\Presets\%(year)i.0.1\export' % {'user': cur_user, 'year':application.year()}
-		else:
-			presetDirectory = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (cur_user, application.year())
-			
-		primary_preset_path = os.path.join(presetDirectory, 'User defined.fbxexportpreset')
-		preset_paths.append(primary_preset_path)
-		
-		# Find all other preset files that could possibly be loaded.
-		for user in users:
-			presetDirectory = r'C:\Users\%s\Documents\3dsmax\FBX\Presets\%i.1\export' % (user, application.year())
-			user_preset_paths = glob.glob(os.path.join(presetDirectory, '*.fbxexportpreset'))
-			preset_paths.extend(user_preset_paths)
-		
-		# Strip out duplicates
-		preset_paths = list(set(preset_paths))
-		
 		# Cache the current presets and overwrite them.
-		cached_presets = {}
-		for preset_path in preset_paths:
-			# Read the current presets and cache them to restore later
-			if os.path.isfile(preset_path):
-				with open(preset_path, 'r') as f:
-					preset = f.read()
-					cached_presets[preset_path] = preset
+		self._orignalFBXpresetPaths = {}
+		for path in presetPaths:
 
-			preset = template.format(user=user, start=frameRange[0], end=frameRange[1], upVector=UpVector.labelByValue(upVector))
+			# Read the current presetPaths and cache them to restore later.
+			if os.path.isfile(path):
+				with open(path, 'r') as f:
+					preset = f.read()
+					self._orignalFBXpresetPaths[path] = preset
+
+			preset = template.format(**kwargs)
 			
 			try:
 				# Creating the path to the preset if not existing.
-				if not os.path.isdir(os.path.dirname(preset_path)):
-					os.makedirs(os.path.dirname(preset_path))
+				if not os.path.isdir(os.path.dirname(path)):
+					os.makedirs(os.path.dirname(path))
 	
-				with open(preset_path, 'w') as f:
+				with open(path, 'w') as f:
 					f.write(preset)
 					
 			except OSError:
 				# Ignore write permission errors, we can't do anything about them right now.
 				traceback.print_exc()
-				
-		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
-			showUI = True
+
+	def _restoreFBXIOPresets(self):
+		presetPaths = self._orignalFBXPresets.iteritems()
+		for preset, preset in presetPaths:
+			try:
+				with open(preset, 'w') as f:
+					f.write(preset)
+					
+			except OSError:
+				# Ignore write permission errors, we can't do anything about them right now.
+				traceback.print_exc()
+
+		# Storing the time of the FBX export preset modification.
+		if presetPaths:
+			self._fbxIOPresetModifiedTime = os.path.getmtime(presetPaths[0])
+
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y, **kwargs):
+		"""
+			Exports a given set of objects as FBX.
+			:returns bool: Success
+		"""
+
+		# Getting the initial state of things.
+		initialSelection = self._nativeSelection()
+		initialFrameRange = self.animationRange()
+		frameRange = initialFrameRange if not frameRange else frameRange
+
+		# Setting frame range and selection.
+		self.setAnimationRange(frameRange)
+		self._setNativeSelection(nativeObjects)
+
+		# Setting up presets.
+		presetPaths = self._fbxIOPresetPaths(action='export')
+		templatePath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'fbx_export_preset.pytempl'))
+
+		# Building the template's kwargs.
+		kwargs = {}
+		kwargs['user'] = getpass.getuser()
+		kwargs['start'] = frameRange[0]
+		kwargs['end'] = frameRange[1]
+		kwargs['upVector'] = UpVector.labelByValue(upVector)
+
+		# Setting up the FBX presets.
+		self._setupFBXIOPresets(presetPaths, templatePath, **kwargs)
+
+		# We always show UI in debug mode.
+		showUI = True if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid else showUI
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
-		if showUI or (preset_paths and os.path.getmtime(preset_paths[0]) > self._fbxExportPresetModifiedTime + 100):
+		if showUI or (presetPaths and os.path.getmtime(presetPaths[0]) > self._fbxIOPresetModifiedTime + 100):
 
 			# If the user did not want to see the UI, we prepare some callbacks that will press the enter key for him.
 			if not showUI:
@@ -1785,26 +1829,12 @@ class StudiomaxScene(AbstractScene):
 			# Calling the FBX exporter without GUI.
 			mxs.exportFile(path, mxs.pyhelper.namify('noPrompt'), selectedOnly=True, using='FBXEXP')
 
-		# Restoring the frame range.
+		# Restoring frame range and selection.
 		self.setAnimationRange(initialFrameRange)
-
-		# Restoring the selection.
 		self._setNativeSelection(initialSelection)
 
-		# Restoring the old preset.
-		for preset_path, preset in cached_presets.iteritems():
-			try:
-				with open(preset_path, 'w') as f:
-					f.write(preset)
-					
-			except OSError:
-				# Ignore write permission errors, we can't do anything about them right now.
-				traceback.print_exc()
-				
-
-		# Storing the time of the FBX export preset modification.
-		if preset_paths:
-			self._fbxExportPresetModifiedTime = os.path.getmtime(preset_paths[0])
+		# Restoring presets.
+		self._restoreFBXIOPresets()
 
 		return True
 

@@ -1411,7 +1411,7 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod	
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y, **kwargs):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
@@ -2694,7 +2694,7 @@ class AbstractScene(QObject):
 		from blur3d.api import application
 		return application
 
-	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y):
+	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y, **kwargs):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
