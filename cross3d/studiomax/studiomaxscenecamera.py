@@ -467,7 +467,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
         # These are the properties we are going to want to load alembic data on.
         cameraType = self.cameraType()
-        if cameraType == CameraType.VRayPhysical:
+        if cameraType == CameraType.Physical:
 
             # We need to create a dedicated radians FOV contoller as the regular FOV controller expects degrees.
             self._addNativeController('RadianFOV', group='Alembic')
@@ -478,10 +478,10 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
         for prop in properties:
             mxs.execute(maxScript.format(prop=prop, path=path, identifier=propertiesIdentifier, propertyName=properties[prop]))
-            alembicController = mxs.setAlembicFloatController(self._nativePointer, timeController)
+            mxs.setAlembicFloatController(self._nativePointer, timeController)
 
         # FOV is going to be special for V-Ray camera.
-        if cameraType == CameraType.VRayPhysical:
+        if cameraType == CameraType.Physical:
     
             # Building a script controller for the FOV in degrees.
             scriptController = mxs.float_script()
