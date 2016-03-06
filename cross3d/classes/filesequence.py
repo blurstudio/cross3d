@@ -38,7 +38,7 @@ class FileSequence(object):
 	# Path/Sequence[0:100].abc
 	# Path/Sequence[0-100].abc
 
-	_regex = re.compile(r'^(?P<baseName>[A-Za-z0-9 _.\-]+?)((?P<separator>[^\da-zA-Z\[]?)\[?(?P<range>(?P<start>[0-9]+)[\-\:](?P<end>[0-9]+)))\]?(\.(?P<extension>[a-zA-Z0-9]+))$')
+	_regex = re.compile(r'^(?P<baseName>[A-Za-z0-9 _.\-\[\]]+?)((?P<separator>[^\da-zA-Z\[]?)\[?(?P<range>(?P<start>[0-9]+)[\-\:](?P<end>[0-9]+)))\]?(\.(?P<extension>[a-zA-Z0-9]+))$')
 
 	@classmethod
 	@pendingdeprecation('Use fromFileName instead.')
