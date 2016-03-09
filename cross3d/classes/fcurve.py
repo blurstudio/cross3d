@@ -384,7 +384,7 @@ class FCurve(object):
 			if before:
 				tp = dt - tp
 			# Now we can just get the value for the time
-			return self.valueAtTime(tp)
+			return self.valueAtTime(tp + t0)
 		elif mode == ExtrapolationType.CycledWithOffset:
 			# This is going to work the same as cycled, except we'll need to add an offset.
 			# our position will be the same, but we'll also need a repetition count to multuiply by
@@ -397,7 +397,7 @@ class FCurve(object):
 			if before:
 				tp = dt - tp
 			# Now we can just get the value for the time and add our offset
-			return self.valueAtTime(tp) + offset
+			return self.valueAtTime(tp + t0) + offset
 		elif mode == ExtrapolationType.PingPong:
 			# Again this will be similar to Cycled, however now we'll need to reverse the looping
 			# direction with each cycle.
@@ -406,9 +406,8 @@ class FCurve(object):
 			# If it's an odd numbered repetition, we need to reverse it.
 			if (not oddRep and before) or (oddRep and not before):
 				tp = dt - tp
-			# print time, oddRep, tp
 			# Now we can just get the value for the time
-			return self.valueAtTime(tp)
+			return self.valueAtTime(tp + t0)
 		else:
 			raise ValueError('Unable to extrapolate values: invalid ExtrapolationType found.')
 
