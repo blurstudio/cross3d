@@ -29,6 +29,18 @@ class Key(object):
 		# Broken key allows to have manipulate tangent individually.
 		self.brokenTangents = bool(kwargs.get('brokenTangents', False))
 
+	@property
+	def inTangentPoint(self):
+		x = self.inTangentLength * math.cos(self.inTangentAngle)
+		y = self.inTangentLength * math.sin(self.inTangentAngle)
+		return self.time-x, self.value+y
+
+	@property
+	def outTangentPoint(self):
+		x = self.outTangentLength * math.cos(self.outTangentAngle)
+		y = self.outTangentLength * math.sin(self.outTangentAngle)
+		return self.time+x, self.value+y
+
 class FCurve(object):
 
 	def __init__(self, **kwargs):
@@ -37,7 +49,54 @@ class FCurve(object):
 		self._keys = []
 		self._inExtrapolation = int(kwargs.get('inExtrapolation', ExtrapolationType.Constant))
 		self._outExtrapolation = int(kwargs.get('outExtrapolation', ExtrapolationType.Constant))
+
+	def valueAtTime(self, time):
+		"""Returns the value of the fcurve at the specified time
 		
+		Args:
+		    time (float): time at which to evaluate the fcurve.
+		
+		Returns:
+		    float: value of the fcurve at the specified time.
+		"""
+		# we need to ensure keys is sorted properly for this to work.
+		sortedKeys = sorted(self._keys, key=lambda k: k.time)
+		# If the time specified is out of the range of keyframes, we'll need to
+		# extrapolate to find the value.  This will be split into its own fn since
+		# it gets a bit messy.
+		if time < sortedKeys[0].time or time > sortedKeys[-1].time:
+			return self.extrapolateValue(time)
+		i = 0
+		t = sortedKeys[i].time
+		maxI = len(sortedKeys) - 1
+		while t < time and i < maxI:
+			i += 1
+			t = sortedKeys[i].time
+		if t == time:
+			# time is at a key -- we can just return that key's value.
+			return sortedKeys[i].value
+		else:
+			# we should have two keys that our time falls between
+			k0 = sortedKeys[i-1]
+			k1 = sortedKeys[i]
+			t = (time - k0.time) / (k1.time - k0.time)
+			return self.solveCubic(k0, k1, t)[1]
+
+	def plot(self, startValue, endValue, resolution):
+		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
+		
+		Args:
+		    startValue (float): Starting value for portion of the curve to sample.
+		    endValue (float): Ending value for portion of the curve to sample.
+		    resolution (float): Frequency with which to sample the curve.
+		"""
+		import numpy as np
+		import matplotlib.pyplot as plt
+		x = np.arange(startValue, endValue, resolution)
+		f = np.vectorize(self.valueAtTime)
+		plt.plot(x, f(x))
+		plt.show()
+
 	def offset(self, value, attr='time', rnd=False):
 		for key in self._keys:
 			v = getattr(key, attr) + float(value)
@@ -276,3 +335,119 @@ class FCurve(object):
 			self.fromXML(fle.read())
 		return True
 
+	def extrapolateValue(self, time):
+		"""Returns the value at a given time outside the range of keyframes for the curve, using the
+			curve's extrapolation mode for values outside the keyframe range in that direction.
+		
+		Args:
+		    time (float): time at which to calculate the curve's value
+		
+		Returns:
+		    float: Extrapolated value for the curve at the specified time.
+		"""
+		sortedKeys = sorted(self._keys, key=lambda k: k.time)
+		if time >= sortedKeys[0].time and time <= sortedKeys[-1].time:
+			raise ValueError('Unable to extrapolate value for time within keyframed curve.')
+		t0, t1 = sortedKeys[0].time, sortedKeys[-1].time
+		dt = t1 - t0
+		dtx = 0
+		if time < sortedKeys[0].time:
+			# time is before start
+			mode = self._inExtrapolation
+			if mode == ExtrapolationType.Constant:
+				return sortedKeys[0].value
+			before = True
+			dtx = t0 - time
+		else:
+			# time is after end
+			mode = self._outExtrapolation
+			if mode == ExtrapolationType.Constant:
+				return sortedKeys[-1].value
+			before = False
+			dtx = time - t1
+		if mode == ExtrapolationType.Linear:
+			v = sortedKeys[0].value if before else sortedKeys[-1].value
+			# get the angle of the opposite tangent (max doesn't store tangents)
+			# for the outer side in this case.
+			theta = sortedKeys[0].outTangentAngle if before else sortedKeys[-1].inTangentAngle
+			# Now get the inverse angle, since we want to move on the opposite vector
+			theta = math.pi - theta
+			# delta from the range to our unknown is our triangle's base,
+			# theta is the angle, and our y value is the side.
+			# Solve for y, and then offset by the value of the last keyframe.
+			return dtx * math.tan(theta) + v
+		elif mode == ExtrapolationType.Cycled:
+			# We're just looping through the existing timeline now, so we can modulus the delta of
+			# sample position with the delta of the start/end keyframe times
+			tp = dtx % dt
+			# If we fell off the beginning, we need to play through backwards
+			if before:
+				tp = dt - tp
+			# Now we can just get the value for the time
+			return self.valueAtTime(tp)
+		elif mode == ExtrapolationType.CycledWithOffset:
+			# This is going to work the same as cycled, except we'll need to add an offset.
+			# our position will be the same, but we'll also need a repetition count to multuiply by
+			# our offset.
+			tp = dtx % dt
+			tc = math.floor(dtx / dt) + 1
+			offset = tc * (sortedKeys[-1].value-sortedKeys[0].value)
+			offset *= (-1 if before else 1)
+			# If we fell off the beginning, we need to play through backwards.
+			if before:
+				tp = dt - tp
+			# Now we can just get the value for the time and add our offset
+			return self.valueAtTime(tp) + offset
+		elif mode == ExtrapolationType.PingPong:
+			# Again this will be similar to Cycled, however now we'll need to reverse the looping
+			# direction with each cycle.
+			tp = dtx % dt
+			oddRep = not bool(math.floor(dtx / dt) % 2)
+			# If it's an odd numbered repetition, we need to reverse it.
+			if (not oddRep and before) or (oddRep and not before):
+				tp = dt - tp
+			# print time, oddRep, tp
+			# Now we can just get the value for the time
+			return self.valueAtTime(tp)
+		else:
+			raise ValueError('Unable to extrapolate values: invalid ExtrapolationType found.')
+
+	@staticmethod
+	def solveCubic(key0, key1, t):
+		"""Finds the point on a cubic bezier spline at percentage t between two keys.
+		
+		Args:
+		    key0 (Key): Starting key for the spline
+		    key1 (Key): Ending key for the spline
+		    t (float): position along the spline (as a percent) to solve for
+		
+		Returns:
+		    Tuple: Tuple of float values for the x (time) and y (value) coordinates of the resulting
+		    		point.
+		"""
+		p0x, p0y = key0.time, key0.value
+		p1x, p1y = key1.time, key1.value
+		cp0x, cp0y = key0.outTangentPoint
+		cp1x, cp1y = key1.inTangentPoint
+
+		# simple version of De Casteljau's algorithm to find point at given position
+		# https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm#Geometric_interpretation
+		# http://stackoverflow.com/a/14205183
+
+		# Get points between points and control points (and between control points) at the percentage
+		# specified by the t value
+		Ax = ( (1 - t) * p0x ) + (t * cp0x)
+		Ay = ( (1 - t) * p0y ) + (t * cp0y)
+		Bx = ( (1 - t) * cp0x ) + (t * cp1x)
+		By = ( (1 - t) * cp0y ) + (t * cp1y)
+		Cx = ( (1 - t) * cp1x ) + (t * p1x)
+		Cy = ( (1 - t) * cp1y ) + (t * p1y)
+		# Get point on linesegments formed by AB and BC at t position
+		Dx = ( (1 - t) * Ax ) + (t * Bx)
+		Dy = ( (1 - t) * Ay ) + (t * By)
+		Ex = ( (1 - t) * Bx ) + (t * Cx)
+		Ey = ( (1 - t) * By ) + (t * Cy)
+		# The desired point will be at the t position on the linesegment DE
+		Px = ( (1 - t) * Dx ) + (t * Ex)
+		Py = ( (1 - t) * Dy ) + (t * Ey)
+		return Px, Py
