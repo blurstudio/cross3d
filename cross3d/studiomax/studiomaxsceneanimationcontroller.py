@@ -134,7 +134,7 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 
 	def extrapolation(self):
 		extrapolation = [mxs.getBeforeORT(self._nativePointer), mxs.getAfterORT(self._nativePointer)]
-		return [self._nativeToAbstractExtrapolationType.get(e, mxs.pyhelper.namify('constant')) for e in extrapolation]
+		return [self._nativeToAbstractExtrapolationType.get(str(e), ExtrapolationType.Constant) for e in extrapolation]
 
 	def setExtrapolation(self, extrapolation=[None, None]):
 		""" None will leave the the extrapolation unaffected.
