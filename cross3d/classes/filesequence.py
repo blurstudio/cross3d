@@ -441,6 +441,42 @@ class FileSequence(object):
 
 		return True
 
+	def retime(self, outputPath, retimeCurve, fps=30, holdOutsideFrame=False):
+		"""Retimes the filesequence using the specified retimeCurve.  Outputs the retimed sequence
+			to the specified location.
+		
+		Args:
+		    outputPath (str): The unique path to output the retimed FileSequence to.
+		    retimeCurve (blur3d.api.FCurve): The curve to evaluate to retime the file sequence.
+		
+		Returns:
+		    FileSequence: The newly created FileSequence.
+		"""
+		start, end = self.start(), self.end()
+		newSequence = FileSequence.fromFileName(outputPath)
+		for frame in xrange(start, end+1, self.step()):
+			sourceFrame = round(retimeCurve.valueAtTime(frame) * fps)
+			if sourceFrame < start:
+				if holdOutsideFrame:
+					sourceFrame = start
+				else:
+					raise ValueError(
+						'Retime curve requires frame outside the source range. '
+						+'(Requested {}, range is {}-{}.)'.format(sourceFrame, start, end)
+					)
+			elif sourceFrame > end:
+				if holdOutsideFrame:
+					sourceFrame = end
+				else:
+					raise ValueError(
+						'Retime curve requires frame outside the source range. '
+						+'(Requested {}, range is {}-{}.)'.format(sourceFrame, start, end)
+					)
+			sourceName = self.codePath() % sourceFrame
+			targetName = newSequence.codePath() % frame
+			shutil.copy2(sourceName, targetName)
+			return newSequence
+
 	def link(self, output):
 		if self.isComplete():
 			if self.count() == output.count():
