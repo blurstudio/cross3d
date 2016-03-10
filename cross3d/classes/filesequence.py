@@ -448,10 +448,15 @@ class FileSequence(object):
 		Args:
 		    outputPath (str): The unique path to output the retimed FileSequence to.
 		    retimeCurve (blur3d.api.FCurve): The curve to evaluate to retime the file sequence.
+		    fps (int, optional): fps that the retime curve was created at.  If not specified
+		    	defaults to 30.
+		    holdOutsideFrame (bool, optional): If this is true, frames outside the input range will
+		    	use the nearest frame from the input range.  If False, requested frames outside the
+		    	input sequence will raise an exception.  Defaults to False.
 		
 		Returns:
 		    FileSequence: The newly created FileSequence.
-		"""
+		"""	
 		start, end = self.start(), self.end()
 		newSequence = FileSequence.fromFileName(outputPath)
 		for frame in xrange(start, end+1, self.step()):
