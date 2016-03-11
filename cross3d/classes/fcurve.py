@@ -5,9 +5,10 @@ import blurdev
 import xml.dom.minidom
 
 from framerange import FrameRange
-from blurdev.XML.xmlelement import XMLElement
+from valuerange import ValueRange
 from blurdev.XML.xmldocument import XMLDocument
 from blur3d.constants import ControllerType, TangentType, ExtrapolationType
+
 
 class Key(object):
 
@@ -33,13 +34,14 @@ class Key(object):
 	def inTangentPoint(self):
 		x = self.inTangentLength * math.cos(self.inTangentAngle)
 		y = self.inTangentLength * math.sin(self.inTangentAngle)
-		return self.time-x, self.value+y
+		return self.time - x, self.value + y
 
 	@property
 	def outTangentPoint(self):
 		x = self.outTangentLength * math.cos(self.outTangentAngle)
 		y = self.outTangentLength * math.sin(self.outTangentAngle)
-		return self.time+x, self.value+y
+		return self.time + x, self.value + y
+
 
 class FCurve(object):
 
@@ -77,7 +79,7 @@ class FCurve(object):
 			return sortedKeys[i].value
 		else:
 			# we should have two keys that our time falls between
-			k0 = sortedKeys[i-1]
+			k0 = sortedKeys[i - 1]
 			k1 = sortedKeys[i]
 			t = (time - k0.time) / (k1.time - k0.time)
 			return self.solveCubic(k0, k1, t)[1]
@@ -142,7 +144,7 @@ class FCurve(object):
 		difference = float(end - start)
 		ratio = (rng[1] - rng[0]) / difference
 		self.scale(ratio, attr=attr, rnd=rnd, pivot=start)
-		self.offset(rng[0]-start, attr=attr, rnd=rnd)
+		self.offset(rng[0] - start, attr=attr, rnd=rnd)
 
 	def round(self, attr='time'):
 		for key in self._keys:
@@ -180,12 +182,13 @@ class FCurve(object):
 			self.scale(1 / conversionRatio, attr='value')
 
 	def range(self, attr='time'):
+		# TODO: This will only work for curves whos start at their minumum and ends at their maximum.
 		keys = self._keys
 		if len(keys) > 1:
 			rng = (getattr(keys[0], attr), getattr(keys[-1], attr))
 		else:
 			rng = (0, 0)
-		return FrameRange(rng)
+		return ValueRange(rng)
 
 	def setExtrapolation(self, extrapolation=[None, None]):
 		self._inExtrapolation = extrapolation[0] or self._inExtrapolation
@@ -205,12 +208,12 @@ class FCurve(object):
 
 	def setName(self, name):
 		self._name = name
-	
+
 	def addKey(self, **kwargs):
 		key = Key(**kwargs)
 		self._keys.append(key)
 		return self._keys
-	
+
 	def __len__(self):
 		return len(self.keys())
 
@@ -272,17 +275,17 @@ class FCurve(object):
 					inTangentType = tbc[inTangentType]
 				if outTangentType in tbc:
 					outTangentType = tbc[outTangentType]
-					
-				kwargs = { 'time': element.attribute('time'),
-						   'value': element.attribute('value'),
-						   'inTangentAngle': element.findChild('inTangentAngle').value(),
-						   'outTangentAngle': element.findChild('outTangentAngle').value(),
-						   'inTangentType': TangentType.valueByLabel(inTangentType),
-						   'outTangentType': TangentType.valueByLabel(outTangentType),
-						   'inTangentLength': element.findChild('inTangentLength').value(), 
-						   'outTangentLength': element.findChild('outTangentLength').value(),
-						   'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
-						   'brokenTangents': element.findChild('brokenTangents').value() == 'True' }
+
+				kwargs = {'time': element.attribute('time'),
+               'value': element.attribute('value'),
+               'inTangentAngle': element.findChild('inTangentAngle').value(),
+               'outTangentAngle': element.findChild('outTangentAngle').value(),
+               'inTangentType': TangentType.valueByLabel(inTangentType),
+               'outTangentType': TangentType.valueByLabel(outTangentType),
+              'inTangentLength': element.findChild('inTangentLength').value(),
+               'outTangentLength': element.findChild('outTangentLength').value(),
+               'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
+               'brokenTangents': element.findChild('brokenTangents').value() == 'True'}
 
 				self._keys.append(Key(**kwargs))
 
@@ -306,14 +309,14 @@ class FCurve(object):
 			keyElement.setAttribute('value', key.value)
 			keyElement.setAttribute('time', key.time)
 
-			properties = { 'inTangentAngle': key.inTangentAngle,
-						   'outTangentAngle': key.outTangentAngle,
-						   'inTangentType': TangentType.labelByValue(key.inTangentType),
-						   'outTangentType': TangentType.labelByValue(key.outTangentType),
-						   'inTangentLength': key.inTangentLength, 
-						   'outTangentLength': key.outTangentLength,
-						   'normalizedTangents': key.normalizedTangents,
-						   'brokenTangents': key.brokenTangents }
+			properties = {'inTangentAngle': key.inTangentAngle,
+                  'outTangentAngle': key.outTangentAngle,
+                  'inTangentType': TangentType.labelByValue(key.inTangentType),
+                  'outTangentType': TangentType.labelByValue(key.outTangentType),
+                 'inTangentLength': key.inTangentLength,
+                  'outTangentLength': key.outTangentLength,
+                  'normalizedTangents': key.normalizedTangents,
+                  'brokenTangents': key.brokenTangents}
 
 			for prop in sorted(properties.keys()):
 				propertyElement = keyElement.addNode(prop)
@@ -391,7 +394,7 @@ class FCurve(object):
 			# our offset.
 			tp = dtx % dt
 			tc = math.floor(dtx / dt) + 1
-			offset = tc * (sortedKeys[-1].value-sortedKeys[0].value)
+			offset = tc * (sortedKeys[-1].value - sortedKeys[0].value)
 			offset *= (-1 if before else 1)
 			# If we fell off the beginning, we need to play through backwards.
 			if before:
@@ -435,18 +438,18 @@ class FCurve(object):
 
 		# Get points between points and control points (and between control points) at the percentage
 		# specified by the t value
-		Ax = ( (1 - t) * p0x ) + (t * cp0x)
-		Ay = ( (1 - t) * p0y ) + (t * cp0y)
-		Bx = ( (1 - t) * cp0x ) + (t * cp1x)
-		By = ( (1 - t) * cp0y ) + (t * cp1y)
-		Cx = ( (1 - t) * cp1x ) + (t * p1x)
-		Cy = ( (1 - t) * cp1y ) + (t * p1y)
+		Ax = ((1 - t) * p0x) + (t * cp0x)
+		Ay = ((1 - t) * p0y) + (t * cp0y)
+		Bx = ((1 - t) * cp0x) + (t * cp1x)
+		By = ((1 - t) * cp0y) + (t * cp1y)
+		Cx = ((1 - t) * cp1x) + (t * p1x)
+		Cy = ((1 - t) * cp1y) + (t * p1y)
 		# Get point on linesegments formed by AB and BC at t position
-		Dx = ( (1 - t) * Ax ) + (t * Bx)
-		Dy = ( (1 - t) * Ay ) + (t * By)
-		Ex = ( (1 - t) * Bx ) + (t * Cx)
-		Ey = ( (1 - t) * By ) + (t * Cy)
+		Dx = ((1 - t) * Ax) + (t * Bx)
+		Dy = ((1 - t) * Ay) + (t * By)
+		Ex = ((1 - t) * Bx) + (t * Cx)
+		Ey = ((1 - t) * By) + (t * Cy)
 		# The desired point will be at the t position on the linesegment DE
-		Px = ( (1 - t) * Dx ) + (t * Ex)
-		Py = ( (1 - t) * Dy ) + (t * Ey)
+		Px = ((1 - t) * Dx) + (t * Ex)
+		Py = ((1 - t) * Dy) + (t * Ey)
 		return Px, Py
