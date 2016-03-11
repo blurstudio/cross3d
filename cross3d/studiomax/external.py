@@ -109,7 +109,7 @@ class External(AbstractExternal):
 			ignoredVersions = set(['{}.0'.format(cls._versionForYear[year]) for year in cls._ignoredVersions if year in cls._versionForYear])
 			for v in sorted(versions, reverse=True):
 				if v in versions and v not in ignoredVersions:
-					version = v.replace('.0', '')
+					version = v.rsplit('.', 1)[0]
 					try:
 						float(version)
 					except ValueError:
