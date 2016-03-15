@@ -456,7 +456,7 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
-	def objectsInFrustrum(objects=[], considerVisibility=True, frameRange=None, step=1, allowClipping=True):
+	def objectsInFrustrum(self, objects=[], considerVisibility=True, frameRange=None, step=1, allowClipping=True):
 		"""Returns a list of objects whose bounding boxes are contained within or intersect with the
 			camera's frustum.
 
