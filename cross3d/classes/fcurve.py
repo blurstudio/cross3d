@@ -182,13 +182,12 @@ class FCurve(object):
 			self.scale(1 / conversionRatio, attr='value')
 
 	def range(self, attr='time'):
+		
 		# TODO: This will only work for curves whos start at their minumum and ends at their maximum.
 		keys = self._keys
-		if len(keys) > 1:
-			rng = (getattr(keys[0], attr), getattr(keys[-1], attr))
-		else:
-			rng = (0, 0)
-		return ValueRange(rng)
+		start = getattr(keys[0], attr) if len(keys) > 1 else 0
+		end = getattr(keys[-1], attr) if len(keys) > 1 else 0
+		return ValueRange(start, end)
 
 	def setExtrapolation(self, extrapolation=[None, None]):
 		self._inExtrapolation = extrapolation[0] or self._inExtrapolation
