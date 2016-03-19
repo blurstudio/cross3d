@@ -298,6 +298,15 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		return derivatedController
 
 	def framesForValue(self, value, closest=True):
+		""" Returns a list o frames that match the given controller value.
+		
+		Args:
+		    value (float): The value we want to lookup frame for.
+		    closest (bool, optional): This will return the closest value if not value can be found.
+		
+		Returns:
+		    list: The list of matching frames.
+		"""
 
 		# TODO: (Douglas) This function is far from being perfect but it does the job.
 		frames = {}

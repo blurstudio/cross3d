@@ -22,9 +22,9 @@ from blurdev import debug
 from PyQt4.QtCore import QTimer
 from blur3d.lib.tmclib import TMCInfo
 from blur3d.lib.pclib import PointCacheInfo
-from blur3d.api import UserProps, application
 from blur3d.lib.xmeshhandler import XMESHHandler
 from blur3d import pendingdeprecation, constants
+from blur3d.api import UserProps, application, FrameRange
 from blur3d.api.abstract.abstractscene import AbstractScene
 from blur3d.constants import UpVector, ExtrapolationType, RendererType
 
@@ -1880,7 +1880,8 @@ class StudiomaxScene(AbstractScene):
 				theMatLib = mxs.materialLibrary()
 				mxs.append(theMatLib, theMaterial)
 				mxs.saveTempMaterialLibrary(theMatLib, theMatLibPath)
-		#BEGIN CACHE RECORD
+				
+		# Beginning cache record.
 		saver.SetSceneRenderBegin()
 		for i in range(start, end):
 
@@ -1895,11 +1896,9 @@ class StudiomaxScene(AbstractScene):
 				else:
 					saver.SaveMeshToSequence(objList[0], ignoreEmpty, ignoreTopology, worldLock, saveVelocity)
 					#saver.SetSceneRenderEnd()
-		#END CACHE RECORD
+
 		saver.SetSceneRenderEnd()
 		mxs.timeDisplayMode = mxs.pyhelper.namify("frames")
-
-		#RETURN FINISH
 		return True
 
 	def animationRange(self):
@@ -1909,7 +1908,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		from blur3d.api import FrameRange
 		r = mxs.animationRange
-		return FrameRange((int(r.start), int(r.end)))
+		return FrameRange((r.start, r.end))
 	
 	def globalRange(self):
 		return self.animationRange()
@@ -2391,7 +2390,9 @@ class StudiomaxScene(AbstractScene):
 		if bake:
 			from blur3d.api import SceneAnimationController
 			controller = SceneAnimationController(self, nativeController)
-			bakeRange = controller.fCurve().range()
+
+			# The FCurve range is not made from floats.
+			bakeRange = FrameRange(controller.fCurve().range())
 			if not bakeRange:
 				bake = False
 
