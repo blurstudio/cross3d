@@ -34,12 +34,20 @@ class Key(object):
 	def inTangentPoint(self):
 		x = self.inTangentLength * math.cos(self.inTangentAngle)
 		y = self.inTangentLength * math.sin(self.inTangentAngle)
+
+		if self.inTangentAngle < 0:
+			y *= -1
+
 		return self.time - x, self.value + y
 
 	@property
 	def outTangentPoint(self):
 		x = self.outTangentLength * math.cos(self.outTangentAngle)
 		y = self.outTangentLength * math.sin(self.outTangentAngle)
+
+		if self.outTangentAngle < 0:
+			y *= -1
+
 		return self.time + x, self.value + y
 
 
@@ -84,7 +92,7 @@ class FCurve(object):
 			t = (time - k0.time) / (k1.time - k0.time)
 			return self.solveCubic(k0, k1, t)[1]
 
-	def plot(self, startValue, endValue, resolution):
+	def plot(self, startValue=None, endValue=None, resolution=1.0):
 		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
 		
 		Args:
@@ -92,12 +100,23 @@ class FCurve(object):
 		    endValue (float): Ending value for portion of the curve to sample.
 		    resolution (float): Frequency with which to sample the curve.
 		"""
+
+		fullRange = self.range()
+		startValue = fullRange[0] if startValue is None else startValue
+		endValue = fullRange[1] if endValue is None else endValue
+
 		import numpy as np
 		import matplotlib.pyplot as plt
 		x = np.arange(startValue, endValue, resolution)
 		f = np.vectorize(self.valueAtTime)
 		plt.plot(x, f(x))
 		plt.show()
+
+	def plotted(self, rng, step=1):
+		plotted = FCurve()
+		for value in xrange(rng[0], rng[1], step):
+			self.addKey(time=value, value=self.valueAtTime(value))
+		return plotted
 
 	def offset(self, value, attr='time', rnd=False):
 		for key in self._keys:
