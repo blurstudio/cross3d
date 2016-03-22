@@ -82,9 +82,6 @@ class FCurve(object):
 			k0 = sortedKeys[i - 1]
 			k1 = sortedKeys[i]
 			return self.bezierEvaluation(k0, k1, time)[1]
-			# t = (time - k0.time) / (k1.time - k0.time)
-			# return self.solveCubic(k0, k1, t)[1]
-			# z "({}, {}), ({}, {}), {}%".format(k0.time, k0.value, k1.time, k1.value, t*100)
 
 	def plot(self, startValue=None, endValue=None, resolution=1.0, plotHandles=True):
 		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
@@ -434,55 +431,30 @@ class FCurve(object):
 			raise ValueError('Unable to extrapolate values: invalid ExtrapolationType found.')
 
 	@staticmethod
-	def solveCubic(key0, key1, t):
-		"""Finds the point on a cubic bezier spline at percentage t between two keys.
+	def bezierEvaluation(key0, key1, frame):
+		"""Finds the point on a cubic bezier spline at time frame between two keys.
 		
 		Args:
 		    key0 (Key): Starting key for the spline
 		    key1 (Key): Ending key for the spline
-		    t (float): position along the spline (as a percent) to solve for
+		    t (float): Time (as a frame) to solve for
 		
 		Returns:
 		    Tuple: Tuple of float values for the x (time) and y (value) coordinates of the resulting
 		    		point.
 		"""
-		p0x, p0y = key0.time, key0.value
-		p1x, p1y = key1.time, key1.value
-		cp0x, cp0y = key0.outTangentPoint
-		cp1x, cp1y = key1.inTangentPoint
-
-		# simple version of De Casteljau's algorithm to find point at given position
-		# https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm#Geometric_interpretation
-		# http://stackoverflow.com/a/14205183
-
-		# Get points between points and control points (and between control points) at the percentage
-		# specified by the t value
-		Ax = ((1 - t) * p0x) + (t * cp0x)
-		Ay = ((1 - t) * p0y) + (t * cp0y)
-		Bx = ((1 - t) * cp0x) + (t * cp1x)
-		By = ((1 - t) * cp0y) + (t * cp1y)
-		Cx = ((1 - t) * cp1x) + (t * p1x)
-		Cy = ((1 - t) * cp1y) + (t * p1y)
-		# Get point on linesegments formed by AB and BC at t position
-		Dx = ((1 - t) * Ax) + (t * Bx)
-		Dy = ((1 - t) * Ay) + (t * By)
-		Ex = ((1 - t) * Bx) + (t * Cx)
-		Ey = ((1 - t) * By) + (t * Cy)
-		# The desired point will be at the t position on the linesegment DE
-		Px = ((1 - t) * Dx) + (t * Ex)
-		Py = ((1 - t) * Dy) + (t * Ey)
-		return Px, Py
-
-	@staticmethod
-	def bezierEvaluation(key0, key1, frame):
+		# Implementation by Tyler Fox, modified by Will Cavanagh.
+		# Based on method described at
+		# http://edmund.birotanker.com/monotonic-bezier-curves-for-animation.html
 		p0x, p0y = key0.time, key0.value
 		p1x, p1y = key0.outTangentPoint
 		p2x, p2y = key1.inTangentPoint
 		p3x, p3y = key1.time, key1.value
 
-		f = (p1x - p0x) / (p3x - p0x)
-		g = (p2x - p0x) / (p3x - p0x)
-		xVal = (frame - p0x) / (p3x - p0x)
+		totalXRecip = 1.0 / (p3x - p0x)
+		f = (p1x - p0x) * totalXRecip
+		g = (p3x - p2x)  * totalXRecip
+		xVal = (frame - p0x) * totalXRecip
 
 		d = 3*f + 3*g - 2
 		n = 2*f + g - 1
@@ -492,24 +464,10 @@ class FCurve(object):
 		discriminant = q*q - 4*r*r*r
 
 		if discriminant >= 0:
-			pm = (discriminant**0.5)/2 #plus/minus
-			w3Pos = -q/2 + pm
-			w3Neg = -q/2 - pm
-			# Don't know which to pick ... will have to test
-			wP = 0.0
-			wN = 0.0
-			try:
-				wP = w3Pos**(1/3.0)
-			except ValueError:
-				pass
-			try:
-				wN = w3Neg**(1/3.0)
-			except ValueError:
-				pass
-			if wP != 0:
-				w = wP
-			else:
-				w = wN
+			pm = (discriminant**0.5)/2 #plus/minus portion of equation
+			# We're able to only use the + portion of the +/- and get an accurate
+			# outcome.  Saves steps / logic.
+			w = (-q/2 + pm)**(1/3.0)
 			u = w + r/w
 		else:
 			theta = math.acos(-q / ( 2*r**(3/2.0)) )
@@ -521,4 +479,3 @@ class FCurve(object):
 		outPtX = t1**3*p0x + 3*t1**2*t*p1x + 3*t1*t**2*p2x + t**3*p3x
 		outPtY = t1**3*p0y + 3*t1**2*t*p1y + 3*t1*t**2*p2y + t**3*p3y
 		return outPtX, outPtY
-	
