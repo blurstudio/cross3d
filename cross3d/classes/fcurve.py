@@ -81,7 +81,7 @@ class FCurve(object):
 			# we should have two keys that our time falls between
 			k0 = sortedKeys[i - 1]
 			k1 = sortedKeys[i]
-			return self.bezierEvaluation(k0, k1, time)[1]
+			return self.bezierEvaluation(k0, k1, time)
 
 	def plot(self, startValue=None, endValue=None, resolution=1.0, plotHandles=True):
 		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
@@ -476,6 +476,4 @@ class FCurve(object):
 
 		t = u + n/d
 		t1 = 1-t
-		outPtX = t1**3*p0x + 3*t1**2*t*p1x + 3*t1*t**2*p2x + t**3*p3x
-		outPtY = t1**3*p0y + 3*t1**2*t*p1y + 3*t1*t**2*p2y + t**3*p3y
-		return outPtX, outPtY
+		return (t1**3*p0y + 3*t1**2*t*p1y + 3*t1*t**2*p2y + t**3*p3y)
