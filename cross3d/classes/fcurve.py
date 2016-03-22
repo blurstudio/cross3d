@@ -34,20 +34,12 @@ class Key(object):
 	def inTangentPoint(self):
 		x = self.inTangentLength * math.cos(self.inTangentAngle)
 		y = self.inTangentLength * math.sin(self.inTangentAngle)
-
-		if self.inTangentAngle < 0:
-			y *= -1
-
 		return self.time - x, self.value + y
 
 	@property
 	def outTangentPoint(self):
 		x = self.outTangentLength * math.cos(self.outTangentAngle)
 		y = self.outTangentLength * math.sin(self.outTangentAngle)
-
-		if self.outTangentAngle < 0:
-			y *= -1
-
 		return self.time + x, self.value + y
 
 
@@ -89,10 +81,12 @@ class FCurve(object):
 			# we should have two keys that our time falls between
 			k0 = sortedKeys[i - 1]
 			k1 = sortedKeys[i]
-			t = (time - k0.time) / (k1.time - k0.time)
-			return self.solveCubic(k0, k1, t)[1]
+			return self.bezierEvaluation(k0, k1, time)[1]
+			# t = (time - k0.time) / (k1.time - k0.time)
+			# return self.solveCubic(k0, k1, t)[1]
+			# z "({}, {}), ({}, {}), {}%".format(k0.time, k0.value, k1.time, k1.value, t*100)
 
-	def plot(self, startValue=None, endValue=None, resolution=1.0):
+	def plot(self, startValue=None, endValue=None, resolution=1.0, plotHandles=True):
 		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
 		
 		Args:
@@ -107,6 +101,13 @@ class FCurve(object):
 
 		import numpy as np
 		import matplotlib.pyplot as plt
+		# plot handles, if asked
+		if plotHandles:
+			for key in self._keys:
+				points = zip(key.inTangentPoint, (key.time, key.value), key.outTangentPoint)
+				plt.plot(*points, marker='o', color='blue')
+				plt.plot(*points, color='black')
+		# plot line
 		x = np.arange(startValue, endValue, resolution)
 		f = np.vectorize(self.valueAtTime)
 		plt.plot(x, f(x))
@@ -471,3 +472,53 @@ class FCurve(object):
 		Px = ((1 - t) * Dx) + (t * Ex)
 		Py = ((1 - t) * Dy) + (t * Ey)
 		return Px, Py
+
+	@staticmethod
+	def bezierEvaluation(key0, key1, frame):
+		p0x, p0y = key0.time, key0.value
+		p1x, p1y = key0.outTangentPoint
+		p2x, p2y = key1.inTangentPoint
+		p3x, p3y = key1.time, key1.value
+
+		f = (p1x - p0x) / (p3x - p0x)
+		g = (p2x - p0x) / (p3x - p0x)
+		xVal = (frame - p0x) / (p3x - p0x)
+
+		d = 3*f + 3*g - 2
+		n = 2*f + g - 1
+		r = (n*n - f*d) / (d*d)
+		q = ((3*f*d*n - 2*n*n*n) / (d*d*d)) - xVal/d
+
+		discriminant = q*q - 4*r*r*r
+
+		if discriminant >= 0:
+			pm = (discriminant**0.5)/2 #plus/minus
+			w3Pos = -q/2 + pm
+			w3Neg = -q/2 - pm
+			# Don't know which to pick ... will have to test
+			wP = 0.0
+			wN = 0.0
+			try:
+				wP = w3Pos**(1/3.0)
+			except ValueError:
+				pass
+			try:
+				wN = w3Neg**(1/3.0)
+			except ValueError:
+				pass
+			if wP != 0:
+				w = wP
+			else:
+				w = wN
+			u = w + r/w
+		else:
+			theta = math.acos(-q / ( 2*r**(3/2.0)) )
+			phi = theta/3 + 4*math.pi/3 
+			u = 2 * r**(0.5) * math.cos(phi)
+
+		t = u + n/d
+		t1 = 1-t
+		outPtX = t1**3*p0x + 3*t1**2*t*p1x + 3*t1*t**2*p2x + t**3*p3x
+		outPtY = t1**3*p0y + 3*t1**2*t*p1y + 3*t1*t**2*p2y + t**3*p3y
+		return outPtX, outPtY
+	
