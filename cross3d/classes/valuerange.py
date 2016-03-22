@@ -10,6 +10,7 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
+from blurdev.decorators import pendingdeprecation
 
 class ValueRange(list):
 
@@ -42,8 +43,20 @@ class ValueRange(list):
 			return self[0] == other[0] and self[1] == other[1]
 		return False
 
+	def __mult__(self, other):
+		if isinstance(other, (float, int)):
+			return ValueRange(self[0] * other, self[1] * other)
+		raise ValueError('Unable to multiply a ValueRange by {}.'.format(str(type(other))))
+
 	def __nonzero__(self):
 		return bool(self.duration())
+
+	def round(self):
+		self[0] = round(self[0])
+		self[1] = round(self[1])
+
+	def rounded(self):
+		return ValueRange(round(self[0]), round(self[1]))
 
 	def string(self, separator='-'):
 		"""
@@ -106,8 +119,12 @@ class ValueRange(list):
 		else:
 			None
 
+	@pendingdeprecation('Use multiply operator instead.')
 	def multiply(self, scalar):
-		return ValueRange(self[0] * scalar, self[1] * scalar)
+		return self.__mult__(scalar)
+
+	def multiplied(self, multiplier):
+		return ValueRange(self[0] * multiplier, self[1] * multiplier)
 
 	def merged(self, valueRange):
 		"""

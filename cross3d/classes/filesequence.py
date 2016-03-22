@@ -12,6 +12,7 @@
 
 import os
 import re
+import copy
 import glob
 import shutil
 import blurdev
@@ -152,6 +153,7 @@ class FileSequence(object):
 			nameTokens['extension'] = extension
 		if separator:
 			nameTokens['separator'] = separator
+
 		self._path = os.path.join(self.basePath(), self.nameMask() % nameTokens)
 		return True
 
@@ -251,6 +253,10 @@ class FileSequence(object):
 			# This will return something like "%4d".
 			elif style == PaddingStyle.Percent:
 				return '%{}d'.format(padding)
+
+			# This will return something like "*".
+			elif style == PaddingStyle.Wildcard:
+				return '*'
 
 			# This will return something like "".
 			elif style == PaddingStyle.Blank:
@@ -352,8 +358,8 @@ class FileSequence(object):
 		# Otherwise shutil might cry.
 		output.delete()
 
-		for source, copy in zip(self.paths(), output.paths()):
-			shutil.copy(source, copy)
+		for source, cpy in zip(self.paths(), output.paths()):
+			shutil.copy(source, cpy)
 
 		return True
 
@@ -441,46 +447,44 @@ class FileSequence(object):
 
 		return True
 
-	def retime(self, outputPath, retimeCurve, fps=30, holdOutsideFrame=False):
+	def retime(self, outputPath, retimeCurve):
 		"""Retimes the filesequence using the specified retimeCurve.  Outputs the retimed sequence
 			to the specified location.
 		
 		Args:
 		    outputPath (str): The unique path to output the retimed FileSequence to.
-		    retimeCurve (blur3d.api.FCurve): The curve to evaluate to retime the file sequence.
-		    fps (int, optional): fps that will be used when converting from seconds on the retime
-		    	curve.  If not specified defaults to 30.
-		    holdOutsideFrame (bool, optional): If this is true, frames outside the input range will
-		    	use the nearest frame from the input range.  If False, requested frames outside the
-		    	input sequence will raise an exception.  Defaults to False.
+		    retimeCurve (blur3d.api.FCurve): The curve to evaluate to retime the file sequence
+		   	by mapping frames to frames.
 		
 		Returns:
 		    FileSequence: The newly created FileSequence.
 		"""	
-		start, end = self.start(), self.end()
-		newSequence = FileSequence.fromFileName(outputPath)
-		for frame in xrange(start, end+1, self.step()):
-			sourceFrame = round(retimeCurve.valueAtTime(frame) * fps)
-			if sourceFrame < start:
-				if holdOutsideFrame:
-					sourceFrame = start
-				else:
-					raise ValueError(
-						'Retime curve requires frame outside the source range. '
-						+'(Requested {}, range is {}-{}.)'.format(sourceFrame, start, end)
-					)
-			elif sourceFrame > end:
-				if holdOutsideFrame:
-					sourceFrame = end
-				else:
-					raise ValueError(
-						'Retime curve requires frame outside the source range. '
-						+'(Requested {}, range is {}-{}.)'.format(sourceFrame, start, end)
-					)
+		# We cannot initialize a FileSequence with a unique path.
+		retimedSequence = FileSequence('{}.0-0{}'.format(*os.path.splitext(outputPath)))
+
+		# We'll prescan the input range to find the bounds of our target output
+		start = None
+		end = None
+
+		invertedCurve = copy.deepcopy(retimeCurve)
+		invertedCurve.invert()
+		for frame in xrange(self.start(), self.end() + 1, self.step()):
+			targetFrame = int(round(invertedCurve.valueAtTime(frame)))
+			start = targetFrame if start is None else min(targetFrame, start)
+			end = targetFrame if end is None else max(targetFrame, end)
+		
+		# We'll invert the curve so we can lookup in the opposite direction, and
+		# find the source frames for our target range.
+		for frame in xrange(start, end + 1):
+			sourceFrame = int(round(retimeCurve.valueAtTime(frame)))
 			sourceName = self.codePath() % sourceFrame
-			targetName = newSequence.codePath() % frame
-			shutil.copy2(sourceName, targetName)
-			return newSequence
+			name = retimedSequence.codePath() % frame
+			print '{} > {}'.format(frame, sourceFrame)
+			shutil.copy2(sourceName, name)
+
+		# Update start/end of returned Sequence
+		retimedSequence.setRange((start, end))
+		return retimedSequence
 
 	def link(self, output):
 		if self.isComplete():
