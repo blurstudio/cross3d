@@ -317,6 +317,13 @@ class FileSequence(object):
 			return True
 		return False
 
+	def existingPaths(self):
+		existingPaths = []
+		for path in self.paths():
+			if os.path.exists(path):
+				existingPaths.append(path)
+		return existingPaths
+		
 	def paths(self):
 		paths = []
 		for frame in range(self.start(), self.end() + 1, self._step):
