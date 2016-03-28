@@ -375,10 +375,14 @@ class FileSequence(object):
 			if self.count() == output.count():
 				inputExtension = self.extension()
 				outputExtension = output.extension()
+				from PyQt4.QtCore import Qt, QSize
 				from PyQt4.QtGui import QImage
 				if inputExtension.lower() == 'exr' and outputExtension.lower() == 'jpg':
 					for i, o in zip(self.paths(), output.paths()):
-						QImage(i, 'exr_nogamma').save(o)
+						image = QImage(i, 'exr_nogamma')
+						if max(image.size().height(), image.size().width()) > 2048:
+							image = image.scaled(QSize(2048, 2048), aspectRatioMode=Qt.KeepAspectRatio)
+						image.save(o)
 					return True
 				else:
 					raise Exception('FileSequence.convert does not supports %s to %s' % (inputExtension, outputExtension))
