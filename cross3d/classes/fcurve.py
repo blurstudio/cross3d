@@ -386,15 +386,28 @@ class FCurve(object):
 			dtx = time - t1
 		if mode == ExtrapolationType.Linear:
 			v = sortedKeys[0].value if before else sortedKeys[-1].value
-			# get the angle of the opposite tangent (max doesn't store tangents)
-			# for the outer side in this case.
-			theta = sortedKeys[0].outTangentAngle if before else sortedKeys[-1].inTangentAngle
-			# Now get the inverse angle, since we want to move on the opposite vector
-			theta = math.pi - theta
-			# delta from the range to our unknown is our triangle's base,
-			# theta is the angle, and our y value is the side.
-			# Solve for y, and then offset by the value of the last keyframe.
-			return dtx * math.tan(theta) + v
+			tangentLength = sortedKeys[0].outTangentLength if before else sortedKeys[-1].inTangentLength
+			if tangentLength:
+				# get the angle of the opposite tangent (max doesn't store tangents)
+				# for the outer side in this case.
+				theta = sortedKeys[0].outTangentAngle if before else sortedKeys[-1].inTangentAngle
+				# Now get the inverse angle, since we want to move on the opposite vector
+				theta = math.pi - theta
+				# delta from the range to our unknown is our triangle's base,
+				# theta is the angle, and our y value is the side.
+				# Solve for y, and then offset by the value of the last keyframe.
+				return dtx * math.tan(theta) + v
+			else:
+				if len(sortedKeys) == 1:
+					return sortedKeys[0].value
+				if before:
+					x = sortedKeys[1].time - sortedKeys[0].time
+					y = sortedKeys[0].value - sortedKeys[1].value
+				else:
+					x = sortedKeys[-2].time - sortedKeys[-1].time
+					y = sortedKeys[-1].value - sortedKeys[-2].value
+				return y / x * dtx + sortedKeys[0 if before else -1].value
+
 		elif mode == ExtrapolationType.Cycled:
 			# We're just looping through the existing timeline now, so we can modulus the delta of
 			# sample position with the delta of the start/end keyframe times
