@@ -479,18 +479,18 @@ class FileSequence(object):
 
 		invertedCurve = copy.deepcopy(retimeCurve)
 		invertedCurve.invert()
+
 		for frame in xrange(self.start(), self.end() + 1, self.step()):
 			targetFrame = int(round(invertedCurve.valueAtTime(frame)))
 			start = targetFrame if start is None else min(targetFrame, start)
 			end = targetFrame if end is None else max(targetFrame, end)
-		
+
 		# We'll invert the curve so we can lookup in the opposite direction, and
 		# find the source frames for our target range.
 		for frame in xrange(start, end + 1):
 			sourceFrame = int(round(retimeCurve.valueAtTime(frame)))
 			sourceName = self.codePath() % sourceFrame
 			name = retimedSequence.codePath() % frame
-			print '{} > {}'.format(frame, sourceFrame)
 			shutil.copy2(sourceName, name)
 
 		# Update start/end of returned Sequence

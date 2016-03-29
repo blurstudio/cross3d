@@ -403,10 +403,12 @@ class FCurve(object):
 				if before:
 					x = sortedKeys[1].time - sortedKeys[0].time
 					y = sortedKeys[0].value - sortedKeys[1].value
+					offset = sortedKeys[0].value
 				else:
-					x = sortedKeys[-2].time - sortedKeys[-1].time
+					x = sortedKeys[-1].time - sortedKeys[-2].time
 					y = sortedKeys[-1].value - sortedKeys[-2].value
-				return y / x * dtx + sortedKeys[0 if before else -1].value
+					offset = sortedKeys[-1].value
+				return (y / x) * dtx + offset
 
 		elif mode == ExtrapolationType.Cycled:
 			# We're just looping through the existing timeline now, so we can modulus the delta of
