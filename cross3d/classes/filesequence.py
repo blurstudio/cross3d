@@ -489,7 +489,7 @@ class FileSequence(object):
 		# find the source frames for our target range.
 		for frame in xrange(start, end + 1):
 			sourceFrame = int(round(retimeCurve.valueAtTime(frame)))
-			sourceName = self.codePath() % sourceFrame
+			sourceName = self.codePath() % min(self.end(), max(self.start(), sourceFrame)) 
 			name = retimedSequence.codePath() % frame
 			shutil.copy2(sourceName, name)
 
