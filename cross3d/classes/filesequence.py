@@ -17,6 +17,7 @@ import glob
 import shutil
 import blurdev
 import subprocess
+import warnings
 
 from framerange import FrameRange
 from blur3d.constants import VideoCodec
@@ -375,14 +376,10 @@ class FileSequence(object):
 			if self.count() == output.count():
 				inputExtension = self.extension()
 				outputExtension = output.extension()
-				from PyQt4.QtCore import Qt, QSize
 				from PyQt4.QtGui import QImage
 				if inputExtension.lower() == 'exr' and outputExtension.lower() == 'jpg':
 					for i, o in zip(self.paths(), output.paths()):
-						image = QImage(i, 'exr_nogamma')
-						if max(image.size().height(), image.size().width()) > 2048:
-							image = image.scaled(QSize(2048, 2048), aspectRatioMode=Qt.KeepAspectRatio)
-						image.save(o)
+						QImage(i, 'exr_nogamma').save(o)
 					return True
 				else:
 					raise Exception('FileSequence.convert does not supports %s to %s' % (inputExtension, outputExtension))
@@ -437,6 +434,9 @@ class FileSequence(object):
 			command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath()]
 			if os.path.exists(audioPath):
 				command += ['-i', audioPath, '-c:a', 'libvo_aacenc', '-b:a', '192k']
+			# Resize the input if it is larger than 2k in either dimension. ffmpeg does not support 
+			# larger resolutions. In my testing you can go up to 4000 for maxSize
+			command += ["-vf", "scale=w='if(eq(min(iw,ih),iw),-1,min(iw,{maxSize}))':h='if(eq(min(iw,ih),ih),-1,min(ih,{maxSize}))'".format(maxSize=2048)]
 			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', outputPath]
 
 		# TODO: GIF Implementation is a bit wonky right now.
@@ -450,13 +450,30 @@ class FileSequence(object):
 		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
 			print 'SEQUENCE TO MOVIE COMMAND: {}'.format(' '.join(command))
 
-		process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
-		process.communicate()
+		success = True
+		try:
+			output = subprocess.check_output(
+				' '.join(command),
+				shell=True,
+				stderr=subprocess.STDOUT,
+				stdin=subprocess.PIPE
+			)
+			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+				# Show the output from ffmpeg
+				print output
+		except subprocess.CalledProcessError as e:
+			success = False
+			program = os.path.splitext(os.path.basename(ffmpeg))[0]
+			warnings.warn(
+				"{} failed.\nCommand '{}' return with error (code {}): {}".format(
+					program, e.cmd, e.returncode, e.output
+				)
+			)
 
 		if blurdev.debug.debugLevel() < blurdev.debug.DebugLevel.Mid:
 			normalisedSequence.delete()
 
-		return True
+		return success
 
 	def retime(self, outputPath, retimeCurve):
 		"""Retimes the filesequence using the specified retimeCurve.  Outputs the retimed sequence
