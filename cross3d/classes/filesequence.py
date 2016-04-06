@@ -431,17 +431,17 @@ class FileSequence(object):
 			os.makedirs(outputBasePath)
 
 		if videoCodec == VideoCodec.PhotoJPEG:
-			command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath()]
+			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.codePath())]
 			if os.path.exists(audioPath):
-				command += ['-i', audioPath, '-c:a', 'libvo_aacenc', '-b:a', '192k']
+				command += ['-i', '"{}"'.format(audioPath), '-c:a', 'libvo_aacenc', '-b:a', '192k']
 			# Resize the input if it is larger than 2k in either dimension. ffmpeg does not support 
 			# larger resolutions. In my testing you can go up to 4000 for maxSize
 			command += ["-vf", "scale=w='if(eq(min(iw,ih),iw),-1,min(iw,{maxSize}))':h='if(eq(min(iw,ih),ih),-1,min(ih,{maxSize}))'".format(maxSize=2048)]
-			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', outputPath]
+			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', '"{}"'.format(outputPath)]
 
 		# TODO: GIF Implementation is a bit wonky right now.
 		elif videoCodec == VideoCodec.GIF:
-			command = [ffmpeg, '-r', str(fps), "-i", normalisedSequence.codePath(), '-pix_fmt', 'rgb24', '-y', outputPath.replace('.mov', '.gif')]
+			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.codePath()), '-pix_fmt', 'rgb24', '-y', '"{}"'.format(outputPath.replace('.mov', '.gif'))]
 
 		# TODO: Implement H264.
 		elif videoCodec == VideoCodec.H264:
