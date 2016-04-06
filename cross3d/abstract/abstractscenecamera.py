@@ -379,6 +379,27 @@ class AbstractSceneCamera(SceneObject):
 		return False
 
 	@abstractmethod
+	def motionBlur(self):
+		""" Returns wheter or not this camera is enabling motion blur at render time.
+		
+		Returns:
+			bool: Whether the camera renders motion blur.
+		"""
+		return False
+
+	@abstractmethod
+	def setMotionBlur(self, motionBlur):
+		""" Sets wheter or not this camera is enabling motion blur at render time.
+		
+		Args:
+			motionBlur (bool): Whether the camera renders motion blur.
+		
+		Returns:
+			True: Whether or not motion blur was set.
+		"""
+		return False
+
+	@abstractmethod
 	def farClippingPlane(self):
 		"""
 			Gets the camera's far clipping plane distance.

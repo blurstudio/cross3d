@@ -407,6 +407,36 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
     def bladesEnabled(self):
         return self._nativePointer.use_blades if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera else False
 
+    def motionBlur(self):
+        """ Returns wheter or not this camera is enabling motion blur at render time.
+        
+        Returns:
+            bool: Whether the camera renders motion blur.
+        """
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            return self._nativePointer.use_moBlur
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            return self._nativePointer.motion_blur_enabled
+        else:
+            return False
+
+    def setMotionBlur(self, motionBlur):
+        """ Sets wheter or not this camera is enabling motion blur at render time.
+        
+        Args:
+            motionBlur (bool): Whether the camera renders motion blur.
+        
+        Returns:
+            True: Whether or not motion blur was set.
+        """
+        if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
+            self._nativePointer.use_moBlur = motionBlur
+            return True
+        elif mxs.classOf(self._nativePointer) == mxs.Physical:
+            self._nativePointer.motion_blur_enabled = motionBlur
+            return True
+        return False
+
     def setBladesEnabled(self, bladesEnabled):
         if mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera:
             self._nativePointer.use_blades = bladesEnabled
