@@ -842,7 +842,7 @@ class AbstractScene(QObject):
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
 
-	def applyTimeController(self, controller, cachesFrameRate=None, include='', exclude='', bake=False):
+	def applyTimeController(self, controller, cachesFrameRate=None, include='', exclude='', bake=False, rnd=0.0):
 		""" Applies a controller to all the time controller found in the scene.
 
 		The expected controller should express time in seconds and will be applied as is to alembic modifiers/controllers.
@@ -856,6 +856,7 @@ class AbstractScene(QObject):
 			include(str): All the objects which name can be found by that regex will be included.
 			exclude(str): All the objects which name can be found byt that regex will be excluded.
 			bake(bool): If true the PC, TMC, XMesh and RayFireCache stuff will be baked to a curve instead of referencing the curve that drives alembic.
+			rnd(float):
 
 		Return:
 			boolean: Wherther or not retime was applied with success.
@@ -869,10 +870,10 @@ class AbstractScene(QObject):
 		elif not isinstance(controller, api.SceneAnimationController):
 			raise Exception('Argument 1 should be an instance of SceneAnimationController or FCurve.')
 
-		return self._applyNativeTimeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude, bake=bake)
+		return self._applyNativeTimeController(controller.nativePointer(), cachesFrameRate=cachesFrameRate, include=include, exclude=exclude, bake=bake, rnd=rnd)
 
 	@abstractmethod
-	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False):
+	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False, rnd=0.0):
 		return False
 
 	@abstractmethod
