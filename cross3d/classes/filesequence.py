@@ -97,12 +97,21 @@ class FileSequence(object):
 				print 'MOVIE TO SEQUENCE COMMAND: {}'.format(command)
 
 			# Raises subprocess.CalledProcessError if ffmpeg errors out.
-			ffmpegOutput = subprocess.check_output(
-				command,
-				shell=shell,
-				stderr=subprocess.STDOUT,
-				stdin=subprocess.PIPE
-			)
+			try:
+				ffmpegOutput = subprocess.check_output(
+					command,
+					shell=shell,
+					stderr=subprocess.STDOUT,
+					stdin=subprocess.PIPE
+				)
+			except subprocess.CalledProcessError as e:
+				# Provide a debuggable exception instead of just returned non-zero exit status exception message
+				program = os.path.splitext(os.path.basename(ffmpeg))[0]
+				raise RuntimeError(
+					"{} failed.\nCommand '{}' return with error (code {}): {}".format(
+						program, e.cmd, e.returncode, e.output
+					)
+				)
 			
 			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
 				print 'FFMPEG OUTPUT', '-'*50
