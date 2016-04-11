@@ -332,7 +332,7 @@ global blur3dhelper
 		),
 		function setMixerMode rigObj value = (
 			rigObj.controller.mixermode = value
-		), 
+		),
 
 		function findSceneState shotName = (
 			sceneStateMgr.findscenestate shotName
@@ -520,6 +520,11 @@ global blur3dhelper
 		),
 		function convertToTime value = (
 			return value as time
+		),
+		function setMinZPivot obj = (
+			obj.pivot.x = obj.center.x
+			obj.pivot.y = obj.center.y
+			obj.pivot.z = obj.min.z
 		)
 	)
 
