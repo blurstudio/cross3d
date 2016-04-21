@@ -462,7 +462,7 @@ class FileSequence(object):
 		success = True
 		try:
 			output = subprocess.check_output(
-				command,
+				' '.join(command),
 				shell=True,
 				stderr=subprocess.STDOUT,
 				stdin=subprocess.PIPE
