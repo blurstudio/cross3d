@@ -1573,6 +1573,8 @@ class StudiomaxScene(AbstractScene):
 			# Adding name space to objects.
 			for name in objectNames:
 				obj = self._findNativeObject(name)
+				if not obj:
+					continue
 				if not model and name == 'Model':
 					model = obj
 					model.name = modelName
