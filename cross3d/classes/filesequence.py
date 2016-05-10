@@ -446,7 +446,9 @@ class FileSequence(object):
 			# Resize the input if it is larger than 2k in either dimension. ffmpeg does not support 
 			# larger resolutions. In my testing you can go up to 4000 for maxSize
 			command += ["-vf", "scale=w='if(eq(min(iw,ih),iw),-1,min(iw,{maxSize}))':h='if(eq(min(iw,ih),ih),-1,min(ih,{maxSize}))'".format(maxSize=2048)]
-			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', '"{}"'.format(outputPath)]
+			# Added the '-vframes' flag to limit how long the quicktime should be. -vframes takes in an argument which is the total number of frrames
+			# the video file will be. I am setting this value to the filesequence's count.
+			command += ['-c:v', 'mjpeg', '-qscale', '1', '-y', '-vframes' , str(self.count()), '"{}"'.format(outputPath)]
 
 		# TODO: GIF Implementation is a bit wonky right now.
 		elif videoCodec == VideoCodec.GIF:
