@@ -33,17 +33,21 @@ from mxscustattribdef import MXSCustAttribDef
 
 #-----------------------------------------------------------------------------
 
+
 class EnvironmentMapHolder(MXSCustAttribDef):
+
 	@classmethod
 	def define(cls):
 		cls.setAttrName('OnionMapHolder')
-		cls.defineParam('environmentMap', 		'textureMap', 	paramId='eMap')
+		cls.defineParam('environmentMap', 'textureMap', paramId='eMap')
 
 EnvironmentMapHolder.register()
 
 #-----------------------------------------------------------------------------
 
+
 class EnvironmentMapsHolder(MXSCustAttribDef):
+
 	def init(self):
 		MXSCustAttribDef.init(self)
 		self.setValue('environmentMaps', [])
@@ -51,14 +55,16 @@ class EnvironmentMapsHolder(MXSCustAttribDef):
 	@classmethod
 	def define(cls):
 		cls.setAttrName('OnionAltMapsHolder')
-		cls.defineParam('environmentMaps', 		'textureMapTab', 	paramId='aMps')
-		cls.defineParam('currentIndex', 		'integer', 			paramId='mi')
+		cls.defineParam('environmentMaps', 'textureMapTab', paramId='aMps')
+		cls.defineParam('currentIndex', 'integer', paramId='mi')
 
 EnvironmentMapsHolder.register()
 
 #-----------------------------------------------------------------------------
 
+
 class CustomProperties(MXSCustAttribDef):
+
 	def init(self):
 		MXSCustAttribDef.init(self)
 		self.setValue('keys', [])
@@ -74,15 +80,16 @@ CustomProperties.register()
 
 #-----------------------------------------------------------------------------
 
+
 class SceneMetaData(MXSCustAttribDef):
-	version 	 = 1.63
+	version = 1.63
 
 	def __init__(self, mxsInstance):
 		MXSCustAttribDef.__init__(self, mxsInstance)
 
-		self._mapsHolder 		 = None
-		self._mapHolder 		 = None
-		self._custProperties 	 = None
+		self._mapsHolder = None
+		self._mapHolder = None
+		self._custProperties = None
 
 	def customProperties(self):
 		# pull the custom properties value
@@ -121,29 +128,30 @@ class SceneMetaData(MXSCustAttribDef):
 		MXSCustAttribDef.init(self)
 
 		self.setValue('version', SceneMetaData.version)
-		self.setValue('layerGroupNames', [ 'Main' ])
-		self.setValue('layerGroupStates', [ True ])
+		self.setValue('layerGroupNames', ['Main'])
+		self.setValue('layerGroupStates', [True])
 
 	@classmethod
 	def define(cls):
 		cls.setAttrName('OnionData')
 
 		# define overall parameters
-		cls.defineParam('version', 				'float', 		paramId='v')
+		cls.defineParam('version', 'float', paramId='v')
 
 		# define layer groups
-		cls.defineParam('layerGroupNames', 		'stringTab', 	paramId='gn')
-		cls.defineParam('layerGroupStates', 		'boolTab', 		paramId='go')
+		cls.defineParam('layerGroupNames', 'stringTab', paramId='gn')
+		cls.defineParam('layerGroupStates', 'boolTab', paramId='go')
 
 		# define the scene material override list
-		cls.defineParam('materialLibraryList', 		'materialTab', 	paramId='mtl')
+		cls.defineParam('materialLibraryList', 'materialTab', paramId='mtl')
 
 		# define the material cache
-		cls.defineParam('baseMaterialCache', 		'materialTab', 	paramId='ms')
+		cls.defineParam('baseMaterialCache', 'materialTab', paramId='ms')
 
 SceneMetaData.register()
 
 #------------------------------------------------------------------------------------------------------------------------
+
 
 class StudiomaxScene(AbstractScene):
 
@@ -157,8 +165,8 @@ class StudiomaxScene(AbstractScene):
 		AbstractScene.__init__(self)
 
 		# create custom properties
-		self._metaData 			 = None
-		self._mapCache			 = None
+		self._metaData = None
+		self._mapCache = None
 		self._connectDefined = False
 
 	#------------------------------------------------------------------------------------------------------------------------
@@ -176,8 +184,8 @@ class StudiomaxScene(AbstractScene):
 
 		# cache alternate materials
 		if (cacheType == MaterialCacheType.BaseMaterial):
-			data 	 = self.metaData()
-			cache 	 = list(data.value('baseMaterialCache', []))
+			data = self.metaData()
+			cache = list(data.value('baseMaterialCache', []))
 
 			# record the scene data
 			if (nativeMaterial and not nativeMaterial in cache):
@@ -195,8 +203,8 @@ class StudiomaxScene(AbstractScene):
 			\param		default			<variant>	value to return if the id was not found
 			\return		<Py3dsMax.mxs.Material> nativeMaterial
 		"""
-		unique_id 	 = mxs.blurUtil.uniqueId
-		cache 		 = self._cachedNativeMaterials(cacheType)
+		unique_id = mxs.blurUtil.uniqueId
+		cache = self._cachedNativeMaterials(cacheType)
 
 		for mtl in cache:
 			if (mtl == None):
@@ -238,8 +246,8 @@ class StudiomaxScene(AbstractScene):
 
 		# return alternate environment map caches
 		if (cacheType == MapCacheType.EnvironmentMap):
-			data 	 = self.metaData().environmentMapsCache()
-			maps	 = list(data.value('environmentMaps'))
+			data = self.metaData().environmentMapsCache()
+			maps = list(data.value('environmentMaps'))
 			maps.append(nativeMap)
 			data.setValue('environmentMaps', maps)
 
@@ -253,8 +261,8 @@ class StudiomaxScene(AbstractScene):
 			\param		default			<variant>	value to return if the id was not found
 			\return		<Py3dsMax.mxs.TextureMap> nativeMap
 		"""
-		unique_id 	 = mxs.blurUtil.uniqueId
-		cache 		 = self._cachedNativeMaps(cacheType)
+		unique_id = mxs.blurUtil.uniqueId
+		cache = self._cachedNativeMaps(cacheType)
 
 		for nativeMap in cache:
 			if (nativeMap == None):
@@ -288,16 +296,16 @@ class StudiomaxScene(AbstractScene):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blur3d.constants 			import MaterialCacheType
-		from blur3d.api.studiomax 	import StudiomaxAppData
+		from blur3d.constants import MaterialCacheType
+		from blur3d.api.studiomax import StudiomaxAppData
 
 		# store the methods we're going to use
-		get_userprop 	 = mxs.getUserProp
-		set_userprop	 = mxs.setUserProp
-		get_appdata		 = mxs.getAppData
-		del_appdata		 = mxs.deleteAppData
-		superclassof	 = mxs.superClassOf
-		geoclass		 = mxs.GeometryClass
+		get_userprop = mxs.getUserProp
+		set_userprop = mxs.setUserProp
+		get_appdata = mxs.getAppData
+		del_appdata = mxs.deleteAppData
+		superclassof = mxs.superClassOf
+		geoclass = mxs.GeometryClass
 
 		for obj in nativeObjects:
 			# ignore non-geometric objects
@@ -332,14 +340,14 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		# store the methods we're going to use
-		from blur3d.api 			import SceneObjectPropSet
-		from blur3d.api.studiomax 	import StudiomaxAppData
+		from blur3d.api import SceneObjectPropSet
+		from blur3d.api.studiomax import StudiomaxAppData
 
-		get_appdata		 = mxs.getAppData
-		del_appdata		 = mxs.deleteAppData
-		get_userprop 	 = mxs.getUserProp
-		set_userprop	 = mxs.setUserProp
-		altpropindex	 = StudiomaxAppData.AltPropIndex
+		get_appdata = mxs.getAppData
+		del_appdata = mxs.deleteAppData
+		get_userprop = mxs.getUserProp
+		set_userprop = mxs.setUserProp
+		altpropindex = StudiomaxAppData.AltPropIndex
 
 		for obj in nativeObjects:
 			# restore base properties
@@ -397,8 +405,8 @@ class StudiomaxScene(AbstractScene):
 			\param		name			<str>
 			\return		<str> nativeLayerGroup || None
 		"""
-		names 	 = list(self.metaData().value('layerGroupNames'))
-		states 	 = list(self.metaData().value('layerGroupStates'))
+		names = list(self.metaData().value('layerGroupNames'))
+		states = list(self.metaData().value('layerGroupStates'))
 		if (not name in names):
 			names.append(str(name))
 			states.append(True)
@@ -499,8 +507,8 @@ class StudiomaxScene(AbstractScene):
 			\param		name	<str>
 			\return		<Py3dsMax.mxs.Object> nativeObject || None
 		"""
-		name 	 = str(name)
-		output 		 = None
+		name = str(name)
+		output = None
 		if (name):
 			output = mxs.getNodeByName(str(name))
 
@@ -535,8 +543,8 @@ class StudiomaxScene(AbstractScene):
 			\param		name	<str>
 			\return		<str> nativeLayerGroup || None
 		"""
-		names 		 = list(self.metaData().value('layerGroupNames'))
-		name 	 = str(name)
+		names = list(self.metaData().value('layerGroupNames'))
+		name = str(name)
 		if (name in names):
 			return name
 		return None
@@ -548,7 +556,7 @@ class StudiomaxScene(AbstractScene):
 			\param		materialName	<str>
 			\return		<Py3dsMax.mxs.Material> nativeMaterial || None
 		"""
-		materialName 	 = str(materialName)
+		materialName = str(materialName)
 		if (not (materialName or materialId)):
 			return None
 
@@ -568,7 +576,7 @@ class StudiomaxScene(AbstractScene):
 			\param		name	<str>
 			\return		<Py3dsMax.mxs.Map> nativeMap || None
 		"""
-		name 	 = str(name)
+		name = str(name)
 
 		if (not (name or uniqueId)):
 			return None
@@ -618,7 +626,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<variant>
 		"""
 		classof = mxs.classof
-		cls		 = classof(nativeValue)
+		cls = classof(nativeValue)
 
 		# return the value as a QColor
 		if (cls == mxs.Color):
@@ -668,10 +676,10 @@ class StudiomaxScene(AbstractScene):
 		from PyQt4.QtGui import QFileDialog
 		filename = QFileDialog.getOpenFileName(None, 'Load Material Library', '', 'Material Library files (*.mat)')
 		if (filename):
-			is_kindof	 = mxs.isKindOf
-			TextureMap	 = mxs.TextureMap
-			mlib 		 = mxs.loadTempMaterialLibrary(str(filename))
-			output 		 = [ mtl for mtl in mlib if not is_kindof(mtl, TextureMap) ]
+			is_kindof = mxs.isKindOf
+			TextureMap = mxs.TextureMap
+			mlib = mxs.loadTempMaterialLibrary(str(filename))
+			output = [mtl for mtl in mlib if not is_kindof(mtl, TextureMap)]
 
 			# clear the material library - this is a memory intensive section
 			del mlib
@@ -708,9 +716,9 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeAtmospherics method to return a list of the atmospheric instances in this scene
 			\return		<list> [ <Py3dsMax.mxs.Atmospheric> nativeAtmospheric, .. ]
 		"""
-		get_atmos 	 = mxs.getAtmospheric
-		get_effect 	 = mxs.getEffect
-		return [ get_atmos(i + 1) for i in range(mxs.numAtmospherics) ] + [ get_effect(i + 1) for i in range(mxs.numEffects) ]
+		get_atmos = mxs.getAtmospheric
+		get_effect = mxs.getEffect
+		return [get_atmos(i + 1) for i in range(mxs.numAtmospherics)] + [get_effect(i + 1) for i in range(mxs.numEffects)]
 
 	@pendingdeprecation
 	def _nativeCameras(self):
@@ -718,9 +726,9 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeCameras method to return a list of the camera instances in this scene
 			\return		<list> [ <Py3dsMax.mxs.Camera> nativeCamera, .. ]
 		"""
-		is_kindof 	 = mxs.isKindOf
-		Camera		 = mxs.Camera
-		return [ cam for cam in mxs.cameras if is_kindof(cam, Camera) ]
+		is_kindof = mxs.isKindOf
+		Camera = mxs.Camera
+		return [cam for cam in mxs.cameras if is_kindof(cam, Camera)]
 
 	def _nativeCustomProperty(self, key, default=None):
 		"""
@@ -729,11 +737,11 @@ class StudiomaxScene(AbstractScene):
 			\param		default	<variant>
 			\return		<variant>
 		"""
-		key		 = str(key)
-		props 	 = self.metaData().customProperties()
-		keys	 = list(props.value('keys'))
+		key = str(key)
+		props = self.metaData().customProperties()
+		keys = list(props.value('keys'))
 		if (key in keys):
-			values	 = list(props.value('values'))
+			values = list(props.value('values'))
 			return values[keys.index(key)]
 		return default
 
@@ -787,10 +795,10 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeLayers method to return a list of the native layers in this scene
 			\return		<list> [ <Py3dsMax.mxs.Layer> nativeLayer, .. ]
 		"""
-		layerManager 	 = mxs.layerManager
-		count 			 = layerManager.count
-		getLayer 		 = layerManager.getLayer
-		layers = [ getLayer(i) for i in range(count) ]
+		layerManager = mxs.layerManager
+		count = layerManager.count
+		getLayer = layerManager.getLayer
+		layers = [getLayer(i) for i in range(count)]
 
 		if wildcard:
 
@@ -826,7 +834,7 @@ class StudiomaxScene(AbstractScene):
 		#output			= []
 
 		# collect all the materials
-		#for mclass in mclasses:
+		# for mclass in mclasses:
 		#	output += get_instances(mclass)
 		output = list(mxs.sceneMaterials)
 
@@ -852,8 +860,8 @@ class StudiomaxScene(AbstractScene):
 		return output
 
 	def _nativeMaps(self):
-		get_instances	 = mxs.getClassInstances
-		output			 = get_instances(mxs.BitmapTexture)
+		get_instances = mxs.getClassInstances
+		output = get_instances(mxs.BitmapTexture)
 
 		# include material list
 		mlist = list(self.metaData().environmentMapsCache().value('environmentMaps'))
@@ -868,7 +876,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			\return		<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 		"""
-		
+
 		# TODO: Needs to be severely optimzed. Using "nativeType = SceneObject._abstractToNativeObjectType.get(type)".
 
 		if getsFromSelection:
@@ -956,8 +964,8 @@ class StudiomaxScene(AbstractScene):
 			for i, obj in enumerate(nativeObjects):
 				n = obj.name
 				if ('.' in n):
-					splt 			 = n.split('.')
-					splt[-1] 		 = names[i]
+					splt = n.split('.')
+					splt[-1] = names[i]
 					names[i] = '.'.join(splt)
 
 		# set the names
@@ -1017,11 +1025,11 @@ class StudiomaxScene(AbstractScene):
 			\param		value	<variant>
 			\return		<bool> success
 		"""
-		key		 = str(key)
-		value	 = str(value)
-		props 	 = self.metaData().customProperties()
-		keys	 = list(props.value('keys'))
-		values	 = list(props.value('values'))
+		key = str(key)
+		value = str(value)
+		props = self.metaData().customProperties()
+		keys = list(props.value('keys'))
+		values = list(props.value('values'))
 
 		# replace an existing property
 		if (key in keys):
@@ -1032,8 +1040,8 @@ class StudiomaxScene(AbstractScene):
 			keys.append(key)
 			values.append(value)
 
-		props.setValue('keys', 	keys)
-		props.setValue('values', 	values)
+		props.setValue('keys', keys)
+		props.setValue('values', values)
 
 		return True
 
@@ -1052,8 +1060,8 @@ class StudiomaxScene(AbstractScene):
 			\param		nativeMap 	<Py3dsMax.mxs.TextureMap> || None
 			\return		<bool> success
 		"""
-		data 		 = self.metaData().environmentMapsCache()
-		basedata 	 = self.metaData().environmentMapCache()
+		data = self.metaData().environmentMapsCache()
+		basedata = self.metaData().environmentMapCache()
 
 		# if we are going into an override state
 		if (nativeMap):
@@ -1086,19 +1094,19 @@ class StudiomaxScene(AbstractScene):
 			\param		nativePropSet	<blur3d.api.SceneObjectPropSet>
 			\return		<bool> success
 		"""
-		from blur3d.api 			import SceneObjectPropSet
-		from blur3d.api.studiomax 	import StudiomaxAppData
+		from blur3d.api import SceneObjectPropSet
+		from blur3d.api.studiomax import StudiomaxAppData
 
-		get_appdata		 = mxs.getAppData
-		del_appdata		 = mxs.deleteAppData
-		set_appdata		 = mxs.setAppData
-		get_prop		 = mxs.getProperty
-		set_prop		 = mxs.setProperty
-		get_userprop 	 = mxs.getUserProp
-		set_userprop	 = mxs.setUserProp
-		altpropindex	 = StudiomaxAppData.AltPropIndex
-		empty 			 = not nativePropSet.isActive()
-		values 			 = [ (key, nativePropSet.value(key), nativePropSet.isCustomProperty(key)) for key in nativePropSet.activeProperties() ]
+		get_appdata = mxs.getAppData
+		del_appdata = mxs.deleteAppData
+		set_appdata = mxs.setAppData
+		get_prop = mxs.getProperty
+		set_prop = mxs.setProperty
+		get_userprop = mxs.getUserProp
+		set_userprop = mxs.setUserProp
+		altpropindex = StudiomaxAppData.AltPropIndex
+		empty = not nativePropSet.isActive()
+		values = [(key, nativePropSet.value(key), nativePropSet.isCustomProperty(key)) for key in nativePropSet.activeProperties()]
 
 		for obj in nativeObjects:
 			# restore base properties
@@ -1172,23 +1180,23 @@ class StudiomaxScene(AbstractScene):
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
-		from blur3d.constants 		import MaterialOverrideOptions, MaterialCacheType
-		from blur3d.api.studiomax	import matlib
-		from blur3d.api.studiomax 	import StudiomaxAppData
+		from blur3d.constants import MaterialOverrideOptions, MaterialCacheType
+		from blur3d.api.studiomax import matlib
+		from blur3d.api.studiomax import StudiomaxAppData
 
 		# use the advanced state for the override system
 		if (advancedState == None):
 			advancedState = {}
 
 		# store the methods we're going to use
-		get_userprop 	 = mxs.getUserProp
-		set_userprop	 = mxs.setUserProp
-		get_appdata		 = mxs.getAppData
-		set_appdata		 = mxs.setAppData
-		superclassof	 = mxs.superClassOf
-		geoclass		 = mxs.GeometryClass
-		unique_id		 = mxs.blurUtil.uniqueId
-		processed		 = {}
+		get_userprop = mxs.getUserProp
+		set_userprop = mxs.setUserProp
+		get_appdata = mxs.getAppData
+		set_appdata = mxs.setAppData
+		superclassof = mxs.superClassOf
+		geoclass = mxs.GeometryClass
+		unique_id = mxs.blurUtil.uniqueId
+		processed = {}
 
 		for obj in nativeObjects:
 			# ignore non-geometric objects
@@ -1217,10 +1225,10 @@ class StudiomaxScene(AbstractScene):
 
 			# otherwise restore the base material
 			else:
-				baseMaterial 	 = self._cachedNativeMaterial(MaterialCacheType.BaseMaterial, mid)
+				baseMaterial = self._cachedNativeMaterial(MaterialCacheType.BaseMaterial, mid)
 
 			# assign the override for the material based on the options
-			uid					 = unique_id(baseMaterial)
+			uid = unique_id(baseMaterial)
 
 			# look up the advanced system for this material
 			advancedMaterial, ignored = advancedState.get(uid, (None, False))
@@ -1231,7 +1239,7 @@ class StudiomaxScene(AbstractScene):
 				continue
 
 			# use the override material and check to see if we've already processed this material
-			overrideMaterial 	 = processed.get(uid)
+			overrideMaterial = processed.get(uid)
 
 			# if we have not processed this material yet
 			if (not overrideMaterial):
@@ -1241,8 +1249,8 @@ class StudiomaxScene(AbstractScene):
 				else:
 					processMaterial = nativeMaterial
 
-				overrideMaterial 	 = matlib.createMaterialOverride(baseMaterial, processMaterial, options=options, advancedState=advancedState)
-				processed[uid] 		 = overrideMaterial
+				overrideMaterial = matlib.createMaterialOverride(baseMaterial, processMaterial, options=options, advancedState=advancedState)
+				processed[uid] = overrideMaterial
 
 			obj.material = overrideMaterial
 
@@ -1254,13 +1262,13 @@ class StudiomaxScene(AbstractScene):
 			\param		objects	<list>
 			\return		<bool> success
 		"""
-		#save current selection
+		# save current selection
 		selection = self._nativeSelection()
-		#set the objects passed in as the selection
+		# set the objects passed in as the selection
 		self._setNativeSelection(objects)
-		#focus
+		# focus
 		mxs.blur3dHelper.maxZoomExtents()
-		#restore previous selection
+		# restore previous selection
 		self._setNativeSelection(selection)
 
 	def _setNativeSelection(self, selection):
@@ -1360,9 +1368,9 @@ class StudiomaxScene(AbstractScene):
 			\param		options			<blur3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
-		from blur3d.api.studiomax 	import cachelib
-		from blur3d.constants 		import VisibilityToggleOptions
-		from blur3d.api.studiomax 	import cachelib
+		from blur3d.api.studiomax import cachelib
+		from blur3d.constants import VisibilityToggleOptions
+		from blur3d.api.studiomax import cachelib
 
 		# toggle all the visibility options by default
 		if (options == None):
@@ -1375,27 +1383,27 @@ class StudiomaxScene(AbstractScene):
 			nativeObjects = mxs.objects
 
 		# store maxscript values
-		superclassof			 = mxs.superClassOf
-		classof					 = mxs.classof
-		B2_Main_Light			 = mxs.B2_Main_Light
-		VRaySun					 = mxs.VraySun
-		VRayIES					 = mxs.VRayIES
-		VRayAmbientLight		 = mxs.VRayAmbientLight
-		Light_Portal			 = mxs.Light_Portal
-		OctaneLight				 = mxs.OctaneLight
-		DaylightLight			 = mxs.Daylightlight
-		IESLight				 = mxs.IESLight
-		XRefObject				 = mxs.XRefObject
-		Missing_Light			 = mxs.Missing_Light
-		Light					 = mxs.Light
-		Event					 = mxs.Event
-		FumeFX					 = mxs.FumeFX
-		PF_Source				 = mxs.PF_Source
-		XMeshLoader				 = mxs.XMeshLoader
-		Frost					 = mxs.Frost
-		VRayStereoscopic		 = mxs.VRayStereoscopic
-		Alembic_Mesh_Geometry 	 = mxs.Alembic_Mesh_Geometry
-		Alembic_Mesh_Topology 	 = mxs.Alembic_Mesh_Topology
+		superclassof = mxs.superClassOf
+		classof = mxs.classof
+		B2_Main_Light = mxs.B2_Main_Light
+		VRaySun = mxs.VraySun
+		VRayIES = mxs.VRayIES
+		VRayAmbientLight = mxs.VRayAmbientLight
+		Light_Portal = mxs.Light_Portal
+		OctaneLight = mxs.OctaneLight
+		DaylightLight = mxs.Daylightlight
+		IESLight = mxs.IESLight
+		XRefObject = mxs.XRefObject
+		Missing_Light = mxs.Missing_Light
+		Light = mxs.Light
+		Event = mxs.Event
+		FumeFX = mxs.FumeFX
+		PF_Source = mxs.PF_Source
+		XMeshLoader = mxs.XMeshLoader
+		Frost = mxs.Frost
+		VRayStereoscopic = mxs.VRayStereoscopic
+		Alembic_Mesh_Geometry = mxs.Alembic_Mesh_Geometry
+		Alembic_Mesh_Topology = mxs.Alembic_Mesh_Topology
 
 		for obj in nativeObjects:
 			state = not obj.ishidden
@@ -1530,7 +1538,7 @@ class StudiomaxScene(AbstractScene):
 				# There might be a second prompt if the file needs to be overwritten.
 				if os.path.exists(path):
 					QTimer.singleShot(400, pressEnter)
-				
+
 			# Exporting showin the UI.
 			mxs.importfile(path)
 
@@ -1557,7 +1565,6 @@ class StudiomaxScene(AbstractScene):
 			return True
 
 		return False
-
 
 	def _importNativeModel(self, path, name='', referenced=False, resolution='', load=True, createFile=False):
 		"""
@@ -1633,7 +1640,7 @@ class StudiomaxScene(AbstractScene):
 	def _isolateNativeObjects(self, nativeObjects):
 		selection = self._nativeSelection()
 		self._setNativeSelection(nativeObjects)
-		if application.nameAndVersion() == 'Max2014':
+		if application.version() >= 16:
 			if nativeObjects:
 				mxs.IsolateSelection.EnterIsolateSelectionMode()
 			else:
@@ -1654,18 +1661,17 @@ class StudiomaxScene(AbstractScene):
 		self.clearSelection()
 
 		if objType == 'Biped_Object':
-			#get the pelvis and attach point
+			# get the pelvis and attach point
 			tPoint = mxs.Point(cross=True, box=False)
 			tPoint.name = obj.name.split('.')[0] + '._Trajectory'
-			tPoint.wirecolor  = mxs.color(0, 230, 250)
-
+			tPoint.wirecolor = mxs.color(0, 230, 250)
 
 			# align the point to the biped obj
 			tPoint.transform = obj.transform
-			
+
 			self.setSelection(tPoint.name)
 			tPoint.parent = obj
-			
+
 		else:
 			self.setSelection(obj.name)
 
@@ -1705,8 +1711,8 @@ class StudiomaxScene(AbstractScene):
 		presetPaths = [presetPattern.format(user=getpass.getuser(), year=application.year(), action=action)]
 
 		# In some cases, presets are being written to a different user folder
-		# than the currently logged in user. We will overwrite ALL user 
-		# settings preferences to make sure the settings are applied. They 
+		# than the currently logged in user. We will overwrite ALL user
+		# settings preferences to make sure the settings are applied. They
 		# will all be restored afterwards.
 		users = os.listdir(r'C:\Users')
 		for user in users:
@@ -1720,7 +1726,7 @@ class StudiomaxScene(AbstractScene):
 		# -----------------------------------
 		# In max, the FBX import/export settings API is broken. To get around
 		# this issue, we take advantage of the fact that the FBX plugin saves
-		# its settings as a preset file in the user's directory. We have a 
+		# its settings as a preset file in the user's directory. We have a
 		# template of the desired settings file and we overwrite the existing
 		# user settings file (making sure to cache the existing preset so that
 		# we can restore it afterwards).  After that settings file is written,
@@ -1746,15 +1752,15 @@ class StudiomaxScene(AbstractScene):
 					self._orignalFBXpresetPaths[path] = preset
 
 			preset = template.format(**kwargs)
-			
+
 			try:
 				# Creating the path to the preset if not existing.
 				if not os.path.isdir(os.path.dirname(path)):
 					os.makedirs(os.path.dirname(path))
-	
+
 				with open(path, 'w') as f:
 					f.write(preset)
-					
+
 			except OSError:
 				# Ignore write permission errors, we can't do anything about them right now.
 				traceback.print_exc()
@@ -1766,7 +1772,7 @@ class StudiomaxScene(AbstractScene):
 			try:
 				with open(path, 'w') as f:
 					f.write(preset)
-					
+
 			except OSError:
 				# Ignore write permission errors, we can't do anything about them right now.
 				traceback.print_exc()
@@ -1824,7 +1830,7 @@ class StudiomaxScene(AbstractScene):
 				# There might be a second prompt if the file needs to be overwritten.
 				if os.path.exists(path):
 					QTimer.singleShot(400, pressEnter)
-				
+
 			# Exporting showin the UI.
 			mxs.exportFile(path, selectedOnly=True, using='FBXEXP')
 
@@ -1841,7 +1847,6 @@ class StudiomaxScene(AbstractScene):
 
 		return True
 
-
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
 	#------------------------------------------------------------------------------------------------------------------------
@@ -1854,9 +1859,9 @@ class StudiomaxScene(AbstractScene):
 		"""
 		import os
 		ignoreEmpty = True
-		#local ignoreTopology = true
-		#local useObjectSpace = true
-		#local saveVelocity = true
+		# local ignoreTopology = true
+		# local useObjectSpace = true
+		# local saveVelocity = true
 
 		fileExt = os.path.basename(path)
 		cacheSplit = os.path.splitext(path)
@@ -1882,7 +1887,7 @@ class StudiomaxScene(AbstractScene):
 				theMatLib = mxs.materialLibrary()
 				mxs.append(theMatLib, theMaterial)
 				mxs.saveTempMaterialLibrary(theMatLib, theMatLibPath)
-				
+
 		# Beginning cache record.
 		saver.SetSceneRenderBegin()
 		for i in range(start, end):
@@ -1891,13 +1896,12 @@ class StudiomaxScene(AbstractScene):
 				time = float(i) + substep * j
 				mxs.sliderTime = time
 
-
 				if len(objList) > 1:
 					saver.SaveMeshesToSequence(objList, True, True, True)
 
 				else:
 					saver.SaveMeshToSequence(objList[0], ignoreEmpty, ignoreTopology, worldLock, saveVelocity)
-					#saver.SetSceneRenderEnd()
+					# saver.SetSceneRenderEnd()
 
 		saver.SetSceneRenderEnd()
 		mxs.timeDisplayMode = mxs.pyhelper.namify("frames")
@@ -1911,7 +1915,7 @@ class StudiomaxScene(AbstractScene):
 		from blur3d.api import FrameRange
 		r = mxs.animationRange
 		return FrameRange((r.start, r.end))
-	
+
 	def globalRange(self):
 		return self.animationRange()
 
@@ -1922,11 +1926,11 @@ class StudiomaxScene(AbstractScene):
 		:param cloneType: Create clones as copy, instance, etc. Defaults to Copy.
 		..seealso:: modules `blur3d.constants.CloneType`
 		"""
-		cloneObjects = mxs.blur3dhelper.cloneObjects([obj.nativePointer() for obj in objects], 
-								expandHierarchy=cloneHierarchy, 
-								cloneType=mxs.pyhelper.namify(constants.CloneType.labelByValue(cloneType)))
+		cloneObjects = mxs.blur3dhelper.cloneObjects([obj.nativePointer() for obj in objects],
+                                               expandHierarchy=cloneHierarchy,
+                                               cloneType=mxs.pyhelper.namify(constants.CloneType.labelByValue(cloneType)))
 		from blur3d.api import SceneObject
-		return [ SceneObject(self, obj) for obj in cloneObjects ]
+		return [SceneObject(self, obj) for obj in cloneObjects]
 
 	def checkForSave(self):
 		"""
@@ -1936,13 +1940,13 @@ class StudiomaxScene(AbstractScene):
 		return mxs.checkForSave()
 
 	def cleanMetaData(self):
-		root	 = mxs.rootNode
+		root = mxs.rootNode
 
 		# remove undefined environment maps
 		data = EnvironmentMapsHolder.find(root)
 		if (data):
-			currentIndex 	 = data.value('currentIndex')
-			oldMaps			 = list(data.value('environmentMaps', []))
+			currentIndex = data.value('currentIndex')
+			oldMaps = list(data.value('environmentMaps', []))
 
 			newMaps = []
 			for i, m in enumerate(oldMaps):
@@ -1955,11 +1959,11 @@ class StudiomaxScene(AbstractScene):
 			data.setValue('environmentMaps', newMaps)
 
 		# remove undefined layers
-		count 				 = mxs.custAttributes.count(root)
-		getLayerFromName 	 = mxs.layerManager.getLayerFromName
-		get_attr 			 = mxs.custAttributes.get
-		rem_attr			 = mxs.custAttributes.delete
-		is_prop				 = mxs.isproperty
+		count = mxs.custAttributes.count(root)
+		getLayerFromName = mxs.layerManager.getLayerFromName
+		get_attr = mxs.custAttributes.get
+		rem_attr = mxs.custAttributes.delete
+		is_prop = mxs.isproperty
 
 		for i in range(count - 1, -1, -1):
 			attr = get_attr(root, i + 1)
@@ -2005,7 +2009,7 @@ class StudiomaxScene(AbstractScene):
 			\raises		ValueError
 			\return		N/A
 		"""
-		kwargs = {'selectedOnly':selectedOnly}
+		kwargs = {'selectedOnly': selectedOnly}
 		if using:
 			kwargs['using'] = using
 		if prompt:
@@ -2050,7 +2054,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements AbstractScene.fileTypes to return the associated file types for this type of application
 			\return		<list> [ <str>, .. ]
 		"""
-		return [ 'Max files (*.max)' ]
+		return ['Max files (*.max)']
 
 	def getSceneState(self, shotName):
 		"""
@@ -2064,7 +2068,6 @@ class StudiomaxScene(AbstractScene):
 				return mxs.blur3dhelper.getSceneState(index)
 
 		return False
-
 
 	def isIsolated(self):
 		r"""
@@ -2208,13 +2211,12 @@ class StudiomaxScene(AbstractScene):
 				xMeshFrameRate = XMESHHandler(fileName).fps()
 
 				# Setting up the playback curve.
-				timeScriptController= mxs.Float_Script()
+				timeScriptController = mxs.Float_Script()
 				timeScriptController.script = '{} / frameRate * F'.format(xMeshFrameRate)
 				xMesh.enablePlaybackGraph = True
 				mxs.setPropertyController(xMesh, "playbackGraphTime", timeScriptController)
 
 		# Creating the and RayFireCaches, PCs, and TMCs instanciated controllers.
-
 
 		# Handling PCs and TMCs.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
@@ -2224,11 +2226,10 @@ class StudiomaxScene(AbstractScene):
 			if mxs.classOf(nativeCache) == mxs.Point_Cache:
 				nativeCache.sampleRate = self.animationFPS() / float(cachesFrameRate)
 
-
 			# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 			fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
 			if os.path.exists(fileName):
-				
+
 				# Parsing the cache file. We need to extract the start frame.
 				if mxs.classof(nativeCache) == mxs.Point_Cache:
 					cacheInfo = PointCacheInfo.read(fileName, header_only=True)
@@ -2257,8 +2258,8 @@ class StudiomaxScene(AbstractScene):
 	def resetTimeControllers(self, include='', exclude=''):
 
 		# Resetting Alembics to normal playback by instantiating the same expression.
-		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller) 
-		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
@@ -2277,7 +2278,7 @@ class StudiomaxScene(AbstractScene):
 					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 						scriptController = mxs.Float_Script()
 						scriptController.script = 'S'
-						mxs.setPropertyController(alembicController, 'time', scriptController) 
+						mxs.setPropertyController(alembicController, 'time', scriptController)
 
 		# Resetting PCs and TMCs to default playback.
 		nativeCaches = mxs.getClassInstances(mxs.Point_Cache) + mxs.getClassInstances(mxs.Transform_Cache)
@@ -2338,7 +2339,7 @@ class StudiomaxScene(AbstractScene):
 					name = dependent.name
 
 					# TODO: That check is a little lite.
-					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):		
+					if re.findall(include, name) and not (re.findall(exclude, name) and exclude):
 						mxs.setPropertyController(fume, 'TimeValue', mxs.bezier_float())
 						mxs.setPropertyController(fume, 'TimeScaleFactor', mxs.bezier_float())
 						fume.TimeScaleFactor = 1.0
@@ -2346,7 +2347,6 @@ class StudiomaxScene(AbstractScene):
 						fume.timescale = 1.0
 
 		return True
-
 
 	def restoreSceneState(self, stateName, parts):
 		return mxs.blur3dHelper.restoreSceneState(stateName, parts)
@@ -2360,8 +2360,8 @@ class StudiomaxScene(AbstractScene):
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
 
 		# Loading time on alembics by instantiating a single controller.
-		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller) 
-		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform) 
+		alembicControllers = mxs.getClassInstances(mxs.Alembic_Float_Controller)
+		alembicControllers += mxs.getClassInstances(mxs.Alembic_Xform)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Geometry)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Normals)
 		alembicControllers += mxs.getClassInstances(mxs.Alembic_Mesh_Topology)
@@ -2422,7 +2422,7 @@ class StudiomaxScene(AbstractScene):
 						# Some info like the first and last frame of the point cache must unfortunately come from parsing the file.
 						fileName = nativeCache.filename if mxs.classOf(nativeCache) == mxs.Point_Cache else nativeCache.CacheFile
 						if os.path.exists(fileName):
-							
+
 							# Parsing the cache file. We need to extract the start frame.
 							if mxs.classof(nativeCache) == mxs.Point_Cache:
 								cacheInfo = PointCacheInfo.read(fileName, header_only=True)
@@ -2522,10 +2522,10 @@ class StudiomaxScene(AbstractScene):
 
 							# Setting the playback controller.
 							mxs.setPropertyController(rayFireCache, "playFrame", timeScriptController)
-			
+
 			# We are only creating a speed curve if fumes or thinking are present.
 			if fumes or thinkings:
-				
+
 				# Creating speed controller for Fume caches.
 				from blur3d.api import SceneAnimationController
 				wrappedController = SceneAnimationController(self, nativeController)
@@ -2553,7 +2553,7 @@ class StudiomaxScene(AbstractScene):
 								# Setting the playback controller.
 								mxs.setPropertyController(fume, "TimeValue", timeScriptController)
 
-								# We are now generating a script that computes the derivative of the time curve for the speed curve.				  
+								# We are now generating a script that computes the derivative of the time curve for the speed curve.
 								mxs.setPropertyController(fume, "TimeScaleFactor", speedScriptController)
 
 				# Handling Thinking Particles objects.
@@ -2591,7 +2591,7 @@ class StudiomaxScene(AbstractScene):
 		elif mxs.classOf(nativeRenderer) == mxs.mental_ray_renderer:
 			return RendererType.MentalRay
 		return 0
-		 
+
 	def renderSize(self):
 		"""
 			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders
@@ -2620,8 +2620,8 @@ class StudiomaxScene(AbstractScene):
 		mxs.fetchMaxFile()
 
 		# flush the maxscript memory that was used during the hold state
-		mxs.gc()	# first time marks items ready for removal
-		mxs.gc()	# second time removes items that are ready for removal
+		mxs.gc()  # first time marks items ready for removal
+		mxs.gc()  # second time removes items that are ready for removal
 
 		return True
 
@@ -2657,9 +2657,6 @@ class StudiomaxScene(AbstractScene):
 		selectedNodes = self._nativeSelection()
 		mxs.saveNodes(selectedNodes, path)
 		return True
-
-
-
 
 	def saveCopy(self, path):
 		"""
@@ -2699,6 +2696,7 @@ class StudiomaxScene(AbstractScene):
 				# If we dont save it as a class variable it will go out of scope and all of the
 				# QTimers will not be called.
 				self._rescaleTime = RescaleTime()
+
 				def finishFrameRate(checkRate):
 					# If the current frame range doesn't match the value we passed into RescaleTime
 					# a error has occurred and we dont want to change the fps
@@ -2815,7 +2813,7 @@ class StudiomaxScene(AbstractScene):
 
 	def setSilentMode(self, switch):
 		mxs.setSilentMode(switch)
-		
+
 	def silentMode(self):
 		return mxs.silentMode()
 
@@ -2855,7 +2853,7 @@ class StudiomaxScene(AbstractScene):
 			\param		layerGroups		<list> [ <blur3d.api.SceneLayerGroup> layerGroup, .. ]
 			\return		<bool> success
 		"""
-		groupNames 	 = []
+		groupNames = []
 		groupStates = []
 
 		for layerGroup in layerGroups:
@@ -2966,7 +2964,7 @@ class StudiomaxScene(AbstractScene):
 		"""
 		mxs.execute('max undo')
 		return True
-	
+
 	def userProps(self):
 		"""Returns the FileProps object associated with this file
 		:return; :class:`blur3d.api.FileProps`
