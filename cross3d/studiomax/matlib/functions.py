@@ -372,7 +372,7 @@ def findBumpMap( material ):
 		return None
 
 	# return a vray bump map
-	if ( cls in (mxs.VrayMtl,mxs.VrayFastSSS2) ):
+	if ( cls in (mxs.VrayMtl,mxs.VrayFastSSS2, mxs.VRaySkinMtl) ):
 		if ( material.texmap_bump_on ):
 			bumpmap = material.texmap_bump
 			if ( bumpmap and material.texmap_bump_multiplier != 100 ):
@@ -437,7 +437,7 @@ def findDisplacementMap( material ):
 		return None
 
 	# return a vray material's displacement map
-	elif ( cls in (mxs.VrayMtl, mxs.VRayFastSSS2) ):
+	elif ( cls in (mxs.VrayMtl, mxs.VRayFastSSS2, mxs.VRaySkinMtl) ):
 		if material.texmap_displacement_on:
 			return material.texmap_displacement
 		else:
@@ -500,7 +500,7 @@ def findOpacityMap( material ):
 			return material.opacityMap
 
 	# return a vray material's opacity map
-	elif ( cls == mxs.VrayMtl ):
+	elif ( cls in (mxs.VrayMtl, mxs.VRaySkinMtl)):
 		if material.texmap_opacity_on:
 			return material.texmap_opacity
 
