@@ -17,6 +17,7 @@ import glob
 import shutil
 import blurdev
 import subprocess
+import time
 import warnings
 
 from framerange import FrameRange
@@ -431,9 +432,14 @@ class FileSequence(object):
 			normalisedSequence = FileSequence(normalisedSequencePath)
 			self.copy(normalisedSequence)
 
-		# Sometimes there is delay due to the servers.
-		while not normalisedSequence.isComplete():
-			continue
+		# Sometimes there is delay due to the servers. Wait for a reasonable ammount of time
+		# before raising a exception.
+		for i in xrange(15):
+			if normalisedSequence.isComplete():
+				break
+			time.sleep(0.1)
+		else:
+			raise IOError('Normalized Sequence is missing frames! "{}"'.format(normalisedSequence.path()))
 
 		outputBasePath = os.path.split(outputPath)[0]
 		if not os.path.exists(outputBasePath):
