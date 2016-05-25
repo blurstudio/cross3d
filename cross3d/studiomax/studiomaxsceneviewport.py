@@ -134,16 +134,16 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		if not os.path.exists(dirName):
 			os.makedirs(dirName)
 
-		# checking inputs
+		# Checking inputs.
 		if not frameRange:
 			frameRange = initialRange
 		if not resolution:
 			resolution = scene.renderSize()
 			
-		# set slate
+		# Setting slates.
 		if slate:
-			self.setSlateText( slate )
-			self.setSlateIsActive( True )
+			self.setSlateText(slate)
+			self.setSlateIsActive(True)
 
 		# storing infornation
 		initialGeometryVisibility = mxs.hideByCategory.geometry
@@ -160,13 +160,13 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		initialSafeFrame = mxs.displaySafeFrames
 		initialViewNumber = mxs.viewport.numViews
 
-		# getting the camera
+		# Getting the camera.
 		camera = self.camera()
 		
 		# setting the scene
 		scene.setAnimationRange( frameRange )
 		
-		# setting the viewport
+		# Setting the viewport.
 		if geometryOnly:
 			mxs.hideByCategory.geometry = False
 			mxs.hideByCategory.shapes = True
@@ -190,11 +190,17 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		
 		mxs.pyhelper.setViewportQuadSize( resolution.width(), resolution.height() )
 
-		# Figuring out if we use Nitrous only supported from Max 2013.
+		# Should we compute multi-pass effects.
+		effects = camera.hasMultiPassEffects() and effects in [None, True]
+
+		# This is my crappy way of figuring out if we are using Nitrous.
 		nitrous = not mxs.gw.GetDriverString() and application.version() >= 15
 
+		# We are going to use progressive rendering if the mode is set to Depth of Field (Mental Ray).
+		progressive = nitrous and mxs.classof(camera.nativePointer().mpassEffect) == mxs.Depth_of_Field__mental_ray
+
 		# If the viewport is using Nitrous.
-		if camera and nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
+		if camera and effects and progressive:
 
 			# Storing and setting up Nitrous options.
 			nitrousSettings = mxs.NitrousGraphicsManager.GetActiveViewportSetting()
@@ -206,20 +212,18 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 			image = None
 			count = count + 1
 
-			# Watching for esc key.
+			# Watching for Esc key.
 			if mxs.keyboard.escPressed:
 				completed = False
 				break
-			scene.setCurrentFrame( frame )
+			scene.setCurrentFrame(frame)
 
 			if camera:
+				if effects:
 
-				# If multi-pass effects are active.
-				if camera.hasMultiPassEffects() and effects in [None, True]:
-					
 					# If we use a Nitrous viewport, we compute the depth of field the new way.
 					passes = 0
-					if nitrous:
+					if progressive:
 						while not mxs.NitrousGraphicsManager.isProgressiveRenderingFinished():
 							mxs.NitrousGraphicsManager.progressiveRendering()
 							passes += 1
@@ -231,11 +235,11 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 						camera.renderMultiPassEffects()
 
 					# Text overlays are only supported until Max 2011.
-					if application.version() <= 13:
+					if slate and application.version() <= 13:
 						self.slateDraw()	
 
 				# For Max 2012 and above only the viewport object allows to save the picture with multipass effects.
-				if application.version() >= 14 and camera.hasMultiPassEffects() and effects in [None, True]:
+				if application.version() >= 14 and effects:
 					image = mxs.viewport.getViewportDib()
 
 			if not image:
@@ -272,7 +276,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		self.setSlateIsActive( False )
 
 		# Restoring Nitrous settings.
-		if camera and nitrous and camera.hasMultiPassEffects() and effects in [None, True]:
+		if camera and progressive and camera.hasMultiPassEffects() and effects in [None, True]:
 
 			# Restoring Nitrous settings.
 			nitrousSettings.ProgressiveFadingFactor = initialFadingFactor
