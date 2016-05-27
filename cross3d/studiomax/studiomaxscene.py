@@ -16,6 +16,7 @@ import getpass
 import win32con
 import win32api
 import traceback
+import math
 
 from Py3dsMax import mxs
 from blurdev import debug
@@ -27,6 +28,7 @@ from blur3d import pendingdeprecation, constants
 from blur3d.api import UserProps, application, FrameRange
 from blur3d.api.abstract.abstractscene import AbstractScene
 from blur3d.constants import UpVector, ExtrapolationType, RendererType
+
 
 # register custom attriutes for MAXScript that hold scene persistent data
 from mxscustattribdef import MXSCustAttribDef
@@ -1576,7 +1578,7 @@ class StudiomaxScene(AbstractScene):
 			modelName = name or os.path.splitext(os.path.split(path)[1])[0]
 			objectNames = mxs.getMaxFileObjectNames(path, quiet=True)
 			mxs.mergeMAXFile(path, mxs.pyhelper.namify('neverReparent'), mxs.pyhelper.namify('useSceneMtlDups'), quiet=True)
-
+			print objectNames
 			# Adding name space to objects.
 			for name in objectNames:
 				obj = self._findNativeObject(name)
@@ -1586,6 +1588,8 @@ class StudiomaxScene(AbstractScene):
 					model = obj
 					model.name = modelName
 				else:
+					if name==None:
+						name = 'temp01'
 					obj.name = '.'.join([modelName, name])
 
 			# Adding name space to layers.
@@ -2790,6 +2794,43 @@ class StudiomaxScene(AbstractScene):
 		if mxs.renderSceneDialog.isOpen():
 			mxs.renderSceneDialog.update()
 
+	def faceFromMouseClick(self):
+		"""Summary
+			finds the geometry and face clicked by the user in the viewport
+		Returns:
+		    TYPE: <tuple> Collision Object and Face Index of Collision
+		"""
+		p = mxs.pickPoint(snap=mxs.pyhelper.namify('3D'))
+		if p == None or p == mxs.pyhelper.namify('rightClick'): #user right clicked
+		    return False
+
+		ray = mxs.mapScreenToWorldRay(mxs.mouse.pos)
+
+		if not ray:
+			return False
+
+		sampledObjects = []
+		for obj in self.objects():
+			if not obj.isHidden() and mxs.superclassOf(obj) == mxs.GeometryClass and mxs.classOf(obj) != mxs.Biped_Object:
+				sampledObjects.append(obj)
+
+		shortestDistance = -1
+		hitObjects = []
+		for obj in sampledObjects:
+		    result = mxs.intersectRayEx(obj, ray)
+		    if result:
+		        faceIndex = result[1]
+		        faceCenter = mxs.meshop.getFaceCenter(obj, faceIndex)
+		        camPos = ray.pos
+		        distance = math.sqrt((camPos.x - faceCenter.x)**2 + (camPos.y - faceCenter.y)**2 + (camPos.z - faceCenter.z)**2)
+		        if shortestDistance < 0 or shortestDistance > distance:
+		            hitObjects.append([obj, faceIndex])
+		            shortestDistance = distance
+
+		if hitObjects:
+			return hitObjects.pop()
+
+		return False
 	def setRenderFrameRange(self, frameRange):
 		"""
 			\remarks	set the render frame range of the scene

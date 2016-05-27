@@ -12,8 +12,9 @@
 import os
 import random
 import blur3d.api
+import math
 
-from Py3dsMax import mxs
+from Py3dsMax import mxs, AtTime
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QSize
 from blur3d.api import application
@@ -534,6 +535,67 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
                 return True
         return False
 
+    def setFocalDistanceByFace(self, geometry=None, face=None, camera=None, sampledGeometries=[], frameRange=None, setKeys=False, step=1):
+        """This method will set the focus of the current viewport camera throwing a ray toward any visible geometry.
+        
+        Args:
+            geometry (None, optional): Geomtry to set focus distance on
+            face (None, optional): face index of face belonging to geometry to set focus distance on
+            camera (None, optional): camera to set the focus distance on
+            sampledGeometries (list, optional): This is the list of geometry object that will be sampled for focus.
+        
+            frameRange (None, optional): If not provided the focus distance will be set on a single frame.
+                                         Otherwise a tuple or list will define a frame range for tracking the focus.
+                                         Alternatively and empty list or tuple will use the current scene frame range.
+        
+            setKeys (bool, optional): If true this function will force setting keys on the focus distance.
+                                      Regardless of the state of "Auto Key".
+            step (int, optional): for trakcing mode, this controls the step at which keys are placed
+        
+        Returns:
+            TYPE: Whether or not the the focus was set.
+        """
+        
+        if not geometry or not face or not camera:
+            return False
+
+        if not frameRange or len(frameRange) != 2:
+            return False
+
+        camCtrl = camera.controller('targetDistance')
+        if setKeys:
+            timeList = []
+            for key in camCtrl.keys():
+                if key.time() > frameRange[0]:
+                    timeList.append(key.time())
+            for keyTime in timeList:
+                camCtrl.removeKeyAt(keyTime)
+
+        trackRange = xrange(frameRange[0], frameRange[1] +1, step)
+        attime = AtTime()
+
+        for frame in trackRange:
+            if frame != None:
+                attime(frame)
+
+            facePos = mxs.meshop.getFaceCenter(geometry, face)
+            camPos = camera.property('position')
+            distance = math.sqrt((camPos.x - facePos.x)**2 + (camPos.y - facePos.y)**2 + (camPos.z - facePos.z)**2)
+
+            if setKeys:
+                #mxs.execute("with Animate On ($'" + camera.name() + "'.baseObject.targetDistance = " + str(distance) + ")")
+                key = camCtrl.createKeyAt(frame)
+                key.setValue(distance)
+            else:
+                camera.property('baseObject').setProperty('targetDistance', distance)
+
+
+        if attime:
+            del attime
+
+
+        return False
+
     def distortionType(self):
         classOf = mxs.classOf(self._nativePointer)
         if classOf == mxs.VRayPhysicalCamera:
@@ -541,6 +603,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         elif classOf == mxs.Physical:
             return self._distortionTypes[self._nativePointer.distortion_type]
         return ''
+
 
     def setDistortionType(self, distortionType):
         if isinstance(distortionType, basestring):

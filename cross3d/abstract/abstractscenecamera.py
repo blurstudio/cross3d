@@ -82,6 +82,29 @@ class AbstractSceneCamera(SceneObject):
 	def addThreeNodesRig(self):
 		return False
 
+	@abstractmethod
+	def setFocalDistanceByFace(self, geometry=None, face=None, camera=None, sampledGeometries=[], frameRange=None, setKeys=False, step=1):
+		"""This method will set the focus of the current viewport camera throwing a ray toward any visible geometry.
+		
+		Args:
+		    geometry (None, optional): Geomtry to set focus distance on
+		    face (None, optional): face index of face belonging to geometry to set focus distance on
+		    camera (None, optional): camera to set the focus distance on
+		    sampledGeometries (list, optional): This is the list of geometry object that will be sampled for focus.
+		
+		    frameRange (None, optional): If not provided the focus distance will be set on a single frame.
+		    							 Otherwise a tuple or list will define a frame range for tracking the focus.
+		    							 Alternatively and empty list or tuple will use the current scene frame range.
+		
+		    setKeys (bool, optional): If true this function will force setting keys on the focus distance.
+		    						  Regardless of the state of "Auto Key".
+		    step (int, optional): for trakcing mode, this controls the step at which keys are placed
+		
+		Returns:
+		    TYPE: Whether or not the the focus was set.
+		"""
+		return False
+
 	def setPlatePath(self, path):
 		return False
 

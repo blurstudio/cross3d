@@ -1053,7 +1053,14 @@ class AbstractScene(QObject):
 			\return 	<boo>	Success
 		"""
 		return False
-
+	@abstractmethod
+	def faceFromMouseClick(self):
+		"""Summary
+			finds the geometry and face clicked by the user in the viewport
+		Returns:
+		    TYPE: <tuple> Collision Object and Face Index of Collision
+		"""
+		return False
 	@abstractmethod
 	def exportFile(self):
 		"""
