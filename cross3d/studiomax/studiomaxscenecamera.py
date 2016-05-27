@@ -563,7 +563,11 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             return False
 
         camCtrl = camera.controller('targetDistance')
-        if setKeys:
+        if not camCtrl:
+            mxs.setPropertyController(camera, "targetDistance", mxs.bezier_float())
+            camCtrl = camera.controller('targetDistance')
+
+        if setKeys and camCtrl:
             timeList = []
             for key in camCtrl.keys():
                 if key.time() > frameRange[0]:
@@ -581,7 +585,6 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             facePos = mxs.meshop.getFaceCenter(geometry, face)
             camPos = camera.property('position')
             distance = math.sqrt((camPos.x - facePos.x)**2 + (camPos.y - facePos.y)**2 + (camPos.z - facePos.z)**2)
-
             if setKeys:
                 #mxs.execute("with Animate On ($'" + camera.name() + "'.baseObject.targetDistance = " + str(distance) + ")")
                 key = camCtrl.createKeyAt(frame)
