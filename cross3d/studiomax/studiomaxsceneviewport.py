@@ -197,7 +197,8 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		nitrous = not mxs.gw.GetDriverString() and application.version() >= 15
 
 		# We are going to use progressive rendering if the mode is set to Depth of Field (Mental Ray).
-		progressive = nitrous and mxs.classof(camera.nativePointer().mpassEffect) == mxs.Depth_of_Field__mental_ray
+		physical = mxs.classof(camera.nativePointer()) in (mxs.VRayPhysicalCamera, mxs.Physical)
+		progressive = nitrous and (physical or mxs.classof(camera.nativePointer().mpassEffect) == mxs.Depth_of_Field__mental_ray)
 
 		# If the viewport is using Nitrous.
 		if camera and effects and progressive:
