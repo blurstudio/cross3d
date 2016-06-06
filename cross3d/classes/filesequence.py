@@ -448,7 +448,9 @@ class FileSequence(object):
 		if videoCodec == VideoCodec.PhotoJPEG:
 			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.codePath())]
 			if os.path.exists(audioPath):
-				command += ['-i', '"{}"'.format(audioPath), '-c:a', 'libvo_aacenc', '-b:a', '192k']
+				# Updating the way the audio file is being added to the new quicktime. Instead of encoding the audio file with a specifc encoder
+				# we are now copying it exactly like , so there isn't any change to the audio.
+				command += ['-i', '"{}"'.format(audioPath), '-c:a','copy']
 			# Resize the input if it is larger than 2k in either dimension. ffmpeg does not support 
 			# larger resolutions. In my testing you can go up to 4000 for maxSize
 			command += ["-vf", "scale=w='if(eq(min(iw,ih),iw),-1,min(iw,{maxSize}))':h='if(eq(min(iw,ih),ih),-1,min(ih,{maxSize}))'".format(maxSize=2048)]
