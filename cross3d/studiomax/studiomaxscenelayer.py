@@ -1029,8 +1029,6 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			newBaseMaterialNames.append( '' )
 			newOverrideMtls.append( overrideMtl )
 
-		print newOverrideMtls
-
 		# record the data
 		data.setValue( 'altMtlIndexes', 	newAltMaterialIndexes )
 		data.setValue( 'baseMtlIds',		newBaseMaterialIds )
