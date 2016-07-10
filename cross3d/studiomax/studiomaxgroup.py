@@ -1,5 +1,5 @@
 ##
-#   :namespace  blur3d.api.studiomax.studiomaxgroup
+#   :namespace  cross3d.studiomax.studiomaxgroup
 #
 #   :remarks    [desc::commented]
 #   
@@ -8,8 +8,8 @@
 #   :date       09/26/13
 #
 
-from blur3d.api.studiomax.studiomaxscenelayer import StudiomaxSceneLayer
-from blur3d import api
+import cross3d
+from cross3d.studiomax.studiomaxscenelayer import StudiomaxSceneLayer
 
 class StudiomaxGroup(StudiomaxSceneLayer):
 
@@ -21,5 +21,4 @@ class StudiomaxGroup(StudiomaxSceneLayer):
 	pass
 
 # register the symbol
-api.registerSymbol('Group', StudiomaxGroup)
-
+cross3d.registerSymbol('Group', StudiomaxGroup)

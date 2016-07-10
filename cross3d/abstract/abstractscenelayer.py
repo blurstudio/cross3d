@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenelayer
+#	\namespace	cross3d.abstract.abstractscenelayer
 #
 #	\remarks	The AbstractSceneLayer provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
@@ -10,9 +10,9 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
+import cross3d
+from cross3d import abstractmethod
 from abstractcontainer import AbstractContainer
-from blur3d import api
 
 class AbstractSceneLayer(AbstractContainer):
 
@@ -101,7 +101,7 @@ class AbstractSceneLayer(AbstractContainer):
 		Add the inputed material to the list of possible alternate
 		materials for this layer
 
-		:param material: :class:`blur3d.api.SceneMaterial`
+		:param material: :class:`cross3d.SceneMaterial`
 
 		"""
 		altMtls = self.altMaterials()
@@ -113,7 +113,7 @@ class AbstractSceneLayer(AbstractContainer):
 		Add the property set to the list of possible alternate property
 		sets for this layer
 
-		:param propSet: :class:`blur3d.api.ScenePropSet`
+		:param propSet: :class:`cross3d.ScenePropSet`
 
 		"""
 		propSets = self.altPropSets()
@@ -130,7 +130,7 @@ class AbstractSceneLayer(AbstractContainer):
 		:return: A dictionary with the BaseMaterialID as keys with values of
 		         tuples of (SceneMaterial, ignored)
 
-		         {int baseMaterialId: (:class:`blur3d.api.SceneMaterial` override, bool ignored), .. }
+		         {int baseMaterialId: (:class:`cross3d.SceneMaterial` override, bool ignored), .. }
 
 		"""
 		return {}
@@ -139,14 +139,14 @@ class AbstractSceneLayer(AbstractContainer):
 		"""Retrieve the alternate material at the inputed index
 
 		:param index: int
-		:return: :class:`blur3d.api.SceneMaterial` or None
+		:return: :class:`cross3d.SceneMaterial` or None
 
 		"""
 		mtls = self._nativeAltMaterials()
 		if (0 <= index and index < len(mtls)):
 			mtl = mtls[index]
 			if (mtl):
-				from blur3d.api import SceneMaterial
+				from cross3d import SceneMaterial
 				return SceneMaterial(self._scene, mtl)
 			else:
 				return None
@@ -164,9 +164,9 @@ class AbstractSceneLayer(AbstractContainer):
 		"""
 			\remarks	return a list of the alternate materials held by this layer
 
-			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
+			\return		<list> [ <cross3d.SceneMaterial>, .. ]
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		output = []
 		for mtl in self._nativeAltMaterials():
 			if (mtl):
@@ -179,7 +179,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def altMaterialFlags(self):
 		"""Return a list of material duplication flags for this layer
 
-		:return: a list of :data:`blur3d.constants.MaterialDuplicateOptions`'s
+		:return: a list of :data:`cross3d.constants.MaterialDuplicateOptions`'s
 
 		"""
 		return []
@@ -187,7 +187,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def altMaterialFlagsAt(self, index):
 		"""Return the material flags at the inputed index
 
-		:return: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:return: :data:`cross3d.constants.MaterialDuplicateOptions`
 
 		"""
 		flags = self.altMaterialFlags()
@@ -198,7 +198,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def altPropSetAt(self, index):
 		"""Retrive the alternate SceneObjectPropSet at the inputed index
 
-		:return: :class:`blur3d.api.SceneObjectPropSet` or None
+		:return: :class:`cross3d.SceneObjectPropSet` or None
 
 		"""
 		propsets = self.altPropSets()
@@ -216,7 +216,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def altPropSets(self):
 		"""Retrive the alternate SceneObjectPropSet's for this layer
 
-		:return: a list of :class:`blur3d.api.SceneObjectPropSet`'s
+		:return: a list of :class:`cross3d.SceneObjectPropSet`'s
 
 		"""
 		return []
@@ -227,7 +227,7 @@ class AbstractSceneLayer(AbstractContainer):
 		material at that index is not already defined
 
 		:param index: int
-		:param material: :class:`blur3d.api.SceneMaterial`
+		:param material: :class:`cross3d.SceneMaterial`
 		:rtype: bool
 
 		"""
@@ -242,7 +242,7 @@ class AbstractSceneLayer(AbstractContainer):
 		property set at that index is not already defined
 
 		:param index: int
-		:param propSet: :class:`blur3d.api.ScenePropSet`
+		:param propSet: :class:`cross3d.ScenePropSet`
 		:rtype: bool
 
 		"""
@@ -263,7 +263,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def currentAltMaterial(self):
 		"""Retrieve the current alt material
 
-		:rtype: :class:`blur3d.api.SceneMaterial`
+		:rtype: :class:`cross3d.SceneMaterial`
 
 		"""
 		return self.altMaterialAt(self._altMtlIndex)
@@ -279,7 +279,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def currentAltPropSet(self):
 		"""Retrieve the alternate object property set at the inputed index
 
-		:rtype: :class:`blur3d.api.ScenePropSet`
+		:rtype: :class:`cross3d.ScenePropSet`
 
 		"""
 		return self.altPropSetAt(self._altPropIndex)
@@ -290,7 +290,7 @@ class AbstractSceneLayer(AbstractContainer):
 		the inputed alt material index
 
 		:param index: int
-		:param flag: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:param flag: :data:`cross3d.constants.MaterialDuplicateOptions`
 		:return: found
 		:rtype: bool
 
@@ -312,7 +312,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def indexOfAltMaterial(self, material):
 		"""Return the index of the inputed material for the current layer
 
-		:param: :class:`blur3d.api.SceneMaterial`
+		:param: :class:`cross3d.SceneMaterial`
 		:return: index of material, or -1 if not found
 
 		"""
@@ -325,7 +325,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def indexOfAltPropSet(self, propSet):
 		"""Return the index of the inputed property set for the current layer
 
-		:param propSet: :class:`blur3d.api.ScenePropSet`
+		:param propSet: :class:`cross3d.ScenePropSet`
 		:return: index of material, or -1 if not found
 
 		"""
@@ -352,7 +352,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def isolate(self):
 		"""
-		Reimplements the :meth:`blur3d.api.SceneObjectGroup.isolate` method
+		Reimplements the :meth:`cross3d.SceneObjectGroup.isolate` method
 		to isolate just this layer (hide all other layers)
 
 		"""
@@ -369,7 +369,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def groupName(self):
 		"""
-		Implements the :meth:`blur3d.api.SceneObjectGroup.groupName`
+		Implements the :meth:`cross3d.SceneObjectGroup.groupName`
 		method to retrieve the group name for this object group instance
 
 		"""
@@ -381,12 +381,12 @@ class AbstractSceneLayer(AbstractContainer):
 	def layerGroup(self):
 		"""Return the layer group that this layer belongs to
 
-		:return: :class:`blur3d.api.SceneLayerGroup` or None
+		:return: :class:`cross3d.SceneLayerGroup` or None
 
 		"""
 		nativeGroup = self._nativeLayerGroup()
 		if (nativeGroup):
-			from blur3d.api import SceneLayerGroup
+			from cross3d import SceneLayerGroup
 			return SceneLayerGroup(self._scene, nativeGroup)
 		return None
 
@@ -444,7 +444,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 		# determine the alterante state for this layer
 		scene = self._scene
-		from blur3d.api import SceneMaterial, SceneMap, SceneObjectPropSet
+		from cross3d import SceneMaterial, SceneMap, SceneObjectPropSet
 		self.setPropSetOverride(SceneObjectPropSet.fromXml(scene, xml.findChild('propSetOverride')))
 		self.setMaterialOverride(SceneMaterial.fromXml(scene, xml.findChild('materialOverride')))
 
@@ -524,7 +524,7 @@ class AbstractSceneLayer(AbstractContainer):
 		inputed alt material index
 
 		:param index: int
-		:param flat: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:param flat: :data:`cross3d.constants.MaterialDuplicateOptions`
 		:param state: bool
 
 		"""
@@ -543,7 +543,7 @@ class AbstractSceneLayer(AbstractContainer):
 		Set the alternate material flags at the inputed index for this instance
 
 		:param index: int
-		:param flags: :data:`blur3d.constants.MaterialDuplicateOptions`
+		:param flags: :data:`cross3d.constants.MaterialDuplicateOptions`
 
 		"""
 		mflags = self.altMaterialFlags()
@@ -557,7 +557,7 @@ class AbstractSceneLayer(AbstractContainer):
 		"""Set the alternate material flags for this instance
 
 		:param flags: list of
-		              :data:`<blur3d.constants.MaterialDuplicateOptions`'s
+		              :data:`<cross3d.constants.MaterialDuplicateOptions`'s
 
 		"""
 		return False
@@ -642,13 +642,13 @@ class AbstractSceneLayer(AbstractContainer):
 
 	def setMaterialOverride(self, material, options= -1, advancedState=None):
 		"""
-		Overloads the :meth:`blur3d.api.SceneObjectGroup.setMaterialOverride`
+		Overloads the :meth:`cross3d.SceneObjectGroup.setMaterialOverride`
 		method to make sure we get recorded alternate properties before
 		applying overrides
 
-		:param material: :class:`blur3d.api.SceneMaterial`
-		:param options: :data:`blur3d.constants.MaterialOverrideOptions`
-		:param advancedState: <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
+		:param material: :class:`cross3d.SceneMaterial`
+		:param options: :data:`cross3d.constants.MaterialOverrideOptions`
+		:param advancedState: <dict> { <int> baseMaterialId: ( <cross3d.gui.SceneMaterial> override, <bool> ignored ) }
 
 		"""
 		amtls = self.altMaterials()
@@ -664,7 +664,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def setLayerGroup(self, layerGroup):
 		"""Set the layer group that this layer is associated with
 
-		:param layerGroup: :class:`blur3d.api.SceneLayerGroup` or None
+		:param layerGroup: :class:`cross3d.SceneLayerGroup` or None
 
 		"""
 		nativeGroup = None
@@ -687,7 +687,7 @@ class AbstractSceneLayer(AbstractContainer):
 		alternate material slot
 
 		:param index: int
-		:param altMaterialState: <dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+		:param altMaterialState: <dict> [ <int> baseMaterialId: (<cross3d.SceneMaterial> override, <bool> ignored), .. }
 
 		"""
 		return False
@@ -726,4 +726,4 @@ class AbstractSceneLayer(AbstractContainer):
 
 
 # register the symbol
-api.registerSymbol('SceneLayer', AbstractSceneLayer, ifNotFound=True)
+cross3d.registerSymbol('SceneLayer', AbstractSceneLayer, ifNotFound=True)

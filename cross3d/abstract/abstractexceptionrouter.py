@@ -1,9 +1,9 @@
 ##
-#   :namespace  blur3d.api.abstract.abstractexceptionrouter
+#   :namespace  cross3d.abstract.abstractexceptionrouter
 #
 #   :remarks    Abstract context that converts native exceptions to Blur3d exceptions.
 #				This Context is used to capture common exceptions raised in the Software. It 
-#				identifies the exception and raises a Blur3d.api.Exceptions exception instead. If it
+#				identifies the exception and raises a cross3d.Exceptions exception instead. If it
 #				can not identify the exception, it raises the existing exception.
 #   
 #   :author     mikeh@blur.com
@@ -11,11 +11,11 @@
 #   :date       11/04/14
 #
 
-from blur3d import api
+import cross3d
 
 class AbstractExceptionRouter(object):
 	""" This Context is used to capture common exceptions raised in the Software. It identifies the
-	exception and raises a Blur3d.api.Exceptions exception instead. If it can not identify the
+	exception and raises a cross3d.Exceptions exception instead. If it can not identify the
 	exception, it raises the existing exception.
 	"""
 	def __enter__(self):
@@ -26,4 +26,4 @@ class AbstractExceptionRouter(object):
 		return False
 
 # register the symbol
-api.registerSymbol('ExceptionRouter', AbstractExceptionRouter, ifNotFound=True)
+cross3d.registerSymbol('ExceptionRouter', AbstractExceptionRouter, ifNotFound=True)

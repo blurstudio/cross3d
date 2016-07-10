@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.studiomax package contains the necessary classes to control 3D Studio Max.
+#	\remarks	The cross3d.studiomax package contains the necessary classes to control 3D Studio Max.
 #	
 #	\author		eric@blur.com
 #	\author		Blur Studio

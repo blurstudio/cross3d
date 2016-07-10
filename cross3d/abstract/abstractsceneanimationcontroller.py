@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneanimationcontroller
+#	\namespace	cross3d.abstract.abstractsceneanimationcontroller
 #
 #	\remarks	The AbstractSceneAnimationController class defines a base class for managing animation curves within a 3d scene
 #
@@ -8,12 +8,10 @@
 #	\date		03/15/10
 #
 
-from blur3d import api
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d.api import FCurve, FrameRange
-from blurdev.decorators import pendingdeprecation
-from blur3d.constants import TangentType, ExtrapolationType
+import cross3d
+from cross3d import SceneWrapper, FCurve, FrameRange, abstractmethod
+from cross3d import pendingdeprecation
+from cross3d.constants import TangentType, ExtrapolationType
 
 
 class AbstractSceneAnimationController(SceneWrapper):
@@ -54,9 +52,9 @@ class AbstractSceneAnimationController(SceneWrapper):
 	def _createNewNative(cls, scene, controllerType):
 		"""
 			\remarks	create a new native controller in the scene of the inputed controller type
-			\param		scene				<blur3d.api.Scene>
-			\param		controllerType		<blur3d.constants.ControllerType>
-			\return		<blur3d.api.SceneAnimationController> || None
+			\param		scene				<cross3d.Scene>
+			\param		controllerType		<cross3d.constants.ControllerType>
+			\return		<cross3d.SceneAnimationController> || None
 		"""
 		return None
 
@@ -102,12 +100,12 @@ class AbstractSceneAnimationController(SceneWrapper):
 		:param time: time to create a key at.
 		:type time: float
 		:return: the new animation key
-		:rtype: :class:`blur3d.api.SceneAnimationKey` or None
+		:rtype: :class:`cross3d.SceneAnimationKey` or None
 
 		"""
 		nativeKey = self._createNativeKeyAt(time)
 		if nativeKey:
-			from blur3d.api import SceneAnimationKey
+			from cross3d import SceneAnimationKey
 			return SceneAnimationKey(self._scene, nativeKey)
 		return None
 
@@ -115,7 +113,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 	def type(self):
 		"""Return the type of controller that this controller is
 		
-		:return: :data:`blur3d.constants.ControllerType`
+		:return: :data:`cross3d.constants.ControllerType`
 		
 		"""
 		return 0
@@ -129,7 +127,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 		return None
 
 	def derivatedController(self):
-		from blur3d.api import SceneAnimationController
+		from cross3d import SceneAnimationController
 		nativeController = self._nativeDerivatedController()
 		if nativeController:
 			return SceneAnimationController(self._scene, nativeController)
@@ -152,7 +150,7 @@ class AbstractSceneAnimationController(SceneWrapper):
 		:param time: time to get key at.
 		:type time: float
 		:return: the animation key
-		:rtype: :class:`blur3d.api.SceneAnimationKey` or None	
+		:rtype: :class:`cross3d.SceneAnimationKey` or None	
 
 		"""
 		for key in self.keys():
@@ -162,13 +160,13 @@ class AbstractSceneAnimationController(SceneWrapper):
 
 	def keys(self):
 		"""
-		Return a list of:class: `blur3d.api.SceneAnimationKey`'s that are 
+		Return a list of:class: `cross3d.SceneAnimationKey`'s that are 
 		defined for this controller
 		
-		:return: a list of :class:`blur3d.api.SceneAnimationKey`'s
+		:return: a list of :class:`cross3d.SceneAnimationKey`'s
 		
 		"""
-		from blur3d.api import SceneAnimationKey
+		from cross3d import SceneAnimationKey
 		return [SceneAnimationKey(self._scene, nativeKey) for nativeKey in self._nativeKeys()]
 
 	@abstractmethod
@@ -211,9 +209,9 @@ class AbstractSceneAnimationController(SceneWrapper):
 		:param time: time to set key at.
 		:type time: float
 		:param key: the animation key
-		:type key: :class:`blur3d.api.SceneAnimationKey`
+		:type key: :class:`cross3d.SceneAnimationKey`
 		:return: the animation key
-		:rtype: :class:`blur3d.api.SceneAnimationKey` or None	
+		:rtype: :class:`cross3d.SceneAnimationKey` or None	
 
 		"""
 		nativeKey = None
@@ -225,14 +223,14 @@ class AbstractSceneAnimationController(SceneWrapper):
 	def createNew(cls, scene, controllerType):
 		"""Create a new controller in the scene of the inputed controller type
 		
-		:param scene: :class:`blur3d.api.Scene`
-		:param controllerType: :data:`blur3d.constants.ControllerType`
-		:return: the new :class:`blur3d.api.SceneAnimationController` or None
+		:param scene: :class:`cross3d.Scene`
+		:param controllerType: :data:`cross3d.constants.ControllerType`
+		:return: the new :class:`cross3d.SceneAnimationController` or None
 		
 		"""
 		nativeController = cls._createNewNative(scene, controllerType)
 		if nativeController:
-			from blur3d.api import SceneAnimationController
+			from cross3d import SceneAnimationController
 			return SceneAnimationController(scene, nativeController)
 		return None
 
@@ -255,4 +253,4 @@ class AbstractSceneAnimationController(SceneWrapper):
 		return (low, high)
 
 # register the symbol
-api.registerSymbol('SceneAnimationController', AbstractSceneAnimationController, ifNotFound=True)
+cross3d.registerSymbol('SceneAnimationController', AbstractSceneAnimationController, ifNotFound=True)

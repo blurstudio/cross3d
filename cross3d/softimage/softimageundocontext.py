@@ -1,13 +1,9 @@
 
-
-
-
-
 from PyQt4.QtCore import QObject
 from PySoftimage import xsi
 
-from blur3d.api.abstract.abstractundocontext import AbstractUndoContext
-from blur3d import api
+import cross3d
+from cross3d.abstract.abstractundocontext import AbstractUndoContext
 
 
 class SoftimageUndoContext(AbstractUndoContext):
@@ -27,9 +23,6 @@ class SoftimageUndoContext(AbstractUndoContext):
 	@classmethod
 	def closeUndo(cls):
 		xsi.CloseUndo()
-		
-	
 	
 # register the symbol
-api.registerSymbol('UndoContext', SoftimageUndoContext)
-	
+cross3d.registerSymbol('UndoContext', SoftimageUndoContext)

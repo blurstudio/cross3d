@@ -1,7 +1,7 @@
 # #
-# 	\namespace	blur3d.api.UserProps
+# 	\namespace	cross3d.UserProps
 #
-# 	\remarks	The blur3d.api.UserProps package creates an abstract wrapper from a 3d system
+# 	\remarks	The cross3d.UserProps package creates an abstract wrapper from a 3d system
 # 				to use storing and retreiving custom user props
 #
 # 	\author		mike@blur.com
@@ -11,16 +11,15 @@
 
 import re
 import json
-import blur3d.api
-from blur3d.naming import Name
+import cross3d
 from collections import OrderedDict
 from PyQt4.QtCore import QTimer as _QTimer
 
-dispatchObject = blur3d.api.dispatch.dispatchObject
+dispatchObject = cross3d.dispatch.dispatchObject
 
 class AbstractUserProps(dict):
 	"""
-	The blur3d.api.UserProps package creates an abstract wrapper from a 
+	The cross3d.UserProps package creates an abstract wrapper from a 
 	3d system to use storing and retreiving custom user props
 	"""
 
@@ -35,8 +34,8 @@ class AbstractUserProps(dict):
 		# if 'BlurTags' in self.keys() and self['BlurTags']:
 		# 	for key in self['BlurTags']:
 		# 		self[key] = self['BlurTags'][key]
-		# 	scene = blur3d.api.Scene()
-		# 	obj = blur3d.api.SceneObject(scene, nativePointer)
+		# 	scene = cross3d.Scene()
+		# 	obj = cross3d.SceneObject(scene, nativePointer)
 		# 	self['BlurTags'] = {}
 		# 	if not obj.model().isReferenced():
 		# 		del self['BlurTags']
@@ -44,8 +43,8 @@ class AbstractUserProps(dict):
 		# if 'Tags' in self.keys() and self['Tags']:
 		# 	for key in self['Tags']:
 		# 		self[key] = self['Tags'][key]
-		# 	scene = blur3d.api.Scene()
-		# 	obj = blur3d.api.SceneObject(scene, nativePointer)
+		# 	scene = cross3d.Scene()
+		# 	obj = cross3d.SceneObject(scene, nativePointer)
 		# 	self['Tags'] = {}
 		# 	if not obj.model().isReferenced():
 		# 		del self['Tags']
@@ -119,6 +118,8 @@ class AbstractUserProps(dict):
 		return out
 
 	def updateFromName(self, format=None):
+		# TODO: REMOVE the dependency of this module
+		from blur3d.naming import Name
 		name = Name(self._nativePointer.name, format)
 		for element in name.elements():
 			key = element.objectName()
@@ -282,7 +283,7 @@ class AbstractFileProps(AbstractUserProps):
 				return True
 			raise KeyError('FileProps does not contain key: %s' % key)
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def __getitem__(self, key):
 		if self.dso().open(self.fileName):
@@ -292,7 +293,7 @@ class AbstractFileProps(AbstractUserProps):
 				return self.unescapeValue(out.value())
 			raise KeyError('FileProps does not contain key: %s' % key)
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def __setitem__(self, key, value):
 		if self.dso().open(self.fileName):
@@ -305,7 +306,7 @@ class AbstractFileProps(AbstractUserProps):
 			self._close()
 			self.emitChange()
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def __repr__(self):
 		return self.__str__()
@@ -334,7 +335,7 @@ class AbstractFileProps(AbstractUserProps):
 			self._close()
 			self.emitChange()
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def close(self):
 		"""
@@ -343,10 +344,11 @@ class AbstractFileProps(AbstractUserProps):
 		if self.dso().open(self.fileName):
 			self._close()
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def dso(self):
 		if not self._dso:
+			# TODO: Move dsofile support outside of blurdev
 			from blurdev.media.dsofile import DSOFile as _DSOFile
 			self._dso = _DSOFile()
 		return self._dso
@@ -359,7 +361,7 @@ class AbstractFileProps(AbstractUserProps):
 			[ret.update({prop.name(): self.unescapeValue(prop.value())}) for prop in self.dso().customProperties()]
 			return ret
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 	def update(self, *args, **kwargs):
 		"""
@@ -371,8 +373,8 @@ class AbstractFileProps(AbstractUserProps):
 			self._saveScheduled = True
 			self._close()
 		else:
-			raise blur3d.api.Exceptions.FileNotDSO
+			raise cross3d.Exceptions.FileNotDSO
 
 # register the symbol
-blur3d.api.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)
-blur3d.api.registerSymbol('FileProps', AbstractFileProps, ifNotFound=True)
+cross3d.registerSymbol('UserProps', AbstractUserProps, ifNotFound=True)
+cross3d.registerSymbol('FileProps', AbstractFileProps, ifNotFound=True)

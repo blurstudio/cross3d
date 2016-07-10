@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxsceneobject
+#	\namespace	cross3d.studiomax.studiomaxsceneobject
 #
 #	\remarks	The StudiomaxSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to 3d Studio Max scenes
@@ -10,11 +10,9 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api import UserProps
-from blur3d.lib.tmclib import TMCInfo
-from blur3d.constants import ObjectType
-from blur3d.lib.pclib import PointCacheInfo
-from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
+from cross3d import UserProps
+from cross3d.constants import ObjectType
+from cross3d.abstract.abstractsceneobject import AbstractSceneObject
 
 class StudiomaxSceneObject( AbstractSceneObject ):
 
@@ -78,12 +76,12 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 	def _nativeCaches( self, cacheType = 0 ):
 		"""
 			\remarks	implements the AbstractSceneObject._nativeCaches method to return a list of the native caches that are applied to this object
-			\param		cacheType	<blur3d.constants.CacheType>	fitler by the inputed cache type
+			\param		cacheType	<cross3d.constants.CacheType>	fitler by the inputed cache type
 			\return		<list> [ <variant> nativeCache, .. ]
 		"""
 		output = []
 
-		from blur3d.constants import CacheType
+		from cross3d.constants import CacheType
 
 		# store maxscript methods used
 		classof 	= mxs.classof
@@ -175,7 +173,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		"""
 		# set a point cache controller
 		if ( name.startswith( 'modifiers[#Point_Cache]' ) ):
-			from blur3d.constants import CacheType
+			from cross3d.constants import CacheType
 			success = False
 			# set controllers within the cache system
 			for cache in self.caches( CacheType.Point_Cache ):
@@ -268,7 +266,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		split = name.split( '.' )
 		if len( split ) > 1:
 			modelName = split[0]
-			from blur3d.api import Scene
+			from cross3d import Scene
 			scene = Scene()
 			return scene._findNativeObject( modelName )
 		return None
@@ -293,7 +291,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			\sa			N/A
 			\return		<Py3dsMax.mxs.Object>
 		"""
-		cloneObject = mxs.blur3dhelper.cloneObjects([self._nativePointer], expandHierarchy=True)
+		cloneObject = mxs.cross3dhelper.cloneObjects([self._nativePointer], expandHierarchy=True)
 		return self.__class__(self.scene(), cloneObject[0])
 
 	def keyframeTimeControllers(self, alembic=True):
@@ -355,11 +353,13 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 			# Unfortunately the start and end frame of the cache data is not stored on the controller so we have to parse the file.
 			if mxs.classof(nativeCache) == mxs.Point_Cache:
+				from blur3d.lib.pclib import PointCacheInfo
 				cacheInfo = PointCacheInfo.read(nativeCache.filename, header_only=True)
 
 			elif mxs.classof(nativeCache) == mxs.Transform_Cache:
 				# Ensure file exists
 				try:
+					from blur3d.lib.tmclib import TMCInfo
 					cacheInfo = TMCInfo.read(nativeCache.CacheFile, header_only=True)
 				except IOError as e:
 					print "Cache file does not exist: {0}".format(nativeCache.CacheFile)
@@ -425,7 +425,7 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 			linear = mxs.pyhelper.namify('linear')
 			mxs.setBeforeORT(timeController, linear)
 			mxs.setAfterORT(timeController, linear)
-			from blur3d.api import SceneAnimationController
+			from cross3d import SceneAnimationController
 			return SceneAnimationController(self._scene, timeController)
 
 		return None
@@ -616,5 +616,5 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 		return output
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneObject', StudiomaxSceneObject )
+import cross3d
+cross3d.registerSymbol( 'SceneObject', StudiomaxSceneObject )

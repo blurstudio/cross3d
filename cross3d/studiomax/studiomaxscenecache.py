@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenecache
+#	\namespace	cross3d.abstract.abstractscenecache
 #
 #	\remarks	The AbstractSceneCache class provides an interface to editing data caches in a Scene environment for any DCC application
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api.abstract.abstractscenecache import AbstractSceneCache
+from cross3d.abstract.abstractscenecache import AbstractSceneCache
 
 class StudiomaxSceneCache( AbstractSceneCache ):
 	def _nativeControllers( self ):
@@ -64,5 +64,5 @@ class StudiomaxSceneCache( AbstractSceneCache ):
 		return True
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneCache', StudiomaxSceneCache )
+import cross3d
+cross3d.registerSymbol( 'SceneCache', StudiomaxSceneCache )

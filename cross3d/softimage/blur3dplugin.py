@@ -13,12 +13,11 @@
 
 from win32com.client 	import constants
 from PyQt4.QtCore		import Qt
-import blur3d
-from blurdev import debug
-from blur3d.api import dispatch
-dispatchRename = blur3d.api.dispatch.dispatchRename
-dispatchObject = blur3d.api.dispatch.dispatchObject
-dispatchSignal = blur3d.api.dispatch.dispatch
+import cross3d
+from cross3d import dispatch
+dispatchRename = cross3d.dispatch.dispatchRename
+dispatchObject = cross3d.dispatch.dispatchObject
+dispatchSignal = cross3d.dispatch.dispatch
 import inspect
 #-------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +49,7 @@ def XsiApplication_objectAdded_OnEvent( ctxt ):
 		for object in ctxt.GetAttribute('Objects'):
 			dispatchObject('objectCreated', object)
 	except TypeError:
-		debug.debugMsg("Unable to process objectCreated Event because it did not return a list." )
+		cross3d.logger.debug("Unable to process objectCreated Event because it did not return a list.")
 	
 def XsiApplication_objectRemoved_OnEvent( ctxt ):
 	for name in ctxt.GetAttribute('ObjectNames'):
@@ -178,17 +177,17 @@ def XsiApplication_valueChanged_OnEvent( ctxt ):
 
 #-------------------------------------------------------------------------------------------------------------
 # Get the enabled state for ValueChanged
-def Blur3d_valueChangedEnabled_Init( ctxt ):
+def Cross3d_valueChangedEnabled_Init( ctxt ):
 	oCmd = ctxt.Source
 	oCmd.Description = ""
 	oCmd.ReturnValue = True
 	return True
 	
-def Blur3d_valueChangedEnabled_Execute():
+def Cross3d_valueChangedEnabled_Execute():
 	return _enableValueChanged
 
 # set the enabled state for ValueChanged
-def Blur3d_enableValueChanged_Init( ctxt ):
+def Cross3d_enableValueChanged_Init( ctxt ):
 	oCmd = ctxt.Source
 	oCmd.Description = ""
 	oCmd.ReturnValue = True
@@ -198,7 +197,7 @@ def Blur3d_enableValueChanged_Init( ctxt ):
 	
 	return True
 	
-def Blur3d_enableValueChanged_Execute(state):
+def Cross3d_enableValueChanged_Execute(state):
 	global _enableValueChanged
 	_enableValueChanged = state
 	return True
@@ -207,7 +206,7 @@ def Blur3d_enableValueChanged_Execute(state):
 
 def XSILoadPlugin( reg ):
 	reg.author 	= 'Blur Studio'
-	reg.name 	= 'blur3d'
+	reg.name 	= 'cross3d'
 	reg.email	= 'beta@blur.com'
 	reg.url		= 'www.blur.com'
 	reg.major	= 1
@@ -243,8 +242,8 @@ def XSILoadPlugin( reg ):
 
 	# Note:  dataChanged slows down xsi
 	
-	reg.RegisterCommand("Blur3d_enableValueChanged", "Blur3d_enableValueChanged")
-	reg.RegisterCommand("Blur3d_valueChangedEnabled", "Blur3d_valueChangedEnabled")
+	reg.RegisterCommand("Cross3d_enableValueChanged", "Cross3d_enableValueChanged")
+	reg.RegisterCommand("Cross3d_valueChangedEnabled", "Cross3d_valueChangedEnabled")
 	
 	return True
 

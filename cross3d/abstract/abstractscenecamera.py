@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenecamera
+#	\namespace	cross3d.abstract.abstractscenecamera
 #
-#	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the blur3d system
+#	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the cross3d system
 #				This class will provide a generic overview structure for all manipulations of 3d objects
 #
 #	\author		eric@blur.com
@@ -9,16 +9,15 @@
 #	\date		03/15/10
 #
 
-from blur3d	import abstractmethod
-from blur3d.api import SceneObject
-from blur3d.constants import ObjectType
-from blur3d import api
+import cross3d
+from cross3d import SceneObject, abstractmethod
+from cross3d.constants import ObjectType
 import math
 
 class AbstractSceneCamera(SceneObject):
 	"""
 		The AbstractSceneObject class provides the base foundation for the 3d
-		Object framework for the blur3d system.  This class will provide a
+		Object framework for the cross3d system.  This class will provide a
 		generic overview structure for all manipulations of 3d objects.
 
 	"""
@@ -128,7 +127,7 @@ class AbstractSceneCamera(SceneObject):
 
 	def isCameraType(self, cameraType):
 		"""
-			Return whether or not this camera is a kind of the inputed camera type. Expecting blur3d.constants.CameraType.
+			Return whether or not this camera is a kind of the inputed camera type. Expecting cross3d.constants.CameraType.
 		"""
 		return (self.cameraType() & cameraType) > 0
 
@@ -219,7 +218,7 @@ class AbstractSceneCamera(SceneObject):
 	@abstractmethod
 	def cameraType(self):
 		"""
-			Returns the camera type for this camera instance as blur3d.constants.CameraType.
+			Returns the camera type for this camera instance as cross3d.constants.CameraType.
 		"""
 		return 0
 
@@ -476,7 +475,7 @@ class AbstractSceneCamera(SceneObject):
 			\param path <String>
 			\param frameRange <FrameRange>
 			\param resolution <QtCore.QSize>
-			\return <blur3d.api.constants.CameraType>
+			\return <cross3d.constants.CameraType>
 		"""
 		return False
 
@@ -536,5 +535,5 @@ class AbstractSceneCamera(SceneObject):
 		return True
 
 # register the symbol
-api.registerSymbol('SceneCamera', AbstractSceneCamera, ifNotFound=True)
+cross3d.registerSymbol('SceneCamera', AbstractSceneCamera, ifNotFound=True)
 

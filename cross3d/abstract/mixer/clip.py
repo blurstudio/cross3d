@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.clip
+#	\namespace	cross3d.abstract.clip
 #
 #	\remarks	The AbstractClip class provides a base implementation of a
 #				cross-application interface to a clip.
@@ -9,9 +9,8 @@
 #	\date		10/15/15
 #
 
-from blur3d import abstractmethod
-from blur3d import api
-from blur3d.api import ClipPortion, TrackPortion
+import cross3d
+from cross3d import ClipPortion, TrackPortion, abstractmethod
 
 class AbstractClip(object):
 	"""The AbstractClip class provides a base implementation of a
@@ -184,4 +183,4 @@ class AbstractClip(object):
 ################################################################################
 
 # register the symbol
-api.registerSymbol('Clip', AbstractClip, ifNotFound=True)
+cross3d.registerSymbol('Clip', AbstractClip, ifNotFound=True)

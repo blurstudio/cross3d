@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneobject
+#	\namespace	cross3d.abstract.abstractsceneobject
 #
-#	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the blur3d system
+#	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the cross3d system
 #				This class will provide a generic overview structure for all manipulations of 3d objects
 #	
 #	\author		eric@blur.com
@@ -9,17 +9,16 @@
 #	\date		03/15/10
 #
 
-from blur3d import api
+import cross3d
 from PyQt4.QtGui import QColor
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d.constants import ObjectType, RotationOrder
+from cross3d import SceneWrapper, abstractmethod
+from cross3d.constants import ObjectType, RotationOrder
 
 class AbstractSceneObject(SceneWrapper):
 
 	"""
 		The SceneObject class provides the base foundation for the 3d 
-		Object framework for the blur3d system.  This class will provide a 
+		Object framework for the cross3d system.  This class will provide a 
 		generic overview structure for all manipulations of 3d objects
 	"""
 
@@ -79,7 +78,7 @@ class AbstractSceneObject(SceneWrapper):
 	def _nativeCaches(self, cacheType=0):
 		"""
 			\remarks	return a list of the native caches that are applied to this object
-			\param		cacheType	<blur3d.constants.CacheType>	fitler by the inputed cache type
+			\param		cacheType	<cross3d.constants.CacheType>	fitler by the inputed cache type
 			\return		<list> [ <variant> nativeCache, .. ]
 		"""
 		return []
@@ -208,7 +207,7 @@ class AbstractSceneObject(SceneWrapper):
 		return None
 	
 	def addController(self, name, group='', tpe=float, default=0.0):
-		from blur3d.api import SceneAnimationController
+		from cross3d import SceneAnimationController
 		return SceneAnimationController(self._scene, self._addNativeController(name, group, tpe, default))
 
 	@abstractmethod
@@ -220,12 +219,12 @@ class AbstractSceneObject(SceneWrapper):
 		
 		:param cacheFile: filepath to the cache
 		:type cacheFile: str
-		:return: :class:`blur3d.api.SceneCache` or None
+		:return: :class:`cross3d.SceneCache` or None
 			
 		"""
 		nativeCache = self._addNativeCacheFromFile(cacheFile)
 		if (nativeCache):
-			from blur3d.api import SceneCache
+			from cross3d import SceneCache
 			return SceneCache(self._scene, nativeCache)
 		return None
 	
@@ -247,17 +246,17 @@ class AbstractSceneObject(SceneWrapper):
 	def caches(self, cacheType=0):
 		"""Return a list of the caches that are applied to this object
 		
-		:param cacheType: :data:`blur3d.constants.CacheType`
-		:return: a list of :class:`blur3d.api.SceneCache` objects
+		:param cacheType: :data:`cross3d.constants.CacheType`
+		:return: a list of :class:`cross3d.SceneCache` objects
 		
 		"""
-		from blur3d.api import SceneCache
+		from cross3d import SceneCache
 		return [ SceneCache(self._scene, nativeCache) for nativeCache in self._nativeCaches(cacheType) ]
 
 	def childAt(self, index):
 		"""Returns the child at a particular index for this object
 		
-		:return: :class:`blur3d.api.SceneObject` or None
+		:return: :class:`cross3d.SceneObject` or None
 		
 		"""
 		nativeChildren = self._nativeChildren()
@@ -281,15 +280,15 @@ class AbstractSceneObject(SceneWrapper):
 		:type wildcard: str
 		:param type: ?
 		:type type: str
-		:return: list of :class:`blur3d.api.SceneObject` objects
+		:return: list of :class:`cross3d.SceneObject` objects
 
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		scene = self._scene
 		return [SceneObject(scene, native) for native in self._nativeChildren(recursive, wildcard, type)]
 
 	def constrainedObjects(self):
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self._scene, nativeObject) for nativeObject in self._constrainedNativeObjects()]
 
 	@abstractmethod
@@ -297,7 +296,7 @@ class AbstractSceneObject(SceneWrapper):
 		return []
 
 	def constrainingObjects(self):
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self._scene, nativeObject) for nativeObject in self._constrainingNativeObjects()]
 
 	@abstractmethod
@@ -322,12 +321,12 @@ class AbstractSceneObject(SceneWrapper):
 		Loops through the children for this object searching for the 
 		proper one
 
-		:return: :class:`blur3d.api.SceneObject` or None
+		:return: :class:`cross3d.SceneObject` or None
 
 		"""
 		nativeChild = self._findNativeChild(name, recursive=recursive)
 		if (nativeChild):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			return SceneObject(self._scene, nativeChild)
 		return None
 
@@ -373,7 +372,7 @@ class AbstractSceneObject(SceneWrapper):
 		Returns whether or not the inputed object type is the type of object 
 		this is
 		
-		:param objectType: :data:`blur3d.constants.ObjectType`
+		:param objectType: :data:`cross3d.constants.ObjectType`
 
 		"""
 		return (self._objectType & objectType) != 0
@@ -390,12 +389,12 @@ class AbstractSceneObject(SceneWrapper):
 		Returns the SceneLayer that this object is on, or none if no 
 		layer found
 		
-		:return: :class:`blur3d.api.SceneLayer` or None
+		:return: :class:`cross3d.SceneLayer` or None
 
 		"""
 		nativeLayer = self._nativeLayer()
 		if (nativeLayer):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self._scene, nativeLayer)
 		return None
 
@@ -426,24 +425,24 @@ class AbstractSceneObject(SceneWrapper):
 		Returns the SceneMaterial that this object is using, or none if no 
 		scene material was found
 		
-		:return: :class:`blur3d.api.SceneMaterial` or None
+		:return: :class:`cross3d.SceneMaterial` or None
 
 		"""
 		nativeMaterial = self._nativeMaterial()
 		if (nativeMaterial):
-			from blur3d.api import SceneMaterial
+			from cross3d import SceneMaterial
 			return SceneMaterial(self._scene, nativeMaterial)
 		return None
 
 	def model(self):
 		"""Returns the SceneObject that is the model for this object
 		
-		:return: :class:`blur3d.api.SceneObject` or None
+		:return: :class:`cross3d.SceneObject` or None
 
 		"""
 		nativeModel = self._nativeModel()
 		if (nativeModel):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			return SceneObject(self._scene, nativeModel)
 		return None
 
@@ -452,7 +451,7 @@ class AbstractSceneObject(SceneWrapper):
 		Returns the type of object this wrapper represents for the 
 		native object
 		
-		:return: :data:`blur3d.constants.ObjectType`
+		:return: :data:`cross3d.constants.ObjectType`
 
 		"""
 		return self._objectType
@@ -460,11 +459,11 @@ class AbstractSceneObject(SceneWrapper):
 	def parent(self):
 		"""
 			Returns the parent item for this object	
-			:return: :class:`blur3d.api.SceneObject` or None
+			:return: :class:`cross3d.SceneObject` or None
 		"""
 		nativeParent = self._nativeParent()
 		if (nativeParent):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			return SceneObject(self._scene, nativeParent)
 		return None
 
@@ -485,7 +484,7 @@ class AbstractSceneObject(SceneWrapper):
 
 	@abstractmethod
 	def rotationOrder(self):
-		""" Returns the blur3d.constants.RotationOrder enum for this object or zero """
+		""" Returns the cross3d.constants.RotationOrder enum for this object or zero """
 		return 0
 
 	@classmethod
@@ -494,7 +493,7 @@ class AbstractSceneObject(SceneWrapper):
 		""" Sets the transform rotation order for the provided object to the provided value.
 		
 		Args:
-			order: blur3d.constants.RotationOrder enum
+			order: cross3d.constants.RotationOrder enum
 		"""
 		return None
 
@@ -502,7 +501,7 @@ class AbstractSceneObject(SceneWrapper):
 		""" Sets the transform rotation order for this object. 
 		
 		Args:
-			order: blur3d.constants.RotationOrder enum
+			order: cross3d.constants.RotationOrder enum
 		"""
 		return self._setNativeRotationOrder(self._nativePointer, order)
 
@@ -551,7 +550,7 @@ class AbstractSceneObject(SceneWrapper):
 	def setLayer(self, layer):
 		"""Sets the layer for this object to the inputed SceneLayer
 		
-		:param layer: :class:`blur3d.api.SceneLayer`
+		:param layer: :class:`cross3d.SceneLayer`
 
 		"""
 		nativeLayer = None
@@ -564,7 +563,7 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		Sets the material for this object to the inputed SceneMaterial
 		
-		:param material: :class:`blur3d.api.SceneMaterial` or None
+		:param material: :class:`cross3d.SceneMaterial` or None
 
 		"""
 		nativeMaterial = None
@@ -577,7 +576,7 @@ class AbstractSceneObject(SceneWrapper):
 		"""
 		Sets the model for this object to the inputed SceneObject
 		
-		:param model: :class:`blur3d.api.SceneObject`
+		:param model: :class:`cross3d.SceneObject`
 
 		"""
 		nativeModel = None
@@ -589,7 +588,7 @@ class AbstractSceneObject(SceneWrapper):
 	def setParent(self, parent):
 		"""Sets the parent for this object to the inputed item
 		
-		:param parent: :class:`blur3d.api.SceneObject` or None
+		:param parent: :class:`cross3d.SceneObject` or None
 		
 		"""
 
@@ -676,7 +675,7 @@ class AbstractSceneObject(SceneWrapper):
 		""" The default rotation order when creating new cameras.
 		
 		Returns:
-			blur3d.constants.RotationOrder
+			cross3d.constants.RotationOrder
 		"""
 		return RotationOrder.XYZ
 
@@ -761,5 +760,5 @@ class AbstractSceneObject(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('SceneObject', AbstractSceneObject, ifNotFound=True)
+cross3d.registerSymbol('SceneObject', AbstractSceneObject, ifNotFound=True)
 

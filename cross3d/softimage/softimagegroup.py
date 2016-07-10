@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagegroup
+#	\namespace	cross3d.softimage.softimagegroup
 #
 #	\remarks	The SoftimageSceneObjectGroup class provides an interface for working with Softimage groups.
 #	
@@ -9,8 +9,8 @@
 #
 
 from PySoftimage import xsi
-from blur3d.api import application
-from blur3d.api.abstract.abstractgroup import AbstractGroup
+from cross3d import application
+from cross3d.abstract.abstractgroup import AbstractGroup
 
 class SoftimageGroup(AbstractGroup):
 
@@ -64,6 +64,6 @@ class SoftimageGroup(AbstractGroup):
 		return self._nativePointer.FullName
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Group', SoftimageGroup)
+import cross3d
+cross3d.registerSymbol('Group', SoftimageGroup)
 

@@ -2,8 +2,9 @@ import re
 import itertools
 import maya.OpenMaya as om
 import maya.cmds as cmds
-from blur3d.api.abstract.abstractscenewrapper import AbstractSceneWrapper
-from blur3d.api import ExceptionRouter
+import cross3d
+from cross3d.abstract.abstractscenewrapper import AbstractSceneWrapper
+from cross3d import ExceptionRouter
 
 class MayaSceneWrapper( AbstractSceneWrapper ):
 	#--------------------------------------------------------------------------------
@@ -63,8 +64,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			if dataType == om.MFnData.kInvalid:
 				# No vaid dataType was found, default to None so we can handle it diffrently
 				dataType == None
-				from blurdev import debug
-				debug.debugMsg('Unable To determine the attribute type.\n{}'.format(str(default)))
+				cross3d.logger.debug('Unable To determine the attribute type.\n{}'.format(str(default)))
 		if dataType == None:
 			# MCH 09/17/14 # TODO Evaluate if this is a valid default?
 			dataType = om.MFnData.kAny
@@ -282,7 +282,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 			return om.MFnDependencyNode(nativeObject).name()
 
 	#--------------------------------------------------------------------------------
-	#							blur3d private methods
+	#							cross3d private methods
 	#--------------------------------------------------------------------------------
 	@property
 	def _nativePointer(self):
@@ -345,7 +345,7 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return cmds.listAttr(name, settable=True, output=True)
 	
 	#--------------------------------------------------------------------------------
-	#							blur3d public methods
+	#							cross3d public methods
 	#--------------------------------------------------------------------------------
 	
 	def namespace(self):
@@ -398,5 +398,4 @@ class MayaSceneWrapper( AbstractSceneWrapper ):
 		return self._nativeHandle.hashCode()
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneWrapper', MayaSceneWrapper )
+cross3d.registerSymbol('SceneWrapper', MayaSceneWrapper)

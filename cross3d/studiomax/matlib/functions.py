@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.matlib
+#	\namespace	cross3d.studiomax.matlib
 #
 #	\remarks	This package contains material editing methods for Studiomax
 #
@@ -241,10 +241,10 @@ def createMaterialOverride( baseMaterial, overrideMaterial, options = None, adva
 					base material based on the supplied options, while joining the main shader aspects of the override material
 		\param		baseMaterial		<Py3dsMax.mxs.Material>
 		\param		overrideMaterial	<Py3dsMax.mxs.Material>
-		\param		options				<blur3d.constants.MaterialOverrideOptions>
+		\param		options				<cross3d.constants.MaterialOverrideOptions>
 		\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 	"""
-	from blur3d.constants import MaterialOverrideOptions
+	from cross3d.constants import MaterialOverrideOptions
 
 	# use default options when none are supplied
 	if ( options == None ):

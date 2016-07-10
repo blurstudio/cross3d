@@ -1,6 +1,6 @@
 """
 	Namespace:
-		blur3d.api.classes.timecode
+		cross3d.classes.timecode
 
 	Remarks:
 		Module containing Timcode class for dealing with timecode,
@@ -19,8 +19,8 @@
 """
 import re
 import math
-from blur3d.constants import TimeUnit
-from blur3d import pendingdeprecation
+from cross3d.constants import TimeUnit
+from cross3d import pendingdeprecation
 
 class Timecode(object):
 	"""Timcode class for dealing with timecode, including conversions from/to different formats.
@@ -405,7 +405,7 @@ class Timecode(object):
 			timeUnit is specified, the Seconds will be used.
 
 		Args:
-					timeUnit(blur3d.constants.TimeUnit): The unit of time to quantify by.
+					timeUnit(cross3d.constants.TimeUnit): The unit of time to quantify by.
 
 		Returns:
 					float: This Timecode instance's value in the specified TimeUnit.

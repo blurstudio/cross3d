@@ -1,7 +1,7 @@
 ##
-#   :namespace  blur3d.api.maya
+#   :namespace  cross3d.maya
 #
-#   :remarks    The blur3d.api.maya package contains the necessary classes to control Maya.
+#   :remarks    The cross3d.maya package contains the necessary classes to control Maya.
 #   
 #   :author     mikeh@blur.com
 #   :author     Blur Studio

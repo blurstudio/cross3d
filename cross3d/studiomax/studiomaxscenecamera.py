@@ -1,5 +1,5 @@
-    ##
-#	\namespace	blur3d.api.studiomax.studiomaxscenecamera
+##
+#	\namespace	cross3d.studiomax.studiomaxscenecamera
 #
 #	\remarks	The StudiomaxSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
 #				to 3d Studio Max scenes
@@ -11,16 +11,16 @@
 
 import os
 import random
-import blur3d.api
+import cross3d
 import math
 
 from Py3dsMax import mxs, AtTime
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QSize
-from blur3d.api import application
-from blur3d import pendingdeprecation
-from blur3d.constants import CameraType
-from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
+from cross3d import application
+from cross3d import pendingdeprecation
+from cross3d.constants import CameraType
+from cross3d.abstract.abstractscenecamera import AbstractSceneCamera
 
 #-------------------------------------------------------------------------
 
@@ -148,7 +148,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             return
         objects = [o.nativePointer() for o in objects]
         cam = self.nativePointer()
-        helper = mxs.blur3dhelper.turntableHelperBuilder(
+        helper = mxs.cross3dhelper.turntableHelperBuilder(
             self.nativePointer(),
             startFrame,
             endFrame,
@@ -196,7 +196,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
     def cameraType(self):
         """
                 \remarks	implements the AbstractSceneCamera.cameraType method to determine what type of camera this instance is
-                \return		<blur3d.api.constants.CameraType>
+                \return		<cross3d.constants.CameraType>
         """
         cls = mxs.classof(self._nativePointer)
         if cls in (mxs.FreeCamera, mxs.TargetCamera):
@@ -293,12 +293,12 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         """
                 \remarks	renders an image sequence form that camera with the current render settings
                 \param 		path <String>
-                \param 		frameRange <blur3d.api.FrameRange>
+                \param 		frameRange <cross3d.FrameRange>
                 \param 		resolution <QtCore.QSize>
                 \param 		pixelAspect <float>
                 \param 		step <int>
                 \param 		missingFramesOnly <bool>
-                \return		<blur3d.api.constants.CameraType>
+                \return		<cross3d.constants.CameraType>
         """
 
         path = options.get('path', '')
@@ -656,7 +656,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
     def interest(self):
         if self._nativePointer.Target:
-            return blur3d.api.SceneObject(self._scene, self._nativePointer.Target)
+            return cross3d.SceneObject(self._scene, self._nativePointer.Target)
         return None
 
     def setInterest(self, interest):
@@ -768,7 +768,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         return planes
 
     def objectsInFrustrum(self, objects=[], considerVisibility=True, frameRange=None, step=1, allowClipping=True):
-        from blur3d.api import Scene, SceneCamera, SceneObject
+        from cross3d import Scene, SceneCamera, SceneObject
         from Py3dsMax import AtTime
         from blur3d.mathutils import Vector
         # TODO convert objects to SceneObjects?
@@ -784,7 +784,7 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
         else:
             attime = AtTime()
 
-        if isinstance(frameRange, blur3d.api.FrameRange):
+        if isinstance(frameRange, cross3d.FrameRange):
             frameRange = xrange(frameRange.start(), frameRange.end()+1, step)
         for frame in frameRange:
             # Explicit comparison to None to allow querying frame 0
@@ -822,5 +822,5 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
 
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneCamera', StudiomaxSceneCamera)
+import cross3d
+cross3d.registerSymbol('SceneCamera', StudiomaxSceneCamera)

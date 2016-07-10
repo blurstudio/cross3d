@@ -1,16 +1,13 @@
 import glob
 import os
 from functools import partial
-import blurdev
 import maya.cmds as cmds
 import maya.OpenMaya as om
 import maya.OpenMayaUI as omUI
-from blur3d import api
-from blur3d.api import Exceptions, ExceptionRouter
-from blur3d.api.classes import FrameRange
-from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
-
-from blur3d.lib.statelockerlib import StateLocker
+import cross3d
+from cross3d import Exceptions, ExceptionRouter
+from cross3d.classes import FrameRange
+from cross3d.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +26,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 		else:
 			self._nativePointer = omUI.M3dView()
 			omUI.M3dView.get3dView(viewportID, self._nativePointer)
-		self._name = api.SceneWrapper._mObjName(self._nativeCamera())
+		self._name = cross3d.SceneWrapper._mObjName(self._nativeCamera())
 	
 	#--------------------------------------------------------------------------------
 	#									Private Methods
@@ -41,12 +38,12 @@ class MayaSceneViewport(AbstractSceneViewport):
 			return undocumentedPythonFunctionRequirement.node()
 		
 	def _setNativeCamera(self, nativeCamera):
-		nativeCamera = api.SceneWrapper._asMOBject(nativeCamera)
+		nativeCamera = cross3d.SceneWrapper._asMOBject(nativeCamera)
 		with ExceptionRouter():
 			dagPath = om.MDagPath.getAPathTo(nativeCamera)
 		self._nativePointer.setCamera(dagPath)
 		# Ensure the viewport is refreshed
-		api.application.refresh()
+		cross3d.application.refresh()
 		return True
 	#--------------------------------------------------------------------------------
 	#									Public Methods
@@ -99,9 +96,9 @@ class MayaSceneViewport(AbstractSceneViewport):
 		if slate != None:
 			# Note: this is probably how we can handle slate
 			#cmds.headsUpDisplay( 'blurBurnin', section=8, block=0, blockAlignment='right', dw=50, label='This is my burnin')
-			blurdev.debug.debugObject(self.generatePlayblast, 'slate is not implemented in Maya')
+			cross3d.logger.debug('slate is not implemented in Maya')
 		if pathFormat != r'{basePath}\{fileName}.{frame}.{ext}':
-			blurdev.debug.debugObject(self.generatePlayblast, 'pathFormat is not implemented in Maya')
+			cross3d.logger.debug('pathFormat is not implemented in Maya')
 		
 		# Prepare to detect if the playblast was canceled
 		formatter = '{fileName}.{frame:0%i}{ext}' % padding
@@ -141,6 +138,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 			cmds.setAttr("{name}.overscan".format(name=name), lock=False)
 		
 		# create a StateLocker object to backup the current values before setting them
+		from blur3d.lib.statelockerlib import StateLocker
 		with StateLocker() as stateLocker:
 			# Currently the state locker isnt the most convienent to use
 			def setPropertyLocker(obj, key, value):
@@ -183,7 +181,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 				updateDict = dict([(attr, False) for attr in attrs if attr not in modelEditorOverrides])
 				modelEditorOverrides.update(updateDict)
 				# New features in 2015
-				if api.application.version() > 2014 and 'particleInstancers' not in modelEditorOverrides:
+				if cross3d.application.version() > 2014 and 'particleInstancers' not in modelEditorOverrides:
 					modelEditorOverrides.update(particleInstancers=False)
 			
 			if effects == True:
@@ -192,7 +190,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 1)
 				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', True)
 				
-				# TODO: Add Camera.setDeptOfField to blur3d
+				# TODO: Add Camera.setDeptOfField to cross3d
 				ntp = cam._nativeTypePointer
 				stateLocker.setMethod(ntp, ntp.setDepthOfField, ntp.isDepthOfField, True)
 				
@@ -202,7 +200,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.motionBlurEnable', 0)
 				setPropertyLocker(self._scene, 'hardwareRenderingGlobals.multiSampleEnable', False)
 				
-				# TODO: Add Camera.setDeptOfField to blur3d
+				# TODO: Add Camera.setDeptOfField to cross3d
 				ntp = cam._nativeTypePointer
 				stateLocker.setMethod(ntp, ntp.setDepthOfField, ntp.isDepthOfField, False)
 			
@@ -259,4 +257,4 @@ class MayaSceneViewport(AbstractSceneViewport):
 		self._nativePointer.refresh(False, True)
 
 # register the symbol
-api.registerSymbol('SceneViewport', MayaSceneViewport)
+cross3d.registerSymbol('SceneViewport', MayaSceneViewport)

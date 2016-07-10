@@ -1,8 +1,8 @@
 ##
-#	\namespace	blur3d.api.abstract.studiomaxapplication
+#	\namespace	cross3d.abstract.studiomaxapplication
 #
-#	\remarks	The StudiomaxApplication class will define all operations for application interaction. It is a singleton class, so calling blur3d.api.Application() will
-#				always return the same instance of Application. One of its main functions is connecting application callbacks to blur3d.api.Dispatch.
+#	\remarks	The StudiomaxApplication class will define all operations for application interaction. It is a singleton class, so calling cross3d.Application() will
+#				always return the same instance of Application. One of its main functions is connecting application callbacks to cross3d.Dispatch.
 #				
 #				The StudiomaxApplication is a QObject instance and any changes to the scene data can be controlled by connecting to the signals defined here.
 #
@@ -18,9 +18,9 @@
 import os
 import re
 
-from blur3d import api
+import cross3d
 from PySoftimage import xsi, constants
-from blur3d.api.abstract.abstractapplication import AbstractApplication
+from cross3d.abstract.abstractapplication import AbstractApplication
 
 dispatch = None
 
@@ -52,14 +52,14 @@ class SoftimageApplication(AbstractApplication):
 	
 	def connect(self):
 		"""
-			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
+			\remarks	connect application specific callbacks to <cross3d.Dispatch>, dispatch will convert the native object to a cross3d object
 						and emit a signal.
-						connect is called when the first <blur3d.api.Dispatch> signal is connected.
+						connect is called when the first <cross3d.Dispatch> signal is connected.
 			\return		<bool>	was the connection successfull
 		"""
 		global dispatch
-		import blur3d.api
-		dispatch = blur3d.api.dispatch
+		import cross3d
+		dispatch = cross3d.dispatch
 		if super(SoftimageApplication, self).connect():
 			if xsi.LoadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py')):
 				return True
@@ -69,14 +69,14 @@ class SoftimageApplication(AbstractApplication):
 		""" Only process valueChanged signals if we actually care about one of its many signals. """
 		if signal in self.objectCallbacks:
 			if self._objectsConnectedCount == 0:
-				xsi.Blur3d_enableValueChanged(True)
+				xsi.Cross3d_enableValueChanged(True)
 			self._objectsConnectedCount += 1
 		return
 	
 	def disconnect(self):
 		"""
-			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
-						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
+			\remarks	disconnect application specific callbacks to <cross3d.Dispatch>. This will be called when <cross3d.Dispatch> is deleted,
+						disconnect is called when the last <cross3d.Dispatch> signal is disconnected.
 		"""
 		xsi.UnloadPlugin(os.path.abspath(__file__ + '/../blur3dplugin.py'))
 	
@@ -85,7 +85,7 @@ class SoftimageApplication(AbstractApplication):
 		if signal in self.objectCallbacks:
 			self._objectsConnectedCount -= 1
 			if self._objectsConnectedCount < 1:
-				xsi.Blur3d_enableValueChanged(False)
+				xsi.Cross3d_enableValueChanged(False)
 		return
 
 	def autokey(self):
@@ -118,7 +118,7 @@ class SoftimageApplication(AbstractApplication):
 		return "Softimage"
 		
 	def exportAlembic(self, filename, **kwargs):
-		from blur3d.api import Scene
+		from cross3d import Scene
 		scene = Scene()
 		
 		job = {'filename': filename}
@@ -183,7 +183,7 @@ class SoftimageApplication(AbstractApplication):
 		return 'emdl'
 		
 # register the symbol
-api.registerSymbol( 'Application', SoftimageApplication)
+cross3d.registerSymbol( 'Application', SoftimageApplication)
 
 # Creating a single instance of Application for all code to use.
-api.registerSymbol( 'application', SoftimageApplication())
+cross3d.registerSymbol( 'application', SoftimageApplication())

@@ -1,5 +1,5 @@
 ##
-# 	\namespace	blur3d.api.external
+# 	\namespace	cross3d.external
 #
 #	\remarks	[desc::commented]
 #
@@ -11,8 +11,8 @@
 #------------------------------------------------------------------------------------------------------------------------
 
 from PyQt4.QtCore import QObject
-from blur3d import abstractmethod
-from blur3d.constants import ScriptLanguage
+from cross3d import abstractmethod
+from cross3d.constants import ScriptLanguage
 
 #------------------------------------------------------------------------------------------------------------------------
 

@@ -1,21 +1,22 @@
 ##
-#   :namespace  blur3d.api.maya.mayaexceptionrouter
+#   :namespace  cross3d.maya.mayaexceptionrouter
 #
-#   :remarks    Context that converts native exceptions in maya to Blur3d exceptions.
+#   :remarks    Context that converts native exceptions in maya to cross3d exceptions.
 #				This Context is used to capture common exceptions raised in the Software. It 
-#				identifies the exception and raises a Blur3d.api.Exceptions exception instead. If it
+#				identifies the exception and raises a cross3d.Exceptions exception instead. If it
 #				can not identify the exception, it raises the existing exception.
 #   
 #   :author     mikeh@blur.com
 #   :author     Blur Studio
 #   :date       11/04/14
-#
-from blur3d.api import Exceptions
-from blur3d import api
+#
+
+import cross3d
+from cross3d import Exceptions
 
 class MayaExceptionRouter(object):
 	""" This Context is used to capture common exceptions raised in the Software. It identifies the
-	exception and raises a Blur3d.api.Exceptions exception instead. If it can not identify the
+	exception and raises a cross3d.Exceptions exception instead. If it can not identify the
 	exception, it raises the existing exception.
 	"""
 	def __enter__(self):
@@ -32,4 +33,4 @@ class MayaExceptionRouter(object):
 		return False
 
 # register the symbol
-api.registerSymbol('ExceptionRouter', MayaExceptionRouter)
+cross3d.registerSymbol('ExceptionRouter', MayaExceptionRouter)

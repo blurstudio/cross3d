@@ -1,11 +1,10 @@
 import re
-from blurdev.debug import DebugLevel, debugLevel, debugMsg
 import maya.cmds as cmds
 import maya.OpenMaya as om
 
-from blur3d import api
+import cross3d
 from collections import OrderedDict
-from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
+from cross3d.abstract.abstractscenemodel import AbstractSceneModel
 
 resolutionAttr = 'resolution'
 
@@ -123,7 +122,7 @@ class MayaSceneModel(AbstractSceneModel):
 		super(MayaSceneModel, self).setDisplayName(name)
 	
 	def _createResolutionComboBox(self):
-		userProps = api.UserProps(self._nativePointer)
+		userProps = cross3d.UserProps(self._nativePointer)
 
 		# Local models have a resolution metadata.
 		# Maybe it's not a good idea.
@@ -146,7 +145,7 @@ class MayaSceneModel(AbstractSceneModel):
 				raise
 
 	def isReferenced(self):
-		userProps = api.UserProps(self._nativePointer)
+		userProps = cross3d.UserProps(self._nativePointer)
 		if userProps.get('referenced', False):
 
 			# Checking if we need to set the resolution combobox.
@@ -290,11 +289,11 @@ class MayaSceneModel(AbstractSceneModel):
 						cmds.file(unloadReference=referenceNodeName)
 
 					# Recreating the local model root.
-					self._nativePointer = api.SceneWrapper._asMOBject(cmds.createNode('transform', name=name))
+					self._nativePointer = cross3d.SceneWrapper._asMOBject(cmds.createNode('transform', name=name))
 					self._nativeTransform = self._nativePointer
 
 					# Re-applying user props.
-					api.UserProps(self._nativePointer).update(userProps)
+					cross3d.UserProps(self._nativePointer).update(userProps)
 
 					# Re-creating resolution channel box.
 					self._createResolutionComboBox()
@@ -333,48 +332,49 @@ class MayaSceneModel(AbstractSceneModel):
 					self._nativeTransform = self._nativePointer
 
 					# Re-applying user props.
-					userProps = api.UserProps(self._nativePointer)
+					userProps = cross3d.UserProps(self._nativePointer)
 					mods = self._modifiedAttrs()
 					# I've left the debug message inside here in case we need to debug this later
-					debugMsg('{res} {line}'.format(res=resolution, line='-'*80), DebugLevel.Mid)
-					debugMsg(unicode(mods.keys()), DebugLevel.Mid)
+					cross3d.logger.debug('{res} {line}'.format(res=resolution, line='-'*80))
+					cross3d.logger.debug(unicode(mods.keys()))
 					for key, value in oldProps.iteritems():
-						debugMsg('	0 "{}"'.format(key), DebugLevel.Mid)
+						cross3d.logger.debug('	0 "{}"'.format(key))
 						if key in userProps:
-							debugMsg('	1', DebugLevel.Mid)
+							cross3d.logger.debug('	1')
 							if key == resolutionAttr:
 								# The keys are the same
-								debugMsg('	2 Skipping, Its the resolution attr', DebugLevel.Mid)
+								cross3d.logger.debug('	2 Skipping, Its the resolution attr')
 								continue
 							if userProps[key] == value:
 								# Do not override values that are the same
-								debugMsg('	3 Skipping {} is the same value'.format(key), DebugLevel.Mid)
+								cross3d.logger.debug('	3 Skipping {} is the same value'.format(key))
 								continue
 							if key in mods:
-								debugMsg('\t4 {comp}\n\t\t\t{upVal}\n\t\t\t{modVal}'.format(
+								cross3d.logger.debug('\t4 {comp}\n\t\t\t{upVal}\n\t\t\t{modVal}'.format(
 										comp = userProps.escapeValue(value) == mods[key]['setAttr']['value'],
 										upVal = [userProps.escapeValue(value)],
 										modVal = [mods[key]['setAttr']['value']]
-										), DebugLevel.Mid)
+										))
 								if userProps.escapeValue(value) == mods[key]['setAttr']['value']:
 									# Ignore any modified values that haven't changed while the 
 									# reference was offloaded
-									debugMsg('	skipping, not changed while offloaded {}'.format(key), DebugLevel.Mid)
+									cross3d.logger.debug('	skipping, not changed while offloaded {}'.format(key))
 									continue
 							elif key in userProps:
-								debugMsg('	5 Skipping, Value didnt change while offloaded Key: {key} Values: {value}'.format(
-										key=key, value=unicode([userProps[key], value])), DebugLevel.Mid)
+								cross3d.logger.debug('	5 Skipping, Value didnt change while offloaded Key: {key} Values: {value}'.format(
+										key=key, value=unicode([userProps[key], value])))
 								continue
 						# printing debug data block #-----------------------------------------------
+						from blurdev.debug import DebugLevel, debugLevel
 						if debugLevel() >= DebugLevel.Mid:
 							old = ''
 							if key in userProps:
 								old = userProps[key]
-							debugMsg('# Setting {key} value from {old} to {value}'.format(key=key, old=old, value=value), DebugLevel.Mid)
+							cross3d.logger.debug('# Setting {key} value from {old} to {value}'.format(key=key, old=old, value=value))
 						# End printing debug data block---------------------------------------------
 						userProps[key] = value
 					
-					api.UserProps(self._nativePointer).update(userProps)
+					cross3d.UserProps(self._nativePointer).update(userProps)
 
 					# Re-creating resolution channel box.
 					self._createResolutionComboBox()
@@ -383,7 +383,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# Also you will notice we set the reference path using the reference variable and not the path one.
 					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
 					# You can see that if you look in File > Reference Editor.
-					api.UserProps(self._nativePointer)['reference'] = reference
+					cross3d.UserProps(self._nativePointer)['reference'] = reference
 
 					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
@@ -406,7 +406,7 @@ class MayaSceneModel(AbstractSceneModel):
 					# Also you will notice we set the reference path using the reference variable and not the path one.
 					# Well believe or not the second time you load a reference the actual "resolved" path get a {1} suffix.
 					# You can see that if you look in File > Reference Editor.
-					api.UserProps(self._nativePointer)['reference'] = cmds.referenceQuery(referenceNodeName, filename=True)
+					cross3d.UserProps(self._nativePointer)['reference'] = cmds.referenceQuery(referenceNodeName, filename=True)
 
 					# Setting the current resolution property.
 					self.setProperty(resolutionAttr, i)
@@ -432,4 +432,4 @@ class MayaSceneModel(AbstractSceneModel):
 		return None
 
 # register the symbol
-api.registerSymbol('SceneModel', MayaSceneModel)
+cross3d.registerSymbol('SceneModel', MayaSceneModel)

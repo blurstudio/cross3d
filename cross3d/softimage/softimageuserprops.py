@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.SoftimageUserProps
+#	\namespace	cross3d.SoftimageUserProps
 #
-#	\remarks	The blur3d.api.SoftimageUserProps handles storing and retreving custom
+#	\remarks	The cross3d.SoftimageUserProps handles storing and retreving custom
 #				properties from objects
 #	
 #	\author		mikeh@blur.com 
@@ -11,10 +11,10 @@
 
 import re
 import json
-from blur3d import api
+import cross3d
 from PyQt4.QtCore import QString
 from win32com.client import constants
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
+from cross3d.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 
 class SoftimageUserProps(AbstractUserProps):
 	#dataTypes = enum('ClusterProperty', 'CustomProperty', 'Property', 'UserDataBlob', 'UserDataMap')
@@ -26,7 +26,7 @@ class SoftimageUserProps(AbstractUserProps):
 		prop = self._nativePointer.Properties(key)
 		if not prop:
 			raise KeyError('%s is not a property' % key)
-		scene = api.Scene()
+		scene = cross3d.Scene()
 		obj = scene.findObject(prop.FullName)
 		scene.removeObjects([obj])
 	
@@ -107,8 +107,8 @@ class SoftimageUserProps(AbstractUserProps):
 
 class SoftimageFileProps(SoftimageUserProps):
 	def __init__(self, nativePointer):
-		super(SoftimageFileProps, self).__init__( api.Scene().rootObject().nativePointer())
+		super(SoftimageFileProps, self).__init__( cross3d.Scene().rootObject().nativePointer())
 
 # register the symbol
-api.registerSymbol( 'UserProps', SoftimageUserProps )
-api.registerSymbol( 'FileProps', SoftimageFileProps )
+cross3d.registerSymbol('UserProps', SoftimageUserProps)
+cross3d.registerSymbol('FileProps', SoftimageFileProps)

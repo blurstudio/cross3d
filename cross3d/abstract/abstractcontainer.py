@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractcontainer
+#	\namespace	cross3d.abstract.abstractcontainer
 #
 #	\remarks	The AbstractContainer class provides an interface for objects that "group" several scene objects.
 #	
@@ -8,11 +8,10 @@
 #	\date		09/08/10
 #
 
-from blur3d import api
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d.constants import ObjectType
-from blurdev.decorators import pendingdeprecation
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
+from cross3d.constants import ObjectType
+from cross3d import pendingdeprecation
 
 class AbstractContainer(SceneWrapper):
 	"""
@@ -22,10 +21,10 @@ class AbstractContainer(SceneWrapper):
 		SceneWrapper.__init__(self, scene, nativeGroup)
 
 		# define custom properties
-		self._materialOverride				 = None			# blur3d.api.SceneMaterial 					- material to be used as the override material for the objects in this group
-		self._materialOverrideFlags			 = 0				# blur3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
+		self._materialOverride				 = None			# cross3d.SceneMaterial 					- material to be used as the override material for the objects in this group
+		self._materialOverrideFlags			 = 0				# cross3d.constants.MaterialOverrideOptions		- options to be used when overriding materials
 		self._materialOverrideAdvancedState = {}			# <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
-		self._propSetOverride				 = None			# blur3d.api.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
+		self._propSetOverride				 = None			# cross3d.SceneObjectPropSet				- property set to be used as the override properties for the objects in this group
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
@@ -63,7 +62,7 @@ class AbstractContainer(SceneWrapper):
 	def _clearNativeMaterialOverride(self):
 		"""
 			\remarks	[virtual] clear the native objects of any material overrides for this group
-			\sa			blur3d.api.Scene._clearNativeMaterialOverride
+			\sa			cross3d.Scene._clearNativeMaterialOverride
 			\return		<bool> success
 		"""
 		return self._scene._clearNativeMaterialOverride(self._nativeObjects())
@@ -71,7 +70,7 @@ class AbstractContainer(SceneWrapper):
 	def _clearNativePropSetOverride(self):
 		"""
 			\remarks	[virtual] clear the native objects of any property set overrides for this group
-			\sa			blur3d.api.Scene._clearNativePropSetOverride
+			\sa			cross3d.Scene._clearNativePropSetOverride
 			\return		<bool> success
 		"""
 		return self._scene._clearNativePropSetOverride(self._nativeObjects())
@@ -140,9 +139,9 @@ class AbstractContainer(SceneWrapper):
 	def _setNativeMaterialOverride(self, nativeMaterial, options= -1, advancedState=None):
 		"""
 			\remarks	[virtual] set the current override materials for this object group
-			\sa			blur3d.api.Scene._setNativeMaterialOverride
+			\sa			cross3d.Scene._setNativeMaterialOverride
 			\param		nativeMaterial 	<variant> || None
-			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		options			<cross3d.constants.MaterialOverrideOptions>
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
@@ -161,7 +160,7 @@ class AbstractContainer(SceneWrapper):
 	def _setNativePropSetOverride(self, nativePropSet):
 		"""
 			\remarks	[virtual] set the current override property set for this object group
-			\sa			blur3d.api.Scene._setNativePropSetOverride
+			\sa			cross3d.Scene._setNativePropSetOverride
 			\param		nativePropSet 	<variant> || None
 			\return		<bool> success
 		"""
@@ -176,7 +175,7 @@ class AbstractContainer(SceneWrapper):
 	def addAtmospherics(self, atmospherics):
 		"""Add the atmospherics to this object group
 		
-		:param atmospherics: list of :class:`blur3d.api.SceneAtmospheric` 
+		:param atmospherics: list of :class:`cross3d.SceneAtmospheric` 
 		                     objects
 		:return: bool
 		
@@ -186,7 +185,7 @@ class AbstractContainer(SceneWrapper):
 	def addFxs(self, fxs):
 		"""Add the fxs to this object group
 		
-		:param fxs: list of :class:`blur3d.api.SceneFx` 
+		:param fxs: list of :class:`cross3d.SceneFx` 
 		                     objects
 		:return: bool
 		
@@ -196,7 +195,7 @@ class AbstractContainer(SceneWrapper):
 	def addObjects(self, objects):
 		"""Add the objects to this object group
 		
-		:param objects: list of :class:`blur3d.api.SceneObject` objects
+		:param objects: list of :class:`cross3d.SceneObject` objects
 		:return: bool
 		
 		"""
@@ -214,10 +213,10 @@ class AbstractContainer(SceneWrapper):
 	def atmospherics(self):
 		"""Return a list of the atmospherics that are part of this object group
 			
-		:return: list of :class:`blur3d.api.SceneAtmospheric` objects
+		:return: list of :class:`cross3d.SceneAtmospheric` objects
 		
 		"""
-		from blur3d.api import SceneAtmospheric
+		from cross3d import SceneAtmospheric
 		return [ SceneAtmospheric(self._scene, atmos) for atmos in self._nativeAtmospherics() ]
 
 	def clearMaterialOverride(self):
@@ -268,17 +267,17 @@ class AbstractContainer(SceneWrapper):
 	def fxs(self):
 		"""Return a list of the fxs that are part of this object group
 			
-		:return: list of :class:`blur3d.api.SceneFx` objects
+		:return: list of :class:`cross3d.SceneFx` objects
 		
 		"""
-		from blur3d.api import SceneFx
+		from cross3d import SceneFx
 		return [ SceneFx(self._scene, fx) for fx in self._nativeFxs() ]
 
 	def hasMaterialOverrideFlag(self, flag):
 		"""
 		Return whether or not the inputed flag is set in the override options
 		
-		:param flag: :data:`blur3d.constants.MaterialOverrideOptions`
+		:param flag: :data:`cross3d.constants.MaterialOverrideOptions`
 		:return: bool
 
 		"""
@@ -354,32 +353,32 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Returns the SceneObject's that are associated with this object group
 		
-		:return: a list of :class:`blur3d.api.SceneObject` objects
+		:return: a list of :class:`cross3d.SceneObject` objects
 		
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [ SceneObject(self._scene, obj) for obj in self._nativeObjects() ]
 
 	def materials(self, baseMaterials=False):
 		"""
 		Return a list of all the materials contained within this object group
 		
-		:return: a list of :class:`blur3d.api.SceneMaterial` objects
+		:return: a list of :class:`cross3d.SceneMaterial` objects
 		
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		return [ SceneMaterial(self._scene, mtl) for mtl in self._nativeMaterials(baseMaterials) ]
 
 	def materialOverride(self):
 		"""
 		Return the current override material for this object set
 		
-		:return: :class:`blur3d.api.SceneMaterial` or None
+		:return: :class:`cross3d.SceneMaterial` or None
 		
 		"""
 		nativeMaterial = self._nativeMaterialOverride()
 		if (nativeMaterial):
-			from blur3d.api import SceneMaterial
+			from cross3d import SceneMaterial
 			return SceneMaterial(self.scene(), nativeMaterial)
 		return None
 
@@ -396,7 +395,7 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Return the duplication flags for the override material
 		
-		:return: :data:`blur3d.constants.MaterialOverrideOptions`
+		:return: :data:`cross3d.constants.MaterialOverrideOptions`
 
 		"""
 		return self._materialOverrideFlags
@@ -405,10 +404,10 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Return the current override prop set for this object set
 		
-		:return: :class:`blur3d.api.SceneObjectPropSet` or None
+		:return: :class:`cross3d.SceneObjectPropSet` or None
 		
 		"""
-		from blur3d.api import ScenePropSet
+		from cross3d import ScenePropSet
 		nativePropSet = self._nativePropSetOverride()
 		if (nativePropSet and not isinstance(nativePropSet, ScenePropSet)):
 			return ScenePropSet(self.scene(), nativePropSet)
@@ -449,8 +448,8 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Set the override material on the objects for this set
 		
-		:param material: :class:`blur3d.api.SceneMaterial` or None
-		:param options: :data:`blur3d.constants.MaterialOverrideOptions`
+		:param material: :class:`cross3d.SceneMaterial` or None
+		:param options: :data:`cross3d.constants.MaterialOverrideOptions`
 		:param advancedState: <dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 		
 		:return: bool
@@ -469,7 +468,7 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Set the inputed flag on or off based on the state
 		
-		:param flag: :data:`blur3d.constants.MaterialOverrideOptions`
+		:param flag: :data:`cross3d.constants.MaterialOverrideOptions`
 		:param state: bool
 		:return: bool
 
@@ -484,7 +483,7 @@ class AbstractContainer(SceneWrapper):
 		"""
 		Set all of the duplication flags for override materials
 		
-		:param flags: :data:`blur3d.constants.MaterialOverrideOptions`
+		:param flags: :data:`cross3d.constants.MaterialOverrideOptions`
 		:return: bool
 		
 		"""
@@ -506,7 +505,7 @@ class AbstractContainer(SceneWrapper):
 		Sets the atmospherics that are associated with this object group 
 		to the inputed list of atmospherics
 		
-		:param atmospherics: list of :class:`blur3d.api.SceneAtmospheric`
+		:param atmospherics: list of :class:`cross3d.SceneAtmospheric`
 		                     objects
 		:return: bool
 
@@ -518,7 +517,7 @@ class AbstractContainer(SceneWrapper):
 		Sets the fxs that are associated with this object group 
 		to the inputed list of fxs
 		
-		:param fxs: list of :class:`blur3d.api.SceneFx`
+		:param fxs: list of :class:`cross3d.SceneFx`
 		                     objects
 		:return: bool
 
@@ -530,7 +529,7 @@ class AbstractContainer(SceneWrapper):
 		Set the override properties on the objects that are a part of 
 		this object group
 		
-		:param propSet: :class:`blur3d.api.SceneObjectPropSet`
+		:param propSet: :class:`cross3d.SceneObjectPropSet`
 		:return: bool
 		
 		"""
@@ -555,7 +554,7 @@ class AbstractContainer(SceneWrapper):
 		Set the hidden state for the objects on this object group
 
 		:param state: bool
-		:param options: :data:`blur3d.constants.VisibilityToggleOptions`
+		:param options: :data:`cross3d.constants.VisibilityToggleOptions`
 		:return: bool
 		
 		"""
@@ -579,7 +578,7 @@ class AbstractContainer(SceneWrapper):
 		Set whether or not this object group is visible
 		
 		:param state: bool
-		:param options: :data:`blur3d.constants.VisibilityToggleOptions`
+		:param options: :data:`cross3d.constants.VisibilityToggleOptions`
 		:return: bool
 
 		"""
@@ -603,4 +602,4 @@ class AbstractContainer(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('Container', AbstractContainer, ifNotFound=True)
+cross3d.registerSymbol('Container', AbstractContainer, ifNotFound=True)

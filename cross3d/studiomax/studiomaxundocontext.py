@@ -1,13 +1,6 @@
 
-
-
-
-
-from PyQt4.QtCore import QObject
-from Py3dsMax import mxs
-
-from blur3d.api.abstract.abstractundocontext import AbstractUndoContext
-from blur3d import api
+import cross3d
+from cross3d.abstract.abstractundocontext import AbstractUndoContext
 
 
 class StudiomaxUndoContext(AbstractUndoContext):
@@ -29,5 +22,4 @@ class StudiomaxUndoContext(AbstractUndoContext):
 	
 	
 # register the symbol
-api.registerSymbol('UndoContext', StudiomaxUndoContext)
-	
+cross3d.registerSymbol('UndoContext', StudiomaxUndoContext)

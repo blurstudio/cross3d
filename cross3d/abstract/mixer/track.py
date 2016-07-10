@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.track
+#	\namespace	cross3d.abstract.track
 #
 #	\remarks	The AbstractTrack class provides a base implementation of a
 #				cross-application interface to a track.
@@ -9,9 +9,8 @@
 #	\date		10/15/15
 #
 
-from blur3d import abstractmethod
-from blur3d import api
-from blur3d.api import Clip, ClipPortion, TrackPortion
+import cross3d
+from cross3d import Clip, ClipPortion, TrackPortion, abstractmethod
 
 class AbstractTrack(object):
 	"""The AbstractClip class provides a base implementation of a
@@ -208,4 +207,4 @@ class AbstractTrack(object):
 ################################################################################
 
 # register the symbol
-api.registerSymbol('Track', AbstractTrack, ifNotFound=True)
+cross3d.registerSymbol('Track', AbstractTrack, ifNotFound=True)

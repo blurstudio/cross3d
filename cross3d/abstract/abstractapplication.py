@@ -1,8 +1,8 @@
 """
 The AbstractApplication class will define all operations for application 
-interaction. It is a singleton class, so calling blur3d.api.Application() will
+interaction. It is a singleton class, so calling cross3d.Application() will
 always return the same instance of Application. One of its main functions 
-is connecting application callbacks to blur3d.api.Dispatch.  The 
+is connecting application callbacks to cross3d.Dispatch.  The 
 AbstractApplication is a QObject instance and any changes to the scene 
 data can be controlled by connecting to the signals defined here.  When 
 subclassing the AbstractScene, methods tagged as @abstractmethod will be 
@@ -14,9 +14,9 @@ the method.  All @abstractmethod methods MUST be implemented in a subclass.
 
 import re
 
-from blur3d import api
+import cross3d
 from PyQt4.QtCore import QObject
-from blur3d import abstractmethod
+from cross3d import abstractmethod
 from contextlib import contextmanager
 
 dispatch = None
@@ -25,9 +25,9 @@ dispatch = None
 class AbstractApplication(QObject):
 	"""
 	The Application class will define all operations for application 
-	interaction. It is a singleton class, so calling blur3d.api.Application() will
+	interaction. It is a singleton class, so calling cross3d.Application() will
 	always return the same instance of Application. One of its main functions 
-	is connecting application callbacks to blur3d.api.Dispatch.  The 
+	is connecting application callbacks to cross3d.Dispatch.  The 
 	Application is a QObject instance and any changes to the scene 
 	data can be controlled by connecting to the signals defined here.  When 
 	subclassing the Scene, methods tagged as @abstractmethod will be 
@@ -47,8 +47,8 @@ class AbstractApplication(QObject):
 	def connect(self):
 		"""
 		Responsible for setting up the application to connect to signals 
-		using :meth:`blur3d.api.Dispatch.connectCallback`.  Connect is 
-		called when the first :class:`blur3d.api.Dispatch` signal is 
+		using :meth:`cross3d.Dispatch.connectCallback`.  Connect is 
+		called when the first :class:`cross3d.Dispatch` signal is 
 		connected.
 		
 		:return: connection success
@@ -56,9 +56,9 @@ class AbstractApplication(QObject):
 			
 		"""
 		# create a signal linking between 2 signals
-		import blur3d.api
+		import cross3d
 		global dispatch
-		dispatch = blur3d.api.dispatch
+		dispatch = cross3d.dispatch
 		dispatch.linkSignals('sceneNewRequested', 'scenePreInvalidated')
 		dispatch.linkSignals('sceneOpenRequested', 'scenePreInvalidated')
 		dispatch.linkSignals('sceneMergeRequested', 'scenePreInvalidated')
@@ -104,7 +104,7 @@ class AbstractApplication(QObject):
 	@abstractmethod
 	def connectCallback(self, signal):
 		"""
-		Connects a single callback. This allows blur3d to only have to
+		Connects a single callback. This allows cross3d to only have to
 		respond to callbacks that tools actually need, instead of all 
 		callbacks.  Called the first time a signal is connected to 
 		this callback.
@@ -115,8 +115,8 @@ class AbstractApplication(QObject):
 	def disconnect(self):
 		"""
 		Responsible for disabling all changes made in 
-		:meth:`blur3d.api.Application.connect`.  Disconnect is called when 
-		the last :class:`blur3d.api.Dispatch` signal is disconnected.
+		:meth:`cross3d.Application.connect`.  Disconnect is called when 
+		the last :class:`cross3d.Dispatch` signal is disconnected.
 		
 		"""
 		return
@@ -255,7 +255,7 @@ class AbstractApplication(QObject):
 		operation in the stack.
 		
 		"""
-		return api.UndoContext(name)
+		return cross3d.UndoContext(name)
 	
 	def openUndo(self, name):
 		"""
@@ -264,14 +264,14 @@ class AbstractApplication(QObject):
 		exception occurs; otherwise, the undo stack will remain open and 
 		unusable.		
 		"""
-		api.UndoContext.openUndo(name)
+		cross3d.UndoContext.openUndo(name)
 		
 	def closeUndo(self):
 		"""
 			Close the undo context.  This call should always follw a call to
 			openUndo().
 		"""
-		api.UndoContext.closeUndo()
+		cross3d.UndoContext.closeUndo()
 	
 	@contextmanager
 	def blockRefreshContext(self, blockRefresh=True):
@@ -292,17 +292,17 @@ class AbstractApplication(QObject):
 		"""
 		if self._blockRefresh != blockRefresh:
 			self._blockRefresh = blockRefresh
-			api.Scene().setUpdatesEnabled(not blockRefresh)
+			cross3d.Scene().setUpdatesEnabled(not blockRefresh)
 			return True
 		return False
 
 	def shouldBlockSignal(self, signal, default):
 		""" Allows the Application to conditionally block a signal.
 		
-		Normally you should pass blur3d.api.dispatch.signalsBlocked() to default.
+		Normally you should pass cross3d.dispatch.signalsBlocked() to default.
 		In general if default is True this method should just return True. This will
 		prevent unexpected signal emits when a script called
-		blur3d.api.dispatch.blockSignals(True) to block all signals.
+		cross3d.dispatch.blockSignals(True) to block all signals.
 		
 		Args:
 			signal (str): The name of the signal to check if it should be blocked.
@@ -314,7 +314,7 @@ class AbstractApplication(QObject):
 		return default
 
 # register the symbol
-api.registerSymbol('Application', AbstractApplication, ifNotFound=True)
+cross3d.registerSymbol('Application', AbstractApplication, ifNotFound=True)
 
 # Creating a single instance of Application for all code to use.
-api.registerSymbol('application', AbstractApplication(), ifNotFound=True)
+cross3d.registerSymbol('application', AbstractApplication(), ifNotFound=True)

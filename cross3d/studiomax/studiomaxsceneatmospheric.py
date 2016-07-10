@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneatmospheric
+#	\namespace	cross3d.abstract.abstractsceneatmospheric
 #
 #	\remarks	The AbstractSceneAtmospheric class provides an interface to editing atmospherics in a Scene environment for any DCC application
 #	
@@ -9,8 +9,8 @@
 #
 
 from Py3dsMax 										import mxs
-from blur3d.api.abstract.abstractsceneatmospheric	import AbstractSceneAtmospheric
-from blur3d.constants import EnvironmentTypes
+from cross3d.abstract.abstractsceneatmospheric	import AbstractSceneAtmospheric
+from cross3d.constants import EnvironmentTypes
 
 class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 	def layer( self ):
 		"""
 			\remarks	reimplements AbstractSceneAtmospheric.layer to return the layer that this atmospheric is associated with
-			\return		<blur3d.api.Layer> || None
+			\return		<cross3d.Layer> || None
 		"""
 		layers 	= self._scene.layers()
 		uid		= mxs.blurUtil.uniqueId( self._nativePointer )
@@ -118,5 +118,5 @@ class StudiomaxSceneAtmospheric( AbstractSceneAtmospheric ):
 		return mxs.blurUtil.uniqueId( self._nativePointer )
 		
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneAtmospheric', StudiomaxSceneAtmospheric )
+import cross3d
+cross3d.registerSymbol( 'SceneAtmospheric', StudiomaxSceneAtmospheric )

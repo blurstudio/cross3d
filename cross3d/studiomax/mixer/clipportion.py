@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.api.studiomax.ClipPortion module provides an
+#	\remarks	The cross3d.studiomax.ClipPortion module provides an
 #				objectified representation of a region of a Clip, to allow for
 #				cleaner interaction with the Max Motion Mixer.
 #	
@@ -12,8 +12,8 @@
 
 import Py3dsMax
 from Py3dsMax import mxs
-from blur3d.api import TrackPortion
-from blur3d.api.abstract.mixer.clipportion import AbstractClipPortion
+from cross3d import TrackPortion
+from cross3d.abstract.mixer.clipportion import AbstractClipPortion
 
 ################################################################################
 #####------------------------------ Classes -------------------------------#####
@@ -54,5 +54,5 @@ class StudiomaxClipPortion(AbstractClipPortion):
 ################################################################################
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('ClipPortion', StudiomaxClipPortion)
+import cross3d
+cross3d.registerSymbol('ClipPortion', StudiomaxClipPortion)

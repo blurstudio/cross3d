@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagescenecamera
+#	\namespace	cross3d.softimage.softimagescenecamera
 #
 #	\remarks	The SotimageSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
 #				to Softimage scenes
@@ -13,12 +13,12 @@ import os
 import re
 import math
 import traceback
-import blur3d.api
+import cross3d
 
 from PySoftimage import xsi, constants as xsiConstants
-from blur3d.api import application
-from blur3d.api import FileSequence
-from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
+from cross3d import application
+from cross3d import FileSequence
+from cross3d.abstract.abstractscenecamera import AbstractSceneCamera
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 	def interest(self):
 		if self._nativePointer.Interest:
-			return blur3d.api.SceneObject(self._scene, self._nativePointer.Interest)
+			return cross3d.SceneObject(self._scene, self._nativePointer.Interest)
 		return None
 
 	def setInterest(self, interest):
@@ -59,7 +59,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 				path = clip.Source.FileName.Value
 
 				# This is the painful process of converting Softimage way to express path into our generic one.
-				match = re.match(blur3d.api.application.imageSequenceRegex(), path)
+				match = re.match(cross3d.application.imageSequenceRegex(), path)
 				if match:
 					t = match.groupdict()
 					fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
@@ -218,7 +218,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 	def setPlatePath(self, path):
 		"""
-			TODO: This is currently only handling FileSequence paths defined by the blur3d.api.FileSequence class.
+			TODO: This is currently only handling FileSequence paths defined by the cross3d.FileSequence class.
 				  It does not support static images or movies.
 		"""
 		fs = FileSequence(path)
@@ -248,7 +248,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 	def platePath(self):
 		"""
-			TODO: This is currently only handling FileSequence paths defined by the blur3d.api.FileSequence class.
+			TODO: This is currently only handling FileSequence paths defined by the cross3d.FileSequence class.
 				  It does not support static images or movies.
 		"""
 
@@ -257,7 +257,7 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		if clipName:
 			clip = xsi.Dictionary.GetObject(clipName, False)
 			path = clip.Source.FileName.Value
-			match = re.match(blur3d.api.application.imageSequenceRegex(), path)
+			match = re.match(cross3d.application.imageSequenceRegex(), path)
 			if match:
 				t = match.groupdict()
 				fileSequence = FileSequence('%s%s-%s.%s' % (t['path'], t['start'], t['end'], t['extension']))
@@ -411,5 +411,5 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneCamera', SoftimageSceneCamera)
+import cross3d
+cross3d.registerSymbol('SceneCamera', SoftimageSceneCamera)

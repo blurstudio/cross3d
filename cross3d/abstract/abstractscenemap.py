@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenemap
+#	\namespace	cross3d.abstract.abstractscenemap
 #
 #	\remarks	The AbstractSceneMap class provides an interface to editing maps in a Scene environment for any DCC application
 #	
@@ -8,9 +8,8 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractSceneMap(SceneWrapper):
@@ -37,4 +36,4 @@ class AbstractSceneMap(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('SceneMap', AbstractSceneMap, ifNotFound=True)
+cross3d.registerSymbol('SceneMap', AbstractSceneMap, ifNotFound=True)

@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenemodel
+#	\namespace	cross3d.abstract.abstractscenemodel
 #
-#	\remarks	The AbstractSceneModel class provides the base foundation for the 3d Object framework for the blur3d system
+#	\remarks	The AbstractSceneModel class provides the base foundation for the 3d Object framework for the cross3d system
 #				This class will provide a generic overview structure for all manipulations of 3d models
 #	
 #	\author		douglas@blur.com
@@ -9,17 +9,15 @@
 #	\date		04/05/10 
 #
 
-from blur3d import api
-from blur3d import abstractmethod
-from blur3d.api import application
-from blur3d.constants import ObjectType
-from blur3d.api import SceneObject, Group
-from blurdev.decorators import pendingdeprecation
+import cross3d
+from cross3d.constants import ObjectType
+from cross3d import SceneObject, Group, application, abstractmethod
+from cross3d import pendingdeprecation
 
 class AbstractSceneModel(SceneObject):
 	"""
 		The SceneModel class provides the base foundation for the 3d Object 
-		framework for the blur3d system.  This class will provide a generic 
+		framework for the cross3d system.  This class will provide a generic 
 		overview structure for all manipulations of 3d models
 	"""
 
@@ -167,4 +165,4 @@ class AbstractSceneModel(SceneObject):
 		return self._scene.findObject(name, uniqueId)
 
 # register the symbol
-api.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)
+cross3d.registerSymbol('SceneModel', AbstractSceneModel, ifNotFound=True)

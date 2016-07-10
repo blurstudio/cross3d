@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscenesubmitter
+#	\namespace	cross3d.studiomax.studiomaxscenesubmitter
 #
 #	\remarks	[desc::commented]
 #	
@@ -9,11 +9,11 @@
 #
 
 from Py3dsMax 										import mxs
-from blur3d.api.abstract.abstractscenesubmitter		import AbstractSceneSubmitter
+from cross3d.abstract.abstractscenesubmitter		import AbstractSceneSubmitter
 
 REMOTE_RENDER_SUBMIT = """
 def runScript( frame ):
-	from blur3d.api import SceneSubmitter, Scene
+	from cross3d import SceneSubmitter, Scene
 	import os.path
 	
 	# the scriptArchiveRoot variable will be set for a job on load
@@ -28,7 +28,7 @@ def runScript( frame ):
 		submitter.setCurrentRenderElement( '%s/%s' % (relpath,os.path.basename(relements[frame-1])) ) # frames are 1 based
 	
 	# turn off the remote submission & render element flags since now we are processing those locally here
-	from blur3d.constants import SubmitFlags
+	from cross3d.constants import SubmitFlags
 	submitter.setSubmitFlag( SubmitFlags.RemoteSubmit, False )
 	submitter.setRenderElements( [] )
 	
@@ -130,7 +130,7 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 			\remarks	implements AbstractScene.defaultJobType method to return the default job type based on the current application
 			\return		<str>
 		"""
-		from blur3d.constants import SubmitType
+		from cross3d.constants import SubmitType
 		submitType = self.submitType()
 		
 		# look up the default render submit job type
@@ -148,12 +148,12 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 	
 	def customArgMapping( self ):
 		"""
-			\remarks	[virtual] create a mapping between the abstracted custom arg keys that are used with the blur3d system to the
+			\remarks	[virtual] create a mapping between the abstracted custom arg keys that are used with the cross3d system to the
 						application/job specific settings that are needed.  Not all arguements need to be converted, as any argument that
 						is not found will simply be ignored.  See the customArgs method for a list of the abstract argument names to be used
 						when developing
 			\sa			customArgs
-			\return		<dict> { <str> blur3dArg: <str> jobArg, .. }
+			\return		<dict> { <str> cross3dArg: <str> jobArg, .. }
 		"""
 		mapping = AbstractSceneSubmitter.customArgMapping( self )
 		
@@ -185,7 +185,7 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		AbstractSceneSubmitter.reset( self )
 		
 		import os.path
-		from blur3d.constants import SubmitType
+		from cross3d.constants import SubmitType
 		
 		submitType = self.submitType()
 		
@@ -277,5 +277,5 @@ class StudiomaxSceneSubmitter( AbstractSceneSubmitter ):
 		return success
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneSubmitter', StudiomaxSceneSubmitter )
+import cross3d
+cross3d.registerSymbol( 'SceneSubmitter', StudiomaxSceneSubmitter )

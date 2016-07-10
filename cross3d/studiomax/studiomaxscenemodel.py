@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxsceneobject
+#	\namespace	cross3d.studiomax.studiomaxsceneobject
 #
 #	\remarks	The StudiomaxSceneModel class provides the implementation of the AbstractSceneModel class as it applies
 #				to 3d Studio Max scenes
@@ -9,8 +9,8 @@
 #	\date		06/27/11
 #
 
-from blur3d.api import application, dispatch
-from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
+from cross3d import application, dispatch
+from cross3d.abstract.abstractscenemodel import AbstractSceneModel
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -108,6 +108,5 @@ class StudiomaxSceneModel( AbstractSceneModel ):
 		return self._scene._nativeLayers('.'.join([self.displayName(), wildcard]))
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneModel', StudiomaxSceneModel )
-
+import cross3d
+cross3d.registerSymbol( 'SceneModel', StudiomaxSceneModel )

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenemap
+#	\namespace	cross3d.abstract.abstractscenemap
 #
 #	\remarks	The AbstractSceneMap class provides an interface to editing maps in a Scene environment for any DCC application
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax 										import mxs
-from blur3d.api.abstract.abstractscenemap 		import AbstractSceneMap
+from cross3d.abstract.abstractscenemap 		import AbstractSceneMap
 
 class StudiomaxSceneMap( AbstractSceneMap ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -52,5 +52,5 @@ class StudiomaxSceneMap( AbstractSceneMap ):
 		return mxs.blurUtil.uniqueId( self._nativePointer )
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneMap', StudiomaxSceneMap )
+import cross3d
+cross3d.registerSymbol( 'SceneMap', StudiomaxSceneMap )

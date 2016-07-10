@@ -1,8 +1,8 @@
 ##
-#	\namespace	blur3d.api.abstract.studiomaxapplication
+#	\namespace	cross3d.abstract.studiomaxapplication
 #
-#	\remarks	The StudiomaxApplication class will define all operations for application interaction. It is a singleton class, so calling blur3d.api.Application() will
-#				always return the same instance of Application. One of its main functions is connecting application callbacks to blur3d.api.Dispatch.
+#	\remarks	The StudiomaxApplication class will define all operations for application interaction. It is a singleton class, so calling cross3d.Application() will
+#				always return the same instance of Application. One of its main functions is connecting application callbacks to cross3d.Dispatch.
 #
 #				The StudiomaxApplication is a QObject instance and any changes to the scene data can be controlled by connecting to the signals defined here.
 #
@@ -15,9 +15,9 @@
 #	\date		06/07/11
 #
 
-from blur3d.api.abstract.abstractapplication import AbstractApplication
+import cross3d
+from cross3d.abstract.abstractapplication import AbstractApplication
 from Py3dsMax import mxs
-from blurdev import debug
 from blurdev.enum import EnumGroup, Enum
 from PyQt4.QtCore import QTimer
 _n = mxs.pyhelper.namify
@@ -25,26 +25,26 @@ dispatch = None
 
 # initialize callback scripts
 _STUDIOMAX_CALLBACK_TEMPLATE = """
-global blur3d
-if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-if ( blur3d != undefined ) do (
+global cross3d
+if ( cross3d == undefined ) do ( cross3d = pymax.import "cross3d" )
+if ( cross3d != undefined ) do (
 	local ms_args = (callbacks.notificationParam())
-	blur3d.api.%(cls)s.%(function)s "%(signal)s" %(args)s
+	cross3d.%(cls)s.%(function)s "%(signal)s" %(args)s
 )
 """
 _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS = """
-global blur3d
-if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-if ( blur3d != undefined ) do (
-	blur3d.api.%(cls)s.%(function)s "%(signal)s"
+global cross3d
+if ( cross3d == undefined ) do ( cross3d = pymax.import "cross3d" )
+if ( cross3d != undefined ) do (
+	cross3d.%(cls)s.%(function)s "%(signal)s"
 )
 """
 _STUDIOMAX_VIEWPORT_TEMPLATE = """
 fn blurfn_%(signal)s =
 (
-	if ( blur3d == undefined ) do ( blur3d = pymax.import "blur3d" )
-	if ( blur3d != undefined ) do (
-		blur3d.api.%(cls)s.%(function)s "%(signal)s"
+	if ( cross3d == undefined ) do ( cross3d = pymax.import "cross3d" )
+	if ( cross3d != undefined ) do (
+		cross3d.%(cls)s.%(function)s "%(signal)s"
 	)
 )
 """
@@ -54,15 +54,15 @@ class _ConnectionType(EnumGroup):
 	Viewport = Enum()
 
 class _ConnectionDef:
-	""" Class that stores all neccissary info to connect blur3d.api.dispatch to StudioMax
+	""" Class that stores all neccissary info to connect cross3d.dispatch to StudioMax
 
 	Args:
-		signal str: The name of the blur3d.api.dispatch signal.
+		signal str: The name of the cross3d.dispatch signal.
 		callback str: The name of StudioMax callback.
 		arguments str: A string of maxscript arguments passed to signal when the callback is emitted.
-		function str: The name of the blur3d.api.dispatch function. Used in the callback maxscript.
+		function str: The name of the cross3d.dispatch function. Used in the callback maxscript.
 		callbackType _ConnectionType: Controls how the callback is connected to StudioMax.
-		cls str: The name of the class called in blur3d.api. Normally 'dispatch'.
+		cls str: The name of the class called in cross3d. Normally 'dispatch'.
 		associated _ConnectionDef: When this signal is connected, all _ConnectionDef's in this list
 			are also connected to. This is used by filePostMerge to disable all callbacks durring
 			the opening of a file.
@@ -193,9 +193,9 @@ class StudiomaxApplication(AbstractApplication):
 			# Connect any associated callbacks using a diffrent ID name allows us to disconnect
 			# this signal without affecting any direct connections to the associated callbacks
 			for reqDef in connDef.associated:
-				self._addCallback(reqDef, reqDef.signal, 'blur3dcallbacks_{}'.format(connDef.callback))
+				self._addCallback(reqDef, reqDef.signal, 'cross3dcallbacks_{}'.format(connDef.callback))
 
-	def _addCallback(self, connDef, blurdevSignal, callbackName='blur3dcallbacks'):
+	def _addCallback(self, connDef, blurdevSignal, callbackName='cross3dcallbacks'):
 		if connDef.arguments:
 			script = _STUDIOMAX_CALLBACK_TEMPLATE % {
 				'cls':connDef.cls,
@@ -250,19 +250,19 @@ class StudiomaxApplication(AbstractApplication):
 
 	def connect(self):
 		"""
-			\remarks	connect application specific callbacks to <blur3d.api.Dispatch>, dispatch will convert the native object to a blur3d.api object
+			\remarks	connect application specific callbacks to <cross3d.Dispatch>, dispatch will convert the native object to a cross3d object
 						and emit a signal.
-						connect is called when the first <blur3d.api.Dispatch> signal is connected.
+						connect is called when the first <cross3d.Dispatch> signal is connected.
 			\return		<bool>	The Connection was successfull
 		"""
 		global dispatch
-		import blur3d.api
-		dispatch = blur3d.api.dispatch
+		import cross3d
+		dispatch = cross3d.dispatch
 		return super(StudiomaxApplication, self).connect()
 
 	def connectCallback(self, signal):
 		"""
-			\remarks	Connects a single callback. This allows blur3d to only have to respond to callbacks that tools actually
+			\remarks	Connects a single callback. This allows cross3d to only have to respond to callbacks that tools actually
 						need, instead of all callbacks.
 		"""
 		if signal in self._connectionMap.getSignalNames():
@@ -270,7 +270,7 @@ class StudiomaxApplication(AbstractApplication):
 			for object in connections:
 				self._connectStudiomaxSignal(object, signal)
 		else:
-			debug.debugMsg('Connect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
+			cross3d.logger.debug('Connect: Signal %s has no signal map' % signal)
 
 	def disconnectCallback(self, signal):
 		"""
@@ -282,25 +282,25 @@ class StudiomaxApplication(AbstractApplication):
 				if connDef.callbackType == _ConnectionType.Viewport:
 					mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % connDef.signal))
 				else:
-					mxs.callbacks.removeScripts(_n(connDef.callback), id = _n('blur3dcallbacks'))
+					mxs.callbacks.removeScripts(_n(connDef.callback), id = _n('cross3dcallbacks'))
 					for reqDef in connDef.associated:
-						mxs.callbacks.removeScripts(_n(reqDef.callback), id = _n('blur3dcallbacks_{}'.format(connDef.callback)))
+						mxs.callbacks.removeScripts(_n(reqDef.callback), id = _n('cross3dcallbacks_{}'.format(connDef.callback)))
 		else:
-			debug.debugMsg('Disconnect: Signal %s has no signal map' % signal, debug.DebugLevel.Mid)
+			cross3d.logger.debug('Disconnect: Signal %s has no signal map' % signal)
 
 	def disconnect(self):
 		"""
-			\remarks	disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called when <blur3d.api.Dispatch> is deleted,
-						disconnect is called when the last <blur3d.api.Dispatch> signal is disconnected.
+			\remarks	disconnect application specific callbacks to <cross3d.Dispatch>. This will be called when <cross3d.Dispatch> is deleted,
+						disconnect is called when the last <cross3d.Dispatch> signal is disconnected.
 		"""
 		# remove all normal callbacks
 		for name in self._disconnectNames:
 			mxs.callbacks.removeScripts(id = _n(name))
 		self._sceneMergeFinishedTimer.stop()
 		# undefine the add callback function
-		mxs.blur3daddcallback = None
-		# remove the callback pointer to blur3d
-		mxs.blur3d = None
+		mxs.cross3daddcallback = None
+		# remove the callback pointer to cross3d
+		mxs.cross3d = None
 		# remove viewport callbacks
 		self.disconnectCallback('viewportRedraw')
 		return
@@ -368,10 +368,10 @@ class StudiomaxApplication(AbstractApplication):
 	def shouldBlockSignal(self, signal, default):
 		""" Allows the Application to conditionally block a signal.
 
-		Normally you should pass blur3d.api.dispatch.signalsBlocked() to default.
+		Normally you should pass cross3d.dispatch.signalsBlocked() to default.
 		In general if default is True this method should just return True. This will
 		prevent unexpected signal emits when a script called
-		blur3d.api.dispatch.blockSignals(True) to block all signals.
+		cross3d.dispatch.blockSignals(True) to block all signals.
 
 		Args:
 			signal (str): The name of the signal to check if it should be blocked.
@@ -427,8 +427,7 @@ class StudiomaxApplication(AbstractApplication):
 		return 'MAX%i%s' % (mversion,sixtyfour)
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'Application', StudiomaxApplication)
+cross3d.registerSymbol( 'Application', StudiomaxApplication)
 
 # Creating a single instance of Application for all code to use.
-api.registerSymbol( 'application', StudiomaxApplication())
+cross3d.registerSymbol( 'application', StudiomaxApplication())

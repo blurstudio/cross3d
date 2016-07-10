@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneanimationcontroller
+#	\namespace	cross3d.abstract.abstractsceneanimationcontroller
 #
 #	\remarks	The AbstractSceneAnimationController class provides an interface to editing controllers in a Scene environment for any DCC application
 #
@@ -11,9 +11,9 @@
 import math
 
 from Py3dsMax import mxs
-from blur3d.api import FCurve
-from blur3d.constants import ControllerType, TangentType, TimeUnit, ExtrapolationType
-from blur3d.api.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
+from cross3d import FCurve
+from cross3d.constants import ControllerType, TangentType, TimeUnit, ExtrapolationType
+from cross3d.abstract.abstractsceneanimationcontroller import AbstractSceneAnimationController
 
 
 class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
@@ -71,9 +71,9 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 	def _createNewNative(cls, scene, controllerType):
 		"""
 			\remarks	implements the AbstractSceneAnimationController._createNewNative method to create a new native controller in the scene of the inputed controller type
-			\param		scene				<blur3d.api.Scene>
-			\param		controllerType		<blur3d.constants.ControllerType>
-			\return		<blur3d.api.SceneAnimationController> || None
+			\param		scene				<cross3d.Scene>
+			\param		controllerType		<cross3d.constants.ControllerType>
+			\return		<cross3d.SceneAnimationController> || None
 		"""
 		if (controllerType == ControllerType.BezierFloat):
 			return mxs.bezier_float()
@@ -110,7 +110,7 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 	def type(self):
 		"""
 			\remarks	implements AbstractSceneAnimationController.controllerType method to return the controller type for this instance
-			\return		<blur3d.constants.ControllerType>
+			\return		<cross3d.constants.ControllerType>
 		"""
 		return self._nativeToAbstractTypes.get(str(mxs.classOf(self._nativePointer)), 0)
 
@@ -152,7 +152,7 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		"""
 
 		# Importing SceneAnimationKey to get abstract types information.
-		from blur3d.api import SceneAnimationKey
+		from cross3d import SceneAnimationKey
 
 		# Getting what we need.
 		controllerType = self.type()
@@ -228,7 +228,7 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		"""
 
 		# Importing SceneAnimationKey to get abstract types information.
-		from blur3d.api import SceneAnimationKey
+		from cross3d import SceneAnimationKey
 
 		# Getting what we need.
 		tpe = fCurve.type()
@@ -346,5 +346,5 @@ class StudiomaxSceneAnimationController(AbstractSceneAnimationController):
 		return sorted(frames.values())
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneAnimationController', StudiomaxSceneAnimationController)
+import cross3d
+cross3d.registerSymbol('SceneAnimationController', StudiomaxSceneAnimationController)

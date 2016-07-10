@@ -1,5 +1,5 @@
 ##
-#   :namespace  blur3d.api.maya.mayascene
+#   :namespace  cross3d.maya.mayascene
 #
 #   :remarks    The MayaScene class will define all the operations for Maya scene interaction.
 #				DEVELOPER NOTE: Native Objects should always be OpenMaya.MObject's not maya.cmds
@@ -19,13 +19,11 @@ import maya.OpenMayaUI as omUI
 import maya.OpenMayaAnim as oma
 import collections as _collections
 
-from blur3d import api
-from blurdev import debug
-from blurdev.enum import enum
+import cross3d
 from collections import OrderedDict
-from blur3d import pendingdeprecation, constants
-from blur3d.constants import ObjectType, RotationOrder
-from blur3d.api.abstract.abstractscene import AbstractScene
+from cross3d import pendingdeprecation, constants
+from cross3d.constants import ObjectType, RotationOrder
+from cross3d.abstract.abstractscene import AbstractScene
 
 class MayaScene(AbstractScene):
 	# Create dicts used to map framerates to maya's time units
@@ -145,7 +143,7 @@ class MayaScene(AbstractScene):
 				oIter.next()
 
 	#--------------------------------------------------------------------------------
-	#							blur3d private methods
+	#							cross3d private methods
 	#--------------------------------------------------------------------------------
 	def _createNativeCamera(self, name='Camera', type='Standard', target=None, rotationOrder=None):
 		""" Implements the AbstractScene._createNativeCamera method to return a new Studiomax camera
@@ -153,19 +151,19 @@ class MayaScene(AbstractScene):
 			:return: <variant> nativeCamera || None
 		"""
 		if type == 'V-Ray':
-			debug.debugObject(self._createNativeCamera, 'V-Ray cameras are not supported currently')
+			cross3d.logger.debug('V-Ray cameras are not supported currently')
 			return None
 		else:
 			if target != None:
-				debug.debugObject(self._createNativeCamera, 'Target not supported currently.')
+				cross3d.logger.debug('Target not supported currently.')
 			tform, shape = cmds.camera()
 			
 			# Set the rotation order for the camera.
 			if rotationOrder == None:
-				rotationOrder = api.SceneCamera.defaultRotationOrder()
-			api.SceneObject._setNativeRotationOrder(tform, rotationOrder)
+				rotationOrder = cross3d.SceneCamera.defaultRotationOrder()
+			cross3d.SceneObject._setNativeRotationOrder(tform, rotationOrder)
 			
-			nativeCamera = api.SceneWrapper._asMOBject(shape)
+			nativeCamera = cross3d.SceneWrapper._asMOBject(shape)
 		cmds.rename(tform, name)
 		return nativeCamera
 
@@ -179,8 +177,8 @@ class MayaScene(AbstractScene):
 		# Create the transform node then the shape node so the transform is properly named
 		parent = cmds.createNode('transform', name='Model')
 		#name = cmds.createNode('locator', name='{}Shape'.format(name), parent=parent)
-		output = api.SceneWrapper._asMOBject(parent)
-		userProps = api.UserProps(output)
+		output = cross3d.SceneWrapper._asMOBject(parent)
+		userProps = cross3d.UserProps(output)
 		userProps['model'] = True
 		if referenced:
 			userProps['referenced'] = referenced
@@ -192,10 +190,10 @@ class MayaScene(AbstractScene):
 		# Add each of nativeObjects to the model namespace
 		if nativeObjects:
 			for nativeObject in nativeObjects:
-				nativeObject = api.SceneWrapper._getTransformNode(nativeObject)
-				objName = api.SceneWrapper._mObjName(nativeObject)
-#				cmds.parent(objName, api.SceneWrapper._mObjName(nativeParent))
-				nameInfo = api.SceneWrapper._namespace(nativeObject)
+				nativeObject = cross3d.SceneWrapper._getTransformNode(nativeObject)
+				objName = cross3d.SceneWrapper._mObjName(nativeObject)
+#				cmds.parent(objName, cross3d.SceneWrapper._mObjName(nativeParent))
+				nameInfo = cross3d.SceneWrapper._namespace(nativeObject)
 				newName = '{namespace}:{name}'.format(namespace=namespace, name=nameInfo['name'])
 				cmds.rename(objName, newName)
 		nativeObjects.append(output)
@@ -231,7 +229,7 @@ class MayaScene(AbstractScene):
 				output = obj
 				found = True
 		if not found and uniqueId:
-			debug.debugObject(self._findNativeObject, 'uniqueId not implemented yet.')
+			cross3d.logger.debug('uniqueId not implemented yet.')
 		return output
 
 	def _fromNativeValue(self, nativeValue):
@@ -248,14 +246,14 @@ class MayaScene(AbstractScene):
 		names = cmds.ls(type='shadingEngine')
 		mtls = []
 		for name in names:
-			mtls.append(api.SceneWrapper._asMOBject(name))
+			mtls.append(cross3d.SceneWrapper._asMOBject(name))
 		return mtls
 
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Implements the AbstractScene._nativeObjects method to return the native objects from the scene
 			:return: list [<Py3dsMax.mxs.Object> nativeObject, ..]
 		"""
-		expression = api.application._wildcardToRegex(wildcard)
+		expression = cross3d.application._wildcardToRegex(wildcard)
 		regex = re.compile(expression, flags=re.I)
 
 		if getsFromSelection:
@@ -264,15 +262,15 @@ class MayaScene(AbstractScene):
 			# TODO MIKE: I had to support kCharacters aka key set cause they are part of what we export.
 			# The problem is not the export because we don't have to select them since they are "dependant".
 			# The issue is for when I try to re-apply the namespace after export.
-			mType = api.SceneObject._abstractToNativeObjectType.get(objectType, (om.MFn.kDagNode, om.MFn.kCharacter))
+			mType = cross3d.SceneObject._abstractToNativeObjectType.get(objectType, (om.MFn.kDagNode, om.MFn.kCharacter))
 			objects = self._objectsOfMTypeIter(mType)
 
 		if objectType != 0 or wildcard:
 
 			container = []
 			for obj in objects:
-				typeCheck = True if not objectType else api.SceneObject._typeOfNativeObject(obj) == objectType
-				wildcardCheck = True if not wildcard else regex.match(api.SceneObject._mObjName(obj, False))
+				typeCheck = True if not objectType else cross3d.SceneObject._typeOfNativeObject(obj) == objectType
+				wildcardCheck = True if not wildcard else regex.match(cross3d.SceneObject._mObjName(obj, False))
 				if typeCheck and wildcardCheck:
 					container.append(obj)
 			objects = container
@@ -291,10 +289,10 @@ class MayaScene(AbstractScene):
 		""" Returns a list of all the objects in the scene wrapped as api objects
 			:param: getsFromSelection <bool>
 			:param: wildcard <string>
-			:param: type <blur3d.constants.ObjectType>
-			:return: <list> [ <blur3d.api.Variant>, .. ]
+			:param: type <cross3d.constants.ObjectType>
+			:return: <list> [ <cross3d.Variant>, .. ]
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type) if obj.apiType() != om.MFn.kWorld]
 
 	def _nativeRefresh(self):
@@ -311,8 +309,8 @@ class MayaScene(AbstractScene):
 		"""
 		ret = True
 		for model in models:
-			nameInfo = api.SceneWrapper._namespace(model)
-			fullName = api.SceneWrapper._mObjName(model)
+			nameInfo = cross3d.SceneWrapper._namespace(model)
+			fullName = cross3d.SceneWrapper._mObjName(model)
 			if cmds.referenceQuery(fullName, isNodeReferenced=True):
 				# The model is referenced and we need to unload it.
 				refNode = cmds.referenceQuery(fullName, referenceNode=True)
@@ -341,7 +339,7 @@ class MayaScene(AbstractScene):
 		objs = []
 		for obj in nativeObjects:
 			if not isinstance(obj, basestring):
-				obj = api.SceneWrapper._mObjName(obj, True)
+				obj = cross3d.SceneWrapper._mObjName(obj, True)
 			objs.append(obj)
 		cmds.delete(*objs)
 		return True
@@ -370,7 +368,7 @@ class MayaScene(AbstractScene):
 				for nativeObject in selection:
 					# Passing the object directly doesnt seem to work.
 					# TODO: Support selecting non-dag objects
-					if api.SceneWrapper._isDagNode(nativeObject):
+					if cross3d.SceneWrapper._isDagNode(nativeObject):
 						dagPath = om.MDagPath.getAPathTo(nativeObject)
 						tempList.add(dagPath)
 					else:
@@ -380,7 +378,7 @@ class MayaScene(AbstractScene):
 		return True
 
 	#--------------------------------------------------------------------------------
-	#							blur3d public methods
+	#							cross3d public methods
 	#--------------------------------------------------------------------------------
 
 	def _addToNativeSelection(self, nativeObjects):
@@ -428,10 +426,10 @@ class MayaScene(AbstractScene):
 	def animationRange(self):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
-			\return		<blur3d.api.FrameRange>
+			\return		<cross3d.FrameRange>
 		"""
 		playControl = oma.MAnimControl
-		return api.FrameRange([int(playControl.minTime().value()), int(playControl.maxTime().value())])
+		return cross3d.FrameRange([int(playControl.minTime().value()), int(playControl.maxTime().value())])
 
 	def setAnimationRange(self, animationRange, globalRange=None):
 		""" Sets the current start and end frame for animation.
@@ -549,7 +547,7 @@ class MayaScene(AbstractScene):
 	def removeObjects(self, objects):
 		""" removes the objects from the scene
 			\sa			_removeNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._removeNativeObjects([ obj._nativeTransform for obj in objects if not obj.isDeleted()])
@@ -586,7 +584,7 @@ class MayaScene(AbstractScene):
 	
 	def setSelection(self, objects, additive=False):
 		""" Selects the inputed objects in the scene
-			:param objects: <list> [ <blur3d.api.SceneObject>, .. ]
+			:param objects: <list> [ <cross3d.SceneObject>, .. ]
 			:return: <bool> success
 		"""
 		if isinstance(objects, basestring):
@@ -595,16 +593,16 @@ class MayaScene(AbstractScene):
 			# Note: This is passing the transform object not the nativePointer
 			nativeObjects = [obj._nativeTransform for obj in objects]
 			return self._addToNativeSelection(nativeObjects) if additive else self._setNativeSelection(nativeObjects)
-		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
+		raise TypeError('Argument 1 must be str or list of cross3d.SceneObjects')
 	
 	def viewports(self):
 		""" Returns all the visible viewports
-			:return: [<blur3d.api.SceneViewport>, ...]
+			:return: [<cross3d.SceneViewport>, ...]
 		"""
 		out = []
 		for index in range(omUI.M3dView.numberOf3dViews()):
-			out.append(api.SceneViewport(self, index))
+			out.append(cross3d.SceneViewport(self, index))
 		return out
 
 # register the symbol
-api.registerSymbol('Scene', MayaScene)
+cross3d.registerSymbol('Scene', MayaScene)

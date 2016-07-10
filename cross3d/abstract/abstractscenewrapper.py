@@ -1,24 +1,24 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenewrapper
+#	\namespace	cross3d.abstract.abstractscenewrapper
 #
 #	\remarks	The AbstractSceneWrapper class defines the base class for all other scene wrapper instances.  This creates a basic wrapper
-#				class for mapping native object instances from a DCC application to the blur3d structure
+#				class for mapping native object instances from a DCC application to the cross3d structure
 #
 #	\author		eric@blur.com
 #	\author		Blur Studio
 #	\date		03/15/10
 #
 
-from blur3d import api
-from blur3d.api	import UserProps
-from blur3d.constants import ControllerType, PointerTypes
-from blur3d import abstractmethod, pendingdeprecation
+import cross3d
+from cross3d import UserProps, abstractmethod
+from cross3d.constants import ControllerType, PointerTypes
+from cross3d import pendingdeprecation
 
 class AbstractSceneWrapper(object):
 	"""
 	The AbstractSceneWrapper class defines the base class for all other 
 	scene wrapper instances.  This creates a basic wrapper class for 
-	mapping native object instances from a DCC application to the blur3d 
+	mapping native object instances from a DCC application to the cross3d 
 	structure
 	"""
 
@@ -40,8 +40,8 @@ class AbstractSceneWrapper(object):
 		By default this simply returns self.nativePointer().
 		
 		Args:
-			retType (blur3d.constants.PointerTypes): Used to request a specific native object.
-					Defaults to blur3d.constants.PointerTypes.Pointer.
+			retType (cross3d.constants.PointerTypes): Used to request a specific native object.
+					Defaults to cross3d.constants.PointerTypes.Pointer.
 		
 		Returns:
 			Variant: Returns a native pointer object specific to the software.
@@ -126,7 +126,7 @@ class AbstractSceneWrapper(object):
 	def copy(self):
 		"""Create a copy of this wrapper in the scene
 		
-		:return: :class:`blur3d.api.SceneWrapper` or None
+		:return: :class:`cross3d.SceneWrapper` or None
 			
 		"""
 		nativeCopy = self._nativeCopy()
@@ -139,22 +139,22 @@ class AbstractSceneWrapper(object):
 		Return a list of SceneAnimationControllers that are linked to this 
 		object and its properties
 		
-		:return: list of :class:`blur3d.api.SceneAnimationController` objects
+		:return: list of :class:`cross3d.SceneAnimationController` objects
 			
 		"""
-		from blur3d.api import SceneAnimationController
+		from cross3d import SceneAnimationController
 		return [ SceneAnimationController(self, nativeController) for nativeController in self._nativeControllers() ]
 
 	def controller(self, name):
 		"""
 		Lookup a controller based on the inputed controllerName for this object
 		
-		:return: :class:`blur3d.api.SceneAnimationController` or None
+		:return: :class:`cross3d.SceneAnimationController` or None
 		
 		"""
 		nativeController = self._nativeController(name)
 		if (nativeController):
-			from blur3d.api import SceneAnimationController
+			from cross3d import SceneAnimationController
 			return SceneAnimationController(self._scene, nativeController)
 		return None
 
@@ -235,7 +235,7 @@ class AbstractSceneWrapper(object):
 		"""
 		Return the scene instance that this wrapper instance is linked to
 		
-		:return: :class:`blur3d.api.Scene`
+		:return: :class:`cross3d.Scene`
 		
 		"""
 		return self._scene
@@ -246,14 +246,14 @@ class AbstractSceneWrapper(object):
 		object
 		
 		:param name: str
-		:param controller: :class:`blur3d.api.SceneAnimationController` or None
+		:param controller: :class:`cross3d.SceneAnimationController` or None
 
 		"""
 
-		if isinstance(controller, api.FCurve):
+		if isinstance(controller, cross3d.FCurve):
 			fCurve = controller
-			nativeController = api.SceneAnimationController._abstractToNativeTypes.get(ControllerType.BezierFloat)()
-			controller = api.SceneAnimationController(self._scene, nativeController)
+			nativeController = cross3d.SceneAnimationController._abstractToNativeTypes.get(ControllerType.BezierFloat)()
+			controller = cross3d.SceneAnimationController(self._scene, nativeController)
 			controller.setFCurve(fCurve)
 
 		elif not isinstance(controller, SceneAnimationController):
@@ -313,7 +313,7 @@ class AbstractSceneWrapper(object):
 	def userProps(self):
 		"""Returns the UserProps object associated with this element
 		
-		:return; :class:`blur3d.api.UserProps`
+		:return; :class:`cross3d.UserProps`
 		
 		"""
 		return UserProps(self._nativePointer)
@@ -332,4 +332,4 @@ class AbstractSceneWrapper(object):
 
 
 # register the symbol
-api.registerSymbol('SceneWrapper', AbstractSceneWrapper, ifNotFound=True)
+cross3d.registerSymbol('SceneWrapper', AbstractSceneWrapper, ifNotFound=True)

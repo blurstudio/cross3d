@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.StudiomaxUserProps
+#	\namespace	cross3d.StudiomaxUserProps
 #
-#	\remarks	The blur3d.api.StudiomaxUserProps handles storing and retreving custom
+#	\remarks	The cross3d.StudiomaxUserProps handles storing and retreving custom
 #				properties from objects
 #	
 #	\author		mikeh@blur.com
@@ -12,7 +12,7 @@
 from Py3dsMax import mxs
 from PyQt4.QtCore import QDate, QString
 from datetime import date
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
+from cross3d.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 import os
 import re
 import json
@@ -184,6 +184,6 @@ class StudiomaxFileProps(AbstractFileProps):
 			self[k] = v
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'UserProps', StudiomaxUserProps )
-api.registerSymbol( 'FileProps', StudiomaxFileProps )
+import cross3d
+cross3d.registerSymbol( 'UserProps', StudiomaxUserProps )
+cross3d.registerSymbol( 'FileProps', StudiomaxFileProps )

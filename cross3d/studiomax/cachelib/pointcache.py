@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.matlib
+#	\namespace	cross3d.studiomax.matlib
 #
 #	\remarks	This package contains material editing methods for Studiomax
 #	

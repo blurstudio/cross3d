@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.maya.mayascenematerial
+#	\namespace	cross3d.maya.mayascenematerial
 #
 #	\remarks	The Maya implementation of SceneMaterial.
 #	
@@ -12,8 +12,8 @@ import re
 import os.path
 import contextlib
 import maya.cmds as cmds
-from blur3d.api.abstract.abstractscenematerial import AbstractSceneMaterial
-from blur3d.constants import MaterialPropertyMap
+from cross3d.abstract.abstractscenematerial import AbstractSceneMaterial
+from cross3d.constants import MaterialPropertyMap
 
 # =============================================================================
 # CLASSES
@@ -59,6 +59,5 @@ class MayaSceneMaterial(AbstractSceneMaterial):
 		yield ('maps', mapSets)
 		yield ('objects', [o.name() for o in self.objects()])
 	
-from blur3d import api
-api.registerSymbol('SceneMaterial', MayaSceneMaterial)
-
+import cross3d
+cross3d.registerSymbol('SceneMaterial', MayaSceneMaterial)

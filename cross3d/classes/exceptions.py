@@ -1,5 +1,5 @@
 ##
-#   \namespace  blur3d.api.classes.exceptions
+#   \namespace  cross3d.classes.exceptions
 #
 #   \remarks    [desc::commented]
 #   

@@ -5,9 +5,8 @@ atmosperhics in a Scene environment for any DCC application
 """
 
 
-from blur3d	import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractSceneFx(SceneWrapper):
@@ -62,19 +61,19 @@ class AbstractSceneFx(SceneWrapper):
 	def layer(self):
 		"""Return the layer that this fx is a part of
 		
-		:return: :class:`blur3d.api.SceneLayer` or None
+		:return: :class:`cross3d.SceneLayer` or None
 			
 		"""
 		nativeLayer = self._nativeLayer()
 		if (nativeLayer):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self._scene, nativeLayer)
 		return None
 
 	def scene(self):
 		"""Return the scene instance that this fx is linked to
 		
-		:return: :class:`blur3d.api.Scene` or None
+		:return: :class:`cross3d.Scene` or None
 		
 		"""
 		return self._scene
@@ -93,13 +92,13 @@ class AbstractSceneFx(SceneWrapper):
 	def fromXml(cls, scene, xml):
 		"""Restore the fx from the inputed xml node
 		
-		:param scene: :class:`blur3d.api.Scene`
+		:param scene: :class:`cross3d.Scene`
 		:param xml: :class:`blurdev.XML.XMLElement`
-		:return: :class:`blurdev.api.SceneFx` or None
+		:return: :class:`cross3d.SceneFx` or None
 		
 		"""
 		return scene.findFx(name=xml.attribute('name'), uniqueId=int(xml.attribute('id', 0)))
 
 
 # register the symbol
-api.registerSymbol('SceneFx', AbstractSceneFx, ifNotFound=True)
+cross3d.registerSymbol('SceneFx', AbstractSceneFx, ifNotFound=True)

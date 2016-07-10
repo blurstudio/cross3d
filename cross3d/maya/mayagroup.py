@@ -1,7 +1,7 @@
-from blur3d import api
-from blur3d.api.abstract.abstractgroup import AbstractGroup
+import cross3d
+from cross3d.abstract.abstractgroup import AbstractGroup
 
 class MayaGroup(AbstractGroup):
 	pass
 # register the symbol
-api.registerSymbol('Group', MayaGroup)
+cross3d.registerSymbol('Group', MayaGroup)

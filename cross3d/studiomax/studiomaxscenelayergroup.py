@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscene
+#	\namespace	cross3d.studiomax.studiomaxscene
 #
 #	\remarks	The StudiomaxScene class will define all the operations for Studiomax scene interaction.
 #
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax 											import mxs
-from blur3d.api.abstract.abstractscenelayergroup 		import AbstractSceneLayerGroup
+from cross3d.abstract.abstractscenelayergroup 		import AbstractSceneLayerGroup
 
 class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 	def _nativeObjects( self ):
@@ -64,7 +64,7 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 	def layers( self ):
 		"""
 			\remarks	implements the AbstractLayerGroup.layers method to retrieve the layers that are currently on this group
-			\return		<list> [ <blur3d.api.SceneLayer>, .. ]
+			\return		<list> [ <cross3d.SceneLayer>, .. ]
 		"""
 		gi		= self.groupOrder()
 		output 	= []
@@ -217,5 +217,5 @@ class StudiomaxSceneLayerGroup( AbstractSceneLayerGroup ):
 		# self.parent().refresh()
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneLayerGroup', StudiomaxSceneLayerGroup )
+import cross3d
+cross3d.registerSymbol( 'SceneLayerGroup', StudiomaxSceneLayerGroup )

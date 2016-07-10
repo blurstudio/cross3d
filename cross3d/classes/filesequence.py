@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.classes.filesequence
+#	\namespace	cross3d.classes.filesequence
 #
 #	\remarks	This file defines the FileSequence class that allows to manipulate a file sequence.
 #
@@ -21,8 +21,7 @@ import time
 import warnings
 
 from framerange import FrameRange
-from blur3d.constants import VideoCodec
-from blur3d.constants import PaddingStyle
+from cross3d.constants import VideoCodec, PaddingStyle
 from blurdev.decorators import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -499,9 +498,9 @@ class FileSequence(object):
 			to the specified location.
 		
 		Args:
-		    outputPath (str): The unique path to output the retimed FileSequence to.
-		    retimeCurve (blur3d.api.FCurve): The curve to evaluate to retime the file sequence
-		   	by mapping frames to frames.
+			outputPath (str): The unique path to output the retimed FileSequence to.
+			retimeCurve (cross3d.FCurve): The curve to evaluate to retime the file sequence
+			by mapping frames to frames.
 		
 		Returns:
 		    FileSequence: The newly created FileSequence.

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenerenderer
+#	\namespace	cross3d.abstract.abstractscenerenderer
 #
 #	\remarks	The StudiomaxSceneRenderer class provides an interface to editing renderers in a Scene environment for a Studiomax application
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax 										import mxs
-from blur3d.api.abstract.abstractscenerenderer 		import AbstractSceneRenderer
+from cross3d.abstract.abstractscenerenderer 		import AbstractSceneRenderer
 
 class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -29,9 +29,9 @@ class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 		"""
 			\remarks	implements AbstractSceneRenderer.rendererType to return the renderer type for this instance
 			\sa			setRendererType
-			\return		<blur3d.constants.RendererType>
+			\return		<cross3d.constants.RendererType>
 		"""
-		from blur3d.constants import RendererType
+		from cross3d.constants import RendererType
 		classname = str(mxs.classof(self._nativePointer)).lower()
 		
 		if ( classname == 'default_scanline_renderer' ):
@@ -44,5 +44,5 @@ class StudiomaxSceneRenderer( AbstractSceneRenderer ):
 		return 0
 		
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneRenderer', StudiomaxSceneRenderer )
+import cross3d
+cross3d.registerSymbol( 'SceneRenderer', StudiomaxSceneRenderer )

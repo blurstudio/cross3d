@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.classes.dispatchprocess
+#	\namespace	cross3d.classes.dispatchprocess
 #
 #	\remarks	Responsible for handling processing of events in a secondary thread
 #	
@@ -19,8 +19,8 @@ class DispatchProcess(QThread):
 		
 		# create connections to signals
 		global Dispatch, Scene, SceneObject
-		from blur3d.api	import dispatch
-		from blur3d.api import Scene, SceneObject
+		from cross3d	import dispatch
+		from cross3d import Scene, SceneObject
 		dispatch.eventCalled.connect(self.processEvent)
 	
 	def __del__(self):
@@ -29,7 +29,7 @@ class DispatchProcess(QThread):
 	
 	def processEvent(self, event, *args):
 		"""
-			\remarks	processes the signals emited from the application creates any objects neccissary, and emits the proper blur3d.api.Dispatch signal.
+			\remarks	processes the signals emited from the application creates any objects neccissary, and emits the proper cross3d.Dispatch signal.
 						This is designed to run in a secondary thread and emit signals that are processed on the main thread. It hopefully will create minimum
 						slowdown.
 			\param		event	<str>	Identifies the event type

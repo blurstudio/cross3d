@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.classes.signalInspector
+#	\namespace	cross3d.classes.signalInspector
 #
 #	\remarks	[desc::commented]
 #	
@@ -9,7 +9,7 @@
 #
 
 import blur3d
-dispatch = blur3d.api.dispatch
+dispatch = cross3d.dispatch
 from PyQt4.QtCore import QObject
 
 class SignalInspector(QObject):

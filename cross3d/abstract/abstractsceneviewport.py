@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.abstractsceneviewport
+#	\namespace	cross3d.studiomax.abstractsceneviewport
 #
 #	\remarks	The AbstractSceneRenderPass class will define all the operations for viewport interaction  
 #	
@@ -10,9 +10,9 @@
 
 from PyQt4.QtCore import QObject
 
-from blur3d import pendingdeprecation
-from blur3d	import abstractmethod
-from blur3d import api
+import cross3d
+from cross3d import abstractmethod
+from cross3d import pendingdeprecation
 
 
 class AbstractSceneViewport(QObject):
@@ -182,20 +182,20 @@ class AbstractSceneViewport(QObject):
 	def camera(self):
 		"""Return the viewport's camera
 		
-		:return: :class:`blur3d.api.SceneCamera`
+		:return: :class:`cross3d.SceneCamera`
 		
 		"""
-		from blur3d.api import SceneCamera
+		from cross3d import SceneCamera
 		camera = self._nativeCamera()
 		if camera:
 			return SceneCamera(self._scene, camera)
-		from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
+		from cross3d.abstract.abstractscenecamera import AbstractSceneCamera
 		return None
 
 	def setCamera(self, camera):
 		"""Sets the camera of the current viewport
 		
-		:param camera: :class:`blur3d.api.SceneCamera` or None
+		:param camera: :class:`cross3d.SceneCamera` or None
 
 		"""
 		if type(camera) == str or type(camera) == unicode:
@@ -208,4 +208,4 @@ class AbstractSceneViewport(QObject):
 
 
 # register the symbol
-api.registerSymbol('SceneViewport', AbstractSceneViewport)
+cross3d.registerSymbol('SceneViewport', AbstractSceneViewport)

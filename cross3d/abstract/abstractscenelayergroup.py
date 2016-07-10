@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenelayergroup
+#	\namespace	cross3d.abstract.abstractscenelayergroup
 #
 #	\remarks	The AbstractSceneLayerGroup provides a cross-application interface to 3d scene layer's and their interaction
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
@@ -10,9 +10,8 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 class AbstractSceneLayerGroup(SceneWrapper):
 
@@ -64,7 +63,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 	def addLayers(self, layers):
 		"""Add the layers to this layer group
 
-		:param layers: list of :class:`blur3d.api.SceneLayer`'s
+		:param layers: list of :class:`cross3d.SceneLayer`'s
 
 		"""
 		return self._addNativeLayers([ layer.nativePointer() for layer in layers ])
@@ -110,19 +109,19 @@ class AbstractSceneLayerGroup(SceneWrapper):
 	def layers(self):
 		"""Returns the SceneLayer's that are associated with this layer
 
-		:return: list of :class:`blur3d.api.SceneLayer`'s
+		:return: list of :class:`cross3d.SceneLayer`'s
 
 		"""
-		from blur3d.api import SceneLayer
+		from cross3d import SceneLayer
 		return [ SceneLayer(self._scene, lay) for lay in self._nativeLayers() ]
 
 	def objects(self):
 		"""Return a list of the objects that are part of this layer group
 
-		:return: list of :class:`blur3d.api.SceneObject`'s
+		:return: list of :class:`cross3d.SceneObject`'s
 
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [ SceneObject(self._scene, obj) for obj in self._nativeObjects() ]
 
 	@abstractmethod
@@ -130,12 +129,12 @@ class AbstractSceneLayerGroup(SceneWrapper):
 		"""Remove the layer from the scene (layers included when desired)
 
 		:param removeLayers: If true, the layers in the layer group should
-		                     be removed from the scene, otherwise only the
-		                     layer group should be removed
+		                    be removed from the scene, otherwise only the
+		                    layer group should be removed
 		:type removeLayers: bool
 		:param removeObjects: If removeLayers is true, when removeObjects
-		                      is true, the objects on the layers in the
-							  layer group should be removed from the scene
+							is true, the objects on the layers in the
+							layer group should be removed from the scene
 
 		"""
 		return False
@@ -143,7 +142,7 @@ class AbstractSceneLayerGroup(SceneWrapper):
 	def scene(self):
 		"""Return the scene instance that this layer is a member of
 
-		:return: :class:`blur3d.api.Scene`
+		:return: :class:`cross3d.Scene`
 
 		"""
 		return self._scene
@@ -214,4 +213,4 @@ class AbstractSceneLayerGroup(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('SceneLayerGroup', AbstractSceneLayerGroup, ifNotFound=True)
+cross3d.registerSymbol('SceneLayerGroup', AbstractSceneLayerGroup, ifNotFound=True)

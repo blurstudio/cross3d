@@ -1,5 +1,5 @@
 #
-#	\namespace	blur3d.api.softimage.softimagesceneobject
+#	\namespace	cross3d.softimage.softimagesceneobject
 #
 #	\remarks	The SoftimageSceneModel class provides the implementation of the AbstractSceneModel class as it applies
 #				to Softimage scenes
@@ -12,12 +12,12 @@
 import os, re
 import copy
 
-from blur3d.api import application
+from cross3d import application
 from win32com.client import Dispatch
 from win32com.client import constants
 from PySoftimage import xsi, xsiFactory
 from blurdev.decorators import pendingdeprecation
-from blur3d.api.abstract.abstractscenemodel import AbstractSceneModel
+from cross3d.abstract.abstractscenemodel import AbstractSceneModel
 
 xsiUIToolkit = Dispatch("XSI.UIToolkit")
 
@@ -264,7 +264,7 @@ class SoftimageSceneModel(AbstractSceneModel):
 		native_action = xsi.ImportAction(native_model, path, 0)
 		native_clip = xsi.AddClip(native_model, native_action, "", native_track.FullName, native_action.FrameStart.Value, name)
 		
-		#TODO: wrap native clip (no specific blur3d object for it yet) and return it.
+		#TODO: wrap native clip (no specific cross3d object for it yet) and return it.
 		return True
 
 	def matchPose(self, model, objects=[]):
@@ -317,5 +317,5 @@ class SoftimageSceneModel(AbstractSceneModel):
 		return True
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneModel', SoftimageSceneModel)
+import cross3d
+cross3d.registerSymbol('SceneModel', SoftimageSceneModel)

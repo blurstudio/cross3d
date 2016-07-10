@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.trackgroup
+#	\namespace	cross3d.abstract.trackgroup
 #
 #	\remarks	The AbstractTrackGroup class provides a base implementation of a
 #				cross-application interface to a layer trackgroup.
@@ -9,9 +9,8 @@
 #	\date		10/13/15
 #
 
-from blur3d import abstractmethod
-from blur3d import api
-from blur3d.api import Track
+import cross3d
+from cross3d import Track, abstractmethod
 
 class AbstractTrackGroup(object):
 	"""The AbstractTrackGroup class provides a base implementation of a
@@ -192,4 +191,4 @@ class AbstractTrackGroup(object):
 
 
 # register the symbol
-api.registerSymbol('TrackGroup', AbstractTrackGroup, ifNotFound=True)
+cross3d.registerSymbol('TrackGroup', AbstractTrackGroup, ifNotFound=True)

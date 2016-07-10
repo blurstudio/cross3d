@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscenepropset
+#	\namespace	cross3d.studiomax.studiomaxscenepropset
 #
 #	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
 #				does not have a native Property Set instance, we will have to control all of the data ourselves
@@ -10,7 +10,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api.abstract.abstractscenepropset	import AbstractScenePropSet
+from cross3d.abstract.abstractscenepropset	import AbstractScenePropSet
 
 class StudiomaxScenePropSet( AbstractScenePropSet ):
 	def __eq__( self, other ):
@@ -265,6 +265,6 @@ class StudiomaxSceneObjectPropSet( StudiomaxScenePropSet ):
 			
 		
 # register the class to the system
-from blur3d import api
-api.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
-api.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )
+import cross3d
+cross3d.registerSymbol( 'ScenePropSet', 		StudiomaxScenePropSet )
+cross3d.registerSymbol( 'SceneObjectPropSet', 	StudiomaxSceneObjectPropSet )

@@ -1,8 +1,8 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenewrapper
+#	\namespace	cross3d.abstract.abstractscenewrapper
 #
 #	\remarks	The AbstractSceneWrapper class defines the base class for all other scene wrapper instances.  This creates a basic wrapper
-#				class for mapping native object instances from a DCC application to the blur3d structure
+#				class for mapping native object instances from a DCC application to the cross3d structure
 #
 #	\author		eric@blur.com
 #	\author		Blur Studio
@@ -10,8 +10,8 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api import UserProps
-from blur3d.api.abstract.abstractscenewrapper import AbstractSceneWrapper
+from cross3d import UserProps
+from cross3d.abstract.abstractscenewrapper import AbstractSceneWrapper
 
 class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -208,5 +208,5 @@ class StudiomaxSceneWrapper( AbstractSceneWrapper ):
 		return [ unicode(propname) for propname in mxs.getPropNames( self._nativePointer ) ]
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneWrapper', StudiomaxSceneWrapper )
+import cross3d
+cross3d.registerSymbol( 'SceneWrapper', StudiomaxSceneWrapper )

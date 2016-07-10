@@ -1,18 +1,83 @@
-"""
-	The blur3d.scenes package creates an abstract wrapper from a 3d system
-	to use when dealing with scenes.  If you need to debug why a software module 
-	is failing to load, set _useDebug, and _modName.
-"""
 
 import glob
 import os
 import sys
 
-import blurdev as _blurdev
-# If you need to test why a package is failing to import set this to true
-_useDebug = _blurdev.debug.debugLevel() == _blurdev.debug.DebugLevel.High
-# specify the module you wish to check. This way it will not report the fail to load softimage if you are in max, as this is a expected failure
-_modName = _blurdev.core.objectName()
+
+# Setup Logging for cross3d
+#--------------------------------------------------------------------------------
+import logging as _logging
+logger = _logging.getLogger(__name__)
+if not logger.handlers:
+	_logLevel = int(os.getenv('CROSS3D_LOGGING_LEVEL', _logging.NOTSET))
+	if _logLevel:
+		ch = _logging.StreamHandler(sys.stdout)
+		ch.setLevel(_logLevel)
+		formatter = _logging.Formatter('%(levelname)s:%(name)s [%(filename)s:%(lineno)d]# %(message)s')
+		ch.setFormatter(formatter)
+		logger.addHandler(ch)
+		logger.setLevel(_logLevel)
+	else:
+		logger.addHandler(_logging.NullHandler())
+#--------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------
+# Decorators and functions used for maintaining cross3d
+#--------------------------------------------------------------------------------
+
+def abstractmethod(function):
+	""" The decorated function should be overridden by a software specific module.
+	
+	Depending on the state of the environment variable "CROSS3D_ABSTRACT_MODE" is set to 
+	"""
+	def newFunction(*args, **kwargs):
+		# when debugging, raise an error
+		msg = 'Abstract implementation has not been overridden.'
+		mode = os.getenv('CROSS3D_ABSTRACTMETHOD_MODE')
+		if mode == 'raise':
+			raise NotImplementedError(debugObjectString(function, msg))
+		elif mode == 'warn':
+			logger.debug(debugObjectString(function, msg))
+		return function(*args, **kwargs)
+	newFunction.__name__ = function.__name__
+	newFunction.__doc__ = function.__doc__
+	newFunction.__dict__ = function.__dict__
+	return newFunction
+
+def debugObjectString(object, msg):
+	import inspect
+	# debug a module
+	if inspect.ismodule(object):
+		return '[%s module] :: %s' % (object.__name__, msg)
+
+	# debug a class
+	elif inspect.isclass(object):
+		return '[%s.%s class] :: %s' % (object.__module__, object.__name__, msg)
+
+	# debug an instance method
+	elif inspect.ismethod(object):
+		return '[%s.%s.%s method] :: %s' % (object.im_class.__module__, object.im_class.__name__, object.__name__, msg)
+
+	# debug a function
+	elif inspect.isfunction(object):
+		return '[%s.%s function] :: %s' % (object.__module__, object.__name__, msg)
+
+# TODO: REMOVE THIS FUNCTION
+from blurdev.decorators import pendingdeprecation
+
+#--------------------------------------------------------------------------------
+# cross3d init
+#--------------------------------------------------------------------------------
+
+# By default cross3d suppresses exceptions when it imports the software specific module. It uses the
+# first module that successfully imports. When programming a software specific module this makes it
+# hard to debug. 
+# If you set the environment variable CROSS3D_DEBUG_MODULE to the name of the module you are working 
+# on it will only try to load that module(and abstract) and it will raise all exceptions.
+_debugModule = os.getenv('CROSS3D_DEBUG_MODULE')
+logger.debug('DebugModule: {}'.format(_debugModule))
+
+import constants
 
 from classes import FCurve
 from classes import Exceptions
@@ -37,28 +102,33 @@ def _methodNames():
 	return ret
 
 def packageName(modname):
-	return 'blur3d.api.%s' % modname
+	return 'cross3d.%s' % modname
 
 def init():
-	# import any overrides to the abstract symbols
-	for modname in _methodNames():
-		pckg = packageName(modname)
+	if _debugModule != None:
+		logger.debug('Forced import of Software Specific module: {}'.format(_debugModule))
+		# TODO: Research a better way to handle importing the software specific modules
+		pckg = packageName(_debugModule)
+		__import__(pckg)
+		mod = sys.modules[pckg]
+		logger.debug('pckg: {}'.format([pckg, mod]))
+		mod.init()
+	else:
+		# import any overrides to the abstract symbols
+		for modname in _methodNames():
+			pckg = packageName(modname)
 
-		# try to import the overrides
-		if _useDebug and (not _modName or modname == _modName):
-			__import__(pckg)
-		else:
+			# Attempt to import and init this modname.
 			try:
 				__import__(pckg)
 			except ImportError:
 				continue
 
-		mod = sys.modules[pckg]
-		if _useDebug and (not _modName or modname == _modName):
-			mod.init()
-		else:
+			mod = sys.modules[pckg]
 			try:
 				mod.init()
+				logger.debug('The module "{}" initialized successfully.'.format(modname))
+				# The module successfully initalized no need to try any other modules.
 				break
 			except:
 				continue
@@ -72,21 +142,23 @@ def external(appName):
 	# classes should not have a external implementation
 	if appName == 'classes':
 		raise KeyError('classes does not have a external implementation.')
-	import blur3d.api
+	import cross3d
 	try:
 		__import__(packageName(appName))
-		return getattr(getattr(getattr(blur3d.api, appName), 'external'), 'External')
+		return getattr(getattr(getattr(cross3d, appName), 'external'), 'External')
 	except AttributeError:
-		return blur3d.api.abstract.external.External
+		return cross3d.abstract.external.External
 
 def registerSymbol(name, value, ifNotFound=False):
 	"""
 		Used by the *adaptors* to register their own classes and functions as
-		part of the blur3d.api.  
+		part of the cross3d.  
 	"""
 	# initialize a value in the dictionary
-	import blur3d.api
-	if ifNotFound and name in blur3d.api.__dict__:
+	import cross3d
+	if ifNotFound and name in cross3d.__dict__:
 		return
 
-	blur3d.api.__dict__[name] = value
+	cross3d.__dict__[name] = value
+
+init()

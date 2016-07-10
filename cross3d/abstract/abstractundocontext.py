@@ -1,10 +1,5 @@
-
-
-
-
-
+import cross3d
 from PyQt4.QtCore import QObject
-from blur3d import api
 
 
 class AbstractUndoContext(QObject):
@@ -29,5 +24,5 @@ class AbstractUndoContext(QObject):
 	
 	
 # register the symbol
-api.registerSymbol('UndoContext', AbstractUndoContext, ifNotFound=True)
+cross3d.registerSymbol('UndoContext', AbstractUndoContext, ifNotFound=True)
 	

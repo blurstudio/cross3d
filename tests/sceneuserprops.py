@@ -1,9 +1,9 @@
 import pytest
-import blur3d
+import cross3d
 
 @pytest.fixture
 def SceneObjectUserProps():
-	scene = blur3d.api.Scene()
+	scene = cross3d.Scene()
 	# TODO: This is probably not the best way to get a object to test userProps on
 	obj = scene.selection()[0]
 	obj.userProps().clear()

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxsceneanimationkey
+#	\namespace	cross3d.studiomax.studiomaxsceneanimationkey
 #
 #	\remarks	The StudiomaxSceneAnimationKey class defines a base class for managing animation curves within a 3d scene
 #
@@ -9,8 +9,8 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.constants import TangentType
-from blur3d.api.abstract.abstractsceneanimationkey import AbstractSceneAnimationKey
+from cross3d.constants import TangentType
+from cross3d.abstract.abstractsceneanimationkey import AbstractSceneAnimationKey
 
 class StudiomaxSceneAnimationKey( AbstractSceneAnimationKey ):
 
@@ -95,5 +95,5 @@ class StudiomaxSceneAnimationKey( AbstractSceneAnimationKey ):
 		return float(self._nativePointer.time)
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneAnimationKey', StudiomaxSceneAnimationKey )
+import cross3d
+cross3d.registerSymbol( 'SceneAnimationKey', StudiomaxSceneAnimationKey )

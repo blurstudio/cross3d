@@ -1,5 +1,5 @@
 ##
-#   \namespace  blur3d.api.classes.valuerange
+#   \namespace  cross3d.classes.valuerange
 #
 #   \remarks    This module holds the ValueRange class to handle value ranges.
 #
@@ -36,7 +36,7 @@ class ValueRange(list):
 		"""
 			\remarks	Affects the class representation.
 		"""
-		return 'blur3d.api.ValueRange( %s, %s )' % (self[0], self[1])
+		return 'cross3d.ValueRange( %s, %s )' % (self[0], self[1])
 
 	def __eq__(self, other):
 		if isinstance(other, ValueRange):

@@ -1,8 +1,8 @@
 ##
-#   :namespace  blur3d.api.maya.mayaapplication
+#   :namespace  cross3d.maya.mayaapplication
 #
 #   :remarks    The MayaApplication class will define all operations for application interaction. This class should never be initalized on its own.
-#				You should access it by blur3d.api.application. One of its main functions is connecting application callbacks to blur3d.api.Dispatch.
+#				You should access it by cross3d.application. One of its main functions is connecting application callbacks to cross3d.Dispatch.
 #				
 #				The MayaApplication is a QObject instance and any changes to the scene data can be controlled by connecting to the signals defined here.
 #   
@@ -15,8 +15,8 @@ import re
 import maya.cmds as cmds
 from maya.OpenMaya import MSceneMessage, MMessage, MModelMessage, MEventMessage
 
-from blur3d import api
-from blur3d.api.abstract.abstractapplication import AbstractApplication
+import cross3d
+from cross3d.abstract.abstractapplication import AbstractApplication
 
 class MayaApplication(AbstractApplication):
 	_callbackMap = {}
@@ -45,8 +45,8 @@ class MayaApplication(AbstractApplication):
 	def _fileNameCallback(self, clientData):
 		# Ensure the scene object is created.
 		if self._scene == None:
-			self._scene = api.Scene()
-		api.dispatch.dispatch(clientData, self._scene.currentFileName())
+			self._scene = cross3d.Scene()
+		cross3d.dispatch.dispatch(clientData, self._scene.currentFileName())
 	
 	def _selectionChanged(self, clientData):
 		import __main__
@@ -58,13 +58,13 @@ class MayaApplication(AbstractApplication):
 		
 	def connectCallback(self, signal):
 		"""
-		Connects a single callback. This allows blur3d to only have to
+		Connects a single callback. This allows cross3d to only have to
 		respond to callbacks that tools actually need, instead of all 
 		callbacks.  Called the first time a signal is connected to 
 		this callback.
 		"""
 		msg = None
-		funct = api.dispatch.dispatch
+		funct = cross3d.dispatch.dispatch
 		addCallback = MSceneMessage.addCallback
 		if signal == 'sceneNewRequested':
 			msg = MSceneMessage.kBeforeNew
@@ -93,7 +93,7 @@ class MayaApplication(AbstractApplication):
 #			addCallback = MEventMessage.addEventCallback
 		if msg != None:
 			if signal in self._callbackMap:
-				raise api.Exceptions.SignalAlreadyConnected('This signal is already connected. The new connection was not made.')
+				raise cross3d.Exceptions.SignalAlreadyConnected('This signal is already connected. The new connection was not made.')
 			else:
 #				print 'connectCallback', signal
 				self._callbackMap[signal] = addCallback(msg, funct, signal)
@@ -110,9 +110,9 @@ class MayaApplication(AbstractApplication):
 
 	def disconnect(self):
 		"""
-		Disconnect application specific callbacks to <blur3d.api.Dispatch>. This will be called 
-		when <blur3d.api.Dispatch> is deleted, disconnect is called when the last 
-		<blur3d.api.Dispatch> signal is disconnected.
+		Disconnect application specific callbacks to <cross3d.Dispatch>. This will be called 
+		when <cross3d.Dispatch> is deleted, disconnect is called when the last 
+		<cross3d.Dispatch> signal is disconnected.
 		"""
 		# iterate over keys because disconnectCallback pops the signals it disconnects
 		for signal in self._callbackMap.keys():
@@ -131,7 +131,7 @@ class MayaApplication(AbstractApplication):
 		if not self._blockRefresh:
 			# Ensure the scene object is created.
 			if self._scene == None:
-				self._scene = api.Scene()
+				self._scene = cross3d.Scene()
 			self._scene.viewport().nativePointer().refresh(True, True)
 			return True
 		return False
@@ -151,7 +151,7 @@ class MayaApplication(AbstractApplication):
 
 
 # register the symbol
-api.registerSymbol( 'Application', MayaApplication)
+cross3d.registerSymbol('Application', MayaApplication)
 
 # Creating a single instance of Application for all code to use.
-api.registerSymbol( 'application', MayaApplication())
+cross3d.registerSymbol('application', MayaApplication())

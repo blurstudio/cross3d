@@ -4,11 +4,9 @@ atmosperhics in a Scene environment for any DCC application
 
 """
 
-
-from blur3d	import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
-from blur3d.constants import EnvironmentTypes
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
+from cross3d.constants import EnvironmentTypes
 
 
 class AbstractSceneAtmospheric(SceneWrapper):
@@ -74,12 +72,12 @@ class AbstractSceneAtmospheric(SceneWrapper):
 	def layer(self):
 		"""Return the layer that this atmospheric is a part of
 		
-		:return: :class:`blur3d.api.SceneLayer` or None
+		:return: :class:`cross3d.SceneLayer` or None
 			
 		"""
 		nativeLayer = self._nativeLayer()
 		if (nativeLayer):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self._scene, nativeLayer)
 		return None
 
@@ -94,7 +92,7 @@ class AbstractSceneAtmospheric(SceneWrapper):
 	def scene(self):
 		"""Return the scene instance that this atmospheric is linked to
 		
-		:return: :class:`blur3d.api.Scene` or None
+		:return: :class:`cross3d.Scene` or None
 		
 		"""
 		return self._scene
@@ -113,13 +111,13 @@ class AbstractSceneAtmospheric(SceneWrapper):
 	def fromXml(cls, scene, xml):
 		"""Restore the atmospheric from the inputed xml node
 		
-		:param scene: :class:`blur3d.api.Scene`
+		:param scene: :class:`cross3d.Scene`
 		:param xml: :class:`blurdev.XML.XMLElement`
-		:return: :class:`blurdev.api.SceneAtmospheric` or None
+		:return: :class:`cross3d.SceneAtmospheric` or None
 		
 		"""
 		return scene.findAtmospheric(name=xml.attribute('name'), uniqueId=int(xml.attribute('id', 0)))
 
 
 # register the symbol
-api.registerSymbol('SceneAtmospheric', AbstractSceneAtmospheric, ifNotFound=True)
+cross3d.registerSymbol('SceneAtmospheric', AbstractSceneAtmospheric, ifNotFound=True)

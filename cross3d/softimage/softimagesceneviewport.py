@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagesceneviewport
+#	\namespace	cross3d.softimage.softimagesceneviewport
 #
 #	\remarks	The SoftimageSceneViewport class provides the implementation of the AbstractSceneViewport class as it applies
 #				to Softimage scenes
@@ -15,9 +15,9 @@ import time
 
 from PySoftimage import xsi
 from PyQt4.QtCore import QSize
-from blur3d.api import Exceptions
-from blur3d.api.classes import FrameRange
-from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
+from cross3d import Exceptions
+from cross3d.classes import FrameRange
+from cross3d.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			cameraName = "Views.View%s.%sCamera" % (self.name, cameraName)
 
 		if cameraName == 'Render Pass':
-			from blur3d.api import Scene
+			from cross3d import Scene
 			scene = Scene()
 			renderPass = self.scene.currentRenderPass()
 			cameraName = renderPass.camera().name()
@@ -275,8 +275,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		return xsi.GetValue( camera.FullName + '.camdisp.headlight' )
 		
 	def slateIsActive( self ):
-		import blur3d.api
-		application = blur3d.api.application
+		import cross3d
+		application = cross3d.application
 		version = application.version()
 		if version > 9:
 			camera = self._nativeCamera()
@@ -284,8 +284,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		return False
 	
 	def setSlateIsActive( self, state ):
-		import blur3d.api
-		application = blur3d.api.application
+		import cross3d
+		application = cross3d.application
 		version = application.version()
 		if version > 9:
 			camera = self._nativeCamera()
@@ -293,8 +293,8 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			return True
 
 	def setSlateText( self, text='' ):
-		import blur3d.api
-		application = blur3d.api.application
+		import cross3d
+		application = cross3d.application
 		version = application.version()
 		if version > 9:
 			camera = self._nativeCamera()
@@ -302,5 +302,5 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 			return True
 		
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneViewport', SoftimageSceneViewport )
+import cross3d
+cross3d.registerSymbol( 'SceneViewport', SoftimageSceneViewport )

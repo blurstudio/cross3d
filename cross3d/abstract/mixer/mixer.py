@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.mixer
+#	\namespace	cross3d.abstract.mixer
 #
 #	\remarks	The AbstractMixer class provides a base implementation of a
 #				cross-application interface to a layer mixer.
@@ -9,9 +9,8 @@
 #	\date		10/13/15
 #
 
-from blur3d import abstractmethod
-from blur3d import api
-from blur3d.api import TrackGroup
+import cross3d
+from cross3d import TrackGroup, abstractmethod
 
 class AbstractMixer(object):
 	"""The AbstractMixer class provides a base implementation of a
@@ -92,4 +91,4 @@ class AbstractMixer(object):
 
 
 # register the symbol
-api.registerSymbol('Mixer', AbstractMixer, ifNotFound=True)
+cross3d.registerSymbol('Mixer', AbstractMixer, ifNotFound=True)

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneobjectgroup
+#	\namespace	cross3d.abstract.abstractsceneobjectgroup
 #
 #	\remarks	The AbstractSceneObjectGroup class provides an interface for working on sets of SceneObject's as a singular group
 #	
@@ -8,9 +8,9 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
+from cross3d import abstractmethod
 from abstractcontainer import AbstractContainer
-from blur3d import api
+import cross3d
 
 class AbstractGroup(AbstractContainer):
 
@@ -52,4 +52,4 @@ class AbstractGroup(AbstractContainer):
 		return ''
 
 # register the symbol
-api.registerSymbol('Group', AbstractGroup, ifNotFound=True)
+cross3d.registerSymbol('Group', AbstractGroup, ifNotFound=True)

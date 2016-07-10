@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscene
+#	\namespace	cross3d.abstract.abstractscene
 #
-#	\remarks	The AbstractScene class will define all the operations for scene interaction.  Everything for the 3d abstraction layer of the blur3d
+#	\remarks	The AbstractScene class will define all the operations for scene interaction.  Everything for the 3d abstraction layer of the cross3d
 #				package will access information from a Scene instance.  This way, you can have a reference to a Studiomax scene, a Softimage scene, a
 #				Proxy scene, whatever, and access all generic object, layer, material information in the same way
 #
@@ -12,7 +12,7 @@
 #				in a subclass.
 #
 #				The term NativeObject will be used when referring to methods and pointers referencing an application specific instance (Studiomax vs. Softimage
-#				for example) vs. one of the blur3d's wrapper objects (SceneObject,SceneLayer,etc.)
+#				for example) vs. one of the cross3d's wrapper objects (SceneObject,SceneLayer,etc.)
 #	
 #	\author		eric@blur.com
 #	\author		Blur Studio
@@ -21,10 +21,10 @@
 
 import collections as _collections
 
-from blur3d import api
+import cross3d
 from PyQt4.QtCore import QObject, pyqtSignal
-from blur3d.constants import UpVector, ObjectType
-from blur3d	import abstractmethod, pendingdeprecation, constants
+from cross3d import abstractmethod, constants
+from cross3d import pendingdeprecation
 
 class AbstractScene(QObject):
 	# layer signals
@@ -67,7 +67,7 @@ class AbstractScene(QObject):
 	def _cacheNativeMap(self, cacheType, nativeMap):
 		"""Cache the inputed native map in the scene.
 		
-		:type cacheType: :class:`blur3d.constants.MapCacheType`
+		:type cacheType: :class:`cross3d.constants.MapCacheType`
 		:param nativeMap: variant?
 		:return: True if successful, False otherwise
 		:rtype: bool
@@ -78,7 +78,7 @@ class AbstractScene(QObject):
 	def _cacheNativeMaterial(self, cacheType, nativeMaterial):
 		"""Cache the inputed native material in the scene.
 		
-		:type cacheType: :class:`blur3d.constants.MaterialCacheType`
+		:type cacheType: :class:`cross3d.constants.MaterialCacheType`
 		:param nativeMaterial: variant
 		:return: True if successful, False otherwise
 		:rtype: bool
@@ -89,7 +89,7 @@ class AbstractScene(QObject):
 	def _cachedNativeMap(self, cacheType, uniqueId, default=None):
 		"""Return the cached native map for the inputed material id.
 		
-		:type cacheType: :class:`blur3d.constants.MapCacheType`
+		:type cacheType: :class:`cross3d.constants.MapCacheType`
 		:type uniqueId: str
 		:param default: value to return if the id was not found
 		:rtype: <variant> nativeMap || None
@@ -100,7 +100,7 @@ class AbstractScene(QObject):
 	def _cachedNativeMaterial(self, cacheType, uniqueId, default=None):
 		"""Return the cached native material for the inputed material id.
 		
-		:type cacheType: :class:`blur3d.constants.MaterialCacheType`
+		:type cacheType: :class:`cross3d.constants.MaterialCacheType`
 		:type uniqueId: str
 		:param default: value to return if the id was not found
 		:rtype: <variant> nativeMaterial || None
@@ -111,7 +111,7 @@ class AbstractScene(QObject):
 	def _cachedNativeMaps(self, cacheType):
 		"""Return the cached native maps for the inputed cache type.
 		
-		:type cacheType: :class:`blur3d.constants.MapCacheType`
+		:type cacheType: :class:`cross3d.constants.MapCacheType`
 		:rtype: list of nativeMaps [<variant> nativeMap, ..]
 		"""
 		return []
@@ -120,7 +120,7 @@ class AbstractScene(QObject):
 	def _cachedNativeMaterials(self, cacheType):
 		"""Return the cached native materials for the inputed cache type.
 		
-		:type cacheType: :class:`blur3d.constants.MaterialCacheType`
+		:type cacheType: :class:`cross3d.constants.MaterialCacheType`
 		:rtype: list of nativeMaterials [<variant> nativeMaterial, ..]
 		"""
 		return []
@@ -195,7 +195,7 @@ class AbstractScene(QObject):
 	def _createNativeRenderer(self, rendererType):
 		"""
 			\remarks	creates a new native renderer based on the inputed renderer type for this scene
-			\param		rendererType	<blur3d.constants.RendererType>
+			\param		rendererType	<cross3d.constants.RendererType>
 			\return		<variant> nativeRenderer || None
 		"""
 		return None
@@ -510,7 +510,7 @@ class AbstractScene(QObject):
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		""" Returns the native objects from the scene
 			:param wildcard: <string>
-			:param objectType: blur3d.constants.ObjectType
+			:param objectType: cross3d.constants.ObjectType
 			:return: <list> [ <variant> nativeObject, .. ]
 		"""
 		return []
@@ -556,7 +556,7 @@ class AbstractScene(QObject):
 	def _setCachedNativeMaps(self, cacheType, nativeMaps):
 		"""
 			\remarks	set the currently cached maps for the inputed cache type
-			\param		cacheType	<blur3d.constants.MapCacheType>
+			\param		cacheType	<cross3d.constants.MapCacheType>
 			\param		nativeMaps	<list> [ <variant> nativeMap, .. ]
 			\return		<bool> success
 		"""
@@ -566,7 +566,7 @@ class AbstractScene(QObject):
 	def _setCachedNativeMaterials(self, cacheType, nativeMaterials):
 		"""
 			\remarks	set the currently cached materials for the inputed cache type
-			\param		cacheType			<blur3d.constants.MaterialCacheType>
+			\param		cacheType			<cross3d.constants.MaterialCacheType>
 			\param		nativeMaterials		<list> [ <variant> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
@@ -606,7 +606,7 @@ class AbstractScene(QObject):
 			\remarks	set the material override for the inputed objects
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
 			\param		nativeMaterial	<variant>
-			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		options			<cross3d.constants.MaterialOverrideOptions>
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
@@ -688,7 +688,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	toggle the inputed object's visibility settings based on the inputed options
 			\param		nativeObjects	<list> [ <variant> nativeObject, .. ]
-			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\param		options			<cross3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
 		return False
@@ -975,7 +975,7 @@ class AbstractScene(QObject):
 		:param objects: A list of objects to clone
 		:param cloneHierarchy: Duplicate parent child structure in clones. Defaults to False
 		:param cloneType: Create clones as copy, instance, etc. Defaults to Copy.
-		..seealso:: modules `blur3d.constants.CloneType`
+		..seealso:: modules `cross3d.constants.CloneType`
 		"""
 		return []
 
@@ -1000,7 +1000,7 @@ class AbstractScene(QObject):
 	def viewports(self):
 		"""
 			\remarks	returns all the visible viewports
-			\return	  	[ <blur3d.api.SceneViewport>, ... ]
+			\return	  	[ <cross3d.SceneViewport>, ... ]
 		"""
 		return []
 
@@ -1008,15 +1008,15 @@ class AbstractScene(QObject):
 	def animationRange(self):
 		"""
 			\remarks	return the start and end frames for the animation range for the scene
-			\return		<blur3d.api.FrameRange>
+			\return		<cross3d.FrameRange>
 		"""
-		from blur3d.api import FrameRange
+		from cross3d import FrameRange
 		return FrameRange()
 	
 	@abstractmethod
 	def globalRange(self):
 		""" Returns a FrameRange of the global start and end range. """
-		from blur3d.api import FrameRange
+		from cross3d import FrameRange
 		return FrameRange()
 
 	@abstractmethod
@@ -1375,7 +1375,7 @@ class AbstractScene(QObject):
 	def setRenderFrameRange(self, frameRange):
 		"""
 			\remarks	set the render frame range of the scene
-			\param		size	<blur3d.api.FrameRange>
+			\param		size	<cross3d.FrameRange>
 			\return		<bool> success
 		"""
 		return False
@@ -1419,7 +1419,7 @@ class AbstractScene(QObject):
 		return False
 
 	@abstractmethod	
-	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=UpVector.Y, **kwargs):
+	def _exportNativeObjectsToFBX(self, nativeObjects, path, frameRange=None, showUI=False, frameRate=None, upVector=constants.UpVector.Y, **kwargs):
 		"""
 			\remarks	exports a given set of nativeObjects as FBX.
 			\return		<bool> success
@@ -1429,11 +1429,11 @@ class AbstractScene(QObject):
 	def activeLayer(self):
 		"""
 			\remarks	returns the currently active layer of the scene
-			\return		<blur3d.api.SceneLayer> || None
+			\return		<cross3d.SceneLayer> || None
 		"""
 		lay = self._nativeActiveLayer()
 		if (lay):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self, lay)
 		return None
 
@@ -1449,9 +1449,9 @@ class AbstractScene(QObject):
 	def atmospherics(self):
 		"""
 			\remarks	returns the atmospheric instances from this scene
-			\return		<list> [ <blur3d.api.SceneAtmospheric>, .. ]
+			\return		<list> [ <cross3d.SceneAtmospheric>, .. ]
 		"""
-		from blur3d.api import SceneAtmospheric
+		from cross3d import SceneAtmospheric
 		nativeAtmos = self._nativeAtmospherics()
 		return [ SceneAtmospheric(self, atmos) for atmos in nativeAtmos ]
 
@@ -1459,8 +1459,8 @@ class AbstractScene(QObject):
 		"""
 			\remarks	cache the inputed map in the scene for the given cache type
 			\sa			_cacheNativeMap
-			\param		cacheType	<blur3d.constants.MapCacheType>
-			\param		sceneMap	<blur3d.api.SceneMap>
+			\param		cacheType	<cross3d.constants.MapCacheType>
+			\param		sceneMap	<cross3d.SceneMap>
 			\return		<bool> success
 		"""
 		return self._cacheNativeMap(cacheType, sceneMap.nativePointer())
@@ -1469,8 +1469,8 @@ class AbstractScene(QObject):
 		"""
 			\remarks	cache the inputed material in the scene for the given cache type
 			\sa			_cacheNativeMaterial
-			\param		cacheType	<blur3d.constants.MaterialCacheType>
-			\param		material	<blur3d.api.SceneMaterial>
+			\param		cacheType	<cross3d.constants.MaterialCacheType>
+			\param		material	<cross3d.SceneMaterial>
 			\return		<bool> success
 		"""
 		return self._cacheNativeMaterial(cacheType, material.nativePointer())
@@ -1479,14 +1479,14 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the cached map given the inputed id
 			\sa			_cachedNativeMap
-			\param		cacheType	<blur3d.constants.MapCacheType>
+			\param		cacheType	<cross3d.constants.MapCacheType>
 			\param		uniqueId		<str>
 			\param		default		<variant>	default return value if not found
-			\return		<blur3d.api.SceneMap> || None
+			\return		<cross3d.SceneMap> || None
 		"""
 		nativeMap = self._cachedNativeMap(cacheType, uniqueId)
 		if (nativeMap):
-			from blur3d.api import SceneMap
+			from cross3d import SceneMap
 			return SceneMap(self, nativeMap)
 		return None
 
@@ -1494,24 +1494,24 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the cached maps for this scene for the given cache type
 			\sa			_cachedNativeMaps
-			\param		cacheType		<blur3d.constants.MapCacheType>
-			\return		<list> [ <blur3d.api.SceneMap> map, .. ]
+			\param		cacheType		<cross3d.constants.MapCacheType>
+			\return		<list> [ <cross3d.SceneMap> map, .. ]
 		"""
-		from blur3d.api import SceneMap
+		from cross3d import SceneMap
 		return [ SceneMap(self, nativeMap) for nativeMap in self._cachedNativeMaps(cacheType) ]
 
 	def cachedMaterial(self, cacheType, uniqueId, default=None):
 		"""
 			\remarks	return the cached material given the inputed id
 			\sa			_cachedNativeMaterial
-			\param		cacheType	<blur3d.constants.MaterialCacheType>
+			\param		cacheType	<cross3d.constants.MaterialCacheType>
 			\param		uniqueId	<str>
 			\param		default		<variant>	default return value if not found
-			\return		<blur3d.api.SceneMaterial> || None
+			\return		<cross3d.SceneMaterial> || None
 		"""
 		nativeMaterial = self._cachedNativeMaterial(cacheType, uniqueId, default=default)
 		if (nativeMaterial):
-			from blur3d.api import SceneMaterial
+			from cross3d import SceneMaterial
 			return SceneMaterial(self, nativeMaterial)
 		return None
 
@@ -1519,10 +1519,10 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the cached materials for this scene given the inputed cache type
 			\sa			_cachedNativeMaterials
-			\param		cacheType		<blur3d.constants.MaterialCacheType>
-			\return		<list> [ <blur3d.api.SceneMaterial> material, .. ]
+			\param		cacheType		<cross3d.constants.MaterialCacheType>
+			\return		<list> [ <cross3d.SceneMaterial> material, .. ]
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		return [ SceneMaterial(self, material) for material in self._cachedNativeMaterials(cacheType) if material != None ]
 
 	@abstractmethod
@@ -1543,18 +1543,18 @@ class AbstractScene(QObject):
 		"""
 			\remarks	import and return a model in the scene. added by douglas
 			\sa			_importNativeModel
-			\return		<blur3d.api.SceneModel>
+			\return		<cross3d.SceneModel>
 		"""
 		nativeModel = self._importNativeModel(path, name, referenced, resolution, load, createFile)
 		if nativeModel:
-			from blur3d.api import SceneModel
+			from cross3d import SceneModel
 			return SceneModel(self, nativeModel)
 		return None
 
 	def clearMaterialOverride(self, objects):
 		"""
 			\remarks	clear the inputed objects of any material overrides that are applied
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._clearNativeMaterialOverride([ obj.nativePointer() for obj in objects ])
@@ -1562,7 +1562,7 @@ class AbstractScene(QObject):
 	def clearPropSetOverride(self, objects):
 		"""
 			\remarks	clear the inputed objects of any property set overrides that are applied
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._clearNativePropSetOverride([ obj.nativePointer() for obj in objects ])
@@ -1575,23 +1575,23 @@ class AbstractScene(QObject):
 		"""
 		return self.setSelection([])
 
-	def createObject(self, tpe=ObjectType.Null, name=''):
-		from blur3d.api import SceneObject
-		return SceneObject(self, self._createNativeObject(tpe, ObjectType.labelByValue(tpe)))
+	def createObject(self, tpe=constants.ObjectType.Null, name=''):
+		from cross3d import SceneObject
+		return SceneObject(self, self._createNativeObject(tpe, constants.ObjectType.labelByValue(tpe)))
 
 	@abstractmethod
-	def _createNativeObject(self, tpe=ObjectType.Null, name=''):
+	def _createNativeObject(self, tpe=constants.ObjectType.Null, name=''):
 		return False
 
 	def createRenderer(self, rendererType):
 		"""
 			\remarks	create a new renderer of the inputed type
-			\param		rendererType	<blur3d.constants.RendererType>
-			\return		<blur3d.api.Renderer>
+			\param		rendererType	<cross3d.constants.RendererType>
+			\return		<cross3d.Renderer>
 		"""
 		nativeRenderer = self._createNativeRenderer(rendererType)
 		if (nativeRenderer):
-			from blur3d.api import SceneRenderer
+			from cross3d import SceneRenderer
 			return SceneRenderer(self, nativeRenderer)
 		return None
 
@@ -1599,12 +1599,12 @@ class AbstractScene(QObject):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
 			\param		name 		<str>
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
-			\return		<blur3d.api.SceneLayer> || None
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
+			\return		<cross3d.SceneLayer> || None
 		"""
 		lay = self._createNativeLayer(name, nativeObjects=[ obj.nativePointer() for obj in objects ])
 		if (lay):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			layer = SceneLayer(self, lay)
 			self.layerCreated.emit(layer)
 			return layer
@@ -1615,23 +1615,23 @@ class AbstractScene(QObject):
 			\remarks	create a new group of layers with the inputed names
 			\sa			layerGroups, _createNativeLayerGroup
 			\param		name		<str>
-			\param		layers		<list> [ <blur3d.api.SceneLayer>, .. ]
-			\return		<blur3d.api.SceneLayerGroup> || None
+			\param		layers		<list> [ <cross3d.SceneLayer>, .. ]
+			\return		<cross3d.SceneLayerGroup> || None
 		"""
 		nativeGroup = self._createNativeLayerGroup(name, nativeLayers=[ layer.nativePointer() for layer in layers ])
 		if (nativeGroup):
-			from blur3d.api import SceneLayerGroup
+			from cross3d import SceneLayerGroup
 			return SceneLayerGroup(self, nativeGroup)
 		return None
 
 	def createModel(self, name='Model', objects=[], referenced=False):
 		"""
 			\remarks	creates a new layer with the inputed name and returns it
-			\return		<blur3d.api.SceneObject> || None
+			\return		<cross3d.SceneObject> || None
 		"""
 		nativeModel = self._createNativeModel(name=name, nativeObjects=[obj.nativePointer() for obj in objects], referenced=referenced)
 		if (nativeModel):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			model = SceneObject(self, nativeModel)
 			return model
 		return None
@@ -1642,12 +1642,12 @@ class AbstractScene(QObject):
 		Args:
 			name (str): The name of the camera. Defaults to 'Camera'
 			type (str): the type of camera. Defaults to 'Standard'
-			target (blur3d.api.SceneObject): Used as the target of the camera. Defaults to None
-			rotationOrder (blur3d.constants.RotationOrder): Rotation order for the camera. Defaults
+			target (cross3d.SceneObject): Used as the target of the camera. Defaults to None
+			rotationOrder (cross3d.constants.RotationOrder): Rotation order for the camera. Defaults
 				to None. If None, it will use the value of SceneCamera.defaultRotationOrder.
 		
 		Returns:
-			blur3d.api.SceneCamera: The created camera.
+			cross3d.SceneCamera: The created camera.
 		"""
 		if target:
 			nativeCamera = self._createNativeCamera(
@@ -1659,19 +1659,19 @@ class AbstractScene(QObject):
 		else:
 			nativeCamera = self._createNativeCamera(name, type, rotationOrder=rotationOrder)
 		if (nativeCamera):
-			from blur3d.api import SceneCamera
+			from cross3d import SceneCamera
 			return SceneCamera(self, nativeCamera, target=target)
 		return None
 
 	def createTurntableCamera(self, name='TurntableCamera', objects=[], type='V-Ray', startFrame=0, endFrame=100):
 		"""
 			\remarks	creates a new camera that rotates around the given objects
-			\return		<blur3d.api.SceneCamera> || None
+			\return		<cross3d.SceneCamera> || None
 		"""
 		tName = '{base}.Target'.format(base=name)
 		nativeTarget = self._createNativeTarget(name=tName)
 		if nativeTarget:
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			target = SceneObject(self, nativeTarget)
 			camera = self.createCamera(
 				name=name,
@@ -1695,20 +1695,20 @@ class AbstractScene(QObject):
 	def createSubmitter(self, submitType):
 		"""
 			\remarks	creates a new SceneSubmitter instance initialized for the inputed submission type
-			\param		submitType	<blur3d.constants.SubmitType.
-			\return		<blur3d.api.SceneSubmitter>
+			\param		submitType	<cross3d.constants.SubmitType.
+			\return		<cross3d.SceneSubmitter>
 		"""
-		from blur3d.api import SceneSubmitter
+		from cross3d import SceneSubmitter
 		return SceneSubmitter(self, submitType)
 
 	def currentCamera(self):
 		"""
 			\remarks	return a SceneCamera instance containing the currently active camera in the scene
-			\return		<blur3d.api.SceneCamera> || None
+			\return		<cross3d.SceneCamera> || None
 		"""
 		nativeCamera = self._currentNativeCamera()
 		if nativeCamera:
-			from blur3d.api import SceneCamera
+			from cross3d import SceneCamera
 			return SceneCamera(self, nativeCamera)
 		return None
 
@@ -1725,11 +1725,11 @@ class AbstractScene(QObject):
 	def currentRenderer(self):
 		"""
 			\remarks	return the current renderer assigned to this scene
-			\return		<blur3d.api.SceneRenderer> || None
+			\return		<cross3d.SceneRenderer> || None
 		"""
 		nativeRenderer = self._currentNativeRenderer()
 		if (nativeRenderer):
-			from blur3d.api import SceneRenderer
+			from cross3d import SceneRenderer
 			return SceneRenderer(self, nativeRenderer)
 		return None
 
@@ -1798,11 +1798,11 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the current environment map from the scene
 			\sa			setEnvironmentMap, _nativeEnvironmentMap
-			\return		<blur3d.api.SceneMap> || None
+			\return		<cross3d.SceneMap> || None
 		"""
 		nativeMap = self._nativeEnvironmentMap()
 		if (nativeMap):
-			from blur3d.api import SceneMap
+			from cross3d import SceneMap
 			return SceneMap(self, nativeMap)
 		return None
 
@@ -1810,11 +1810,11 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return the current environment map override for this scene
 			\sa			setEnvironmentMapOverride, _nativeEnvironmentOverride
-			\return		<blur3d.api.SceneMap> || None
+			\return		<cross3d.SceneMap> || None
 		"""
 		nativeMap = self._nativeEnvironmentMapOverride()
 		if (nativeMap):
-			from blur3d.api import SceneMap
+			from cross3d import SceneMap
 			return SceneMap(self, nativeMap)
 		return None
 
@@ -1822,7 +1822,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	locks/freezes the inputed nodes based on the state
 			\sa			_freezeNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -1833,11 +1833,11 @@ class AbstractScene(QObject):
 			\remarks	look up an atmospheric based on the inputed name
 			\sa			_findNativeAtmospheric
 			\param		name	<str>
-			\return		<blur3d.api.SceneAtmospheric> || None
+			\return		<cross3d.SceneAtmospheric> || None
 		"""
 		nativeAtmos = self._findNativeAtmospheric(name, uniqueId)
 		if (nativeAtmos):
-			from blur3d.api import SceneAtmospheric
+			from cross3d import SceneAtmospheric
 			return SceneAtmospheric(self, nativeAtmos)
 		return None
 
@@ -1846,11 +1846,11 @@ class AbstractScene(QObject):
 			\remarks	looks up a layer based on the inputed name
 			\sa			_findNativeLayer
 			\param		name	<str>
-			\return		<blur3d.api.SceneLayer> || None
+			\return		<cross3d.SceneLayer> || None
 		"""
 		nativeLayer = self._findNativeLayer(name, uniqueId)
 		if (nativeLayer):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self, nativeLayer)
 		return None
 
@@ -1859,11 +1859,11 @@ class AbstractScene(QObject):
 			\remarks	look up a layer group based on the inputed name
 			\sa			_findNativeLayerGroup
 			\param		name	<str>
-			\return		<blur3d.api.SceneLayerGroup> || None
+			\return		<cross3d.SceneLayerGroup> || None
 		"""
 		nativeLayerGroup = self._findNativeLayerGroup(name, uniqueId)
 		if (nativeLayerGroup):
-			from blur3d.api import SceneLayerGroup
+			from cross3d import SceneLayerGroup
 			return SceneLayerGroup(self, nativeLayerGroup)
 		return None
 
@@ -1872,11 +1872,11 @@ class AbstractScene(QObject):
 			\remarks	looks up an individual object by its name
 			\sa			_findNativeObject
 			\param		name	<str>
-			\return		<blur3d.api.SceneObject> || None
+			\return		<cross3d.SceneObject> || None
 		"""
 		nativeObject = self._findNativeObject(name, uniqueId)
 		if (nativeObject):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			return SceneObject(self, nativeObject)
 		return None
 
@@ -1885,11 +1885,11 @@ class AbstractScene(QObject):
 			\remarks	looks up an individual camera by its name
 			\sa			_findNativeCamera
 			\param		name	<str>
-			\return		<blur3d.api.SceneCamera> || None
+			\return		<cross3d.SceneCamera> || None
 		"""
 		nativeCamera = self._findNativeCamera(name, uniqueId)
 		if (nativeCamera):
-			from blur3d.api import SceneCamera
+			from cross3d import SceneCamera
 			return SceneCamera(self, nativeCamera)
 		return None
 
@@ -1898,7 +1898,7 @@ class AbstractScene(QObject):
 			\remarks	looks up an individual material by its name
 			\sa			_findNativeMaterial
 			\param		name	<str>
-			\return		<blur3d.api.SceneMaterial> || None
+			\return		<cross3d.SceneMaterial> || None
 		"""
 		if (self._materialCache != None):
 			mtl = self._materialCache['id'].get(uniqueId)
@@ -1908,7 +1908,7 @@ class AbstractScene(QObject):
 		else:
 			nativeMaterial = self._findNativeMaterial(name, uniqueId)
 			if (nativeMaterial):
-				from blur3d.api import SceneMaterial
+				from cross3d import SceneMaterial
 				return SceneMaterial(self, nativeMaterial)
 			return None
 
@@ -1917,7 +1917,7 @@ class AbstractScene(QObject):
 			\remarks	looks up an individual map by its name
 			\sa			_findNativeMap
 			\param		name	<str>
-			\return		<blur3d.api.SceneMap> || None
+			\return		<cross3d.SceneMap> || None
 		"""
 		if (self._mapCache != None):
 			m = self._mapCache['id'].get(uniqueId)
@@ -1927,7 +1927,7 @@ class AbstractScene(QObject):
 		else:
 			nativeMap = self._findNativeMap(name, uniqueId)
 			if (nativeMap):
-				from blur3d.api import SceneMap
+				from cross3d import SceneMap
 				return SceneMap(self, nativeMap)
 			return None
 
@@ -1946,18 +1946,18 @@ class AbstractScene(QObject):
 	def fxs(self):
 		"""
 			\remarks	returns the fx instances from this scene
-			\return		<list> [ <blur3d.api.SceneFx>, .. ]
+			\return		<list> [ <cross3d.SceneFx>, .. ]
 		"""
-		from blur3d.api import SceneFx
+		from cross3d import SceneFx
 		nativeFxs = self._nativeFxs()
 		return [ SceneFx(self, fx) for fx in nativeFxs ]
 
 	def getObject(self):
 		"""
 			\remarks	invokes the application's ability to let a user select an Object from the scene
-			\return		<blur3d.api.Object> || None
+			\return		<cross3d.Object> || None
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		obj = self._getNativeObject()
 		if obj:
 			return SceneObject(self, obj)
@@ -1966,9 +1966,9 @@ class AbstractScene(QObject):
 	def getMaterial(self):
 		"""
 			\remarks	invokes the application's ability to let a user select a Material from the scene
-			\return		<blur3d.api.SceneMaterial> || None
+			\return		<cross3d.SceneMaterial> || None
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		mtl = self._getNativeMaterial()
 		if (mtl):
 			return SceneMaterial(self, mtl)
@@ -1977,9 +1977,9 @@ class AbstractScene(QObject):
 	def getMap(self):
 		"""
 			\remarks	invokes the application's ability to let a user select a Material from the scene
-			\return		<blur3d.api.SceneMaterial> || None
+			\return		<cross3d.SceneMaterial> || None
 		"""
-		from blur3d.api import SceneMap
+		from cross3d import SceneMap
 		nativeMap = self._getNativeMap()
 		if (nativeMap):
 			return SceneMap(self, nativeMap)
@@ -1989,7 +1989,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	hides the inputed objects based on the given state
 			\sa			_hideNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\param		state		<bool>
 			\return		<bool> success
 		"""
@@ -1999,7 +1999,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	Hightlight provided object with provided color.
 			\sa			_highlightNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\param		color		<QColor>
 			\param		state		<bool>
 			\return		<bool> success
@@ -2017,7 +2017,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	isolates (hides all other objects) or unisolates the inputed objects in the scene
 			\sa			_isolateNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._isolateNativeObjects([ obj.nativePointer() for obj in objects ])
@@ -2026,43 +2026,43 @@ class AbstractScene(QObject):
 		"""
 			\remarks	collects all the layers in the scene and returns them
 			\sa			createLayer, findLayer
-			\return		<list> [ <blur3d.api.SceneLayer>, .. ]
+			\return		<list> [ <cross3d.SceneLayer>, .. ]
 		"""
-		from blur3d.api import SceneLayer
+		from cross3d import SceneLayer
 		return [ SceneLayer(self, nativeLayer) for nativeLayer in self._nativeLayers(wildcard) ]
 
 	def layerGroups(self):
 		"""
 			\remarks	collect all the layer groups and their corresponding layers
 			\sa			createLayerGroup, findLayerGroup
-			\return		<dict> { <str> name: <list> [ <blur3d.api.SceneLayer>, .. ], .. }
+			\return		<dict> { <str> name: <list> [ <cross3d.SceneLayer>, .. ], .. }
 		"""
-		from blur3d.api import SceneLayerGroup
+		from cross3d import SceneLayerGroup
 		return [ SceneLayerGroup(self, nativeLayerGroup) for nativeLayerGroup in self._nativeLayerGroups() ]
 
 	def loadMaterialsFromLibrary(self, filename=''):
 		"""
 			\remarks	loads all the materials from a given material library file
 			\param		filename	<str>
-			\return		<list> [ <blur3d.api.SceneMaterial> ]
+			\return		<list> [ <cross3d.SceneMaterial> ]
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		return [ SceneMaterial(self, nativeMaterial) for nativeMaterial in self._loadNativeMaterialsFromLibrary(filename) ]
 
 	def materials(self, baseMaterials=False):
 		"""
 			\remarks	returns a list of all the materials in the scene wrapped as SceneMaterials
-			\return		<list> [ <blur3d.api.SceneMaterial>, .. ]
+			\return		<list> [ <cross3d.SceneMaterial>, .. ]
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		return [ SceneMaterial(self, obj) for obj in self._nativeMaterials(baseMaterials) ]
 
 	def maps(self):
 		"""
 			\remarks	returns a list of all the maps in the scene wrapped as SceneMaps
-			\return		<list> [ <blur3d.api.SceneMap>, .. ]
+			\return		<list> [ <cross3d.SceneMap>, .. ]
 		"""
-		from blur3d.api import SceneMap
+		from cross3d import SceneMap
 		return [ SceneMap(self, obj) for obj in self._nativeMaps() ]
 
 	@abstractmethod
@@ -2078,10 +2078,10 @@ class AbstractScene(QObject):
 			\remarks	returns a list of all the objects in the scene wrapped as api objects
 			\param		getsFromSelection <bool>
 			\param		wildcard <string>
-			\param		type <blur3d.constants.ObjectType>
-			\return		<list> [ <blur3d.api.Variant>, .. ]
+			\param		type <cross3d.constants.ObjectType>
+			\return		<list> [ <cross3d.Variant>, .. ]
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, objectType=type)]
 
 	def saveMaterialsToLibrary(self, filename=''):
@@ -2096,7 +2096,7 @@ class AbstractScene(QObject):
 	def select(self):
 		"""
 			\remarks	launches the application's selection dialog and returns the selected objects
-			\return		<list> [<blur3d.api.Variant>, ..]
+			\return		<list> [<cross3d.Variant>, ..]
 		"""
 		pass
 
@@ -2104,8 +2104,8 @@ class AbstractScene(QObject):
 		"""
 			\remarks	returns the currently selected objects from the scene
 			\param		wildcard <string>
-			\param		type <blur3d.constants.ObjectType>
-			\return		<list> [ <blur3d.api.Variant>, .. ]
+			\param		type <cross3d.constants.ObjectType>
+			\return		<list> [ <cross3d.Variant>, .. ]
 		"""
 		return self._objects(True, wildcard, type)
 
@@ -2113,8 +2113,8 @@ class AbstractScene(QObject):
 		"""
 			\remarks	returns a list of all the objects in the scene wrapped as api objects
 			\param		wildcard <string>
-			\param		type <blur3d.constants.ObjectType>
-			\return		<list> [ <blur3d.api.Variant>, .. ]
+			\param		type <cross3d.constants.ObjectType>
+			\return		<list> [ <cross3d.Variant>, .. ]
 		"""
 		return self._objects(False, wildcard, type)
 
@@ -2139,15 +2139,10 @@ class AbstractScene(QObject):
 			\sa			recordLayerState, SceneLayer.restoreLayerState
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		watch = debug.Stopwatch('AbstractScene.restoreLayerState')
-
 		layerState = xml.findChild('layerState')
 		if (not layerState):
-			watch.stop()
 			return False
 
-		watch.startLap('Mapping Layers')
 		# create a layer mapping
 		layers 			 = self.layers()
 		layernamemap 	 = {}
@@ -2155,10 +2150,8 @@ class AbstractScene(QObject):
 		for layer in layers:
 			layernamemap[ str(layer.name()) ] 	 = layer
 			layeridmap[ str(layer.uniqueId()) ] 		 = layer
-		watch.stopLap()
 
 		# create a material caching
-		watch.startLap('Caching Materials')
 		materials		 = self.materials()
 		materialcache	 = { 'name': {}, 'id': {} }
 		for material in materials:
@@ -2166,10 +2159,8 @@ class AbstractScene(QObject):
 			materialcache[ 'id' ][ material.uniqueId() ] 		 = material
 
 		self._materialCache = materialcache
-		watch.stopLap()
 
 		# create a map caching
-		watch.startLap('Caching Maps')
 		maps			 = self.maps()
 		mapcache		 = { 'name': {}, 'id': {} }
 		for m in maps:
@@ -2177,7 +2168,6 @@ class AbstractScene(QObject):
 			mapcache[ 'id' ][ m.uniqueId() ] 		 = map
 
 		self._mapCache = mapcache
-		watch.stopLap()
 
 		# create the progress dialog
 		from PyQt4.QtGui import QProgressDialog
@@ -2198,9 +2188,7 @@ class AbstractScene(QObject):
 			# lookup the layer by name
 			if (name in layernamemap):
 				layer = layernamemap[name]
-				watch.startLap('Restoring %s' % name)
 				layer.restoreLayerState(layerXml)
-				watch.stopLap()
 				processed.append(layer)
 				continue
 
@@ -2208,9 +2196,7 @@ class AbstractScene(QObject):
 			lid = layerXml.attribute('id')
 			if (name in layeridmap):
 				layer = layeridmap[name]
-				watch.startLap('Restoring %s' % name)
 				layer.restoreLayerState(layerXml)
-				watch.stopLap()
 				processed.append(layer)
 				continue
 
@@ -2222,14 +2208,10 @@ class AbstractScene(QObject):
 			progress.setValue(i + 1)
 			progress.setLabelText('Hiding %s...' % layer.name())
 
-			watch.startLap('Hiding %s' % layer.name())
 			layer.setHidden(True, affectObjects=True)
-			watch.stopLap()
 
 		self._materialCache = None
 		self._mapCache 		 = None
-
-		watch.stop()
 
 		return True
 
@@ -2237,7 +2219,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	removes the objects from the scene
 			\sa			_removeNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		return self._removeNativeObjects([ obj.nativePointer() for obj in objects if not obj.isDeleted()])
@@ -2246,7 +2228,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	renames the inputed objects to the inputed names
 			\sa			_renameNativeObjects
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\param		names		<list> [ <str>, .. ]
 			\param		display		<bool> 	flags whether or not the names are display names or object names
 			\return		<bool> success
@@ -2256,11 +2238,11 @@ class AbstractScene(QObject):
 	def rootObject(self):
 		"""
 			\remarks	returns the root object of the scene
-			\return		<blur3d.api.SceneObject> || None
+			\return		<cross3d.SceneObject> || None
 		"""
 		native = self._nativeRootObject()
 		if (native):
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			return SceneObject(self, native)
 		return None
 
@@ -2279,7 +2261,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	set the current environment map in the scene to the inputed map
 			\sa			environmentMap, _setNativeEnvironmentMap
-			\param		sceneMap		<blur3d.api.SceneMap>
+			\param		sceneMap		<cross3d.SceneMap>
 			\return		<bool> success
 		"""
 		nativeMap = None
@@ -2292,7 +2274,7 @@ class AbstractScene(QObject):
 		"""
 			\remarks	override the current environment map in the scene to the inputed map
 			\sa			setEnvironmentMap, _setNativeEnvironmentMapOverride
-			\param		sceneMap		<blur3d.api.SceneMap>
+			\param		sceneMap		<cross3d.SceneMap>
 			\return		<bool> success
 		"""
 		nativeMap = None
@@ -2304,9 +2286,9 @@ class AbstractScene(QObject):
 	def setCachedMapAt(self, cacheType, index, sceneMap):
 		"""
 			\remarks	set the cached map for this scene at the inputed index to the given map
-			\param		cacheType		<blur3d.constants.MapCacheType>
+			\param		cacheType		<cross3d.constants.MapCacheType>
 			\param		index			<int>
-			\param		sceneMap		<blur3d.api.SceneMap> || None
+			\param		sceneMap		<cross3d.SceneMap> || None
 			\return		<bool> success
 		"""
 		nativeMaps = self._cachedNativeMaps(cacheType)
@@ -2323,8 +2305,8 @@ class AbstractScene(QObject):
 	def setCachedMaps(self, cacheType, sceneMaps):
 		"""
 			\remarks	set the cached maps for this scene for the given cacheType
-			\param		cacheType		<blur3d.constants.MapCacheType>
-			\param		sceneMaps		<list> [ <blur3d.api.SceneMap> map, .. ]
+			\param		cacheType		<cross3d.constants.MapCacheType>
+			\param		sceneMaps		<list> [ <cross3d.SceneMap> map, .. ]
 			\return		<bool> success
 		"""
 		return self._setCachedNativeMaps([sceneMap.nativePointer() for sceneMap in sceneMaps])
@@ -2332,9 +2314,9 @@ class AbstractScene(QObject):
 	def setCachedMaterialAt(self, cacheType, index, material):
 		"""
 			\remarks	set the cached material for this scene at the inputed index to the given material
-			\param		cacheType		<blur3d.constants.MaterialCacheType>
+			\param		cacheType		<cross3d.constants.MaterialCacheType>
 			\param		index			<int>
-			\param		material		<blur3d.api.SceneMaterial> || None
+			\param		material		<cross3d.SceneMaterial> || None
 			\return		<bool> success
 		"""
 		nativeMaterials = self._cachedNativeMaterials(cacheType)
@@ -2351,8 +2333,8 @@ class AbstractScene(QObject):
 	def setCachedMaterials(self, cacheType, materials):
 		"""
 			\remarks	set the cached materials for this scene for the given cacheType
-			\param		cacheType		<blur3d.constants.MaterialCacheType>
-			\param		materials		<list> [ <blur3d.api.SceneMaterial> material, .. ]
+			\param		cacheType		<cross3d.constants.MaterialCacheType>
+			\param		materials		<list> [ <cross3d.SceneMaterial> material, .. ]
 			\return		<bool> success
 		"""
 		return self._setCachedNativeMaterials(cacheType, [ material.nativePointer() for material in materials ])
@@ -2360,7 +2342,7 @@ class AbstractScene(QObject):
 	def setCurrentCamera(self, camera):
 		"""
 			\remarks	return a SceneCamera instance containing the currently active camera in the scene
-			\param		camera	<blur3d.api.SceneCamera> || None
+			\param		camera	<cross3d.SceneCamera> || None
 			\return		<bool> success
 		"""
 		nativeCamera = None
@@ -2375,28 +2357,19 @@ class AbstractScene(QObject):
 			\param		layerState	<str>
 			\return		<bool> success
 		"""
-		from blurdev import debug
-		# create a stopwatch
-		watch = debug.Stopwatch('AbstractScene.setCurrentLayerState')
-
 		from blurdev.XML import XMLDocument
 		doc = XMLDocument()
 
-		watch.startLap('Parsing State')
 		doc.parse(layerState)
-		watch.stopLap()
-
-		watch.startLap('Restoring Layer State')
+		
 		result = self.restoreLayerState(doc)
-		watch.stopLap()
-		watch.stop()
-
+		
 		return result
 
 	def setCurrentRenderer(self, renderer):
 		"""
 			\remarks	set the current scene renderer to this class type
-			\param		renderer	<blur3d.api.SceneRenderer>
+			\param		renderer	<cross3d.SceneRenderer>
 			\return		<bool> success
 		"""
 		nativeRenderer = None
@@ -2416,8 +2389,8 @@ class AbstractScene(QObject):
 	def setPropSetOverride(self, objects, propSet):
 		"""
 			\remarks	set the override property set for the inputed objects to the given propset
-			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
-			\param		propSet		<blur3d.api.ScenePropSet>
+			\param		objects		<list> [ <cross3d.SceneObject> object, .. ]
+			\param		propSet		<cross3d.ScenePropSet>
 			\return		<bool> success
 		"""
 		nativePropSet = None
@@ -2429,9 +2402,9 @@ class AbstractScene(QObject):
 	def setMaterialOverride(self, objects, material, options=None, advancedState=None):
 		"""
 			\remarks	set the override material for the inputed objects to the given material
-			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
-			\param		material	<blur3d.api.SceneMaterial>
-			\param		options		<blur3d.constants.MaterialOverrideOptions>
+			\param		objects		<list> [ <cross3d.SceneObject> object, .. ]
+			\param		material	<cross3d.SceneMaterial>
+			\param		options		<cross3d.constants.MaterialOverrideOptions>
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 		"""
 		nativeMaterial = None
@@ -2443,7 +2416,7 @@ class AbstractScene(QObject):
 	def setSelection(self, objects, additive=False):
 		"""
 			\remarks	selects the inputed objects in the scene
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		if isinstance(objects, basestring):
@@ -2451,19 +2424,19 @@ class AbstractScene(QObject):
 		elif isinstance(objects, _collections.Iterable):
 			nativeObjects = [obj.nativePointer() for obj in objects]
 			return self._addToNativeSelection(nativeObjects) if additive else self._setNativeSelection(nativeObjects)
-		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
+		raise TypeError('Argument 1 must be str or list of cross3d.SceneObjects')
 
 	def addToSelection(self, objects):
 		"""
 			\remarks	add the inputed objects to the selection in the scene
-			\param		objects		<list> [ <blur3d.api.SceneObject>, .. ]
+			\param		objects		<list> [ <cross3d.SceneObject>, .. ]
 			\return		<bool> success
 		"""
 		if isinstance(objects, basestring):
 			return self._addToNativeSelection(objects)
 		elif isinstance(objects, _collections.Iterable):
 			return self._addToNativeSelection([obj.nativePointer() for obj in objects])
-		raise TypeError('Argument 1 must be str or list of blur3d.api.SceneObjects')
+		raise TypeError('Argument 1 must be str or list of cross3d.SceneObjects')
 
 	def setUpdatesEnabled(self, state):
 		"""
@@ -2494,7 +2467,7 @@ class AbstractScene(QObject):
 		if you don't it may be possible you will overwrite data stored by other plugins, users, etc.
 		:param newDict: dict
 		"""
-		from blur3d.api import FileProps
+		from cross3d import FileProps
 		props = self.userProps()
 		props.clear()
 		props.update(newDict)
@@ -2502,8 +2475,8 @@ class AbstractScene(QObject):
 	def toggleVisibleState(self, objects=None, options=None):
 		"""
 			\remarks	toggle the visible options for the inputed objects
-			\param		objects		<list> [ <blur3d.api.SceneObject> object, .. ]
-			\param		options		<blur3d.constants.VisibilityToggleOptions>
+			\param		objects		<list> [ <cross3d.SceneObject> object, .. ]
+			\param		options		<cross3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
 		nativeObjects = None
@@ -2565,9 +2538,9 @@ class AbstractScene(QObject):
 
 	def userProps(self):
 		"""Returns the FileProps object associated with this file
-		:return; :class:`blur3d.api.FileProps`
+		:return; :class:`cross3d.FileProps`
 		"""
-		from blur3d.api import FileProps
+		from cross3d import FileProps
 		# Note currentFileName is ignored by most software specific implementations. It is used only
 		# for the abstract implementation as we have no application to ask for the current file
 		return FileProps(self.currentFileName())
@@ -2583,36 +2556,36 @@ class AbstractScene(QObject):
 	def visibleObjects(self):
 		"""
 			\remarks	returns the objects that are currently visible in the scene
-			\return		<list> [ <blur3d.api.SceneObject>, .. ]
+			\return		<list> [ <cross3d.SceneObject>, .. ]
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [ SceneObject(self, nativeObject) for nativeObject in self._visibleNativeObjects() ]
 
 	def worldLayer(self):
 		"""
 			\remarks	[virtual]	returns the base world layer for the scene
-			\return		<blur3d.api.SceneLayer> || None
+			\return		<cross3d.SceneLayer> || None
 		"""
 		lay = self._nativeWorldLayer()
 		if (lay):
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			return SceneLayer(self, lay)
 		return None
 
 	def renderPasses(self):
 		"""
 			\remarks	returns render passes of the scene
-			\return		<list> [ <blur3d.api.SceneRenderPass>, .. ]
+			\return		<list> [ <cross3d.SceneRenderPass>, .. ]
 		"""
-		from blur3d.api import SceneRenderPass
+		from cross3d import SceneRenderPass
 		return [ SceneRenderPass(self, nativeRenderPass) for nativeRenderPass in self._nativeRenderPasses() ]
 
 	def findRenderPass(self, displayName=''):
 		"""
 			\remarks	returns a render pass based on it's name. would not need to do that if SceneObject and SceneRenderPass were inheriting from a common lower level class
-			\return		<blur3d.api.SceneRenderPass> || None
+			\return		<cross3d.SceneRenderPass> || None
 		"""
-		from blur3d.api import SceneRenderPass
+		from cross3d import SceneRenderPass
 		nativeRenderPass = self._findNativeRenderPass(displayName)
 		if nativeRenderPass:
 			return SceneRenderPass(self, nativeRenderPass)
@@ -2621,15 +2594,15 @@ class AbstractScene(QObject):
 	def currentRenderPass(self):
 		"""
 			\remarks	returns the active render pass
-			\return		<blur3d.api.SceneRenderPass> || None
+			\return		<cross3d.SceneRenderPass> || None
 		"""
-		from blur3d.api import SceneRenderPass
+		from cross3d import SceneRenderPass
 		return SceneRenderPass(self, self._currentNativeRenderPass())
 
 	def setCurrentRenderPass(self, renderPass):
 		"""
 			\remarks	sets the active render pass
-			\param		renderPass <blur3d.api.SceneRenderPass>
+			\param		renderPass <cross3d.SceneRenderPass>
 			\return		<bool> success
 		"""
 		self._setCurrentNativeRenderPass(renderPass.nativePointer())
@@ -2638,7 +2611,7 @@ class AbstractScene(QObject):
 	def removeRenderPasses(self, renderPasses):
 		"""
 			\remarks	deletes specified render passes
-			\param		renderPasses [ <blur3d.api.SceneRenderPass> ]
+			\param		renderPasses [ <cross3d.SceneRenderPass> ]
 			\return		<bool> success
 		"""
 		return self._removeNativeRenderPasses([ renderPass.nativePointer() for renderPass in renderPasses ])
@@ -2649,7 +2622,7 @@ class AbstractScene(QObject):
 			\param		displayName	<str>
 			\return		<bool> success
 		"""
-		from blur3d.api import SceneRenderPass
+		from cross3d import SceneRenderPass
 		return SceneRenderPass(self, self._createNativeRenderPass(displayName))
 
 	def removeModels(self, models):
@@ -2677,9 +2650,9 @@ class AbstractScene(QObject):
 		"""
 			\remarks	returns the specified viewport
 			\param		viewportName <string>
-			\return	  	<blur3d.api.SceneViewport> viewport | None
+			\return	  	<cross3d.SceneViewport> viewport | None
 		"""
-		from blur3d.api import SceneViewport
+		from cross3d import SceneViewport
 		return SceneViewport(self, viewportID)
 
 	def isAvalaibleName(self, name):
@@ -2693,16 +2666,16 @@ class AbstractScene(QObject):
 		else:
 			return True
 
-	@pendingdeprecation('Use blur3d.api.application instead. This function is just pointing to that.')
+	@pendingdeprecation('Use cross3d.application instead. This function is just pointing to that.')
 	def application(self):
 		"""
 			\remarks	returns the application class.
-			\return	  	<blur3d.api.Application> application
+			\return	  	<cross3d.Application> application
 		"""
-		from blur3d.api import application
+		from cross3d import application
 		return application
 
-	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=UpVector.Y, **kwargs):
+	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=constants.UpVector.Y, **kwargs):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
@@ -2714,9 +2687,9 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return a list of all the models objects in this scene
 			\sa			_nativeModels
-			\return		<list> [ <blur3d.api.SceneModel>, .. ]
+			\return		<list> [ <cross3d.SceneModel>, .. ]
 		"""
-		from blur3d.api import SceneModel
+		from cross3d import SceneModel
 		return [ SceneModel(self, nativeModel) for nativeModel in self._nativeModels() ]
 
 	@pendingdeprecation('Use Scene.objects( type=ObjectType.Camera )')
@@ -2724,9 +2697,9 @@ class AbstractScene(QObject):
 		"""
 			\remarks	return a list of all the camera objects in this scene
 			\sa			_nativeCameras
-			\return		<list> [ <blur3d.api.SceneCamera>, .. ]
+			\return		<list> [ <cross3d.SceneCamera>, .. ]
 		"""
-		from blur3d.api import SceneCamera
+		from cross3d import SceneCamera
 		return [ SceneCamera(self, nativeCamera) for nativeCamera in self._nativeCameras() ]
 
 	#------------------------------------------------------------------------------------------------------------------------
@@ -2736,7 +2709,7 @@ class AbstractScene(QObject):
 	@staticmethod
 	def instance():
 		if (not AbstractScene._instance):
-			from blur3d.api import Scene
+			from cross3d import Scene
 			AbstractScene._instance = Scene()
 		return AbstractScene._instance
 
@@ -2745,10 +2718,4 @@ class AbstractScene(QObject):
 		AbstractScene._instance = None
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Scene', AbstractScene, ifNotFound=True)
-
-# connect the clear instance method to when a scene is invalidated
-import blurdev
-blurdev.core.sceneInvalidated.connect(AbstractScene.clearInstance)
-
+cross3d.registerSymbol('Scene', AbstractScene, ifNotFound=True)

@@ -1,9 +1,9 @@
 ##
-#   :namespace  blur3d.api.motionbuilder.external
+#   :namespace  cross3d.motionbuilder.external
 #
 #   :remarks    This class can be used even outside of motionbuilder. It gives you info on where
 #				motionbuilder is installed, and allows you to run scripts in motionbuilder.
-#				To Access this class use: blur3d.api.external('motionbuilder')
+#				To Access this class use: cross3d.external('motionbuilder')
 #   
 #   :author     mikeh@blur.com
 #   :author     Blur Studio
@@ -16,9 +16,9 @@ import os
 import subprocess
 
 from blurdev import osystem
-from blur3d.api import Exceptions
-from blur3d.constants import ScriptLanguage
-from blur3d.api.abstract.external import External as AbstractExternal
+from cross3d import Exceptions
+from cross3d.constants import ScriptLanguage
+from cross3d.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
 

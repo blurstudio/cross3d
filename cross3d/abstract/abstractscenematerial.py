@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenematerial
+#	\namespace	cross3d.abstract.abstractscenematerial
 #
 #	\remarks	The AbstractSceneMaterial class provides an interface for editing
 #				materials in a Scene environment within any DCC application.
@@ -9,9 +9,8 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 # =============================================================================
 # CLASSES
@@ -54,27 +53,27 @@ class AbstractSceneMaterial(SceneWrapper):
 		"""The material type for this material instance
 		
 		Returns:
-			`blur3d.constants.MaterialType`
+			`cross3d.constants.MaterialType`
 		"""
-		from blur3d.constants import MaterialType
+		from cross3d.constants import MaterialType
 		return MaterialType.Generic
 
 	def objects(self):
 		"""The objects that are using this material.
 
 		Returns:
-			list: The list of `blur3d.api.SceneObject`s using this material.
+			list: The list of `cross3d.SceneObject`s using this material.
 		"""
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self._scene, o) for o in self._nativeObjects() if o]
 
 	def submaterials(self):
 		"""The sub-materials for this material.
 
 		Returns:
-			list: `blur3d.api.SceneMaterial`
+			list: `cross3d.SceneMaterial`
 		"""
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 		subMtls = [s for s in self._nativeSubmaterials() if s]
 		return [SceneMaterial(self._scene, mtl) for mtl in subMtls]
 
@@ -89,12 +88,12 @@ class AbstractSceneMaterial(SceneWrapper):
 		Args:
 			dictionary(dict): The dictionary containing the material
 				description.
-			materialType(blur3d.constants.MaterialType): The type of
+			materialType(cross3d.constants.MaterialType): The type of
 				material to create.
-			mapType(blur3d.constants.MapType): The type of maps to create.
+			mapType(cross3d.constants.MapType): The type of maps to create.
 
 		Returns:
-			blur3d.api.SceneMaterial
+			cross3d.SceneMaterial
 		"""
 		pass
 
@@ -107,7 +106,7 @@ class AbstractSceneMaterial(SceneWrapper):
 				material description.
 		
 		Returns:
-			blur3d.api.SceneMaterial
+			cross3d.SceneMaterial
 		"""
 		if (not xml):
 			return None
@@ -142,5 +141,5 @@ class AbstractSceneMaterial(SceneWrapper):
 		"""
 		pass
 
-api.registerSymbol('SceneMaterial', AbstractSceneMaterial, ifNotFound=True)
+cross3d.registerSymbol('SceneMaterial', AbstractSceneMaterial, ifNotFound=True)
 

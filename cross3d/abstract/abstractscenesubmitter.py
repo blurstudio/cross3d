@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenesubmitter
+#	\namespace	cross3d.abstract.abstractscenesubmitter
 #
 #	\remarks	The AbstractSceneSubmitter class defines the way a scene will interact with the render farm when submitting jobs
 #	
@@ -8,9 +8,8 @@
 #	\date		03/18/11
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractSceneSubmitter(SceneWrapper):
@@ -36,8 +35,8 @@ class AbstractSceneSubmitter(SceneWrapper):
 		onto the scene itself.  We will provide the nativePointer for this 
 		wrapper manually
 		
-		:param scene: :class:`blur3d.api.Scene`
-		:param submitType: :data:`blur3d.constants.SubmitType`
+		:param scene: :class:`cross3d.Scene`
+		:param submitType: :data:`cross3d.constants.SubmitType`
 
 		"""
 		# initialize the SceneWrapper base class
@@ -66,7 +65,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		self._username = blur.Stone.getUserName()
 		self._hostname = socket.gethostname()
 
-		from blur3d.constants import NotifyType
+		from cross3d.constants import NotifyType
 		self._notifyOnError = NotifyType.Email
 		self._notifyOnComplete = 0
 
@@ -92,7 +91,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		self._customArgs = {}
 
 		# initialize non-job submitter settings
-		from blur3d.constants import SubmitFlags, ProxyType
+		from cross3d.constants import SubmitFlags, ProxyType
 
 		self._submitFlags = SubmitFlags.Default
 		self._proxyType = ProxyType.Disabled
@@ -151,7 +150,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 			u = self._username
 			n = ''
 
-			from blur3d.constants import NotifyType
+			from cross3d.constants import NotifyType
 
 			# define the complete notifications
 			if (self._notifyOnComplete & NotifyType.Jabber):
@@ -251,7 +250,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		"""Submit the data for this submitter to the farm as a render job
 
 		"""
-		from blur3d.constants import SubmitFlags
+		from cross3d.constants import SubmitFlags
 
 		scene = self.scene()
 
@@ -291,7 +290,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		this submitter
 
 		"""
-		from blur3d.constants import SubmitFlags, SubmitType
+		from cross3d.constants import SubmitFlags, SubmitType
 
 		scene = self.scene()
 
@@ -433,7 +432,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		   This property is only used during processing, and is not actually 
 		   a property on a farm job
 		   
-		:return: list of :class:`blur3d.api.SceneCamera` objects
+		:return: list of :class:`cross3d.SceneCamera` objects
 		
 		"""
 		return self._cameras
@@ -483,7 +482,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 	def customArgMapping(self):
 		"""
 		Create a mapping between the abstracted custom arg keys that are 
-		used with the blur3d system to the application/job specific 
+		used with the cross3d system to the application/job specific 
 		settings that are needed.  Not all arguements need to be converted, 
 		as any argument that is not found will simply be ignored.  See 
 		the customArgs method for a list of the abstract argument names to 
@@ -500,7 +499,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		Return the default job type for this submitter instance based on 
 		the abstract submitType inputed.
 		
-		:param submitType: :class:`blur3d.constants.SubmitType1
+		:param submitType: :class:`cross3d.constants.SubmitType1
 
 		"""
 		return ''
@@ -535,7 +534,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 
 		# if we were unable to remove some of the files, use the backend spooler to force removal
 		if (usespool):
-			from blur3d import spool
+			from trax.api import spool
 			fname = os.path.split(path)[0] + '/*' + os.path.splitext(path)[1]
 			spool.removeFiles(fname)
 
@@ -598,7 +597,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		Return whether or not the inputed submission flag is currently set 
 		for this submitter
 		
-		:param flag: :data:`blur3d.constants.SubmitFlag`
+		:param flag: :data:`cross3d.constants.SubmitFlag`
 
 		"""
 		return (self._submitFlags & flag) != 0
@@ -635,11 +634,10 @@ class AbstractSceneSubmitter(SceneWrapper):
 		if (not self._hostNames):
 			return []
 
-		from blurdev import debug
 		try:
 			import trax.api
 		except:
-			debug.debugObject(self.services, 'trax package is not installed.')
+			cross3d.logger.debug('trax package is not installed.')
 			return []
 
 		return trax.api.data.Host.select('name IN (%s)' % ','.join(["'%s'" % hostname for hostname in self._hostNames]))
@@ -700,7 +698,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		Return the prefrences set for the notify on complete option from 
 		the submission
 		
-		:return: :data:`blur3d.constants.NotifyType`
+		:return: :data:`cross3d.constants.NotifyType`
 		
 		"""
 		return self._notifyOnComplete
@@ -710,7 +708,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		Return the preferences set for the notify on error option from 
 		the submission
 		
-		:return: :data:`blur3d.constants.NotifyType`
+		:return: :data:`cross3d.constants.NotifyType`
 		
 		"""
 		return self._notifyOnError
@@ -764,7 +762,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		   This property is only used during processing, and is not 
 		   actually a property on a farm job
 		   
-		:return: :data:`blur3d.constants.ProxyType`
+		:return: :data:`cross3d.constants.ProxyType`
 		
 		"""
 		return self._proxyType
@@ -861,7 +859,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		self._customArgs.clear()
 
 		# reset scripting args
-		from blur3d.constants import SubmitType
+		from cross3d.constants import SubmitType
 		if (self.submitType() == SubmitType.Script):
 			self.setCustomArg('runPythonScript', 	True)
 			self.setCustomArg('run64Bit', 			False)
@@ -896,11 +894,10 @@ class AbstractSceneSubmitter(SceneWrapper):
 		if (not self._serviceNames):
 			return []
 
-		from blurdev import debug
 		try:
 			import trax.api
 		except:
-			debug.debugObject(self.services, 'trax package is not installed.')
+			cross3d.logger.debug('trax package is not installed.')
 			return []
 
 		return list(trax.api.data.Service.select('service IN (%s)' % (','.join(["'%s'" % servicename for servicename in self._serviceNames]))))
@@ -939,7 +936,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		submitter, allowing for mult-shot processing from a single 
 		submission job
 		
-		:param cameras: a list of :class:`blur3d.api.SceneCamera` objects
+		:param cameras: a list of :class:`cross3d.SceneCamera` objects
 		
 		"""
 		self._cameras = cameras
@@ -1087,7 +1084,7 @@ S
 		Set the completion notification preferences for this submission
 		to the inputed type
 		 
-		:param notifyType: :data:`blur3d.constants.NotifyType`
+		:param notifyType: :data:`cross3d.constants.NotifyType`
 		
 		"""
 		self._notifyOnComplete = notifyType
@@ -1097,7 +1094,7 @@ S
 		Set the error notification preferences for this submission to the
 		inputed type
 		
-		:param notifyType: :data:`blur3d.constants.NotifyType`
+		:param notifyType: :data:`cross3d.constants.NotifyType`
 		
 		"""
 		self._notifyOnError = notifyType
@@ -1162,12 +1159,12 @@ S
 		automatically be removed from the submission flags, otherwise, 
 		it will be added to the submission flags for this submit
 		
-		:param proxyType: :data:`blur3d.constants.ProxyType`
+		:param proxyType: :data:`cross3d.constants.ProxyType`
 
 		"""
 		self._proxyType = proxyType
 
-		from blur3d.constants import ProxyType, SubmitFlags
+		from cross3d.constants import ProxyType, SubmitFlags
 		self.setSubmitFlag(SubmitFlags.CreateProxyJob, proxyType != ProxyType.Disabled)
 
 	def setRenderElements(self, renderElements):
@@ -1209,7 +1206,7 @@ S
 		"""
 		Set the inputed submit flag to the given state
 		
-		:param flag: :data:`blur3d.constants.SubmitFlag`
+		:param flag: :data:`cross3d.constants.SubmitFlag`
 		
 		"""
 		# set the flag as active
@@ -1224,7 +1221,7 @@ S
 		"""
 		Set the submit flags for this submission to the inputed flags
 			
-		:param flags: :data:`blur3d.constants.SubmitFlag`
+		:param flags: :data:`cross3d.constants.SubmitFlag`
 		
 		"""
 		self._submitFlags = flags
@@ -1236,7 +1233,7 @@ S
 		of the defaultJobType() call to abstractly set the default job 
 		types per submit type
 		
-		:param submitType: :data:`blur3d.constants.SubmitType`
+		:param submitType: :data:`cross3d.constants.SubmitType`
 
 		"""
 		self._submitType = submitType
@@ -1279,7 +1276,7 @@ s
 		if (self._progress):
 			return False
 
-		from blur3d.constants import SubmitType, SubmitFlags
+		from cross3d.constants import SubmitType, SubmitFlags
 
 		sections = []
 
@@ -1317,7 +1314,7 @@ s
 		submitSucceeded and submitErrored signals from this submitter's scene
 
 		"""
-		from blur3d.constants import SubmitType, SubmitFlags
+		from cross3d.constants import SubmitType, SubmitFlags
 
 		# make sure we have a valid job name and job type at least for this submission (required for all jobs)
 		if (not (self.jobName() and self.jobType())):
@@ -1346,7 +1343,7 @@ s
 		"""
 		Return the submit flags that are currently set for this submission
 		
-		:return: :data:`blur3d.constants.SubmitFlag`
+		:return: :data:`cross3d.constants.SubmitFlag`
 		
 		.. warning::
 		
@@ -1358,7 +1355,7 @@ s
 	def submitType(self):
 		"""Return the submit type for this submitter+
 		
-		:return: :data:`blur3d.constants.SubmitType`
+		:return: :data:`cross3d.constants.SubmitType`
 			
 		"""
 		return self._submitType
@@ -1428,16 +1425,16 @@ s
 		Implements AbstractSceneWrapper.fromXml method to create a new
 		wrapper instance from the inputed xml data
 		
-		:param scene: :class:`blur3d.api.Scene`
+		:param scene: :class:`cross3d.Scene`
 		:param xml: :class:`blurdev.XML.XMLElement`
-		:return: :class:`blur3d.api.SceneSubmitter` or None
+		:return: :class:`cross3d.SceneSubmitter` or None
 		
 		"""
 		if (xml.nodeName != 'submitter'):
 			return None
 
-		from blur3d.api 		import SceneSubmitter
-		from blur3d.constants 	import SubmitType
+		from cross3d 		import SceneSubmitter
+		from cross3d.constants 	import SubmitType
 
 		submitter = SceneSubmitter(scene, int(xml.attribute('type', 0)))
 
@@ -1482,9 +1479,9 @@ s
 		"""
 		Loads the submitter from the xml file for the inputed scene
 		
-		:param scene: :class:`blur3d.api.Scene`
+		:param scene: :class:`cross3d.Scene`
 		:param filename: filepath
-		:return: :class:`blur3d.api.SceneSubmitter` or None
+		:return: :class:`cross3d.SceneSubmitter` or None
 		"""
 		from blurdev.XML import XMLDocument
 		doc = XMLDocument()
@@ -1494,4 +1491,4 @@ s
 
 
 # register the symbol
-api.registerSymbol('SceneSubmitter', AbstractSceneSubmitter, ifNotFound=True)
+cross3d.registerSymbol('SceneSubmitter', AbstractSceneSubmitter, ifNotFound=True)

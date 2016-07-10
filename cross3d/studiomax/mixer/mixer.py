@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.api.studiomax.Mixer module contains an
+#	\remarks	The cross3d.studiomax.Mixer module contains an
 #				abstraction of the MAXScript MXMixer class for interacting with
 #				the Motion Mixer.
 #	
@@ -12,8 +12,8 @@
 
 import Py3dsMax
 from Py3dsMax import mxs
-from blur3d.api import TrackGroup
-from blur3d.api.abstract.mixer.mixer import AbstractMixer
+from cross3d import TrackGroup
+from cross3d.abstract.mixer.mixer import AbstractMixer
 
 # ==============================================================================
 # Mixers are organized hierarchically with the reltionships as follows:
@@ -159,5 +159,5 @@ class StudiomaxMixer(AbstractMixer):
 ################################################################################
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Mixer', StudiomaxMixer)
+import cross3d
+cross3d.registerSymbol('Mixer', StudiomaxMixer)

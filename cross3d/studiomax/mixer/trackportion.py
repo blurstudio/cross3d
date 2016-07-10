@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.api.studiomax.TrackPortion module provides an
+#	\remarks	The cross3d.studiomax.TrackPortion module provides an
 #				objectified representation of a region of a Track, to allow for
 #				cleaner interaction with the Max Motion Mixer.
 #	
@@ -12,7 +12,7 @@
 
 import Py3dsMax
 from Py3dsMax import mxs
-from blur3d.api.abstract.mixer.trackportion import AbstractTrackPortion
+from cross3d.abstract.mixer.trackportion import AbstractTrackPortion
 
 ################################################################################
 #####------------------------------ Classes -------------------------------#####
@@ -32,5 +32,5 @@ class StudiomaxTrackPortion(AbstractTrackPortion):
 ################################################################################
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('TrackPortion', StudiomaxTrackPortion)
+import cross3d
+cross3d.registerSymbol('TrackPortion', StudiomaxTrackPortion)

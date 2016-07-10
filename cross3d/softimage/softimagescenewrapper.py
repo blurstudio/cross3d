@@ -1,8 +1,8 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagescenewrapper
+#	\namespace	cross3d.softimage.softimagescenewrapper
 #
 #	\remarks	The AbstractSceneWrapper class defines the base class for all other scene wrapper instances.  This creates a basic wrapper
-#				class for mapping native object instances from a DCC application to the blur3d structure
+#				class for mapping native object instances from a DCC application to the cross3d structure
 #
 #	\author		douglas@blur.com
 #	\author		Blur Studio
@@ -10,7 +10,7 @@
 #
 
 from PySoftimage import xsi, constants as xsiConstants
-from blur3d.api.abstract.abstractscenewrapper 	import AbstractSceneWrapper
+from cross3d.abstract.abstractscenewrapper 	import AbstractSceneWrapper
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -69,5 +69,5 @@ class SoftimageSceneWrapper( AbstractSceneWrapper ):
 		return self._nativePointer.Model.ModelKind == xsiConstants.siModelKind_Reference
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneWrapper', SoftimageSceneWrapper )
+import cross3d
+cross3d.registerSymbol( 'SceneWrapper', SoftimageSceneWrapper )

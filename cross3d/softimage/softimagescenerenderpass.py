@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagescenerenderpass
+#	\namespace	cross3d.softimage.softimagescenerenderpass
 #
 #	\remarks	The SoftimageSceneRenderPass class will define all the operations for Softimage render passes interaction.  
 #	
@@ -9,7 +9,7 @@
 #
 
 from PySoftimage import xsi
-from blur3d.api.abstract.abstractscenerenderpass import AbstractSceneRenderPass
+from cross3d.abstract.abstractscenerenderpass import AbstractSceneRenderPass
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ class SoftimageSceneRenderPass( AbstractSceneRenderPass ):
 	
 	def _nativeCamera( self ):
 		cameraName = self.nativePointer().Camera.Value
-		from blur3d.api import Scene
+		from cross3d import Scene
 		scene = Scene()
 		return scene.findObject( cameraName )
 		
@@ -44,5 +44,5 @@ class SoftimageSceneRenderPass( AbstractSceneRenderPass ):
 		return True
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneRenderPass', SoftimageSceneRenderPass )
+import cross3d
+cross3d.registerSymbol( 'SceneRenderPass', SoftimageSceneRenderPass )

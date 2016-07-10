@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.api.studiomax.Clip module contains an
+#	\remarks	The cross3d.studiomax.Clip module contains an
 #				abstraction of the MAXScript MXClip class for interacting
 #				with the Motion Mixer.
 #	
@@ -12,8 +12,8 @@
 
 import Py3dsMax
 from Py3dsMax import mxs
-from blur3d.api import ClipPortion, TrackPortion
-from blur3d.api.abstract.mixer.clip import AbstractClip
+from cross3d import ClipPortion, TrackPortion
+from cross3d.abstract.mixer.clip import AbstractClip
 
 ################################################################################
 #####------------------------------ Classes -------------------------------#####
@@ -281,5 +281,5 @@ class StudiomaxClip(AbstractClip):
 ################################################################################
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Clip', StudiomaxClip)
+import cross3d
+cross3d.registerSymbol('Clip', StudiomaxClip)

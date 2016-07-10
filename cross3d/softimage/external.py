@@ -1,9 +1,9 @@
 ##
-# 	\namespace	blur3d.api.softimage.external
+# 	\namespace	cross3d.softimage.external
 #
 #	\remarks	This class can be used even outside of softimage. It gives you info on where
 #				softimage is installed, and allows you to run scripts in softimage.
-#				To Access this class use: blur3d.api.external('softimage')
+#				To Access this class use: cross3d.external('softimage')
 #
 # 	\author		dougl@blur.com
 # 	\author		Blur Studio
@@ -17,9 +17,9 @@ import subprocess
 import xml.etree.cElementTree as ET
 
 from blurdev import osystem
-from blur3d.api import Exceptions
-from blur3d.constants import ScriptLanguage
-from blur3d.api.abstract.external import External as AbstractExternal
+from cross3d import Exceptions
+from cross3d.constants import ScriptLanguage
+from cross3d.abstract.external import External as AbstractExternal
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ class External(AbstractExternal):
 	@classmethod
 	def binariesPath(cls, version=None, architecture=64, language='English'):
 		""" Finds the install path for various software installations. If version is None, the default
-		it will return the latest installed version of the software. Raises blur3d.api.Exceptions.SoftwareNotInstalled
+		it will return the latest installed version of the software. Raises cross3d.Exceptions.SoftwareNotInstalled
 		if the software is not installed.
 		:param version: The version of the software. Default is None
 		:param architecture: The bit type to query the registry for(32, 64). Default is 64

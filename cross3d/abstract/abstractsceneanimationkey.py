@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractsceneanimationkey
+#	\namespace	cross3d.abstract.abstractsceneanimationkey
 #
 #	\remarks	The AbstractSceneAnimationKey class defines a base class for managing animation curves within a 3d scene
 #
@@ -8,9 +8,8 @@
 #	\date		03/15/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractSceneAnimationKey(SceneWrapper):
@@ -75,5 +74,5 @@ class AbstractSceneAnimationKey(SceneWrapper):
         return 0
 
 # register the symbol
-api.registerSymbol(
+cross3d.registerSymbol(
     'SceneAnimationKey', AbstractSceneAnimationKey, ifNotFound=True)

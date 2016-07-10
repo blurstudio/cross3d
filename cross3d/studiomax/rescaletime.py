@@ -181,8 +181,8 @@ class RescaleTime(QObject):
 		try:
 			SetForegroundWindow(maxHwnd)
 		except:
-			import blurdev
-			blurdev.debug.debugMsg('Unable to set forground window to max')
+			import cross3d
+			cross3d.logger.debug('Unable to set forground window to max')
 		SetActiveWindow (maxHwnd)
 		self.minimizeWindows(timeButton)
 		self.clickPoint(timeButton)

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.motionbuilderscene
+#	\namespace	cross3d.softimage.motionbuilderscene
 #
 #	\remarks	The MotionBuilderScene class will define all the operations for Motion Builder scene interaction.  
 #	
@@ -9,7 +9,7 @@
 #
 
 import pyfbsdk as mob
-from blur3d.api.abstract.abstractscene import AbstractScene
+from cross3d.abstract.abstractscene import AbstractScene
 from PyQt4.QtGui import QFileDialog
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -37,5 +37,5 @@ class MotionBuilderScene( AbstractScene ):
 		return False
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'Scene', MotionBuilderScene )
+import cross3d
+cross3d.registerSymbol('Scene', MotionBuilderScene)

@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenepropset
+#	\namespace	cross3d.abstract.abstractscenepropset
 #
 #	\remarks	The AbstractScenePropSet defines a class that creates a generic property set of information for any attribute that is being used
 #	
@@ -8,9 +8,8 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractScenePropSet(SceneWrapper):
@@ -127,9 +126,9 @@ class AbstractScenePropSet(SceneWrapper):
 		"""
 		Restores a property set from the scene based on the inputed xml
 		
-		:param scene: :class:`blur3d.api.Scene`
+		:param scene: :class:`cross3d.Scene`
 		:param xml: :class:`blurdev.XML.XMLElement`
-		:return: :class:`blur3d.classes.ScenePropSet` or None
+		:return: :class:`cross3d.classes.ScenePropSet` or None
 		
 		"""
 		if (not xml):
@@ -138,6 +137,6 @@ class AbstractScenePropSet(SceneWrapper):
 
 
 # register the class to the system
-api.registerSymbol('ScenePropSet', AbstractScenePropSet)
-api.registerSymbol('SceneObjectPropSet', AbstractScenePropSet)
+cross3d.registerSymbol('ScenePropSet', AbstractScenePropSet)
+cross3d.registerSymbol('SceneObjectPropSet', AbstractScenePropSet)
 

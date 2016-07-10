@@ -1,9 +1,9 @@
 ##
-#   :namespace  blur3d.api.maya.external
+#   :namespace  cross3d.maya.external
 #
 #   :remarks    This class can be used even outside of Maya. It gives you info on where
 #				Maya is installed, and allows you to run scripts in Maya.
-#				To Access this class use: blur3d.api.external('maya')
+#				To Access this class use: cross3d.external('maya')
 #   
 #   :author     mikeh@blur.com
 #   :author     Blur Studio
@@ -16,9 +16,9 @@ import re
 import subprocess
 
 from blurdev import osystem
-from blur3d.api import Exceptions
-from blur3d.constants import ScriptLanguage
-from blur3d.api.abstract.external import External as AbstractExternal
+from cross3d import Exceptions
+from cross3d.constants import ScriptLanguage
+from cross3d.abstract.external import External as AbstractExternal
 
 class External(AbstractExternal):
 	_hkeyBase = r'Software\Autodesk\Maya'

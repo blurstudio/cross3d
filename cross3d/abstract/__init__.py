@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.scenes
+#	\namespace	cross3d.scenes
 #
-#	\remarks	The blur3d.scenes package creates an abstract wrapper from a 3d system
+#	\remarks	The cross3d.scenes package creates an abstract wrapper from a 3d system
 #				to use when dealing with scenes
 #	
 #	\author		eric@blur.com

@@ -2,18 +2,17 @@ import re
 import maya.OpenMaya as om
 import maya.OpenMayaAnim as oma
 import maya.cmds as cmds
-import blurdev
-from blur3d.constants import ObjectType, RotationOrder, PointerTypes
-from blur3d.api import application, UserProps, ExceptionRouter
-from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
+from cross3d.constants import ObjectType, RotationOrder, PointerTypes
+from cross3d import application, UserProps, ExceptionRouter
+from cross3d.abstract.abstractsceneobject import AbstractSceneObject
 						
 class MayaSceneObject( AbstractSceneObject ):
 	#--------------------------------------------------------------------------------
 	#							Init class variables
 	#--------------------------------------------------------------------------------
 	
-	# This enum provides a map between blur3d's objectTypes and OpenMaya.MFn object types.
-	# If the values are in a tuple more than one MFn object type needs to map to blur3d's objectType
+	# This enum provides a map between cross3d's objectTypes and OpenMaya.MFn object types.
+	# If the values are in a tuple more than one MFn object type needs to map to cross3d's objectType
 	# None values are ignored. They eather don't exist, or we haven't found the maya equivelent of it.
 	# NOTE: Many of these are untested.
 	_abstractToNativeObjectType = {ObjectType.Generic: om.MFn.kDagNode,
@@ -62,7 +61,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		self._nativeTransform = self._getTransformNode(mObj)
 	
 	#--------------------------------------------------------------------------------
-	#							blur3d private methods
+	#							cross3d private methods
 	#--------------------------------------------------------------------------------
 	@classmethod
 	def _mObjChildren(cls, mObj, recursive=True, regex=None):
@@ -92,11 +91,11 @@ class MayaSceneObject( AbstractSceneObject ):
 			\return		<list> [ <variant> nativeObject, .. ]
 		"""
 		if type:
-			blurdev.debug.debugObject(self._nativeChildren, 'type not implemented yet.')
+			cross3d.logger.debug('type not implemented yet.')
 		if parent:
-			blurdev.debug.debugObject(self._nativeChildren, 'parent not implemented yet.')
+			cross3d.logger.debug('parent not implemented yet.')
 		if childrenCollector:
-			blurdev.debug.debugObject(self._nativeChildren, 'childrenCollector not implemented yet.')
+			cross3d.logger.debug('childrenCollector not implemented yet.')
 		# Convert the wildcard to a regular expression so the generator doesn't have to create the
 		# regex over and over
 		regex=None
@@ -199,8 +198,8 @@ class MayaSceneObject( AbstractSceneObject ):
 		By default this simply returns self.nativePointer().
 		
 		Args:
-			retType (blur3d.constants.PointerTypes): Used to request a specific native object.
-					Defaults to blur3d.constants.PointerTypes.Pointer.
+			retType (cross3d.constants.PointerTypes): Used to request a specific native object.
+					Defaults to cross3d.constants.PointerTypes.Pointer.
 		
 		Returns:
 			Variant: Returns a native pointer object specific to the software.
@@ -221,7 +220,7 @@ class MayaSceneObject( AbstractSceneObject ):
 			\return		<bool> success
 		"""
 		# Make sure the nativeObject is a OpenMaya.MObject
-		# TODO: Move this into a blur3d private function the __new__ factory can call.
+		# TODO: Move this into a cross3d private function the __new__ factory can call.
 		nativeObject = cls._asMOBject(nativeObject)
 		with ExceptionRouter():
 			apiType = nativeObject.apiType()
@@ -242,7 +241,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		return AbstractSceneObject._typeOfNativeObject(nativeObject)
 	
 	#--------------------------------------------------------------------------------
-	#							blur3d public methods
+	#							cross3d public methods
 	#--------------------------------------------------------------------------------
 
 	def isHidden(self):
@@ -333,7 +332,7 @@ class MayaSceneObject( AbstractSceneObject ):
 	def setParent(self, parent):
 		"""Sets the parent for this object to the inputed item
 		
-		:param parent: :class:`blur3d.api.SceneObject` or None
+		:param parent: :class:`cross3d.SceneObject` or None
 		"""
 		# set the model in particular
 		if (parent and parent.isObjectType(ObjectType.Model)):
@@ -346,7 +345,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		return self._setNativeParent(nativeParent)
 
 	def rotationOrder(self):
-		""" Returns the blur3d.constants.RotationOrder enum for this object or zero """
+		""" Returns the cross3d.constants.RotationOrder enum for this object or zero """
 		tform = self._mObjName(self._nativeTransform)
 		selected = cmds.getAttr('{}.rotateOrder'.format(tform))
 		enumValues = cmds.attributeQuery('rotateOrder', node=tform, listEnum=True)
@@ -368,7 +367,7 @@ class MayaSceneObject( AbstractSceneObject ):
 		""" Sets the transform rotation order for the provided object to the provided value.
 		
 		Args:
-			order: blur3d.constants.RotationOrder enum
+			order: cross3d.constants.RotationOrder enum
 		"""
 		# Set the rotation order for the camera.
 		tform = cls._mObjName(cls._asMOBject(nativePointer))
@@ -382,10 +381,10 @@ class MayaSceneObject( AbstractSceneObject ):
 		""" Sets the transform rotation order for this object. 
 		
 		Args:
-			order: blur3d.constants.RotationOrder enum
+			order: cross3d.constants.RotationOrder enum
 		"""
 		return self._setNativeRotationOrder(self._nativeTransform, order)
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneObject', MayaSceneObject )
+import cross3d
+cross3d.registerSymbol('SceneObject', MayaSceneObject)

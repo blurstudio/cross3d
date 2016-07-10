@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscene
+#	\namespace	cross3d.studiomax.studiomaxscene
 #
 #	\remarks	The StudiomaxScene class will define all the operations for Studiomax scene interaction.
 #
@@ -18,16 +18,13 @@ import win32api
 import traceback
 import math
 
+import cross3d
 from Py3dsMax import mxs
-from blurdev import debug
 from PyQt4.QtCore import QTimer
-from blur3d.lib.tmclib import TMCInfo
-from blur3d.lib.pclib import PointCacheInfo
-from blur3d.lib.xmeshhandler import XMESHHandler
-from blur3d import pendingdeprecation, constants
-from blur3d.api import UserProps, application, FrameRange
-from blur3d.api.abstract.abstractscene import AbstractScene
-from blur3d.constants import UpVector, ExtrapolationType, RendererType
+from cross3d import pendingdeprecation, constants
+from cross3d import UserProps, application, FrameRange
+from cross3d.abstract.abstractscene import AbstractScene
+from cross3d.constants import UpVector, ExtrapolationType, RendererType
 
 
 # register custom attriutes for MAXScript that hold scene persistent data
@@ -178,11 +175,11 @@ class StudiomaxScene(AbstractScene):
 	def _cacheNativeMaterial(self, cacheType, nativeMaterial):
 		"""
 			\remarks	implements the AbstractScene._cacheNativeMaterial method to cache the inputed material in the scene
-			\param		cacheType		<blur3d.constants.MaterialCacheType>
+			\param		cacheType		<cross3d.constants.MaterialCacheType>
 			\param		nativeMaterial	<Py3dsMax.mxs.Material>
 			\return		<bool> changed
 		"""
-		from blur3d.constants import MaterialCacheType
+		from cross3d.constants import MaterialCacheType
 
 		# cache alternate materials
 		if (cacheType == MaterialCacheType.BaseMaterial):
@@ -200,7 +197,7 @@ class StudiomaxScene(AbstractScene):
 	def _cachedNativeMaterial(self, cacheType, materialId, default=None):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMaterial method to return the cached material for the inputed material id
-			\param		cacheType		<blur3d.constants.MaterialCacheType>
+			\param		cacheType		<cross3d.constants.MaterialCacheType>
 			\param		materialId		<str>
 			\param		default			<variant>	value to return if the id was not found
 			\return		<Py3dsMax.mxs.Material> nativeMaterial
@@ -222,10 +219,10 @@ class StudiomaxScene(AbstractScene):
 	def _cachedNativeMaterials(self, cacheType):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMaterials method to return the cached material for the inputed material cache type
-			\param		cacheType	<blur3d.constants.MaterialCacheType>
+			\param		cacheType	<cross3d.constants.MaterialCacheType>
 			\return		<list> [ <Py3dsMax.mxs.Material> nativeMaterial, .. ]
 		"""
-		from blur3d.constants import MaterialCacheType
+		from cross3d.constants import MaterialCacheType
 
 		# return override material list
 		if (cacheType == MaterialCacheType.MaterialOverrideList):
@@ -240,11 +237,11 @@ class StudiomaxScene(AbstractScene):
 	def _cacheNativeMap(self, cacheType, nativeMap):
 		"""
 			\remarks	implements the AbstractScene._cacheNativeMap method to cache the inputed map in the scene
-			\param		cacheType	<blur3d.constants.MapCacheType>
+			\param		cacheType	<cross3d.constants.MapCacheType>
 			\param		nativeMap	<Py3dsMax.mxs.TextureMap>
 			\return		<bool> changed
 		"""
-		from blur3d.constants import MapCacheType
+		from cross3d.constants import MapCacheType
 
 		# return alternate environment map caches
 		if (cacheType == MapCacheType.EnvironmentMap):
@@ -258,7 +255,7 @@ class StudiomaxScene(AbstractScene):
 	def _cachedNativeMap(self, cacheType, uniqueId, default=None):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMap method to return the cached map for the inputed map id
-			\param		cacheType		<blur3d.constants.MapCacheType>
+			\param		cacheType		<cross3d.constants.MapCacheType>
 			\param		uniqueId			<str>
 			\param		default			<variant>	value to return if the id was not found
 			\return		<Py3dsMax.mxs.TextureMap> nativeMap
@@ -280,10 +277,10 @@ class StudiomaxScene(AbstractScene):
 	def _cachedNativeMaps(self, cacheType):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMaps method to return the cached maps for the given type from the scene
-			\param		cacheType		<blur3d.constants.MapCacheType>
+			\param		cacheType		<cross3d.constants.MapCacheType>
 			\return		<list> [ <Py3dsMax.mxs.TextureMap> nativeMap, .. ]
 		"""
-		from blur3d.constants import MapCacheType
+		from cross3d.constants import MapCacheType
 
 		# return alternate environment map caches
 		if (cacheType == MapCacheType.EnvironmentMap):
@@ -298,8 +295,8 @@ class StudiomaxScene(AbstractScene):
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\return		<bool> success
 		"""
-		from blur3d.constants import MaterialCacheType
-		from blur3d.api.studiomax import StudiomaxAppData
+		from cross3d.constants import MaterialCacheType
+		from cross3d.studiomax import StudiomaxAppData
 
 		# store the methods we're going to use
 		get_userprop = mxs.getUserProp
@@ -342,8 +339,8 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		# store the methods we're going to use
-		from blur3d.api import SceneObjectPropSet
-		from blur3d.api.studiomax import StudiomaxAppData
+		from cross3d import SceneObjectPropSet
+		from cross3d.studiomax import StudiomaxAppData
 
 		get_appdata = mxs.getAppData
 		del_appdata = mxs.deleteAppData
@@ -397,7 +394,7 @@ class StudiomaxScene(AbstractScene):
 		if not lay:
 			lay = mxs.layerManager.newLayerFromName(name)
 		if lay:
-			from blur3d.api import SceneLayer
+			from cross3d import SceneLayer
 			SceneLayer(self, lay)._addNativeObjects(nativeObjects)
 		return lay
 
@@ -437,10 +434,10 @@ class StudiomaxScene(AbstractScene):
 	def _createNativeRenderer(self, rendererType):
 		"""
 			\remaks		implements AbstractScene._createNativeRenderer to create a new renderer based on the inputed rendererType for this scene
-			\param		rendererType		<blur3d.constants.RendererType>
+			\param		rendererType		<cross3d.constants.RendererType>
 			\return		<Py3dsMax.mxs.Renderer> nativeRenderer || None
 		"""
-		from blur3d.constants import RendererType
+		from cross3d.constants import RendererType
 
 		# create a scanline renderer
 		if (rendererType == RendererType.Scanline):
@@ -567,7 +564,7 @@ class StudiomaxScene(AbstractScene):
 			if (material.name == materialName or uniqueid(material) == materialId):
 				return material
 
-		debug.debugObject(self._findNativeMaterial, 'could not find material (%s - %s)' % (materialName, materialId))
+		cross3d.logger.debug('could not find material (%s - %s)' % (materialName, materialId))
 
 		return None
 
@@ -771,18 +768,18 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements the AbstractScene._nativeFx method to return a list of the fx instances in this scene
 			\return		<list>
 		"""
-		from blur3d.constants import ObjectType
+		from cross3d.constants import ObjectType
 		tps = [o for o in self.objects() if o.objectType() & ObjectType.Thinking]
 
 		def _crawlForSubDyns(dynset):
 			if not dynset:
 				return []
 			from copy import copy
-			subs = mxs.blur3dhelper.getSubDyns(dynset)
+			subs = mxs.cross3dhelper.getSubDyns(dynset)
 			subs = [s for s in subs if hasattr(s, 'name') and s.name.startswith('DS:')]
 			finalList = copy(subs)
 			for sub in subs:
-				if mxs.blur3dhelper.getSubDyns(sub):
+				if mxs.cross3dhelper.getSubDyns(sub):
 					finalList.extend(_crawlForSubDyns(sub))
 			return finalList
 
@@ -904,7 +901,7 @@ class StudiomaxScene(AbstractScene):
 
 		if objectType:
 			holder = []
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			for obj in ret:
 				if SceneObject._typeOfNativeObject(obj) == objectType:
 					holder.append(obj)
@@ -977,11 +974,11 @@ class StudiomaxScene(AbstractScene):
 	def _setCachedNativeMaps(self, cacheType, nativeMaps):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMaps method to set the cached maps for the given type from the scene
-			\param		cacheType		<blur3d.constants.MapCacheType>
+			\param		cacheType		<cross3d.constants.MapCacheType>
 			\param		nativeMaps		<list> [ <Py3dsMax.mxs.TextureMap> nativeMap, .. ]
 			\return		<bool> success
 		"""
-		from blur3d.constants import MapCacheType
+		from cross3d.constants import MapCacheType
 
 		# return alternate environment map caches
 		if (cacheType == MapCacheType.EnvironmentMap):
@@ -993,11 +990,11 @@ class StudiomaxScene(AbstractScene):
 	def _setCachedNativeMaterials(self, cacheType, nativeMaterials):
 		"""
 			\remarks	implements the AbstractScene._cachedNativeMaterials method to set the cached materials for the given type from the scene
-			\param		cacheType			<blur3d.constants.MaterialCacheType>
+			\param		cacheType			<cross3d.constants.MaterialCacheType>
 			\param		nativeMaterials		<list> [ <Py3dsMax.mxs.Material> nativeMaterial, .. ]
 			\return		<bool> success
 		"""
-		from blur3d.constants import MaterialCacheType
+		from cross3d.constants import MaterialCacheType
 
 		# return override material list
 		if (cacheType == MaterialCacheType.MaterialOverrideList):
@@ -1093,11 +1090,11 @@ class StudiomaxScene(AbstractScene):
 		"""
 			\remarks	implements the AbstractScene._setNativePropSetOverride method to set the inputed objects with an overriding property set
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
-			\param		nativePropSet	<blur3d.api.SceneObjectPropSet>
+			\param		nativePropSet	<cross3d.SceneObjectPropSet>
 			\return		<bool> success
 		"""
-		from blur3d.api import SceneObjectPropSet
-		from blur3d.api.studiomax import StudiomaxAppData
+		from cross3d import SceneObjectPropSet
+		from cross3d.studiomax import StudiomaxAppData
 
 		get_appdata = mxs.getAppData
 		del_appdata = mxs.deleteAppData
@@ -1178,13 +1175,13 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements AbstractScene._setNativeMaterialOverride to apply this material as an override to the inputed objects
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
 			\param		nativeMaterial	<Py3dsMax.mxs.Material> nativeMaterial
-			\param		options			<blur3d.constants.MaterialOverrideOptions>
+			\param		options			<cross3d.constants.MaterialOverrideOptions>
 			\param		advancedState	<dict> { <int> baseMaterialId: ( <blur3d.gui.SceneMaterial> override, <bool> ignored ) }
 			\return		<bool> success
 		"""
-		from blur3d.constants import MaterialOverrideOptions, MaterialCacheType
-		from blur3d.api.studiomax import matlib
-		from blur3d.api.studiomax import StudiomaxAppData
+		from cross3d.constants import MaterialOverrideOptions, MaterialCacheType
+		from cross3d.studiomax import matlib
+		from cross3d.studiomax import StudiomaxAppData
 
 		# use the advanced state for the override system
 		if (advancedState == None):
@@ -1269,7 +1266,7 @@ class StudiomaxScene(AbstractScene):
 		# set the objects passed in as the selection
 		self._setNativeSelection(objects)
 		# focus
-		mxs.blur3dHelper.maxZoomExtents()
+		mxs.cross3dHelper.maxZoomExtents()
 		# restore previous selection
 		self._setNativeSelection(selection)
 
@@ -1367,12 +1364,12 @@ class StudiomaxScene(AbstractScene):
 		"""
 			\remarks	implements the AbstractScene.toggleVisibleOptions method to toggle the visible state of the inputed options for the given objects
 			\param		nativeObjects	<list> [ <Py3dsMax.mxs.Object> nativeObject, .. ]
-			\param		options			<blur3d.constants.VisibilityToggleOptions>
+			\param		options			<cross3d.constants.VisibilityToggleOptions>
 			\return		<bool> success
 		"""
-		from blur3d.api.studiomax import cachelib
-		from blur3d.constants import VisibilityToggleOptions
-		from blur3d.api.studiomax import cachelib
+		from cross3d.studiomax import cachelib
+		from cross3d.constants import VisibilityToggleOptions
+		from cross3d.studiomax import cachelib
 
 		# toggle all the visibility options by default
 		if (options == None):
@@ -1456,11 +1453,11 @@ class StudiomaxScene(AbstractScene):
 			# Toggle point caches.
 			if options & VisibilityToggleOptions.TogglePointCaches:
 				mods = [m for m in obj.modifiers]
-				mxs.blur3dhelper.togglePointCaches(mods, state)
+				mxs.cross3dhelper.togglePointCaches(mods, state)
 
 			# Toggle transform caches.
 			if options & VisibilityToggleOptions.ToggleTransformCaches:
-				mxs.blur3dhelper.toggleTransformCache(obj, state)
+				mxs.cross3dhelper.toggleTransformCache(obj, state)
 
 			# Toggle XMeshLoaders to save memory and redraw speed.
 			if options & VisibilityToggleOptions.ToggleXMeshes:
@@ -1559,10 +1556,10 @@ class StudiomaxScene(AbstractScene):
 		# Get the root node of the biped
 		if bipedCtrl and 'Rig' in bipedCtrl.name():
 
-			mix = mxs.blur3dhelper.getMixerController(bipedCtrl)
-			trackGrp = mxs.blur3dhelper.getMixerTrackGroup(mix, 1)
-			track = mxs.blur3dhelper.getMixerTrack(trackGrp, 1)
-			mxs.blur3dhelper.appendMixerClip(track, path, False, 0)
+			mix = mxs.cross3dhelper.getMixerController(bipedCtrl)
+			trackGrp = mxs.cross3dhelper.getMixerTrackGroup(mix, 1)
+			track = mxs.cross3dhelper.getMixerTrack(trackGrp, 1)
+			mxs.cross3dhelper.appendMixerClip(track, path, False, 0)
 
 			return True
 
@@ -1679,7 +1676,7 @@ class StudiomaxScene(AbstractScene):
 		else:
 			self.setSelection(obj.name)
 
-		mxs.blur3dHelper.toggleTrajectories()
+		mxs.cross3dHelper.toggleTrajectories()
 		self._setNativeSelection(selectionSave)
 
 	def _unisolate(self):
@@ -1914,9 +1911,9 @@ class StudiomaxScene(AbstractScene):
 	def animationRange(self):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
-			\return		<blur3d.api.FrameRange>
+			\return		<cross3d.FrameRange>
 		"""
-		from blur3d.api import FrameRange
+		from cross3d import FrameRange
 		r = mxs.animationRange
 		return FrameRange((r.start, r.end))
 
@@ -1928,12 +1925,12 @@ class StudiomaxScene(AbstractScene):
 		:param objects: A list of objects to clone
 		:param cloneHierarchy: Duplicate parent child structure in clones. Defaults to False
 		:param cloneType: Create clones as copy, instance, etc. Defaults to Copy.
-		..seealso:: modules `blur3d.constants.CloneType`
+		..seealso:: modules `cross3d.constants.CloneType`
 		"""
-		cloneObjects = mxs.blur3dhelper.cloneObjects([obj.nativePointer() for obj in objects],
+		cloneObjects = mxs.cross3dhelper.cloneObjects([obj.nativePointer() for obj in objects],
                                                expandHierarchy=cloneHierarchy,
                                                cloneType=mxs.pyhelper.namify(constants.CloneType.labelByValue(cloneType)))
-		from blur3d.api import SceneObject
+		from cross3d import SceneObject
 		return [SceneObject(self, obj) for obj in cloneObjects]
 
 	def checkForSave(self):
@@ -2005,7 +2002,7 @@ class StudiomaxScene(AbstractScene):
 			\param 		<str>	stateName
 			\return 	<boo>	Success
 		"""
-		return mxs.blur3dHelper.deleteSceneState(stateName)
+		return mxs.cross3dHelper.deleteSceneState(stateName)
 
 	def exportFile(self, file, using=None, prompt=False, selectedOnly=True):
 		"""
@@ -2067,9 +2064,9 @@ class StudiomaxScene(AbstractScene):
 			\return		<string> name of scene state
 		"""
 		if shotName:
-			index = mxs.blur3dhelper.findSceneState(shotName)
+			index = mxs.cross3dhelper.findSceneState(shotName)
 			if index > 0:
-				return mxs.blur3dhelper.getSceneState(index)
+				return mxs.cross3dhelper.getSceneState(index)
 
 		return False
 
@@ -2200,7 +2197,7 @@ class StudiomaxScene(AbstractScene):
 
 	def realizeTimeControllers(self, cachesFrameRate=None):
 
- 		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
+		# If the frame rate at which the PC and TMC caches have been made is not specified, we use the scene rate.
 		cachesFrameRate = float(cachesFrameRate) if cachesFrameRate else self.animationFPS()
 
 		# Handling XMeshes.
@@ -2212,6 +2209,7 @@ class StudiomaxScene(AbstractScene):
 			if os.path.exists(fileName):
 
 				# Getting the FPS at which the XMesh was generated.
+				from blur3d.lib.xmeshhandler import XMESHHandler
 				xMeshFrameRate = XMESHHandler(fileName).fps()
 
 				# Setting up the playback curve.
@@ -2236,8 +2234,10 @@ class StudiomaxScene(AbstractScene):
 
 				# Parsing the cache file. We need to extract the start frame.
 				if mxs.classof(nativeCache) == mxs.Point_Cache:
+					from blur3d.lib.pclib import PointCacheInfo
 					cacheInfo = PointCacheInfo.read(fileName, header_only=True)
 				elif mxs.classof(nativeCache) == mxs.Transform_Cache:
+					from blur3d.lib.tmclib import TMCInfo
 					cacheInfo = TMCInfo.read(fileName, header_only=True)
 
 				# Setting the playback to curve.
@@ -2353,10 +2353,10 @@ class StudiomaxScene(AbstractScene):
 		return True
 
 	def restoreSceneState(self, stateName, parts):
-		return mxs.blur3dHelper.restoreSceneState(stateName, parts)
+		return mxs.cross3dHelper.restoreSceneState(stateName, parts)
 
 	def saveSceneState(self, stateName, parts):
-		return mxs.blur3dhelper.captureSceneState(stateName, parts)
+		return mxs.cross3dhelper.captureSceneState(stateName, parts)
 
 	def _applyNativeTimeController(self, nativeController, cachesFrameRate=None, include='', exclude='', bake=False, rnd=0.0):
 
@@ -2394,7 +2394,7 @@ class StudiomaxScene(AbstractScene):
 
 		# Getting the range of the native controller in case we need to bake.
 		if bake:
-			from blur3d.api import SceneAnimationController
+			from cross3d import SceneAnimationController
 			controller = SceneAnimationController(self, nativeController)
 
 			# The FCurve range is not made from floats.
@@ -2429,8 +2429,10 @@ class StudiomaxScene(AbstractScene):
 
 							# Parsing the cache file. We need to extract the start frame.
 							if mxs.classof(nativeCache) == mxs.Point_Cache:
+								from blur3d.lib.pclib import PointCacheInfo
 								cacheInfo = PointCacheInfo.read(fileName, header_only=True)
 							elif mxs.classof(nativeCache) == mxs.Transform_Cache:
+								from blur3d.lib.tmclib import TMCInfo
 								cacheInfo = TMCInfo.read(fileName, header_only=True)
 
 							# Setting up the start frame.
@@ -2445,7 +2447,7 @@ class StudiomaxScene(AbstractScene):
 
 							# Baking the controller requested.
 							if bake:
-								from blur3d.api import SceneAnimationController
+								from cross3d import SceneAnimationController
 								wrappedController = SceneAnimationController(self, timeScriptController)
 								wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 								timeScriptController = wrappedController.nativePointer()
@@ -2462,6 +2464,7 @@ class StudiomaxScene(AbstractScene):
 			if os.path.exists(fileName):
 
 				# Getting the FPS at which the XMesh was generated.
+				from blur3d.lib.xmeshhandler import XMESHHandler
 				xMeshFrameRate = XMESHHandler(fileName).fps()
 
 				# Creating the XMesh and RayFire and Fume instanciated time script controller.
@@ -2470,7 +2473,7 @@ class StudiomaxScene(AbstractScene):
 
 				# Baking the controller requested.
 				if bake:
-					from blur3d.api import SceneAnimationController
+					from cross3d import SceneAnimationController
 					wrappedController = SceneAnimationController(self, timeScriptController)
 					wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 					timeScriptController = wrappedController.nativePointer()
@@ -2504,7 +2507,7 @@ class StudiomaxScene(AbstractScene):
 
 			# Baking the controller requested.
 			if bake:
-				from blur3d.api import SceneAnimationController
+				from cross3d import SceneAnimationController
 				wrappedController = SceneAnimationController(self, timeScriptController)
 				wrappedController.bake(rng=bakeRange, extrapolation=ExtrapolationType.Linear)
 				timeScriptController = wrappedController.nativePointer()
@@ -2531,7 +2534,7 @@ class StudiomaxScene(AbstractScene):
 			if fumes or thinkings:
 
 				# Creating speed controller for Fume caches.
-				from blur3d.api import SceneAnimationController
+				from cross3d import SceneAnimationController
 				wrappedController = SceneAnimationController(self, nativeController)
 				speedScriptController = wrappedController.derivatedController()
 
@@ -2695,8 +2698,8 @@ class StudiomaxScene(AbstractScene):
 		# No need to change it if the frameRate is already correct
 		if mxs.frameRate != fps:
 			if changeType == constants.FPSChangeType.Frames:
-				from blur3d.api.studiomax.rescaletime import RescaleTime
-				from blur3d.api import FrameRange
+				from cross3d.studiomax.rescaletime import RescaleTime
+				from cross3d import FrameRange
 				# If we dont save it as a class variable it will go out of scope and all of the
 				# QTimers will not be called.
 				self._rescaleTime = RescaleTime()
@@ -2710,7 +2713,7 @@ class StudiomaxScene(AbstractScene):
 					self.setAnimationRange(animRange)
 					self.setCurrentFrame(currFrame)
 #					if not errorCheck:
-#						from blur3d.api import Exceptions
+#						from cross3d import Exceptions
 #						raise Exceptions.FPSChangeFailed('Changing the FPS appears to have failed. Your FPS has not been changed.')
 					if callback:
 						callback()
@@ -2834,7 +2837,7 @@ class StudiomaxScene(AbstractScene):
 	def setRenderFrameRange(self, frameRange):
 		"""
 			\remarks	set the render frame range of the scene
-			\param		size	<blur3d.api.FrameRange>
+			\param		size	<cross3d.FrameRange>
 			\return		<bool> success
 		"""
 		# not the ideal way to deal with all the options but I am in the rush
@@ -2891,7 +2894,7 @@ class StudiomaxScene(AbstractScene):
 	def setLayerGroups(self, layerGroups):
 		"""
 			\remarks	reimplements the AbstractScene.setLayerGroups method to set the scene layer groups to the inputed list
-			\param		layerGroups		<list> [ <blur3d.api.SceneLayerGroup> layerGroup, .. ]
+			\param		layerGroups		<list> [ <cross3d.SceneLayerGroup> layerGroup, .. ]
 			\return		<bool> success
 		"""
 		groupNames = []
@@ -3008,9 +3011,9 @@ class StudiomaxScene(AbstractScene):
 
 	def userProps(self):
 		"""Returns the FileProps object associated with this file
-		:return; :class:`blur3d.api.FileProps`
+		:return; :class:`cross3d.FileProps`
 		"""
-		from blur3d.api import FileProps
+		from cross3d import FileProps
 		return FileProps()
 
 	def animationMixers(self):
@@ -3024,7 +3027,7 @@ class StudiomaxScene(AbstractScene):
 		# able to use getClassInstances to retrieve Mixers in the scene.
 		# Instead, we'll iterate over objects in the scene, and test to see if
 		# they have a controller with a Mixer attached.
-		from blur3d.api import Mixer
+		from cross3d import Mixer
 		mixers = []
 		for obj in mxs.objects:
 			if hasattr(obj, 'controller') and hasattr(obj.controller, 'mixer'):
@@ -3032,5 +3035,4 @@ class StudiomaxScene(AbstractScene):
 		return mixers
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Scene', StudiomaxScene)
+cross3d.registerSymbol('Scene', StudiomaxScene)

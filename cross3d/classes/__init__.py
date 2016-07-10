@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.classes
+#	\namespace	cross3d.classes
 #
 #	\remarks	[desc::commented]
 #	

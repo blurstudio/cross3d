@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.abstractscenerenderpass
+#	\namespace	cross3d.softimage.abstractscenerenderpass
 #
 #	\remarks	The AbstractSceneRenderPass class will define all the operations for render passes interaction.  
 #	
@@ -8,8 +8,8 @@
 #	\date		04/08/11
 #
 
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper
 
 
 class AbstractSceneRenderPass(SceneWrapper): # new douglas. technically it should be a scene object, but render passes have different methods than the one specified in AbstractSceneObject.
@@ -36,7 +36,7 @@ class AbstractSceneRenderPass(SceneWrapper): # new douglas. technically it shoul
 	#------------------------------------------------------------------------------------------------------------------------
 
 	def camera(self): # new douglas
-		from blur3d.api import SceneCamera
+		from cross3d import SceneCamera
 		return SceneCamera(self._nativeCamera())
 
 	def setCamera(self, sceneCamera): # new douglas
@@ -53,5 +53,5 @@ class AbstractSceneRenderPass(SceneWrapper): # new douglas. technically it shoul
 
 
 # register the symbol
-api.registerSymbol('SceneRenderPass', AbstractSceneRenderPass)
+cross3d.registerSymbol('SceneRenderPass', AbstractSceneRenderPass)
 

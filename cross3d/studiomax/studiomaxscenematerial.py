@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenematerial
+#	\namespace	cross3d.abstract.abstractscenematerial
 #
 #	\remarks	3ds Max implementation of SceneMaterial.
 #	
@@ -10,9 +10,9 @@
 
 import os.path
 from Py3dsMax import mxs
-from blur3d.constants import MaterialType, MapType
-from blur3d.api.abstract.abstractscenematerial import AbstractSceneMaterial
-from blur3d.api import Scene
+from cross3d.constants import MaterialType, MapType
+from cross3d.abstract.abstractscenematerial import AbstractSceneMaterial
+from cross3d import Scene
 
 # =============================================================================
 # CLASSES
@@ -78,9 +78,9 @@ class StudiomaxSceneMaterial(AbstractSceneMaterial):
 
 		Args:
 			dictionary(dict): The dictionary containing the material description.
-			materialType(blur3d.constants.MaterialType): The type of material to
+			materialType(cross3d.constants.MaterialType): The type of material to
 				create.  Default is MaterialType.Generic.
-			mapType(blur3d.constants.MapType): The type of map to use.  Default
+			mapType(cross3d.constants.MapType): The type of map to use.  Default
 				if MapType.Generic.
 
 		Returns:
@@ -157,9 +157,5 @@ class StudiomaxSceneMaterial(AbstractSceneMaterial):
 		"""The unique ID of this material."""
 		return mxs.blurUtil.uniqueId(self._nativePointer)
 	
-from blur3d import api
-api.registerSymbol('SceneMaterial', StudiomaxSceneMaterial)
-
-
-
-
+import cross3d
+cross3d.registerSymbol('SceneMaterial', StudiomaxSceneMaterial)

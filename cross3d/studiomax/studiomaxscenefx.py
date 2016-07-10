@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscenefx
+#	\namespace	cross3d.studiomax.studiomaxscenefx
 #
 #	\remarks	The StudiomaxSceneFx class provides an interface to editing fx in a Scene environment for 3dsMax
 #	
@@ -9,7 +9,7 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api.abstract.abstractscenefx import AbstractSceneFx
+from cross3d.abstract.abstractscenefx import AbstractSceneFx
 
 class StudiomaxSceneFx( AbstractSceneFx ):
 	#------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class StudiomaxSceneFx( AbstractSceneFx ):
 	def layer( self ):
 		"""
 			\remarks	reimplements AbstractSceneFx.layer to return the layer that this fx is associated with
-			\return		<blur3d.api.Layer> || None
+			\return		<cross3d.Layer> || None
 		"""
 		layers 	= self._scene.layers()
 		uid		= mxs.blurUtil.uniqueId( self._nativePointer )
@@ -75,7 +75,7 @@ class StudiomaxSceneFx( AbstractSceneFx ):
 			\param		state	<bool>
 			\return		<bool> success
 		"""
-		mxs.blur3dhelper.toggleSubDyn(self.nativePointer(), state)
+		mxs.cross3dhelper.toggleSubDyn(self.nativePointer(), state)
 		
 	def uniqueId( self ):
 		"""
@@ -86,6 +86,6 @@ class StudiomaxSceneFx( AbstractSceneFx ):
 		return mxs.blurUtil.uniqueId( self._nativePointer )
 		
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneFx', StudiomaxSceneFx )
+import cross3d
+cross3d.registerSymbol( 'SceneFx', StudiomaxSceneFx )
 

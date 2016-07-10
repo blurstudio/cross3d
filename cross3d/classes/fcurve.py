@@ -7,7 +7,7 @@ import xml.dom.minidom
 from framerange import FrameRange
 from valuerange import ValueRange
 from blurdev.XML.xmldocument import XMLDocument
-from blur3d.constants import ControllerType, TangentType, ExtrapolationType
+from cross3d.constants import ControllerType, TangentType, ExtrapolationType
 
 
 class Key(object):

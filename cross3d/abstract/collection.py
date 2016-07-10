@@ -1,5 +1,5 @@
 ##
-#   \namespace  blur3d.api.abstract.collection
+#   \namespace  cross3d.abstract.collection
 #
 #   \remarks    This module implements the collection class allowing to manipulate multiple objects.
 #
@@ -10,8 +10,8 @@
 
 #-------------------------------------------------------------------------
 
-from blur3d import api
-from blur3d import abstractmethod
+import cross3d
+from cross3d import abstractmethod
 from collections import MutableSequence
 
 class Collection(MutableSequence):
@@ -42,15 +42,15 @@ class Collection(MutableSequence):
 	@classmethod
 	def _objectsGenerator(cls, scene, objects):
 		for obj in objects:
-			if isinstance(obj, api.SceneObject):
+			if isinstance(obj, cross3d.SceneObject):
 				yield obj
 			else:
-				yield api.SceneObject(scene, obj)
+				yield cross3d.SceneObject(scene, obj)
 
 	@classmethod
 	def _nativeObjectsGenerator(cls, objects):
 		for obj in objects:
-			if isinstance(obj, api.SceneObject):
+			if isinstance(obj, cross3d.SceneObject):
 				yield obj()
 			else:
 				yield obj
@@ -66,4 +66,4 @@ class Collection(MutableSequence):
 		return False
 
 # Registering the symbol.
-api.registerSymbol('Collection', Collection)
+cross3d.registerSymbol('Collection', Collection)

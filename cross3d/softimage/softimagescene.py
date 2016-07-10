@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagescene
+#	\namespace	cross3d.softimage.softimagescene
 #
 #	\remarks	The SoftimageScene class provides the implementation of the AbstractScene class as it applies
 #				to Softimage
@@ -16,11 +16,11 @@ import time
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
-from blur3d.constants import UpVector
+from cross3d.constants import UpVector
 from blurdev.decorators import stopwatch
-from blur3d import pendingdeprecation, constants
-from blur3d.api import application, dispatch, FrameRange
-from blur3d.api.abstract.abstractscene import AbstractScene
+from cross3d import pendingdeprecation, constants
+from cross3d import application, dispatch, FrameRange
+from cross3d.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 
@@ -156,7 +156,7 @@ class SoftimageScene(AbstractScene):
 
 		if objectType:
 			holder = []
-			from blur3d.api import SceneObject
+			from cross3d import SceneObject
 			for obj in objects:
 				if SceneObject._typeOfNativeObject(obj) == objectType:
 					holder.append(obj)
@@ -357,9 +357,9 @@ class SoftimageScene(AbstractScene):
 	def viewports(self):
 		"""
 			\remarks	implements the AbstractScene.viewports method to return the visible viewports
-			\return		[ <blur3d.api.SceneViewport>, ... ]
+			\return		[ <cross3d.SceneViewport>, ... ]
 		"""
-		from blur3d.api import SceneViewport
+		from cross3d import SceneViewport
 		viewportNames = SceneViewport.viewportNames
 		viewportLetters = [ viewportNames[ key ] for key in viewportNames.keys() ]
 		viewportLetters = sorted(viewportLetters)
@@ -500,7 +500,7 @@ class SoftimageScene(AbstractScene):
 
 		for model in xsi.ActiveSceneRoot.FindChildren2( "*", xsiConstants.siModelType ):
 			if model.FullName not in models:
-				from blur3d.api import SceneModel
+				from cross3d import SceneModel
 				return SceneModel(self, model)
 
 		return False
@@ -508,15 +508,15 @@ class SoftimageScene(AbstractScene):
 	def animationRange(self):
 		"""
 			\remarks	implements AbstractScene.animationRange method to return the current animation start and end frames
-			\return		<blur3d.api.FrameRange>
+			\return		<cross3d.FrameRange>
 		"""
-		from blur3d.api import FrameRange
+		from cross3d import FrameRange
 		playControl = xsi.ActiveProject.Properties("Play Control")
 		return FrameRange([int(round(playControl.Parameters("In").Value)),int(round(playControl.Parameters("Out").Value))])
 
 	def globalRange(self):
 		""" Returns the global start and stop range. """
-		from blur3d.api import FrameRange
+		from cross3d import FrameRange
 		playControl = xsi.ActiveProject.Properties("Play Control")
 		return FrameRange([int(round(playControl.Parameters("GlobalIn").Value)), int(round(playControl.Parameters("GlobalOut").Value))])
 
@@ -857,5 +857,5 @@ class SoftimageScene(AbstractScene):
 		return True
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol('Scene', SoftimageScene)
+import cross3d
+cross3d.registerSymbol('Scene', SoftimageScene)

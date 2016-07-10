@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.classes.clipboard
+#	\namespace	cross3d.classes.clipboard
 #
 #	\remarks	This file defines the clipboard class that allows to manipulate the clipboard.
 #	

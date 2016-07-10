@@ -1,5 +1,5 @@
 ##
-#   \namespace  blur3d.api.softimage.collection
+#   \namespace  cross3d.softimage.collection
 #
 #   \remarks    This module implements the collection class allowing to manipulate multiple objects.
 #   
@@ -10,11 +10,11 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from blur3d import api
-from blur3d.api.abstract.collection import Collection as AbstractCollection
+import cross3d
+from cross3d.abstract.collection import Collection as AbstractCollection
 
 class Collection(AbstractCollection):
 	pass
 
 # Registering the symbol.
-api.registerSymbol('Collection', Collection)
+cross3d.registerSymbol('Collection', Collection)

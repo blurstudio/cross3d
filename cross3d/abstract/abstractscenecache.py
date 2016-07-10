@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.abstract.abstractscenecache
+#	\namespace	cross3d.abstract.abstractscenecache
 #
 #	\remarks	The AbstractSceneCache class provides an interface to editing data caches in a Scene environment for any DCC application
 #	
@@ -8,9 +8,8 @@
 #	\date		09/08/10
 #
 
-from blur3d import abstractmethod
-from blur3d.api import SceneWrapper
-from blur3d import api
+import cross3d
+from cross3d import SceneWrapper, abstractmethod
 
 
 class AbstractSceneCache(SceneWrapper):
@@ -27,10 +26,10 @@ class AbstractSceneCache(SceneWrapper):
 		"""Return a list of the controllers that are currently on this 
 		cache instance
 		
-		:return: a list of :class:`blur3d.api.SceneAnimationController`'s
+		:return: a list of :class:`cross3d.SceneAnimationController`'s
 			
 		"""
-		from blur3d.api import SceneAnimationController
+		from cross3d import SceneAnimationController
 		return [ SceneAnimationController(self._scene, nativeControl) for nativeControl in self._nativeControllers() ]
 
 	def enable(self):
@@ -69,4 +68,4 @@ class AbstractSceneCache(SceneWrapper):
 
 
 # register the symbol
-api.registerSymbol('SceneCache', AbstractSceneCache, ifNotFound=True)
+cross3d.registerSymbol('SceneCache', AbstractSceneCache, ifNotFound=True)

@@ -1,8 +1,8 @@
 import maya.OpenMaya as om
-import blur3d.api
+import cross3d
 import math
-from blur3d.api.abstract.abstractscenecamera import AbstractSceneCamera
-from blur3d.constants import RotationOrder
+from cross3d.abstract.abstractscenecamera import AbstractSceneCamera
+from cross3d.constants import RotationOrder
 
 class MayaSceneCamera(AbstractSceneCamera):
 	def clippingEnabled(self):
@@ -20,7 +20,7 @@ class MayaSceneCamera(AbstractSceneCamera):
 		""" The default rotation order when creating new cameras.
 		
 		Returns:
-			blur3d.constants.RotationOrder
+			cross3d.constants.RotationOrder
 		"""
 		return RotationOrder.ZXY
 
@@ -100,5 +100,5 @@ class MayaSceneCamera(AbstractSceneCamera):
 		return True
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneCamera', MayaSceneCamera)
+import cross3d
+cross3d.registerSymbol('SceneCamera', MayaSceneCamera)

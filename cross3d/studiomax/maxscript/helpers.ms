@@ -6,9 +6,9 @@
 */
 _blurLibrary.load "blurPointCache"
 
-global blur3dhelper
+global cross3dhelper
 (
-	struct Blur3dHelperStruct (
+	struct Cross3dHelperStruct (
 
 		function getXRefItems xref = (
 			xrefObjs = #()
@@ -195,7 +195,7 @@ global blur3dhelper
 				)
 				else (
 					for child in obj.children do (
-						if ( blur3dhelper.hasVisibleDescendent child ) do (
+						if ( cross3dhelper.hasVisibleDescendent child ) do (
 							found = true
 							exit
 						)
@@ -213,7 +213,7 @@ global blur3dhelper
 				)
 				else (
 					for obj in refs.dependentNodes obj do (
-						if ( blur3dhelper.hasVisibleReference obj ) then (
+						if ( cross3dhelper.hasVisibleReference obj ) then (
 							found = true
 							exit
 						)
@@ -232,11 +232,11 @@ global blur3dhelper
 						success = false
 						exit
 					)
-					if ( blur3dhelper.hasVisibleDescendent obj ) do (
+					if ( cross3dhelper.hasVisibleDescendent obj ) do (
 						success = false
 						exit
 					)
-					if ( blur3dhelper.hasVisibleReference obj ) do (
+					if ( cross3dhelper.hasVisibleReference obj ) do (
 						success = false
 						exit
 					)
@@ -252,7 +252,7 @@ global blur3dhelper
 		function toggleTransformCache obj state = (
 			if ( isproperty obj #controller and classof obj.controller == transform_cache ) do (
 				if ( obj.controller.enabled != state ) do (
-					if ( not state and blur3dhelper.canDisableTMController obj.controller ) then (
+					if ( not state and cross3dhelper.canDisableTMController obj.controller ) then (
 						obj.controller.enabled = false
 					)
 					else (
@@ -528,5 +528,5 @@ global blur3dhelper
 		)
 	)
 
-	blur3dhelper = Blur3dHelperStruct()
+	cross3dhelper = Cross3dHelperStruct()
 )

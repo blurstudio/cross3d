@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxsceneviewport
+#	\namespace	cross3d.studiomax.studiomaxsceneviewport
 #
 #	\remarks	The StudiomaxSceneViewport class provides the implementation of the AbstractSceneViewport class as it applies
 #				to Softimage scenes
@@ -13,9 +13,9 @@ import os
 import time 
 
 from Py3dsMax import mxs
-from blur3d.api import dispatch, application
-from blur3d.api.classes import FrameRange
-from blur3d.api.abstract.abstractsceneviewport import AbstractSceneViewport
+from cross3d import dispatch, application
+from cross3d.classes import FrameRange
+from cross3d.abstract.abstractsceneviewport import AbstractSceneViewport
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		
 	def _setNativeCamera( self, nativeCamera ):
 		if type( nativeCamera ) in [ str, unicode ]:
-			from blur3d.api import Scene
+			from cross3d import Scene
 			scene = Scene()
 			camera = scene._findNativeObject( nativeCamera )
 		else:
@@ -356,5 +356,5 @@ class StudiomaxSceneViewport( AbstractSceneViewport ):
 		return True
 	
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneViewport', StudiomaxSceneViewport )
+import cross3d
+cross3d.registerSymbol( 'SceneViewport', StudiomaxSceneViewport )

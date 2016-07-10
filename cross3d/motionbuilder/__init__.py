@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.motionbuilder
+#	\namespace	cross3d.motionbuilder
 #
-#	\remarks	The blur3d.motionbuilder package contains the necessary classes to control Motion Builder.
+#	\remarks	The cross3d.motionbuilder package contains the necessary classes to control Motion Builder.
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio

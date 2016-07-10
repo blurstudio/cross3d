@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.studiomaxscenelayer
+#	\namespace	cross3d.studiomax.studiomaxscenelayer
 #
 #	\remarks	The StudiomaxSceneLayer class provides implementation of the AbstractSceneLayer class as it applys to 3d Studio Max scenes
 #
@@ -9,8 +9,9 @@
 #
 
 from Py3dsMax import mxs
-from blur3d.api.abstract.abstractscenelayer	import AbstractSceneLayer
-from blur3d.api import SceneObject
+import cross3d
+from cross3d.abstract.abstractscenelayer import AbstractSceneLayer
+from cross3d import SceneObject
 
 #-----------------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ class LayerMetaData( MXSCustAttribDef ):
 		usages 		= list( self.value( 'altPropUsages', [] ) )
 		ids 		= list( self.value( 'altPropIds', [] ) )
 
-		from blur3d.api import SceneObjectPropSet
+		from cross3d import SceneObjectPropSet
 		baseProp = SceneObjectPropSet( None, None )
 
 		values.append( baseProp._valueString() )
@@ -343,7 +344,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def _nativeLayerGroup( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer._nativeLayerGroup method to retrieve the SceneLayerGroup that this layer belongs to
-			\return		<blur3d.api.SceneLayerGroup>
+			\return		<cross3d.SceneLayerGroup>
 		"""
 		index	= self.metaData().value( 'groupIndex' ) - 1
 		names 	= list(self._scene.metaData().value('layerGroupNames'))
@@ -370,8 +371,8 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		mtls = []
 		for obj in self._nativeObjects():
 			if baseMaterials and self.materialOverride():
-				from blur3d.constants import MaterialCacheType
-				from blur3d.api.studiomax import StudiomaxAppData
+				from cross3d.constants import MaterialCacheType
+				from cross3d.studiomax import StudiomaxAppData
 				get_userprop = mxs.getUserProp
 				get_appdata	= mxs.getAppData
 				mid = get_appdata(obj, StudiomaxAppData.AltMtlIndex)
@@ -395,14 +396,13 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			if ( 0 <= index and index < len(mtls) ):
 				return mtls[index]
 			else:
-				from blurdev import debug
-				debug.debugObject( self._nativeMaterialOverride, '%i index is out of range of %i alt materials for %s layer.' % (index,len(mtls),self.name()) )
+				cross3d.logger.debug('%i index is out of range of %i alt materials for %s layer.' % (index,len(mtls),self.name()))
 				return None
 
 		# load the material from the material library
 		index = data.value( 'mtlLibindex' )
 		if ( index ):
-			from blur3d.constants import MaterialCacheType
+			from cross3d.constants import MaterialCacheType
 			mtls = self._scene._cachedNativeMaterials( MaterialCacheType.MaterialOverrideList )
 			index -= 1
 			if ( 0 <= index and index < len(mtls) ):
@@ -422,8 +422,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			if ( 0 <= index and index < len(propSets) ):
 				return propSets[index]
 			else:
-				from blurdev import debug
-				debug.debugObject( self._nativePropSetOverride, '%i index is out of range of %i alt propsets for %s layer.' % (index,len(propSets),self.name()) )
+				cross3d.logger.debug('%i index is out of range of %i alt propsets for %s layer.' % (index,len(propSets),self.name()))
 				return None
 
 		return None
@@ -480,7 +479,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		# check to see if we are setting this to one of our cached native material indexes
 		data = self.metaData()
 		if ( nativeMaterial ):
-			from blur3d.constants import MaterialCacheType
+			from cross3d.constants import MaterialCacheType
 
 			# set the native alternatematerial
 			altmtls = self._nativeAltMaterials()
@@ -514,7 +513,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		"""
 			\remarks	reimplements the AbstractSceneObjectGroup._setNativePropSetOverride method to set the overriden propset for this layer instance,
 						marking that it is using a propset from the global propset cache if necessary
-			\param		nativePropSet	<blur3d.api.ScenePropSet>
+			\param		nativePropSet	<cross3d.ScenePropSet>
 			\return		<bool> success
 		"""
 		# check to see if we are setting this to one of our cached native propset indexes
@@ -614,7 +613,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\remarks	implements the AbstractSceneLayer.advancedAltMaterialStateAt method to return a mapping for the advanced alternate material status of a given alternate material
 						slot
 			\param		index	<int>
-			\return		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> overrideMaterial, <bool> ignored), .. }
+			\return		<dict> [ <int> baseMaterialId: (<cross3d.SceneMaterial> overrideMaterial, <bool> ignored), .. }
 		"""
 		data 				= self.metaData()
 		altMaterialIndexes	= list(data.value( 'altMtlIndexes' ))
@@ -624,7 +623,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 
 		output = {}
 
-		from blur3d.api import SceneMaterial
+		from cross3d import SceneMaterial
 
 		# collect all the material overrides for the inputed alternate material index
 		index += 1 # match maxscript 1-based array's
@@ -647,7 +646,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def altMaterialFlags( self ):
 		"""
 			\remarks	implements the AbstractSceneLayer.altMaterialFlags method to return a list of material duplication flags for this layer
-			\return		<list> [ <blur3d.constants.MaterialOverrideOptions>, .. ]
+			\return		<list> [ <cross3d.constants.MaterialOverrideOptions>, .. ]
 		"""
 		if ( self._altMtlFlagsCache == None ):
 			self._altMtlFlagsCache = []
@@ -655,7 +654,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			keepDisplacement 	= list(self.metaData().value( 'keepDisplacement' ))
 			keepOpacity			= list(self.metaData().value( 'keepOpacity' ))
 
-			from blur3d.constants import MaterialOverrideOptions
+			from cross3d.constants import MaterialOverrideOptions
 			for i in range( len( keepDisplacement ) ):
 				flags = 0
 				if ( keepDisplacement[i] ):
@@ -672,10 +671,10 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\remarks	implements the AbstractSceneLayer.altPropSets method to retrive the alternate SceneObjectPropSet's for this layer
 			\sa			altPropSetCount, altPropAt, currentAltPropSet, currentAltPropSetIndex, setAltPropSetAt, setAltPropSets,
 						setCurrentAltPropSetIndex
-			\return		<list> [ <blur3d.api.SceneObjectPropSet>, .. ]
+			\return		<list> [ <cross3d.SceneObjectPropSet>, .. ]
 		"""
 		if ( self._altPropCache == None ):
-			from blur3d.api import SceneObjectPropSet
+			from cross3d import SceneObjectPropSet
 			cache 			= []
 			data 			= self.metaData()
 			altPropValues	= list(data.value('altPropValues'))
@@ -989,7 +988,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 			\remarks	implements AbstractSceneLayer.setAdvancedAltMaterialStateAt method to set a mapping for the advanced alternate material status of a given alternate material
 						slot
 			\param		index	<int>
-			\param		<dict> [ <int> baseMaterialId: (<blur3d.api.SceneMaterial> override, <bool> ignored), .. }
+			\param		<dict> [ <int> baseMaterialId: (<cross3d.SceneMaterial> override, <bool> ignored), .. }
 			\return		<bool> success
 		"""
 		data = self.metaData()
@@ -1040,7 +1039,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 	def setAltMaterialFlags( self, flags ):
 		"""
 			\remarks	implements the AbstractSceneLayer.setAltMaterialFlags method to set the alternate material flags for this instance
-			\param		flags	<list> [ <blur3d.constants.MaterialOverrideOptions>
+			\param		flags	<list> [ <cross3d.constants.MaterialOverrideOptions>
 			\return		<bool> success
 		"""
 
@@ -1048,7 +1047,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		keepOpac = []
 		keepBump = []
 
-		from blur3d.constants import MaterialOverrideOptions
+		from cross3d.constants import MaterialOverrideOptions
 		for flag in flags:
 			keepDisp.append( (flag & MaterialOverrideOptions.KeepDisplacement) != 0 )
 			keepOpac.append( (flag & MaterialOverrideOptions.KeepOpacity) != 0 )
@@ -1087,7 +1086,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		altPropIds		= []
 
 		# use blank prop strings for empty sets
-		from blur3d.api import SceneObjectPropSet
+		from cross3d import SceneObjectPropSet
 		blank 		= SceneObjectPropSet( self._scene, None )
 		blankValues = blank._valueString()
 		blankUsages = blank._activeString()
@@ -1210,5 +1209,4 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 		return mxs.blurUtil.uniqueId( self._nativePointer.layerAsRefTarg )
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'SceneLayer', StudiomaxSceneLayer )
+cross3d.registerSymbol( 'SceneLayer', StudiomaxSceneLayer )

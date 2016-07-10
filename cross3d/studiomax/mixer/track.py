@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.api.studiomax
+#	\namespace	cross3d.studiomax
 #
-#	\remarks	The blur3d.api.studiomax.Track module contains an
+#	\remarks	The cross3d.studiomax.Track module contains an
 #				abstraction of the MAXScript MXTrack class for interacting
 #				with the Motion Mixer.
 #	
@@ -12,8 +12,8 @@
 
 import Py3dsMax
 from Py3dsMax import mxs
-from blur3d.api import Clip, ClipPortion, TrackPortion
-from blur3d.api.abstract.mixer.track import AbstractTrack
+from cross3d import Clip, ClipPortion, TrackPortion
+from cross3d.abstract.mixer.track import AbstractTrack
 
 ################################################################################
 #####------------------------------ Classes -------------------------------#####
@@ -345,5 +345,5 @@ class StudiomaxTrack(AbstractTrack):
 ################################################################################
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('Track', StudiomaxTrack)
+import cross3d
+cross3d.registerSymbol('Track', StudiomaxTrack)

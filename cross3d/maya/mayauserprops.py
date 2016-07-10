@@ -1,7 +1,7 @@
 import maya.OpenMaya as om
 import maya.cmds as cmds
-from blur3d.api.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
-from blur3d import api
+import cross3d
+from cross3d.abstract.abstractuserprops import AbstractUserProps, AbstractFileProps
 
 class MayaUserProps(AbstractUserProps):
 	# MCH 09/30/14 Dev Note:  If it is possible to store metadata without changing selection
@@ -9,17 +9,17 @@ class MayaUserProps(AbstractUserProps):
 	# way. Currently I can't figure out how to do that without wrighting a plugin, so MayaUserProps
 	# stores its data as OpenMaya.MObject attributes.
 	def __contains__(self, key):
-		return api.SceneWrapper._hasAttribute(self._nativePointer, key)
+		return cross3d.SceneWrapper._hasAttribute(self._nativePointer, key)
 	
 	def __delitem__(self, key):
 		if not key in self:
 			raise KeyError('{} is not stored in UserProps'.format(key))
-		cmds.deleteAttr(api.SceneWrapper._mObjName(self._nativePointer), attribute=key)
+		cmds.deleteAttr(cross3d.SceneWrapper._mObjName(self._nativePointer), attribute=key)
 	
 	def __getitem__(self, key):
 		if not key in self:
 			raise KeyError('{} is not stored in UserProps'.format(key))
-		node = api.SceneWrapper._mObjName(self._nativePointer)
+		node = cross3d.SceneWrapper._mObjName(self._nativePointer)
 
 		# TODO MIKE: I had to do a try except here for the character native object that already has native custom attributes.
 		# Maybe there is a better way to handle that.
@@ -33,11 +33,11 @@ class MayaUserProps(AbstractUserProps):
 		# Note: self.escapeKey(key) will be called when we create the attribute, so there is no
 		# reason to call it twice.
 		value = self.escapeValue(value)
-		if not api.SceneWrapper._hasAttribute(self._nativePointer, key):
-			key, shortName = api.SceneWrapper._createAttribute(self._nativePointer, key, 
+		if not cross3d.SceneWrapper._hasAttribute(self._nativePointer, key):
+			key, shortName = cross3d.SceneWrapper._createAttribute(self._nativePointer, key, 
 					dataType=om.MFnData.kString)
 		# Set the current attribute
-		api.SceneWrapper._setAttribute(self._nativePointer, key, value)
+		cross3d.SceneWrapper._setAttribute(self._nativePointer, key, value)
 		# Notify listening slots about the change
 		self.emitChange()
 	
@@ -46,7 +46,7 @@ class MayaUserProps(AbstractUserProps):
 		# TODO MIKE: I had to do a try except here for the the object called "|groundPlane_transform".
 		# It's apparently always in the scene and error with that line.
 		try:
-			keys = cmds.listAttr(api.SceneWrapper._mObjName(self._nativePointer), userDefined=True)
+			keys = cmds.listAttr(cross3d.SceneWrapper._mObjName(self._nativePointer), userDefined=True)
 			if keys:
 				return keys
 		except ValueError:
@@ -102,7 +102,7 @@ class MayaUserProps(AbstractUserProps):
 		""" Replaces any unstorable characters in key with their html codes """
 		if not isinstance(string, (str, unicode)):
 			string = unicode(string)
-		return api.SceneWrapper._normalizeAttributeName(string)
+		return cross3d.SceneWrapper._normalizeAttributeName(string)
 
 class MayaFileProps(MayaUserProps):
 	def _hasStruct(self):
@@ -115,19 +115,19 @@ class MayaFileProps(MayaUserProps):
 		# if the structure is not defined the key is not stored and hasMetadata will error out
 		if not self._hasStruct():
 			return False
-		return key in cmds.hasMetadata(scene=True, streamName=self._blur3dStream, asList=True)
+		return key in cmds.hasMetadata(scene=True, streamName=self._cross3dStream, asList=True)
 	
 	def __delitem__(self, key):
 		if not key in self:
 			raise KeyError('{} is not stored in FileProps'.format(key))
-		cmds.editMetadata(streamName=self._blur3dStream, index=key, scene=True, remove=True)
+		cmds.editMetadata(streamName=self._cross3dStream, index=key, scene=True, remove=True)
 	
 	def __getitem__(self, key):
 		if not key in self:
 			raise KeyError('{} is not stored in FileProps'.format(key))
 		# Returns a list of values. Return the first item in the list
 		ret = cmds.getMetadata(
-				streamName=self._blur3dStream, 
+				streamName=self._cross3dStream, 
 				memberName=self._memberName, 
 				channelName=self._channelName, 
 				index=key, 
@@ -146,17 +146,17 @@ class MayaFileProps(MayaUserProps):
 		if not self._hasStruct():
 			cmds.dataStructure(
 					format='raw', 
-					asString='name={}:string=Blur3dValue'.format(self._structureName))
+					asString='name={}:string=cross3dValue'.format(self._structureName))
 		# Note: Make sure the metadata channel exists
 		cmds.addMetadata(
 				structure=self._structureName, 
-				streamName=self._blur3dStream, 
+				streamName=self._cross3dStream, 
 				channelName=self._channelName, 
 				indexType=self._indexType, 
 				scene=True)
 		# Store the metadata
 		cmds.editMetadata(
-				streamName=self._blur3dStream, 
+				streamName=self._cross3dStream, 
 				memberName=self._memberName, 
 				index=key, 
 				stringValue=self.escapeValue(value), 
@@ -166,10 +166,10 @@ class MayaFileProps(MayaUserProps):
 	
 	def __init__(self, fileName=''):
 		# These values are passed to various maya.cmds calls to retreive/set data
-		self._structureName = 'Blur3dMetaData'
-		self._blur3dStream = 'MetaBlur3d'
-		self._memberName = 'Blur3dValue'
-		self._channelName = 'Blur3dChannel'
+		self._structureName = 'Cross3dMetaData'
+		self._cross3dStream = 'MetaCross3d'
+		self._memberName = 'Cross3dValue'
+		self._channelName = 'Cross3dChannel'
 		self._indexType = 'string'
 		super(MayaFileProps, self).__init__(None)
 	
@@ -180,13 +180,12 @@ class MayaFileProps(MayaUserProps):
 	def keys(self):
 		if not self._hasStruct() or not self._hasMetaDataChannel():
 			return []
-		out = cmds.hasMetadata(scene=True, streamName=self._blur3dStream, asList=True)
+		out = cmds.hasMetadata(scene=True, streamName=self._cross3dStream, asList=True)
 		# Our stream name is always listed in hasMetadata, so remove it
-		if self._blur3dStream in out:
-			out.remove(self._blur3dStream)
+		if self._cross3dStream in out:
+			out.remove(self._cross3dStream)
 		return out
 
 # register the symbol
-from blur3d import api
-api.registerSymbol( 'UserProps', MayaUserProps )
-api.registerSymbol( 'FileProps', MayaFileProps )
+cross3d.registerSymbol('UserProps', MayaUserProps)
+cross3d.registerSymbol('FileProps', MayaFileProps)

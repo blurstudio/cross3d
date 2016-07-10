@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.softimage.softimagesceneobject
+#	\namespace	cross3d.softimage.softimagesceneobject
 #
 #	\remarks	The SoftimageSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to Softimage
@@ -11,11 +11,11 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from blur3d.api import application
-from blur3d.constants import ObjectType
+from cross3d import application
+from cross3d.constants import ObjectType
 from PySoftimage import xsi, xsiFactory, constants as xsiConstants
 from win32com.client.dynamic import Dispatch as dynDispatch
-from blur3d.api.abstract.abstractsceneobject import AbstractSceneObject
+from cross3d.abstract.abstractsceneobject import AbstractSceneObject
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -344,7 +344,7 @@ class SoftimageSceneObject(AbstractSceneObject):
 	def _nativeTypeOfObjectType(objectType):
 		"""
 			\remarks	reimplements the AbstractSceneObject._nativeTypeOfObjectType method to return the nativeType of the ObjectType supplied
-			\param		<blur3d.api.constants.ObjectType> objectType || None
+			\param		<cross3d.constants.ObjectType> objectType || None
 			\return		<bool> success
 		"""
 		if objectType == ObjectType.Geometry:
@@ -381,9 +381,9 @@ class SoftimageSceneObject(AbstractSceneObject):
 		# Collecting all curves for this parameters.
 		curves = []
 		for parameter in parameters:
-		    for source in parameter.Sources:
-		    	if source.Type == 20:
-		     		curves.append(source)
+			for source in parameter.Sources:
+				if source.Type == 20:
+					curves.append(source)
 
 		# Collecting all frames with keys for these curves.
 		frames = set()
@@ -396,6 +396,5 @@ class SoftimageSceneObject(AbstractSceneObject):
 		return sorted(frames)
 
 # register the symbol
-from blur3d import api
-api.registerSymbol('SceneObject', SoftimageSceneObject)
-
+import cross3d
+cross3d.registerSymbol('SceneObject', SoftimageSceneObject)

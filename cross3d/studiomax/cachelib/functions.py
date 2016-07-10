@@ -1,5 +1,5 @@
 ##
-#	\namespace	blur3d.api.studiomax.matlib
+#	\namespace	cross3d.studiomax.matlib
 #
 #	\remarks	This package contains material editing methods for Studiomax
 #	
@@ -17,8 +17,8 @@ def toggleCaches( object, state ):
 		\param		state		<bool>
 		\return		<bool> success
 	"""
-	from blur3d.api.studiomax.cachelib import pointcache
+	from cross3d.studiomax.cachelib import pointcache
 	pointcache.toggleCaches( object, state )
 	
-	from blur3d.api.studiomax.cachelib import transformcache
+	from cross3d.studiomax.cachelib import transformcache
 	transformcache.toggleCaches( object, state )

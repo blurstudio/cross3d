@@ -1,7 +1,7 @@
 ##
-#	\namespace	blur3d.softimage
+#	\namespace	cross3d.softimage
 #
-#	\remarks	The blur3d.softimage package contains the necessary classes to control Softimage.
+#	\remarks	The cross3d.softimage package contains the necessary classes to control Softimage.
 #	
 #	\author		douglas@blur.com
 #	\author		Blur Studio

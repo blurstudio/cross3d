@@ -1,5 +1,5 @@
 ##
-#   \namespace  blur3d.api.classes.framerange
+#   \namespace  cross3d.classes.framerange
 #
 #   \remarks    This module holds the FrameRange class to handle frame ranges.
 #
@@ -37,7 +37,7 @@ class FrameRange(list):
 		"""
 			\remarks	Affects the class representation.
 		"""
-		return 'blur3d.api.FrameRange( %s, %s )' % (self[0], self[1])
+		return 'cross3d.FrameRange( %s, %s )' % (self[0], self[1])
 
 	def __eq__(self, other):
 		if isinstance(other, FrameRange):
