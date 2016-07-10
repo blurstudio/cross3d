@@ -751,7 +751,7 @@ class AbstractSceneObject(SceneWrapper):
 	def fromXml(scene, xml):
 		"""Create a new object from the inputed xml data
 		
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		if (xml):

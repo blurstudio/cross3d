@@ -221,7 +221,7 @@ class AbstractSceneWrapper(object):
 		"""
 		Define a way to record this controller to xml
 		
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		if (not xml):
@@ -325,7 +325,7 @@ class AbstractSceneWrapper(object):
 	def fromXml(cls, scene, xml):
 		"""Create a new wrapper instance from the inputed xml data
 		
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		return 0

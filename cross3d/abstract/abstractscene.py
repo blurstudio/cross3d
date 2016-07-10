@@ -1717,8 +1717,7 @@ class AbstractScene(QObject):
 			\remarks	records the current layer state to xml and returns the string
 			\return		<str> layerState
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
+		doc = cross3d.migrate.XMLDocument()
 		self.recordLayerState(doc)
 		return doc.toxml()
 
@@ -2357,8 +2356,7 @@ class AbstractScene(QObject):
 			\param		layerState	<str>
 			\return		<bool> success
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
+		doc = cross3d.migrate.XMLDocument()
 
 		doc.parse(layerState)
 		

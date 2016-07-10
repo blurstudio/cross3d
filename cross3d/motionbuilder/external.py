@@ -15,7 +15,7 @@
 import os
 import subprocess
 
-from blurdev import osystem
+from cross3d.migrate import osystem
 from cross3d import Exceptions
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal

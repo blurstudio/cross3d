@@ -93,8 +93,7 @@ class Dispatch(QObject):
 	def __new__(cls, *args, **kwargs):
 		if not cls._instance:
 			cls._instance = super(Dispatch, cls).__new__(cls, *args, **kwargs)
-			global cross3d, blurdev
-			import blurdev
+			global cross3d
 			cls._instance._linkedSignals = {}
 			cls._instance._linkedTriggers = []
 			cls._process = None
@@ -109,8 +108,8 @@ class Dispatch(QObject):
 			cross3d.application.disconnect()
 		except:
 			pass
-		import blurdev
-		blurdev.core.aboutToClearPaths.disconnect(self.disconnectSignals)
+		# TODO: Add a system for monitoring if the treegrunt environment is being reset
+		cross3d.migrate.aboutToClearPaths.disconnect(self.disconnectSignals)
 		self._isConnected = False
 
 	def connect(self, signal, function):
@@ -123,8 +122,8 @@ class Dispatch(QObject):
 		# only connect the callbacks if a application actually requests them
 		if not self._isConnected:
 			self._isConnected = cross3d.application.connect()
-			# Listen for changes to the blurdev environment, ie switching between beta, gold, or local
-			blurdev.core.aboutToClearPaths.connect(self.disconnectSignals)
+			# Listen for changes to the treegrunt environment, ie switching between beta, gold, or local
+			cross3d.migrate.aboutToClearPaths.connect(self.disconnectSignals)
 		# connect the signal
 		if (hasattr(self, signal) and type(getattr(self, signal)).__name__ == 'pyqtBoundSignal'):
 			if not signal in self._functionSignals:

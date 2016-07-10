@@ -43,7 +43,7 @@ class RescaleTime(QObject):
 		self.maximizeMax()
 
 	def warningDialog(self, parent, title='FPS', msg='Adjusting frame rate,\n please wait...'):
-		from blurdev.gui import Window
+		from cross3d.migrate import Window
 		from PyQt4.QtGui import QLabel
 		self.uiWarningWND = Window()
 		self.uiWarningWND.setWindowTitle(title)

@@ -5,7 +5,6 @@ import xml.dom.minidom
 
 from framerange import FrameRange
 from valuerange import ValueRange
-from blurdev.XML.xmldocument import XMLDocument
 from cross3d.constants import ControllerType, TangentType, ExtrapolationType
 
 
@@ -263,7 +262,7 @@ class FCurve(object):
 		"""
 
 		# If the document is a path we try to load the XML from that file.
-		document = XMLDocument()
+		document = cross3d.migrate.XMLDocument()
 		document.parse(xml)
 
 		# Getting the curve element.
@@ -311,7 +310,7 @@ class FCurve(object):
 		Returns:
 			str: The XML data for that curve.
 		"""
-		document = XMLDocument()
+		document = cross3d.migrate.XMLDocument()
 		fCurveElement = document.addNode('fCurve')
 		fCurveElement.setAttribute('name', self._name)
 		fCurveElement.setAttribute('type', ControllerType.labelByValue(self._type))

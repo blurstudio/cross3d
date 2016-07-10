@@ -348,9 +348,8 @@ class AbstractFileProps(AbstractUserProps):
 
 	def dso(self):
 		if not self._dso:
-			# TODO: Move dsofile support outside of blurdev
-			from blurdev.media.dsofile import DSOFile as _DSOFile
-			self._dso = _DSOFile()
+			from cross3d.migrate import dsofile
+			self._dso = dsofile.DSOFile()
 		return self._dso
 
 	def lookupProps(self):

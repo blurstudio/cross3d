@@ -10,7 +10,7 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from blurdev.decorators import pendingdeprecation
+from cross3d import pendingdeprecation
 
 class ValueRange(list):
 

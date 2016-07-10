@@ -26,9 +26,6 @@ class StudiomaxSceneObject( AbstractSceneObject ):
 
 	_abstractToNativeObjectType = dict((v,k) for k, v in _nativeToAbstractObjectType.iteritems())
 
-	AppDataAltMtlIndex		= 1108
-	AppDataAltPropIndex 	= 1110
-
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												protected methods
 	#------------------------------------------------------------------------------------------------------------------------

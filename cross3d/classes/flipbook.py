@@ -8,7 +8,6 @@
 #	\date		12/01/15
 #
 
-import blurdev
 import subprocess
 
 class FlipBook(object):

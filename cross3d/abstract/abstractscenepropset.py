@@ -127,7 +127,7 @@ class AbstractScenePropSet(SceneWrapper):
 		Restores a property set from the scene based on the inputed xml
 		
 		:param scene: :class:`cross3d.Scene`
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 		:return: :class:`cross3d.classes.ScenePropSet` or None
 		
 		"""

@@ -400,7 +400,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def recordLayerState(self, xml):
 		"""Records the layer's current state to xml
 
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		# don't bother recording hidden layers
@@ -433,7 +433,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def restoreLayerState(self, xml):
 		"""Restore the layer's state from the inputed xml
 
-		:param xml: :class:`blurdev.XML.XMLDocument`
+		:param xml: :class:`cross3d.migrate.XMLDocument`
 
 		"""
 		if (not xml):
@@ -717,7 +717,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def fromXml(scene, xml):
 		"""Create a new layer from the inputed xml data
 
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		if (xml):

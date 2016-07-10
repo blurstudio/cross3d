@@ -8,18 +8,23 @@
 #	\date		03/15/10
 #
 
-from blurdev.enum import enum
-from blurdev import relativePath
-
-StudiomaxAppData = enum( AltMtlIndex = 1108, AltPropIndex = 1110 )
+import os
+from cross3d.enum import Enum, EnumGroup
 
 import external
+
+# Define some constants that are needed internally for Studiomax
+class _StudiomaxAppData(Enum): pass
+class StudiomaxAppData(EnumGroup):
+	AltMtlIndex = _StudiomaxAppData(1108)
+	AltPropIndex = _StudiomaxAppData(1110)
 
 def init():
 	
 	# Making sure we can import the layer.
 	from Py3dsMax import mxs
-	mxs.filein(relativePath(__file__, 'maxscript/helpers.ms'))
+	path = os.path.join(os.path.split(unicode(__file__))[0], 'maxscript', 'helpers.ms')
+	mxs.filein(path)
 	
 	# Importing the layer's classes.
 	import studiomaxuserprops

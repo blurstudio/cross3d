@@ -1,7 +1,7 @@
 ##
-#	\namespace	blurdev.cores.studiomaxcore.plugin
+#   :namespace  cross3d.softimage.blur3dplugin
 #
-#	\remarks	Defines the plugin methods needed for the softimage session using the blurdev package
+#	\remarks	Defines the plugin methods needed for the softimage session using the cross3d package
 #	
 #	\author		beta@blur.com
 #	\author		Blur Studio
@@ -74,11 +74,11 @@ def XsiApplication_refModelLoadFinished_OnEvent( ctxt ):
 	dispatchSignal('sceneImportFinished')
 	
 def XsiApplication_renderFrameRequested_OnEvent( ctxt ):
-	#blurdev.core.renderFrameRequested.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
+	#dispatch.renderFrameRequested.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
 	pass
 	
 def XsiApplication_renderFrameFinished_OnEvent( ctxt ):
-	#blurdev.core.renderFrameFinished.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
+	#dispatch.renderFrameFinished.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
 	pass
 	
 def XsiApplication_sceneClosed_OnEvent( ctxt ):
@@ -131,13 +131,13 @@ def XsiApplication_selectionChanged_OnEvent( ctxt ):
 	dispatch.selectionChanged.emit()
 	
 #def XsiApplication_sequenceRenderRequested_OnEvent( ctxt ):
-#	blurdev.core.sequenceRenderRequested.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
+#	dispatch.sequenceRenderRequested.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
 #	
 #def XsiApplication_sequenceRenderFinished_OnEvent( ctxt ):
-#	blurdev.core.sequenceRenderFinished.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
+#	dispatch.sequenceRenderFinished.emit( int( ctxt.GetAttribute( 'RenderType' ) ), str( ctxt.GetAttribute( 'FileName' ) ), int( ctxt.GetAttribute( 'Frame' ) ), int( ctxt.GetAttribute( 'Sequence' ) ), int( ctxt.GetAttribute( 'RenderField' ) ) )
 	
 #def XsiApplication_timeChanged_OnEvent( ctxt ):
-#	#blurdev.core.currentFrameChanged.emit( int( ctxt.GetAttribute( 'Frame' ) ) )
+#	#dispatch.currentFrameChanged.emit( int( ctxt.GetAttribute( 'Frame' ) ) )
 #	pass
 	
 def XsiApplication_valueChanged_OnEvent( ctxt ):

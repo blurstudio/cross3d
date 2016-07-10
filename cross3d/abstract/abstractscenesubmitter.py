@@ -356,7 +356,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 
 			scene.emitProgressUpdated(self.SCRIPT_PROGRESS_SECTIONS[1], 100)
 
-			from blurdev import zipper
+			from cross3d.migrate import zipper
 			if (not zipper.packageFiles([scriptFile] + self._additionalFiles, temparchivefile)):
 				scene.emitProgressErrored(self.SCRIPT_PROGRESS_SECTIONS[1], 'Could not package the files together')
 				return False
@@ -795,7 +795,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		"""
 		Define a way to record this controller to xml
 		
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		xml.setAttribute('type', 					self.submitType())
@@ -875,8 +875,7 @@ class AbstractSceneSubmitter(SceneWrapper):
 		Saves out an XML description of this submitter to the inputed filename
 
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
+		doc = cross3d.migrate.XMLDocument()
 		node = doc.addNode('submitter')
 		self.recordXml(node)
 		return doc.save(filename)
@@ -1425,7 +1424,7 @@ s
 		wrapper instance from the inputed xml data
 		
 		:param scene: :class:`cross3d.Scene`
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 		:return: :class:`cross3d.SceneSubmitter` or None
 		
 		"""
@@ -1482,8 +1481,7 @@ s
 		:param filename: filepath
 		:return: :class:`cross3d.SceneSubmitter` or None
 		"""
-		from blurdev.XML import XMLDocument
-		doc = XMLDocument()
+		doc = cross3d.migrate.XMLDocument()
 		if (doc.load(filename)):
 			return cls.fromXml(scene, doc.root())
 		return None

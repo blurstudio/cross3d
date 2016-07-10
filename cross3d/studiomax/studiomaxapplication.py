@@ -18,7 +18,7 @@
 import cross3d
 from cross3d.abstract.abstractapplication import AbstractApplication
 from Py3dsMax import mxs
-from blurdev.enum import EnumGroup, Enum
+from cross3d.enum import EnumGroup, Enum
 from PyQt4.QtCore import QTimer
 _n = mxs.pyhelper.namify
 dispatch = None
@@ -171,7 +171,7 @@ class StudiomaxApplication(AbstractApplication):
 		self._openingScene = False
 		self._disconnectNames = set()
 
-	def _connectStudiomaxSignal(self, connDef, blurdevSignal):
+	def _connectStudiomaxSignal(self, connDef, cross3dSignal):
 		"""
 			\remarks	Responsible for connecting a signal to studiomax
 		"""
@@ -180,34 +180,34 @@ class StudiomaxApplication(AbstractApplication):
 			signal = _STUDIOMAX_VIEWPORT_TEMPLATE % {
 				'cls':'dispatch',
 				'function':connDef.function,
-				'signal':blurdevSignal
+				'signal':cross3dSignal
 			}
 			# Ensure that if the old signal existed it is removed before redefining it.
 			# If function is undefined it will do nothing
-			mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % blurdevSignal))
+			mxs.unregisterRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % cross3dSignal))
 			mxs.execute(signal)
-			mxs.registerRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % blurdevSignal))
+			mxs.registerRedrawViewsCallback(getattr(mxs, 'blurfn_%s' % cross3dSignal))
 		else:
-			# Connec the callback
-			self._addCallback(connDef, blurdevSignal)
+			# Connect the callback
+			self._addCallback(connDef, cross3dSignal)
 			# Connect any associated callbacks using a diffrent ID name allows us to disconnect
 			# this signal without affecting any direct connections to the associated callbacks
 			for reqDef in connDef.associated:
 				self._addCallback(reqDef, reqDef.signal, 'cross3dcallbacks_{}'.format(connDef.callback))
 
-	def _addCallback(self, connDef, blurdevSignal, callbackName='cross3dcallbacks'):
+	def _addCallback(self, connDef, cross3dSignal, callbackName='cross3dcallbacks'):
 		if connDef.arguments:
 			script = _STUDIOMAX_CALLBACK_TEMPLATE % {
 				'cls':connDef.cls,
 				'function':connDef.function,
-				'signal': blurdevSignal,
+				'signal': cross3dSignal,
 				'args': connDef.arguments
 			}
 		else:
 			script = _STUDIOMAX_CALLBACK_TEMPLATE_NO_ARGS % {
 				'cls':connDef.cls,
 				'function':connDef.function,
-				'signal': blurdevSignal
+				'signal': cross3dSignal
 			}
 		mxs.callbacks.addScript( _n(connDef.callback), script, id = _n(callbackName) )
 		self._disconnectNames.add(callbackName)

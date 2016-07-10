@@ -102,7 +102,7 @@ class AbstractSceneMaterial(SceneWrapper):
 		"""Create a new material from the given XML data.
 
 		Args:
-			xml(blurdev.XML.XMLElement): The XML data containing the
+			xml(cross3d.migrate.XMLElement): The XML data containing the
 				material description.
 		
 		Returns:

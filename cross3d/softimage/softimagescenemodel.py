@@ -16,7 +16,7 @@ from cross3d import application
 from win32com.client import Dispatch
 from win32com.client import constants
 from PySoftimage import xsi, xsiFactory
-from blurdev.decorators import pendingdeprecation
+from cross3d import pendingdeprecation
 from cross3d.abstract.abstractscenemodel import AbstractSceneModel
 
 xsiUIToolkit = Dispatch("XSI.UIToolkit")

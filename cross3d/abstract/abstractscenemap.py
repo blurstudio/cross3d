@@ -27,7 +27,7 @@ class AbstractSceneMap(SceneWrapper):
 	def fromXml(scene, xml):
 		"""Create a new map from the inputed xml data
 		
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 
 		"""
 		if (xml):

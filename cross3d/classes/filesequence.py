@@ -15,14 +15,13 @@ import re
 import copy
 import glob
 import shutil
-import blurdev
 import subprocess
 import time
 import warnings
 
 from framerange import FrameRange
 from cross3d.constants import VideoCodec, PaddingStyle
-from blurdev.decorators import pendingdeprecation
+from cross3d import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -57,15 +56,14 @@ class FileSequence(object):
 			step(int) : The sequence step interval.
 
 		"""
-		import blurdev.media
-		sequence = blurdev.media.imageSequenceFromFileName(fileName)
+		sequence = cross3d.migrate.imageSequenceFromFileName(fileName)
 		# If we're dealing with a single file, we'll need to manually format it as a sequence Path/Sequence0-0.abc
 		# instead of accepting the filename without sequence formatting (as imageSequenceRepr returns.)
 		if len(sequence) > 1:
-			return cls(blurdev.media.imageSequenceRepr(sequence, '{pre}{firstNum}-{lastNum}{post}'), step)
+			return cls(cross3d.migrate.imageSequenceRepr(sequence, '{pre}{firstNum}-{lastNum}{post}'), step)
 		else:
 			# If the provided filename is not a sequence, create an invalid file sequence
-			imageSequenceInfo = blurdev.media.imageSequenceInfo(fileName)
+			imageSequenceInfo = cross3d.migrate.imageSequenceInfo(fileName)
 			if imageSequenceInfo:
 				return cls('{pre}{frame}-{frame}{post}'.format(
 					**imageSequenceInfo.groupdict()),

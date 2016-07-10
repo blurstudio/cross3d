@@ -93,7 +93,7 @@ class AbstractSceneFx(SceneWrapper):
 		"""Restore the fx from the inputed xml node
 		
 		:param scene: :class:`cross3d.Scene`
-		:param xml: :class:`blurdev.XML.XMLElement`
+		:param xml: :class:`cross3d.migrate.XMLElement`
 		:return: :class:`cross3d.SceneFx` or None
 		
 		"""

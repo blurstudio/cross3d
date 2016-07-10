@@ -13,7 +13,7 @@
 import os
 import subprocess
 
-from blurdev import osystem
+from cross3d.migrate import osystem
 from cross3d import Exceptions
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal
@@ -41,7 +41,7 @@ class External(AbstractExternal):
 		"""
 
 		# TODO: This was move here, otherwise this top import causes an error in MotionBuilder.
-		from blurdev.media import dsofile
+		from cross3d.migrate import dsofile
 
 		dso = dsofile.DSOFile()
 		try:

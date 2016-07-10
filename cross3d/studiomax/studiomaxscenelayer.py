@@ -375,7 +375,7 @@ class StudiomaxSceneLayer( AbstractSceneLayer ):
 				from cross3d.studiomax import StudiomaxAppData
 				get_userprop = mxs.getUserProp
 				get_appdata	= mxs.getAppData
-				mid = get_appdata(obj, StudiomaxAppData.AltMtlIndex)
+				mid = get_appdata(obj, int(StudiomaxAppData.AltMtlIndex))
 				if mid == None:
 					mid = get_userprop(obj, 'basematerial')
 				omtl = self.scene()._cachedNativeMaterial(MaterialCacheType.BaseMaterial, mid)

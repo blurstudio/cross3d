@@ -311,7 +311,7 @@ class StudiomaxScene(AbstractScene):
 				continue
 
 			# pull the app data
-			mid = get_appdata(obj, StudiomaxAppData.AltMtlIndex)
+			mid = get_appdata(obj, int(StudiomaxAppData.AltMtlIndex))
 
 			# pull the user properties
 			if (mid == None):
@@ -320,7 +320,7 @@ class StudiomaxScene(AbstractScene):
 			# record the base material if it is not already recorded
 			if (mid and mid != 'undefined'):
 				# clear the cache data
-				del_appdata(obj, StudiomaxAppData.AltMtlIndex)
+				del_appdata(obj, int(StudiomaxAppData.AltMtlIndex))
 				set_userprop(obj, 'basematerial', 'undefined')
 
 				# restore the original material
@@ -345,7 +345,7 @@ class StudiomaxScene(AbstractScene):
 		del_appdata = mxs.deleteAppData
 		get_userprop = mxs.getUserProp
 		set_userprop = mxs.setUserProp
-		altpropindex = StudiomaxAppData.AltPropIndex
+		altpropindex = int(StudiomaxAppData.AltPropIndex)
 
 		for obj in nativeObjects:
 			# restore base properties
@@ -1102,7 +1102,7 @@ class StudiomaxScene(AbstractScene):
 		set_prop = mxs.setProperty
 		get_userprop = mxs.getUserProp
 		set_userprop = mxs.setUserProp
-		altpropindex = StudiomaxAppData.AltPropIndex
+		altpropindex = int(StudiomaxAppData.AltPropIndex)
 		empty = not nativePropSet.isActive()
 		values = [(key, nativePropSet.value(key), nativePropSet.isCustomProperty(key)) for key in nativePropSet.activeProperties()]
 
@@ -1202,7 +1202,7 @@ class StudiomaxScene(AbstractScene):
 				continue
 
 			# pull the app data
-			mid = get_appdata(obj, StudiomaxAppData.AltMtlIndex)
+			mid = get_appdata(obj, int(StudiomaxAppData.AltMtlIndex))
 
 			# pull the user properties
 			if (mid == None):
@@ -1214,11 +1214,11 @@ class StudiomaxScene(AbstractScene):
 
 				if (baseMaterial):
 					uid = unique_id(baseMaterial)
-					set_appdata(obj, StudiomaxAppData.AltMtlIndex, str(uid))
+					set_appdata(obj, int(StudiomaxAppData.AltMtlIndex), str(uid))
 					set_userprop(obj, 'basematerial', str(uid))
 					self._cacheNativeMaterial(MaterialCacheType.BaseMaterial, baseMaterial)
 				else:
-					set_appdata(obj, StudiomaxAppData.AltMtlIndex, '0')
+					set_appdata(obj, int(StudiomaxAppData.AltMtlIndex), '0')
 					set_userprop(obj, 'basematerial', '0')
 
 			# otherwise restore the base material

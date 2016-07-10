@@ -17,7 +17,6 @@ from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
 from cross3d.constants import UpVector
-from blurdev.decorators import stopwatch
 from cross3d import pendingdeprecation, constants
 from cross3d import application, dispatch, FrameRange
 from cross3d.abstract.abstractscene import AbstractScene
