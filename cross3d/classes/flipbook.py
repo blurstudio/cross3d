@@ -69,7 +69,7 @@ class FlipBook(object):
 		command.append('--play_forward')
 
 		# Running the command.
-		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+		if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 			print 'PDPLAYER COMMAND:', ' '.join(command)
 		subprocess.Popen(command)
 		return True

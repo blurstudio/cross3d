@@ -365,8 +365,7 @@ class MayaSceneModel(AbstractSceneModel):
 										key=key, value=unicode([userProps[key], value])))
 								continue
 						# printing debug data block #-----------------------------------------------
-						from blurdev.debug import DebugLevel, debugLevel
-						if debugLevel() >= DebugLevel.Mid:
+						if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 							old = ''
 							if key in userProps:
 								old = userProps[key]

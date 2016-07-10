@@ -11,7 +11,6 @@
 import os
 import re
 import glob
-import blurdev
 import getpass
 import win32con
 import win32api
@@ -1518,7 +1517,7 @@ class StudiomaxScene(AbstractScene):
 		self._setupFBXIOPresets(presetPaths, templatePath, **{'user': getpass.getuser()})
 
 		# We always show UI in debug mode.
-		showUI = True if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid else showUI
+		showUI = True if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid else showUI
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or (presetPaths and os.path.getmtime(presetPaths[0]) > self._fbxIOPresetModifiedTime + 100):
@@ -1812,7 +1811,7 @@ class StudiomaxScene(AbstractScene):
 		self._setupFBXIOPresets(presetPaths, templatePath, **kwargs)
 
 		# We always show UI in debug mode.
-		showUI = True if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid else showUI
+		showUI = True if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid else showUI
 
 		# If the preset has been modified since the last export, we make sure to reload ours by showing the UI.
 		if showUI or (presetPaths and os.path.getmtime(presetPaths[0]) > self._fbxIOPresetModifiedTime + 100):

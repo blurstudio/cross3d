@@ -93,7 +93,7 @@ class FileSequence(object):
 			# prevents this.
 			command = ' '.join(command)
 
-			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+			if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 				print 'MOVIE TO SEQUENCE COMMAND: {}'.format(command)
 
 			# Raises subprocess.CalledProcessError if ffmpeg errors out.
@@ -113,7 +113,7 @@ class FileSequence(object):
 					)
 				)
 			
-			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+			if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 				print 'FFMPEG OUTPUT', '-'*50
 				print ffmpegOutput
 
@@ -465,7 +465,7 @@ class FileSequence(object):
 		elif videoCodec == VideoCodec.H264:
 			command = [ffmpeg]
 
-		if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+		if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 			print 'SEQUENCE TO MOVIE COMMAND: {}'.format(' '.join(command))
 
 		success = True
@@ -476,7 +476,7 @@ class FileSequence(object):
 				stderr=subprocess.STDOUT,
 				stdin=subprocess.PIPE
 			)
-			if blurdev.debug.debugLevel() >= blurdev.debug.DebugLevel.Mid:
+			if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 				# Show the output from ffmpeg
 				print output
 		except subprocess.CalledProcessError as e:
@@ -488,7 +488,7 @@ class FileSequence(object):
 				)
 			)
 
-		if blurdev.debug.debugLevel() < blurdev.debug.DebugLevel.Mid:
+		if cross3d.debugLevel < cross3d.constants.DebugLevels.Mid:
 			normalisedSequence.delete()
 
 		return success

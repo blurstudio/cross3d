@@ -235,11 +235,10 @@ class AbstractSceneSubmitter(SceneWrapper):
 		scene.emitProgressUpdated(self.SUBMIT_PROGRESS_SECTIONS[1], 100)
 		self._nativePointer.submit()
 
-		from blurdev import debug
-		if (debug.debugLevel()):
+		if cross3d.debugLevel:
 			self.saveXml('c:/temp/submission_settings.xml')
 
-		if (debug.isDebugLevel(debug.DebugLevel.Mid)):
+		if cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid:
 			self._nativePointer.waitForFinished()
 		else:
 			self._cache()

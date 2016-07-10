@@ -4,7 +4,10 @@ import os
 import sys
 
 
-# Setup Logging for cross3d
+# Setup logging for the cross3d library.
+# To access the logger object call cross3d.logger. If the environment variable 
+# "CROSS3D_LOGGING_LEVEL" is set a StreamHandler will be created that prints all 
+# output to sys.stdout. Otherwise it will create a NullHandler.
 #--------------------------------------------------------------------------------
 import logging as _logging
 logger = _logging.getLogger(__name__)
@@ -20,6 +23,17 @@ if not logger.handlers:
 	else:
 		logger.addHandler(_logging.NullHandler())
 #--------------------------------------------------------------------------------
+
+# Create a cross3d library debug level
+# This allows developers to create additional workflows inside the code that helps
+# with debugging and development. By default it defaults to DebugLevels.Disabled,
+# but you can control the default with the "CROSS3D_DEBUG_LEVEL" environment variable.
+# To change the current debug level:
+# 		cross3d.debugLevel = cross3d.constants.DebugLevels.Mid
+# To check if the current debug level is Mid or higher:
+#		cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid
+from constants import DebugLevels as _DebugLevels
+debugLevel = _DebugLevels[os.getenv('CROSS3D_DEBUG_LEVEL', 'Disabled')]
 
 #--------------------------------------------------------------------------------
 # Decorators and functions used for maintaining cross3d
