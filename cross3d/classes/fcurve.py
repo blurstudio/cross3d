@@ -87,9 +87,9 @@ class FCurve(object):
 		"""Uses matplotlib to generate a plot of the curve, primarily useful for debugging purposes.
 		
 		Args:
-		    startValue (float): Starting value for portion of the curve to sample.
-		    endValue (float): Ending value for portion of the curve to sample.
-		    resolution (float): Frequency with which to sample the curve.
+			startValue (float): Starting value for portion of the curve to sample.
+			endValue (float): Ending value for portion of the curve to sample.
+			resolution (float): Frequency with which to sample the curve.
 		"""
 
 		fullRange = self.range()
@@ -120,7 +120,7 @@ class FCurve(object):
 		for key in self._keys:
 			v = getattr(key, attr) + float(value)
 			v = round(v) if rnd else v
- 			setattr(key, attr, v)
+			setattr(key, attr, v)
 
 	def keys(self):
 		return self._keys
@@ -166,7 +166,7 @@ class FCurve(object):
 	def round(self, attr='time'):
 		for key in self._keys:
 			v = getattr(key, attr)
- 			setattr(key, attr, round(v))
+			setattr(key, attr, round(v))
 
 	def invert(self, conversionRatio=1.0):
 		""" Inverse time and values of each key.
@@ -293,15 +293,15 @@ class FCurve(object):
 					outTangentType = tbc[outTangentType]
 
 				kwargs = {'time': element.attribute('time'),
-               'value': element.attribute('value'),
-               'inTangentAngle': element.findChild('inTangentAngle').value(),
-               'outTangentAngle': element.findChild('outTangentAngle').value(),
-               'inTangentType': TangentType.valueByLabel(inTangentType),
-               'outTangentType': TangentType.valueByLabel(outTangentType),
-              'inTangentLength': element.findChild('inTangentLength').value(),
-               'outTangentLength': element.findChild('outTangentLength').value(),
-               'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
-               'brokenTangents': element.findChild('brokenTangents').value() == 'True'}
+					'value': element.attribute('value'),
+					'inTangentAngle': element.findChild('inTangentAngle').value(),
+					'outTangentAngle': element.findChild('outTangentAngle').value(),
+					'inTangentType': TangentType.valueByLabel(inTangentType),
+					'outTangentType': TangentType.valueByLabel(outTangentType),
+					'inTangentLength': element.findChild('inTangentLength').value(),
+					'outTangentLength': element.findChild('outTangentLength').value(),
+					'normalizedTangents': element.findChild('normalizedTangents').value() == 'True',
+					'brokenTangents': element.findChild('brokenTangents').value() == 'True'}
 
 				self._keys.append(Key(**kwargs))
 
@@ -326,13 +326,13 @@ class FCurve(object):
 			keyElement.setAttribute('time', key.time)
 
 			properties = {'inTangentAngle': key.inTangentAngle,
-                  'outTangentAngle': key.outTangentAngle,
-                  'inTangentType': TangentType.labelByValue(key.inTangentType),
-                  'outTangentType': TangentType.labelByValue(key.outTangentType),
-                 'inTangentLength': key.inTangentLength,
-                  'outTangentLength': key.outTangentLength,
-                  'normalizedTangents': key.normalizedTangents,
-                  'brokenTangents': key.brokenTangents}
+				'outTangentAngle': key.outTangentAngle,
+				'inTangentType': TangentType.labelByValue(key.inTangentType),
+				'outTangentType': TangentType.labelByValue(key.outTangentType),
+				'inTangentLength': key.inTangentLength,
+				'outTangentLength': key.outTangentLength,
+				'normalizedTangents': key.normalizedTangents,
+				'brokenTangents': key.brokenTangents}
 
 			for prop in sorted(properties.keys()):
 				propertyElement = keyElement.addNode(prop)
