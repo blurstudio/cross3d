@@ -20,8 +20,7 @@ import math
 import cross3d
 from Py3dsMax import mxs
 from PyQt4.QtCore import QTimer
-from cross3d import pendingdeprecation, constants
-from cross3d import UserProps, application, FrameRange
+from cross3d import UserProps, application, FrameRange, constants
 from cross3d.abstract.abstractscene import AbstractScene
 from cross3d.constants import UpVector, ExtrapolationType, RendererType
 
@@ -718,16 +717,6 @@ class StudiomaxScene(AbstractScene):
 		get_effect = mxs.getEffect
 		return [get_atmos(i + 1) for i in range(mxs.numAtmospherics)] + [get_effect(i + 1) for i in range(mxs.numEffects)]
 
-	@pendingdeprecation
-	def _nativeCameras(self):
-		"""
-			\remarks	implements the AbstractScene._nativeCameras method to return a list of the camera instances in this scene
-			\return		<list> [ <Py3dsMax.mxs.Camera> nativeCamera, .. ]
-		"""
-		is_kindof = mxs.isKindOf
-		Camera = mxs.Camera
-		return [cam for cam in mxs.cameras if is_kindof(cam, Camera)]
-
 	def _nativeCustomProperty(self, key, default=None):
 		"""
 			\remarks	implements the AbstractScene._nativeCustomProperty method to return a value for the inputed key for a custom scene property
@@ -910,17 +899,6 @@ class StudiomaxScene(AbstractScene):
 
 	def _nativeSelection(self, wildcard=''):
 		return self._nativeObjects(getsFromSelection=True, wildcard=wildcard)
-
-	def _nativeRefresh(self):
-		"""
-			\remarks	implements the AbstractScene._nativeRefresh method to refreshe the contents of the current scene
-			\sa			setUpdatesEnabled, update
-			\return		<bool> success
-		"""
-		if (not mxs.isSceneRedrawDisabled()):
-			mxs.redrawViews()
-			return True
-		return False
 
 	def _nativeRootObject(self):
 		"""
@@ -1596,18 +1574,6 @@ class StudiomaxScene(AbstractScene):
 
 			return model
 		raise Exception('Model file does not exist.')
-
-	@pendingdeprecation
-	def _nativeModels(self):
-		"""
-			\remarks	implements the AbstractScene._nativeModels to return native models in the scene. added by douglas.
-			\return		[ <Py3dsMax.mxs.Object> ] models
-		"""
-		modelsRoot = self.findObject('Models')
-		if modelsRoot:
-			models = modelsRoot._nativeChildren()
-			return models
-		return []
 
 	def _removeNativeModels(self, models):
 		"""

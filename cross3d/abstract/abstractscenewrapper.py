@@ -12,7 +12,6 @@
 import cross3d
 from cross3d import UserProps, abstractmethod
 from cross3d.constants import ControllerType, PointerTypes
-from cross3d import pendingdeprecation
 
 class AbstractSceneWrapper(object):
 	"""
@@ -260,14 +259,6 @@ class AbstractSceneWrapper(object):
 			raise Exception('Argument 2 should be an instance of SceneAnimationController of FCurve.')
 
 		return self._setNativeController(name, controller.nativePointer())
-
-	@pendingdeprecation('Use setDisplayName() instead. Call setDisplayName to rename parent objects/Models.')
-	def setName(self, name):
-		"""
-		Returns the full name of this object, including any model information in xsi.
-
-		"""
-		return self.setDisplayName(name)
 
 	@abstractmethod
 	def setDisplayName(self, name):

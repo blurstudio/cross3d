@@ -16,7 +16,6 @@ from cross3d import application
 from win32com.client import Dispatch
 from win32com.client import constants
 from PySoftimage import xsi, xsiFactory
-from cross3d import pendingdeprecation
 from cross3d.abstract.abstractscenemodel import AbstractSceneModel
 
 xsiUIToolkit = Dispatch("XSI.UIToolkit")
@@ -179,10 +178,6 @@ class SoftimageSceneModel(AbstractSceneModel):
 				tokens = match.groupdict()
 				if tokens["model"] == oldName:
 					item.Value = item.Value.replace(tokens["model"], name)
-	
-	@pendingdeprecation('Use loadAnimation instead with mixer flag true.')
-	def addAnimationClip(self, path, name=None):
-		self.loadAnimationInMixer(path, name)
 
 	def storePose(self, name='', objects=[]):
 		if not objects:

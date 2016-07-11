@@ -152,7 +152,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		
 		# Storing object states.
 		self._scene.storeState()
-		self.storeState()
+		self.storeViewOptions()
 			
 		# Setting slate.
 		if slate:
@@ -235,7 +235,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
 		# Restoring states.
-		self._scene.restoreState()
+		self._scene.restoreViewOptions)
 		self.restoreViewOptions()
 		
 		if camera:

@@ -404,7 +404,7 @@ class AbstractSceneLayer(AbstractContainer):
 
 		"""
 		# don't bother recording hidden layers
-		if (not self.isVisible()):
+		if self.isHidden():
 			return False
 
 		# record the layer state

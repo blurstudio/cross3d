@@ -12,7 +12,6 @@ from PyQt4.QtCore import QObject
 
 import cross3d
 from cross3d import abstractmethod
-from cross3d import pendingdeprecation
 
 
 class AbstractSceneViewport(QObject):
@@ -160,14 +159,6 @@ class AbstractSceneViewport(QObject):
 	@abstractmethod
 	def setViewOptions(self, viewOptions):
 		return False
-	
-	@pendingdeprecation('Use restoreViewOptions instead')
-	def restoreState(self):
-		return self.restoreViewOptions()
-
-	@pendingdeprecation('Use storeViewOptions instead')
-	def storeState( self ):
-		return self.storeViewOptions()
 
 	def nativePointer(self):
 		return self._nativePointer

@@ -2,8 +2,8 @@
 # be removed from cross3d, but will take more time to refactor ourt of cross3d.
 
 
-
 # TODO: Find and remove these blurdev imports
+
 
 # This PyQt4 signal is used to notify modules that they are about to be cleared.
 # This means that their paths will be removed from sys.path and any modules
@@ -35,3 +35,38 @@ from blurdev import zipper
 # rescaletime is basicly a hack that allows us to change the frameRate of a max scene
 # and preserve the key frame locations. It uses win32 to interact with the max interface.
 from blurdev.gui import Window
+
+
+#--------------------------------------------------------------------------------
+# These methods were marked as @pendingdeprecation. They have been removed from
+# cross3d, but code outside of cross3d may still attempt to use these functions.
+# We need to search the code base to make sure those calls are removed.
+
+"""
+SceneCamera.isVrayCam()
+Scene._nativeCameras()
+Scene._nativeModels()
+Scene._nativeRefresh()
+
+Scene.application()
+Scene.cameras()
+Scene.models()
+Scene.exportModel()
+Scene.update()
+ValueRange.multiply()
+FrameRange.offset(...)
+FrameRange.merge(...)
+SceneModel.addAnimationClip(...)
+Timecode.fromSeconds(...)
+Timecode.toFrames()
+FileSequence.sequenceForPath(...)
+FileSequence.paddingCode()
+FileSequence.codeName()
+FileSequence.codePath()
+SceneWrapper.setName(...)
+SceneViewport.restoreState()
+SceneViewport.storeState()
+SceneAnimationController.controllerType()
+Container.isVisible()
+Container.setVisible(...)
+"""

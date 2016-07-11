@@ -11,7 +11,6 @@
 import cross3d
 from cross3d import SceneWrapper, abstractmethod
 from cross3d.constants import ObjectType
-from cross3d import pendingdeprecation
 
 class AbstractContainer(SceneWrapper):
 	"""
@@ -321,16 +320,6 @@ class AbstractContainer(SceneWrapper):
 		"""
 		return False
 
-	@pendingdeprecation('Use isHidden instead.')
-	def isVisible(self):
-		"""
-		Return whether or not this object group is visible
-		
-		:return: bool
-		
-		"""
-		return not self.isHidden()
-
 	def isolate(self):
 		"""
 		Isolates the objects in this group in the scene
@@ -571,18 +560,6 @@ class AbstractContainer(SceneWrapper):
 
 		"""
 		return self._scene._setNativeSelection(self._nativeObjects())
-
-	@pendingdeprecation('Use setHidden instead.')
-	def setVisible(self, state, options=None, affectObjects=False):
-		"""
-		Set whether or not this object group is visible
-		
-		:param state: bool
-		:param options: :data:`cross3d.constants.VisibilityToggleOptions`
-		:return: bool
-
-		"""
-		return self.setHidden(not state, options, affectObjects=affectObjects)
 
 	def unhide(self, options=None, affectObjects=False):
 		"""Unhides the objects on this object group

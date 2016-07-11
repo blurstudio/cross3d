@@ -17,8 +17,7 @@ from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QTimer
 from pywintypes import com_error
 from cross3d.constants import UpVector
-from cross3d import pendingdeprecation, constants
-from cross3d import application, dispatch, FrameRange
+from cross3d import application, dispatch, FrameRange, constants
 from cross3d.abstract.abstractscene import AbstractScene
 from win32com.client.dynamic import Dispatch as dynDispatch
 from PySoftimage import xsi, xsiFactory, constants as xsiConstants
@@ -116,18 +115,6 @@ class SoftimageScene(AbstractScene):
 		names = ["B:" + obj.FullName for obj in nativeObjects]
 		xsi.DeleteObj(",".join(names))
 		return True
-
-	@pendingdeprecation
-	def _nativeModels(self):
-		"""
-			\remarks	implements the AbstractScene._nativeModels method to return the native root of the scene
-			\return		<PySoftimage.xsi.X3DObject> nativeObject
-		"""
-		models = []
-		for obj in self._nativeObjects():
-			if "model" in obj.Type.lower():
-				models.append(obj)
-		return models
 	
 	def _nativeObjects(self, getsFromSelection=False, wildcard='', objectType=0):
 		"""
@@ -207,18 +194,6 @@ class SoftimageScene(AbstractScene):
 			object.Properties('Visibility').Parameters('viewvis').SetValue(not state)
 			object.Properties('Visibility').Parameters('rendvis').SetValue(not state)
 		return True
-	
-	@pendingdeprecation
-	def _nativeCameras(self):
-		"""
-			\remarks	implements the AbstractScene._nativeCameras method to return the native cameras of the scene
-			\return		<PySoftimage.xsi.X3DObject> nativeObject
-		"""
-		cameras = []
-		for obj in self._nativeObjects():
-			if "camera" in obj.Type.lower():
-				cameras.append(obj)
-		return cameras
 		
 	def _nativeRenderPasses(self):
 		"""

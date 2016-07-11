@@ -76,9 +76,6 @@ def debugObjectString(object, msg):
 	elif inspect.isfunction(object):
 		return '[%s.%s function] :: %s' % (object.__module__, object.__name__, msg)
 
-# TODO: REMOVE THIS FUNCTION
-from blurdev.decorators import pendingdeprecation
-
 #--------------------------------------------------------------------------------
 # cross3d init
 #--------------------------------------------------------------------------------

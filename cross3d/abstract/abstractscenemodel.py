@@ -12,7 +12,6 @@
 import cross3d
 from cross3d.constants import ObjectType
 from cross3d import SceneObject, Group, application, abstractmethod
-from cross3d import pendingdeprecation
 
 class AbstractSceneModel(SceneObject):
 	"""
@@ -126,11 +125,6 @@ class AbstractSceneModel(SceneObject):
 	@abstractmethod
 	def resolutions(self):
 		return []
-	
-	@abstractmethod
-	@pendingdeprecation('Use loadAnimationInMixer instead')
-	def addAnimationClip(self, path, name=None):
-		return False
 
 	@abstractmethod
 	def savePose(self, basePath, name='', objects=[]):

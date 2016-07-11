@@ -404,12 +404,6 @@ class SoftimageSceneCamera(AbstractSceneCamera):
 		xsi.SetValue('preferences.ViewCube.show', viewOptions.get('viewcubeshow'), xsi.GetValue('preferences.ViewCube.show'))
 		return True
 
-
-
-	def isVrayCam(self):
-		return False
-
-
 # register the symbol
 import cross3d
 cross3d.registerSymbol('SceneCamera', SoftimageSceneCamera)

@@ -21,7 +21,6 @@ import warnings
 
 from framerange import FrameRange
 from cross3d.constants import VideoCodec, PaddingStyle
-from cross3d import pendingdeprecation
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -40,11 +39,6 @@ class FileSequence(object):
 	# Path/Sequence[0-100].abc
 
 	_regex = re.compile(r'^(?P<baseName>[A-Za-z0-9 _.\-\[\]]+?)((?P<separator>[^\da-zA-Z\[]?)\[?(?P<range>(?P<start>[0-9]+)[\-\:](?P<end>[0-9]+)))\]?(\.(?P<extension>[a-zA-Z0-9]+))$')
-
-	@classmethod
-	@pendingdeprecation('Use fromFileName instead.')
-	def sequenceForPath(cls, fileName, step=1):
-		return cls.fromFileName(fileName, step)
 
 	@classmethod
 	def fromFileName(cls, fileName, step=1):
@@ -293,27 +287,11 @@ class FileSequence(object):
 	def setBasePath(self, basePath):
 		self._path = os.path.join(basePath, os.path.split(self._path)[1])
 
-	@pendingdeprecation('Use padding method instead using the padding style argument.')
-	def paddingCode(self):
-		return '%0' + str(self.padding()) + 'd'
-
-	@pendingdeprecation('Use uniqueName instead with paddingStyle argument.')
-	def codeName(self):
-		''' From "Path/Sequence.0-100.jpg" it will return "Sequence.%0d.jpg".
-		'''
-		return self.baseName() + self.nameToken('separator') + self.paddingCode() + '.' + self.extension()
-
-	@pendingdeprecation('Use uniquePath instead with paddingStyle argument.')
-	def codePath(self):
-		''' From "Path/Sequence.0-100.jpg" it will return "Path/Sequence.%0d.jpg".
-		'''
-		return os.path.join(self.basePath(), self.codeName())
-
 	def framePath(self, frame):
 		start = self.start()
 		end = self.end()
 		if start <= frame <= end:
-			return self.codePath() % frame
+			return self.uniquePath(PaddingStyle.Percent) % frame
 		raise ValueError('The frame provided is outside the range of the FileSequence. {start}, {end}'.format(start=start, end=end))
 
 	def uniquePath(self, paddingStyle=None):
@@ -354,7 +332,7 @@ class FileSequence(object):
 		return frames
 
 	def offsetRange(self, offset):
-		self.setRange(self.frameRange().offset(offset))
+		self.setRange(self.frameRange().offseted(offset))
 		return True
 
 	def move(self, output):
@@ -443,7 +421,7 @@ class FileSequence(object):
 			os.makedirs(outputBasePath)
 
 		if videoCodec == VideoCodec.PhotoJPEG:
-			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.codePath())]
+			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.uniquePath(PaddingStyle.Percent))]
 			if os.path.exists(audioPath):
 				# Updating the way the audio file is being added to the new quicktime. Instead of encoding the audio file with a specifc encoder
 				# we are now copying it exactly like , so there isn't any change to the audio.
@@ -457,7 +435,7 @@ class FileSequence(object):
 
 		# TODO: GIF Implementation is a bit wonky right now.
 		elif videoCodec == VideoCodec.GIF:
-			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.codePath()), '-pix_fmt', 'rgb24', '-y', '"{}"'.format(outputPath.replace('.mov', '.gif'))]
+			command = [ffmpeg, '-r', str(fps), "-i", '"{}"'.format(normalisedSequence.uniquePath(PaddingStyle.Percent)), '-pix_fmt', 'rgb24', '-y', '"{}"'.format(outputPath.replace('.mov', '.gif'))]
 
 		# TODO: Implement H264.
 		elif videoCodec == VideoCodec.H264:
@@ -522,8 +500,8 @@ class FileSequence(object):
 		# find the source frames for our target range.
 		for frame in xrange(start, end + 1):
 			sourceFrame = int(round(retimeCurve.valueAtTime(frame)))
-			sourceName = self.codePath() % min(self.end(), max(self.start(), sourceFrame)) 
-			name = retimedSequence.codePath() % frame
+			sourceName = self.uniquePath(PaddingStyle.Percent) % min(self.end(), max(self.start(), sourceFrame)) 
+			name = retimedSequence.uniquePath(PaddingStyle.Percent) % frame
 			shutil.copy2(sourceName, name)
 
 		# Update start/end of returned Sequence

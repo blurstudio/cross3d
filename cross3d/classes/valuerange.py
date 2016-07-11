@@ -10,8 +10,6 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from cross3d import pendingdeprecation
-
 class ValueRange(list):
 
 	def __init__(self, *args):
@@ -118,10 +116,6 @@ class ValueRange(list):
 			return ValueRange(start, end)
 		else:
 			None
-
-	@pendingdeprecation('Use multiply operator instead.')
-	def multiply(self, scalar):
-		return self.__mult__(scalar)
 
 	def multiplied(self, multiplier):
 		return ValueRange(self[0] * multiplier, self[1] * multiplier)

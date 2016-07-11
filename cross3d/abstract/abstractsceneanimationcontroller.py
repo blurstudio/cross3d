@@ -10,7 +10,6 @@
 
 import cross3d
 from cross3d import SceneWrapper, FCurve, FrameRange, abstractmethod
-from cross3d import pendingdeprecation
 from cross3d.constants import TangentType, ExtrapolationType
 
 
@@ -117,10 +116,6 @@ class AbstractSceneAnimationController(SceneWrapper):
 		
 		"""
 		return 0
-
-	@pendingdeprecation('Use type method instead.')
-	def controllerType(self):
-		return self.type()
 
 	@abstractmethod
 	def _nativeDerivatedController(self):

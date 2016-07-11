@@ -21,7 +21,7 @@ import collections as _collections
 
 import cross3d
 from collections import OrderedDict
-from cross3d import pendingdeprecation, constants
+from cross3d import constants
 from cross3d.constants import ObjectType, RotationOrder
 from cross3d.abstract.abstractscene import AbstractScene
 
@@ -294,13 +294,6 @@ class MayaScene(AbstractScene):
 		"""
 		from cross3d import SceneObject
 		return [SceneObject(self, obj) for obj in self._nativeObjects(getsFromSelection, wildcard, type) if obj.apiType() != om.MFn.kWorld]
-
-	def _nativeRefresh(self):
-		""" Refreshes the contents of the current scene
-			:sa: setUpdatesEnabled, update
-			:return: <bool> success
-		"""
-		return self.viewport().nativePointer().refresh(True, True)
 
 	def _removeNativeModels(self, models):
 		""" Deletes provided native models.

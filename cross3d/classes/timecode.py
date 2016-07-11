@@ -20,7 +20,6 @@
 import re
 import math
 from cross3d.constants import TimeUnit
-from cross3d import pendingdeprecation
 
 class Timecode(object):
 	"""Timcode class for dealing with timecode, including conversions from/to different formats.
@@ -177,15 +176,6 @@ class Timecode(object):
 		if isinstance(other, Timecode):
 			return self.toSeconds() >= other.toSeconds()
 		return False
-
-
-	@classmethod
-	@pendingdeprecation('Use fromValue instead.')
-	def fromSeconds(cls, sec, framerate=29.97):
-		"""DEPRECATED: Construct an instance of Timecode given a quantity of seconds."""
-		instance = cls(framerate=framerate)
-		instance.setFromSeconds(sec)
-		return instance
 
 	@classmethod
 	def fromString(cls, timecodeString, formatString='hh:mm:ss:ff', framerate=29.97):
@@ -359,12 +349,6 @@ class Timecode(object):
 			self._frames = 0.0
 		else:
 			self._frames = f
-
-	@pendingdeprecation('Use toValue instead.')
-	def toFrames(self):
-		"""DEPRECATED: Gets the total number of frames represented by the Timecode instance at its
-			current framerate."""
-		return self.toValue(timeUnit=TimeUnit.Frames)
 
 	def toSeconds(self):
 		"""Convert the Timecode object to a float quantity of seconds.

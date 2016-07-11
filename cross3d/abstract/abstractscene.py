@@ -24,7 +24,6 @@ import collections as _collections
 import cross3d
 from PyQt4.QtCore import QObject, pyqtSignal
 from cross3d import abstractmethod, constants
-from cross3d import pendingdeprecation
 
 class AbstractScene(QObject):
 	# layer signals
@@ -462,16 +461,6 @@ class AbstractScene(QObject):
 		return None
 
 	@abstractmethod
-	@pendingdeprecation('Use application.refresh')
-	def _nativeRefresh(self):
-		"""
-			\remarks	refreshes the contents of the current scene
-			\sa			setUpdatesEnabled, update
-			\return		<bool> success
-		"""
-		return None
-
-	@abstractmethod
 	def _nativeLayers(self, wildcard=''):
 		"""
 			\remarks	returns a list of the native layers in this scene
@@ -821,22 +810,6 @@ class AbstractScene(QObject):
 			\return		<bool>
 		"""
 		return False
-
-	@pendingdeprecation
-	def _nativeModels(self):
-		"""
-			\remarks	return a collection of the models in this scene. added by douglas
-			\return		<list> [ <variant> nativeModel, .. ]
-		"""
-		return []
-
-	@pendingdeprecation
-	def _nativeCameras(self):
-		"""
-			\remarks	return a collection of the cameras in this scene
-			\return		<list> [ <variant> nativeCamera, .. ]
-		"""
-		return []
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												public methods
@@ -2493,17 +2466,6 @@ class AbstractScene(QObject):
 		"""
 		return False
 
-	@pendingdeprecation('Use application.refresh')
-	def update(self):
-		"""
-			\remarks	refreshes the current scene based on the updates enabled flag
-			\sa			_nativeRefresh
-			\return		<bool> success
-		"""
-		if (self.updatesEnabled()):
-			return self._nativeRefresh()
-		return False
-
 	@classmethod
 	def updatesEnabled(cls):
 		"""
@@ -2635,15 +2597,6 @@ class AbstractScene(QObject):
 	def retarget(self, inputRigPath, inputAnimationPath, outputRigPath, outputAnimationPath):
 		return False
 
-	@pendingdeprecation('Use Model.export method instead')
-	def exportModel(self, model, path):
-		"""
-			\remarks	exports a specified model to a specific path
-			\return		<bool> success
-		"""
-		nativeModel = model.nativePointer()
-		return self._exportNativeModel(nativeModel, path)
-
 	def viewport(self, viewportID=0):
 		"""
 			\remarks	returns the specified viewport
@@ -2664,41 +2617,12 @@ class AbstractScene(QObject):
 		else:
 			return True
 
-	@pendingdeprecation('Use cross3d.application instead. This function is just pointing to that.')
-	def application(self):
-		"""
-			\remarks	returns the application class.
-			\return	  	<cross3d.Application> application
-		"""
-		from cross3d import application
-		return application
-
 	def exportObjectsToFBX(self, objects, path, frameRange=None, showUI=True, frameRate=None, upVector=constants.UpVector.Y, **kwargs):
 		"""
 			\remarks	exports a given set of objects as FBX.
 			\return		<bool> success
 		"""
 		return self._exportNativeObjectsToFBX([obj.nativePointer() for obj in objects], path, frameRange, showUI, frameRate, upVector)
-
-	@pendingdeprecation('Use Scene.objects( type=ObjectType.Model )')
-	def models(self):
-		"""
-			\remarks	return a list of all the models objects in this scene
-			\sa			_nativeModels
-			\return		<list> [ <cross3d.SceneModel>, .. ]
-		"""
-		from cross3d import SceneModel
-		return [ SceneModel(self, nativeModel) for nativeModel in self._nativeModels() ]
-
-	@pendingdeprecation('Use Scene.objects( type=ObjectType.Camera )')
-	def cameras(self):
-		"""
-			\remarks	return a list of all the camera objects in this scene
-			\sa			_nativeCameras
-			\return		<list> [ <cross3d.SceneCamera>, .. ]
-		"""
-		from cross3d import SceneCamera
-		return [ SceneCamera(self, nativeCamera) for nativeCamera in self._nativeCameras() ]
 
 	#------------------------------------------------------------------------------------------------------------------------
 	# 												static methods

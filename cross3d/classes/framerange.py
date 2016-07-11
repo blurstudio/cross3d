@@ -10,9 +10,6 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from cross3d import pendingdeprecation
-
-
 class FrameRange(list):
 
 	def __init__(self, args=None):
@@ -115,10 +112,6 @@ class FrameRange(list):
 	def multiply(self, scalar):
 		return FrameRange([round(self[0] * scalar), round(self[1] * scalar)])
 
-	@pendingdeprecation('Use merged instead.')
-	def merge(self, frameRange):
-		return self.merged(frameRange)
-
 	def merged(self, frameRange):
 		"""
 			\remarks	Returns a range that covers both framerange.
@@ -132,10 +125,6 @@ class FrameRange(list):
 		if isinstance(padding, (list, tuple)) and len(padding) >= 2:
 			return FrameRange([self[0] - padding[0], self[1] + padding[1]])
 		return FrameRange([self[0] - padding, self[1] + padding])
-
-	@pendingdeprecation('Use offseted instead.')
-	def offset(self, offset):
-		return self.offseted(offset)
 
 	def offseted(self, offset):
 		"""

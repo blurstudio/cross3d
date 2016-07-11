@@ -18,7 +18,6 @@ from Py3dsMax import mxs, AtTime
 from PyQt4.QtGui import QColor
 from PyQt4.QtCore import QSize
 from cross3d import application
-from cross3d import pendingdeprecation
 from cross3d.constants import CameraType
 from cross3d.abstract.abstractscenecamera import AbstractSceneCamera
 
@@ -649,10 +648,6 @@ class StudiomaxSceneCamera(AbstractSceneCamera):
             self._nativePointer.clip_on = state
         else:
             self._nativePointer.clipManually = state
-
-    @pendingdeprecation('Use cameraType instead.')
-    def isVrayCam(self):
-        return mxs.classOf(self._nativePointer) == mxs.VRayPhysicalCamera
 
     def interest(self):
         if self._nativePointer.Target:
