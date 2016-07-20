@@ -1665,15 +1665,6 @@ class AbstractScene(QObject):
 		)
 		return camera
 
-	def createSubmitter(self, submitType):
-		"""
-			\remarks	creates a new SceneSubmitter instance initialized for the inputed submission type
-			\param		submitType	<cross3d.constants.SubmitType.
-			\return		<cross3d.SceneSubmitter>
-		"""
-		from cross3d import SceneSubmitter
-		return SceneSubmitter(self, submitType)
-
 	def currentCamera(self):
 		"""
 			\remarks	return a SceneCamera instance containing the currently active camera in the scene

@@ -46,7 +46,6 @@ def init():
 	import studiomaxsceneanimationcontroller
 	import studiomaxsceneanimationkey
 	import studiomaxscenecache
-	import studiomaxscenesubmitter
 	import studiomaxsceneviewport
 	import mixer
 	import collection

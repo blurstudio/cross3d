@@ -26,10 +26,6 @@ from blurdev.media import imageSequenceFromFileName, imageSequenceInfo, imageSeq
 # This is a library used to parse XML files.
 from blurdev.XML.xmldocument import XMLDocument, XMLElement
 
-# Used by AbstractSceneSubmitter to create a zip file. AbstractSceneSubmitter should
-# probably just be removed from cross3d.
-from blurdev import zipper
-
 # This is used by Studiomax's rescaletime module. It basicly provides a QMainWindow
 # that is parented to 3ds Max to tell the user to not do anything while its processing.
 # rescaletime is basicly a hack that allows us to change the frameRate of a max scene
