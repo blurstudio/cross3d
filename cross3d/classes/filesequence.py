@@ -19,6 +19,7 @@ import subprocess
 import time
 import warnings
 
+import cross3d
 from framerange import FrameRange
 from cross3d.constants import VideoCodec, PaddingStyle
 
