@@ -3,7 +3,7 @@
 #
 #	\remarks	The StudiomaxSceneFx class provides an interface to editing fx in a Scene environment for 3dsMax
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

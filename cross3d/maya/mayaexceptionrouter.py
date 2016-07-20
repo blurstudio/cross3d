@@ -6,7 +6,7 @@
 #				identifies the exception and raises a cross3d.Exceptions exception instead. If it
 #				can not identify the exception, it raises the existing exception.
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       11/04/14
 #

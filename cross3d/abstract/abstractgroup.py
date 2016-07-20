@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractSceneObjectGroup class provides an interface for working on sets of SceneObject's as a singular group
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

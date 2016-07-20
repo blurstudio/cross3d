@@ -3,7 +3,7 @@
 #
 #	\remarks	Responsible for handling processing of events in a secondary thread
 #	
-#	\author		Mikeh@blur.com
+#	\author		Mikeh
 #	\author		Blur Studio
 #	\date		06/09/11
 #

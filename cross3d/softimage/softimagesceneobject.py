@@ -4,7 +4,7 @@
 #	\remarks	The SoftimageSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to Softimage
 #
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		04/04/11
 #

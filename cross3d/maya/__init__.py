@@ -3,7 +3,7 @@
 #
 #   :remarks    The cross3d.maya package contains the necessary classes to control Maya.
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/10/14
 #

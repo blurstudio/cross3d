@@ -4,7 +4,7 @@
 #	\remarks	The SotimageSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
 #				to Softimage scenes
 #
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		03/15/10
 #

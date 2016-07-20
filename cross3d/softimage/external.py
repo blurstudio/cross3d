@@ -5,7 +5,7 @@
 #				softimage is installed, and allows you to run scripts in softimage.
 #				To Access this class use: cross3d.external('softimage')
 #
-# 	\author		dougl@blur.com
+# 	\author		dougl
 # 	\author		Blur Studio
 # 	\date		01/21/14
 #

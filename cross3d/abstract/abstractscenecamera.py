@@ -4,7 +4,7 @@
 #	\remarks	The AbstractSceneObject class provides the base foundation for the 3d Object framework for the cross3d system
 #				This class will provide a generic overview structure for all manipulations of 3d objects
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

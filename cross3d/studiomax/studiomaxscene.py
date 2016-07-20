@@ -3,7 +3,7 @@
 #
 #	\remarks	The StudiomaxScene class will define all the operations for Studiomax scene interaction.
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

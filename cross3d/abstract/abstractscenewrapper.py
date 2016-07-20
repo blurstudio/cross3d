@@ -4,7 +4,7 @@
 #	\remarks	The AbstractSceneWrapper class defines the base class for all other scene wrapper instances.  This creates a basic wrapper
 #				class for mapping native object instances from a DCC application to the cross3d structure
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

@@ -5,7 +5,7 @@
 #				abstraction of the MAXScript MXTrack class for interacting
 #				with the Motion Mixer.
 #	
-#	\author		willc@blur.com
+#	\author		willc
 #	\author		Blur Studio
 #	\date		09/28/15
 #

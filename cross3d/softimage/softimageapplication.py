@@ -10,7 +10,7 @@
 #				are flagged such that additional operations could be required based on the needs of the method.  All @abstractmethod methods MUST be implemented
 #				in a subclass.
 #	
-#	\author		Mikeh@blur.com
+#	\author		Mikeh
 #	\author		Blur Studio
 #	\date		06/07/11
 #

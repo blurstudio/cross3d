@@ -3,7 +3,7 @@
 #
 #	\remarks	The cross3d.studiomax package contains the necessary classes to control 3D Studio Max.
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

@@ -3,7 +3,7 @@
 #
 #   :remarks    [desc::commented]
 #   
-#   :author     douglas@blur.com
+#   :author     douglas
 #   :author     Blur Studio
 #   :date       09/26/13
 #

@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractSceneSubmitter class defines the way a scene will interact with the render farm when submitting jobs
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/18/11
 #

@@ -3,7 +3,7 @@
 #
 #	\remarks	The MotionBuilderScene class will define all the operations for Motion Builder scene interaction.  
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		06/21/12
 #

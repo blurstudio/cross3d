@@ -11,7 +11,7 @@
 
 	Author:
 		Will Cavanagh
-		willc@blur.com
+		willc
 		Blur Studio
 
 	Date:

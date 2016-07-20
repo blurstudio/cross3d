@@ -4,7 +4,7 @@
 #	\remarks	The AbstractClipPortion class provides a base implementation of
 #				a cross-application interface to a portion of a clip.
 #
-#	\author		willc@blur.com
+#	\author		willc
 #	\author		Blur Studio
 #	\date		10/15/15
 #

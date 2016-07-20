@@ -5,7 +5,7 @@
 #				This class will provide the base implementation and definition of methods that will need to be re-implemented
 #				to hanel per-application usage
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

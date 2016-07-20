@@ -4,7 +4,7 @@
 #	\remarks	The cross3d.scenes package creates an abstract wrapper from a 3d system
 #				to use when dealing with scenes
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

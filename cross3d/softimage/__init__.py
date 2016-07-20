@@ -3,7 +3,7 @@
 #
 #	\remarks	The cross3d.softimage package contains the necessary classes to control Softimage.
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		03/15/10
 #

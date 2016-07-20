@@ -4,7 +4,7 @@
 #	\remarks	The AbstractSceneMaterial class provides an interface for editing
 #				materials in a Scene environment within any DCC application.
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

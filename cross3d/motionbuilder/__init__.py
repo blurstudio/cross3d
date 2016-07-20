@@ -3,7 +3,7 @@
 #
 #	\remarks	The cross3d.motionbuilder package contains the necessary classes to control Motion Builder.
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		06/21/12
 #

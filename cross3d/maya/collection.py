@@ -3,7 +3,7 @@
 #
 #   \remarks    This module implements the collection class allowing to manipulate multiple objects.
 #   
-#   \author     douglas@blur.com
+#   \author     douglas
 #   \author     Blur Studio
 #   \date       04/20/15
 #

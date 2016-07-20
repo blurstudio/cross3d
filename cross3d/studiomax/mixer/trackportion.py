@@ -5,7 +5,7 @@
 #				objectified representation of a region of a Track, to allow for
 #				cleaner interaction with the Max Motion Mixer.
 #	
-#	\author		willc@blur.com
+#	\author		willc
 #	\author		Blur Studio
 #	\date		09/28/15
 #

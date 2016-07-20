@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractSceneRenderPass class will define all the operations for render passes interaction.  
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		04/08/11
 #

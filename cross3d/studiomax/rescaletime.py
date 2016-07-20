@@ -4,7 +4,7 @@
 #   :remarks    This is a Hack to provide script access to the Re-Scale Time option in the maxscipt interface.
 #				It is not available through Maxscript
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       12/04/12
 #

@@ -3,7 +3,7 @@
 #
 #	\remarks	The Maya implementation of SceneMaterial.
 #	
-#	\author		jbee@blur.com
+#	\author		jbee
 #	\author		Blur Studio
 #	\date		01/2015
 #

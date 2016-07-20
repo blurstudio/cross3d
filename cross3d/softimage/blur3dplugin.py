@@ -3,7 +3,7 @@
 #
 #	\remarks	Defines the plugin methods needed for the softimage session using the cross3d package
 #	
-#	\author		beta@blur.com
+#	\author		beta
 #	\author		Blur Studio
 #	\date		04/12/10
 #

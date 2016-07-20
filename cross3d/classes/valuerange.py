@@ -3,7 +3,7 @@
 #
 #   \remarks    This module holds the ValueRange class to handle value ranges.
 #
-#   \author     douglas@blur.com
+#   \author     douglas
 #   \author     Blur Studio
 #   \date       02/17/16
 #

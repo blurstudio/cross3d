@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractScenePropSet defines a class that creates a generic property set of information for any attribute that is being used
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

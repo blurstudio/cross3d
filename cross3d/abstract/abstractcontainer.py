@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractContainer class provides an interface for objects that "group" several scene objects.
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

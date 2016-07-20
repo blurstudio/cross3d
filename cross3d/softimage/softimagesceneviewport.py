@@ -4,7 +4,7 @@
 #	\remarks	The SoftimageSceneViewport class provides the implementation of the AbstractSceneViewport class as it applies
 #				to Softimage scenes
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		04/11/10
 #

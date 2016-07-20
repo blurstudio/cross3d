@@ -14,7 +14,7 @@
 #				The term NativeObject will be used when referring to methods and pointers referencing an application specific instance (Studiomax vs. Softimage
 #				for example) vs. one of the cross3d's wrapper objects (SceneObject,SceneLayer,etc.)
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

@@ -4,7 +4,7 @@
 #	\remarks	The SoftimageSceneModel class provides the implementation of the AbstractSceneModel class as it applies
 #				to Softimage scenes
 #
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		04/04/11
 #

@@ -4,7 +4,7 @@
 #	\remarks	The StudiomaxSceneCamera class provides the implementation of the AbstractSceneCamera class as it applies
 #				to 3d Studio Max scenes
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

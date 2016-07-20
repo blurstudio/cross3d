@@ -4,7 +4,7 @@
 #	\remarks	The AbstractMixer class provides a base implementation of a
 #				cross-application interface to a layer mixer.
 #
-#	\author		willc@blur.com
+#	\author		willc
 #	\author		Blur Studio
 #	\date		10/13/15
 #

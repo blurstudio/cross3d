@@ -3,7 +3,7 @@
 #
 #   \remarks    This module holds the FrameRange class to handle frame ranges.
 #
-#   \author     douglas@blur.com
+#   \author     douglas
 #   \author     Blur Studio
 #   \date       11/30/11
 #

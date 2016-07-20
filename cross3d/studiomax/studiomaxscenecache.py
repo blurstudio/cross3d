@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractSceneCache class provides an interface to editing data caches in a Scene environment for any DCC application
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

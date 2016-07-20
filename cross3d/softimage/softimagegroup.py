@@ -3,7 +3,7 @@
 #
 #	\remarks	The SoftimageSceneObjectGroup class provides an interface for working with Softimage groups.
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio 
 #	\date		09/20/13
 #

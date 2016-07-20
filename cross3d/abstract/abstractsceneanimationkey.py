@@ -3,7 +3,7 @@
 #
 #	\remarks	The AbstractSceneAnimationKey class defines a base class for managing animation curves within a 3d scene
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

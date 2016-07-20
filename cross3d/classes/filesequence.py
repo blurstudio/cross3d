@@ -3,7 +3,7 @@
 #
 #	\remarks	This file defines the FileSequence class that allows to manipulate a file sequence.
 #
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		09/11/11
 #

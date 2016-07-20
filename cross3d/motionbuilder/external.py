@@ -5,7 +5,7 @@
 #				motionbuilder is installed, and allows you to run scripts in motionbuilder.
 #				To Access this class use: cross3d.external('motionbuilder')
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/03/14
 #

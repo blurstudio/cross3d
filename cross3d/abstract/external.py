@@ -3,7 +3,7 @@
 #
 #	\remarks	[desc::commented]
 #
-# 	\author		dougl@blur.com
+# 	\author		dougl
 # 	\author		Blur Studio
 # 	\date		01/21/14
 #

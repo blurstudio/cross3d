@@ -5,7 +5,7 @@
 #				Maya is installed, and allows you to run scripts in Maya.
 #				To Access this class use: cross3d.external('maya')
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/10/14
 #

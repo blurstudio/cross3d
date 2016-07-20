@@ -4,7 +4,7 @@
 #	\remarks	The cross3d.SoftimageUserProps handles storing and retreving custom
 #				properties from objects
 #	
-#	\author		mikeh@blur.com 
+#	\author		mikeh 
 #	\author		Blur Studio
 #	\date		05/26/11
 #

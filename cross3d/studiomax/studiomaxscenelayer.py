@@ -3,7 +3,7 @@
 #
 #	\remarks	The StudiomaxSceneLayer class provides implementation of the AbstractSceneLayer class as it applys to 3d Studio Max scenes
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

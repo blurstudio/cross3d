@@ -4,7 +4,7 @@
 #	\remarks	The StudiomaxSceneObject class provides the implementation of the AbstractSceneObject class as it applies
 #				to 3d Studio Max scenes
 #
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		03/15/10
 #

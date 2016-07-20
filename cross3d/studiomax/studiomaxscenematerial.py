@@ -3,7 +3,7 @@
 #
 #	\remarks	3ds Max implementation of SceneMaterial.
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

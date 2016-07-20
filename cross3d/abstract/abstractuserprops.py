@@ -4,7 +4,7 @@
 # 	\remarks	The cross3d.UserProps package creates an abstract wrapper from a 3d system
 # 				to use storing and retreiving custom user props
 #
-# 	\author		mike@blur.com
+# 	\author		mike
 # 	\author		Blur Studio
 # 	\date		05/26/11
 #

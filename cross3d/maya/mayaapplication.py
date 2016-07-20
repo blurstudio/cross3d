@@ -6,7 +6,7 @@
 #				
 #				The MayaApplication is a QObject instance and any changes to the scene data can be controlled by connecting to the signals defined here.
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/10/14
 #

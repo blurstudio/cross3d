@@ -5,7 +5,7 @@
 #				DEVELOPER NOTE: Native Objects should always be OpenMaya.MObject's not maya.cmds
 #				objects.
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/11/14
 #

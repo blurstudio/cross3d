@@ -4,7 +4,7 @@
 #	\remarks	The StudiomaxSceneModel class provides the implementation of the AbstractSceneModel class as it applies
 #				to 3d Studio Max scenes
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		06/27/11
 #

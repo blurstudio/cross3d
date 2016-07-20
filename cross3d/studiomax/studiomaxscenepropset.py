@@ -4,7 +4,7 @@
 #	\remarks	The StudiomaxScenePropSet class defines the different property sets that are used in the Studiomax system.  Since Studiomax
 #				does not have a native Property Set instance, we will have to control all of the data ourselves
 #	
-#	\author		eric@blur.com
+#	\author		eric
 #	\author		Blur Studio
 #	\date		09/08/10
 #

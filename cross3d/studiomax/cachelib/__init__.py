@@ -3,7 +3,7 @@
 #
 #	\remarks	Manages methods and systems that are relative to caching for Studiomax
 #	
-#	\author		beta@blur.com
+#	\author		beta
 #	\author		Blur Studio
 #	\date		01/10/11
 #

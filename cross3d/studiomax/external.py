@@ -5,7 +5,7 @@
 #				studiomax is installed, and allows you to run scripts in studiomax.
 #				To Access this class use: cross3d.external('studiomax')
 #   
-#   :author     mikeh@blur.com
+#   :author     mikeh
 #   :author     Blur Studio
 #   :date       09/03/14
 #

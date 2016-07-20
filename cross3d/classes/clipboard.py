@@ -3,7 +3,7 @@
 #
 #	\remarks	This file defines the clipboard class that allows to manipulate the clipboard.
 #	
-#	\author		douglas@blur.com
+#	\author		douglas
 #	\author		Blur Studio
 #	\date		09/11/11
 #
