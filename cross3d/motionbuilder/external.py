@@ -15,7 +15,6 @@
 import os
 import subprocess
 
-from cross3d.migrate import osystem
 from cross3d import Exceptions
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal
@@ -39,16 +38,17 @@ class External(AbstractExternal):
 		"""
 		version = cls._yearForVersion.get(unicode(version), version)
 		hive = 'HKEY_LOCAL_MACHINE'
+		from cross3d.migrate import winregistry
 		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = osystem.listRegKeys(hive, cls._hkeyBase, architecture=architecture)
+			versions = winregistry.listRegKeys(hive, cls._hkeyBase, architecture=architecture)
 			for v in sorted(versions, reverse=True):
 				if v not in cls._ignoredVersions:
 					version = v
 					break
 		hkey = r'{hkeyBase}\{version}'.format(hkeyBase=cls._hkeyBase, version=version)
 		try:
-			ret = osystem.registryValue(hive, hkey, 'InstallPath', architecture)[0]
+			ret = winregistry.registryValue(hive, hkey, 'InstallPath', architecture)[0]
 		except WindowsError:
 			raise Exceptions.SoftwareNotInstalled('MotionBuilder', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

@@ -13,7 +13,6 @@
 import os
 import subprocess
 
-from cross3d.migrate import osystem
 from cross3d import Exceptions
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal
@@ -101,9 +100,10 @@ class External(AbstractExternal):
 		hive = 'HKEY_LOCAL_MACHINE'
 		# Ensure we get a valid version number
 		version = cls._versionForYear.get(unicode(version), version)
+		from cross3d.migrate import winregistry
 		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = set(osystem.listRegKeys(hive, cls._hkeyBase, architecture=architecture))
+			versions = set(winregistry.listRegKeys(hive, cls._hkeyBase, architecture=architecture))
 			# Years to ignore isnt very useful, convert them to version numbers ('14.0').
 			# This allows the environment variable to remain the same for all of the software implemntations
 			ignoredVersions = set(['{}.0'.format(cls._versionForYear[year]) for year in cls._ignoredVersions if year in cls._versionForYear])
@@ -118,7 +118,7 @@ class External(AbstractExternal):
 					# Ignore all keys that don't store Installdir info.
 					hkey = cls._getHkey(version, langId)
 					try:
-						ret = osystem.registryValue(hive, hkey, 'Installdir', architecture)[0]
+						ret = winregistry.registryValue(hive, hkey, 'Installdir', architecture)[0]
 						if not ret:
 							continue
 					except WindowsError:
@@ -127,7 +127,7 @@ class External(AbstractExternal):
 		dispVersion = cls._yearForVersion.get(unicode(version), version)
 		hkey = cls._getHkey(version, langId)
 		try:
-			ret = osystem.registryValue(hive, hkey, 'Installdir', architecture)[0]
+			ret = winregistry.registryValue(hive, hkey, 'Installdir', architecture)[0]
 		except WindowsError:
 			raise Exceptions.SoftwareNotInstalled('Studiomax', version=dispVersion, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

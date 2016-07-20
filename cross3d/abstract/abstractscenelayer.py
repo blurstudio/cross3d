@@ -433,7 +433,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def restoreLayerState(self, xml):
 		"""Restore the layer's state from the inputed xml
 
-		:param xml: :class:`cross3d.migrate.XMLDocument`
+		:param xml: :class:`cross3d.migrate.XML.XMLDocument`
 
 		"""
 		if (not xml):

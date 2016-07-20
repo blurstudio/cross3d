@@ -1681,7 +1681,8 @@ class AbstractScene(QObject):
 			\remarks	records the current layer state to xml and returns the string
 			\return		<str> layerState
 		"""
-		doc = cross3d.migrate.XMLDocument()
+		from cross3d.migrate.XML import XMLDocument
+		doc = XMLDocument()
 		self.recordLayerState(doc)
 		return doc.toxml()
 
@@ -2320,7 +2321,8 @@ class AbstractScene(QObject):
 			\param		layerState	<str>
 			\return		<bool> success
 		"""
-		doc = cross3d.migrate.XMLDocument()
+		from cross3d.migrate.XML import XMLDocument
+		doc = XMLDocument()
 
 		doc.parse(layerState)
 		

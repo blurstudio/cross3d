@@ -16,7 +16,6 @@ import os
 import subprocess
 import xml.etree.cElementTree as ET
 
-from cross3d.migrate import osystem
 from cross3d import Exceptions
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal
@@ -93,7 +92,8 @@ class External(AbstractExternal):
 		ret = None
 		if version == None:
 			# Find the latest version
-			versions = osystem.listRegKeyValues(hive, hkey, architecture=architecture)
+			from cross3d.migrate import winregistry
+			versions = winregistry.listRegKeyValues(hive, hkey, architecture=architecture)
 			for version in sorted(versions, key= lambda i: i[0], reverse=True):
 				if version[0] not in cls._ignoredVersions:
 					ret = version[1]
@@ -101,7 +101,7 @@ class External(AbstractExternal):
 		else:
 			version = cls._yearForVersion.get(unicode(version), version)
 			try:
-				ret = osystem.registryValue(hive, hkey, unicode(version), architecture)[0]
+				ret = winregistry.registryValue(hive, hkey, unicode(version), architecture)[0]
 			except WindowsError:
 				raise Exceptions.SoftwareNotInstalled('Softimage', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

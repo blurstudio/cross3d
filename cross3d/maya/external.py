@@ -16,7 +16,6 @@ import re
 import subprocess
 
 from cross3d import Exceptions
-from cross3d.migrate import osystem
 from cross3d.constants import ScriptLanguage
 from cross3d.abstract.external import External as AbstractExternal
 
@@ -95,14 +94,15 @@ class External(AbstractExternal):
 		hive = 'HKEY_LOCAL_MACHINE'
 		valueName = 'MAYA_INSTALL_LOCATION'
 		ret = None
+		from cross3d.migrate import winregistry
 		if version == None:
 			# Get all of the installed versions so we can find the latest version.
-			versions = osystem.listRegKeys(hive, cls._hkeyBase, architecture=architecture)
+			versions = winregistry.listRegKeys(hive, cls._hkeyBase, architecture=architecture)
 			for v in sorted(versions, reverse=True):
 				if v not in cls._ignoredVersions:
 					hkey = buildHKey(v)
 					try:
-						ret = osystem.registryValue(hive, hkey, valueName, architecture)[0]
+						ret = winregistry.registryValue(hive, hkey, valueName, architecture)[0]
 					except WindowsError:
 						continue
 					if ret:
@@ -111,7 +111,7 @@ class External(AbstractExternal):
 		else:
 			hkey = buildHKey(version)
 			try:
-				ret = osystem.registryValue(hive, hkey, valueName, architecture)[0]
+				ret = winregistry.registryValue(hive, hkey, valueName, architecture)[0]
 			except WindowsError:
 				raise Exceptions.SoftwareNotInstalled('Maya', version=version, architecture=architecture, language=language)
 		# If the version is not installed this will return '.', we want to return False.

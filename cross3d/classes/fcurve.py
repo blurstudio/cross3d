@@ -262,7 +262,8 @@ class FCurve(object):
 		"""
 
 		# If the document is a path we try to load the XML from that file.
-		document = cross3d.migrate.XMLDocument()
+		from cross3d.migrate.XML import XMLDocument
+		document = XMLDocument()
 		document.parse(xml)
 
 		# Getting the curve element.
@@ -310,7 +311,8 @@ class FCurve(object):
 		Returns:
 			str: The XML data for that curve.
 		"""
-		document = cross3d.migrate.XMLDocument()
+		from cross3d.migrate.XML import XMLDocument
+		document = XMLDocument()
 		fCurveElement = document.addNode('fCurve')
 		fCurveElement.setAttribute('name', self._name)
 		fCurveElement.setAttribute('type', ControllerType.labelByValue(self._type))
