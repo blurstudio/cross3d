@@ -109,7 +109,8 @@ class Dispatch(QObject):
 		except:
 			pass
 		# TODO: Add a system for monitoring if the treegrunt environment is being reset
-		cross3d.migrate.aboutToClearPaths.disconnect(self.disconnectSignals)
+		if cross3d.migrate.aboutToClearPaths:
+			cross3d.migrate.aboutToClearPaths.disconnect(self.disconnectSignals)
 		self._isConnected = False
 
 	def connect(self, signal, function):
@@ -123,7 +124,15 @@ class Dispatch(QObject):
 		if not self._isConnected:
 			self._isConnected = cross3d.application.connect()
 			# Listen for changes to the treegrunt environment, ie switching between beta, gold, or local
-			cross3d.migrate.aboutToClearPaths.connect(self.disconnectSignals)
+			if cross3d.migrate.aboutToClearPaths:
+				# TODO: Is this still needed? When I developed the Dispatch class this was neccissary.
+				# If we did not listen to this signal the existing connections would not be disconnected
+				# so, if you reloaded the python environment(remove the cross3d file paths from sys.path
+				# and remove the cross3d modules from sys.modules) Qt would still call the signals and
+				# because the modules were removed it would raise exceptions.
+				# TODO: re-work this class so Signals are properly parented, or so we are not using Qt
+				# Signals.
+				cross3d.migrate.aboutToClearPaths.connect(self.disconnectSignals)
 		# connect the signal
 		if (hasattr(self, signal) and type(getattr(self, signal)).__name__ == 'pyqtBoundSignal'):
 			if not signal in self._functionSignals:

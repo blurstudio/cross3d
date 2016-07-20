@@ -8,8 +8,11 @@
 # This PyQt4 signal is used to notify modules that they are about to be cleared.
 # This means that their paths will be removed from sys.path and any modules
 # for those paths will be removed from sys.modules.
-import blurdev
-aboutToClearPaths = blurdev.core.aboutToClearPaths
+try:
+	import blurdev
+	aboutToClearPaths = blurdev.core.aboutToClearPaths
+except ImportError:
+	aboutToClearPaths = None
 
 # blurdev.osystem is a module that provides operating system dependent functions.
 # cross3d mostly uses it to simplify reading from the windows registry.
