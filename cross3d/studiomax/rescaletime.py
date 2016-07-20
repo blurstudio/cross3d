@@ -44,18 +44,22 @@ class RescaleTime(QObject):
 
 	def warningDialog(self, parent, title='FPS', msg='Adjusting frame rate,\n please wait...'):
 		from cross3d.migrate import Window
-		from PyQt4.QtGui import QLabel
-		self.uiWarningWND = Window()
-		self.uiWarningWND.setWindowTitle(title)
-		x,y,w,h = GetWindowRect(parent)
-		self.uiWarningWND.setGeometry(x+15, y+40, 303, 80)
-		lbl = QLabel(self.uiWarningWND)
-		fnt = lbl.font()
-		fnt.setPointSize(20)
-		lbl.setGeometry(0,0,300,86)
-		lbl.setFont(fnt)
-		lbl.setText(msg)
-		self.uiWarningWND.show()
+		# Tell the user what is going on and that they should wait for it to complete.
+		# Because of the this system works it can not block keyboard and mouse input to Max
+		# TODO: Re-build this in a generic non-blurdev specific way.
+		if Window:
+			from PyQt4.QtGui import QLabel
+			self.uiWarningWND = Window()
+			self.uiWarningWND.setWindowTitle(title)
+			x,y,w,h = GetWindowRect(parent)
+			self.uiWarningWND.setGeometry(x+15, y+40, 303, 80)
+			lbl = QLabel(self.uiWarningWND)
+			fnt = lbl.font()
+			fnt.setPointSize(20)
+			lbl.setGeometry(0,0,300,86)
+			lbl.setFont(fnt)
+			lbl.setText(msg)
+			self.uiWarningWND.show()
 
 	@staticmethod
 	def EnumWindowsProc(hwnd,list):

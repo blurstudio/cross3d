@@ -33,7 +33,10 @@ from blurdev.XML.xmldocument import XMLDocument, XMLElement
 # that is parented to 3ds Max to tell the user to not do anything while its processing.
 # rescaletime is basicly a hack that allows us to change the frameRate of a max scene
 # and preserve the key frame locations. It uses win32 to interact with the max interface.
-from blurdev.gui import Window
+try:
+	from blurdev.gui import Window
+except ImportError:
+	Window = None
 
 
 #--------------------------------------------------------------------------------
