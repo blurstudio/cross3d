@@ -22,7 +22,7 @@ from cross3d.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 	_hkeyBase = r'Software\Autodesk\Maya'
 	# In case the software is installed but not used don't find it when not passing in a version
-	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_MAYA', '2016').split(','))
+	_ignoredVersions = set(os.environ.get('CROSS3D_STUDIO_IGNORED_MAYA', '2015').split(','))
 	# map years to version numbers. Maya doesnt use these anymore, add older versions if support is needed
 	_yearForVersion = {}
 

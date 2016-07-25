@@ -24,7 +24,7 @@ from cross3d.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 	_hkeyBase = r'Software\Autodesk\MotionBuilder'
 	# In case the software is installed but not used don't find it when not passing in a version
-	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_MOTIONBUILDER', '2013,2015').split(','))
+	_ignoredVersions = set(os.environ.get('CROSS3D_STUDIO_IGNORED_MOTIONBUILDER', '2013,2015').split(','))
 	# map years to version numbers 
 	# NOTE: I am guessing that these are correct based on 2014 being version 14000.0
 	_yearForVersion = {'12': '2012', '13': '2013', '14': '2014', '15': '2015', '16': '2016'}

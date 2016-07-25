@@ -22,7 +22,7 @@ from cross3d.abstract.external import External as AbstractExternal
 class External(AbstractExternal):
 	
 	_hkeyBase = r'Software\Autodesk\3dsMax'
-	_ignoredVersions = set(os.environ.get('BDEV_STUDIO_IGNORED_STUDIOMAX', '2011,2013,2015,2016').split(','))
+	_ignoredVersions = set(os.environ.get('CROSS3D_STUDIO_IGNORED_STUDIOMAX', '2011,2013,2015,2016').split(','))
 	# map years to version numbers
 	_versionForYear = {'2008': '10', '2009': '11', '2010': '12', '2011': '13', '2012': '14', 
 						'2013': '15', '2014': '16', '2015': '17', '2016': '18'}
