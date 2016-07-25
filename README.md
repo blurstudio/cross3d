@@ -40,8 +40,8 @@ cross3d.registerSymbol('Scene', StudiomaxScene)
 This code is used to store the StudiomaxScene class(`cross3d.studiomax.studiomaxscene.StudiomaxScene`) in the official cross3d name of `cross3d.Scene`.
 
 # Additional packages
-* Currently 'PyQt4' is required for cross3d.
-* 'cross3d.FCurve' requires 'numpy'
+* Currently `PyQt4` is required for cross3d.
+* `cross3d.FCurve` requires `numpy`
 
 Depending on the DCC some additional modules are needed. These are documented in the DCC's readme.md file.
 # Examples
