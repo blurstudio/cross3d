@@ -18,7 +18,7 @@ from cross3d import dispatch
 dispatchRename = cross3d.dispatch.dispatchRename
 dispatchObject = cross3d.dispatch.dispatchObject
 dispatchSignal = cross3d.dispatch.dispatch
-import inspect
+#import inspect
 #-------------------------------------------------------------------------------------------------------------
 
 _signalsEnabled = True
