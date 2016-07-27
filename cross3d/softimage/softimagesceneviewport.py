@@ -235,7 +235,7 @@ class SoftimageSceneViewport( AbstractSceneViewport ):
 		xsi.CaptureViewport( letterToNumber[ self.name ], False )
 		
 		# Restoring states.
-		self._scene.restoreViewOptions)
+		self._scene.restoreViewOptions()
 		self.restoreViewOptions()
 		
 		if camera:

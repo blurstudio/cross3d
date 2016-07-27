@@ -4,8 +4,6 @@
 	this file defines a struct of methods designed to help out the python integration
 	for methods that are not easily transferrable to python
 */
-_blurLibrary.load "blurPointCache"
-
 global cross3dhelper
 (
 	struct Cross3dHelperStruct (
@@ -173,6 +171,7 @@ global cross3dhelper
 
 		-- Visibility toggle for PC objects.
 		function togglePointCaches mods state = (
+			_blurLibrary.load "blurPointCache"
 			pcMods = #()
 			for i = 1 to mods.count do
 				if classOf mods[i] == Point_Cache do

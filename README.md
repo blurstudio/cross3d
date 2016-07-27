@@ -44,6 +44,7 @@ This code is used to store the StudiomaxScene class(`cross3d.studiomax.studiomax
 * `cross3d.FCurve` requires `numpy`
 
 Depending on the DCC some additional modules are needed. These are documented in the DCC's readme.md file.
+cross3d.FileSequence has a few methods that use ffmpeg. Currently you can pass the path to ffmpeg as a argument to these functions. By default it assumes that ffmpeg is in the path variable.
 # Examples
 Get objects in a scene:
 ```python
@@ -107,6 +108,37 @@ Start 3ds Max(with interface) and run script(valid filename or text of script)
 ```python
 cross3d.external('StudioMax').runScript(script, 2016, headless=False) 
 ```
+
+## Environment Variables
+cross3d uses environment variables to configure specific settings for module initialization.
+
+### CROSS3D_LOGGING_LEVEL
+Setup logging for the cross3d library. To access the logger object call cross3d.logger. If the environment variable 
+"CROSS3D_LOGGING_LEVEL" is set a StreamHandler will be created that prints all output to sys.stdout. Otherwise it will create a NullHandler.
+
+### CROSS3D_DEBUG_LEVEL
+This allows developers to create additional workflows inside the code that helps with debugging and development. By default it defaults to DebugLevels.Disabled, but you can control the default with the "CROSS3D_DEBUG_LEVEL" environment variable.
+To change the current debug level: `cross3d.debugLevel = cross3d.constants.DebugLevels.Mid`
+To check if the current debug level is Mid or higher: `cross3d.debugLevel >= cross3d.constants.DebugLevels.Mid`
+
+### CROSS3D_ABSTRACTMETHOD_MODE
+Similar to CROSS3D_DEBUG_LEVEL, this variable allows a cross3d developer to have a log message sent any time a abstractmethod function is called and is not overriden by the DCC specific code. This is useful for auditing what functions still need implemented. 
+
+Here are the valid values:
+* "": A empty string disables any logs or exceptions from being raised. The Default.
+* "raise": If a abstractmethod is called without a subclass, raise a exception.
+* "warn": If a abstractmethod is called log a message that it was called.
+
+### CROSS3D_DEBUG_MODULE
+By default cross3d suppresses exceptions when it imports the software specific module. It uses the first module that successfully imports. When programming a software specific module this makes it hard to debug. If you set the environment variable CROSS3D_DEBUG_MODULE to the name of the module you are working on it will only try to load that module(and abstract) and it will raise all exceptions.
+
+### CROSS3D_STUDIO_IGNORED_[DCCNAME]
+Currently: CROSS3D_STUDIO_IGNORED_MAYA, CROSS3D_STUDIO_IGNORED_MOTIONBUILDER, CROSS3D_STUDIO_IGNORED_SOFTIMAGE, CROSS3D_STUDIO_IGNORED_STUDIOMAX
+
+These variables are used to ignore speciffic versions of DCC when using cross3d.external. Each of these variables should contain a comma seperated list of versions that if installed should be ignored when automatically choosing the version of the DCC. It is ignored if the version is explicitly requested.
+
+# History
+cross3d was originally called blurapi. Eric Hulser and a few others wrote the initial framework in late 2008. It was later renamed blur3d with a major refactor. blur3d has been used in many tools at blur. It has been touched by most of the TD's and programmers at blur at some point. When releasing it as a module on github we renamed it to cross3d and removed(planning to remove) a lot of the blur specific logic to reduce the number of requirements.
 
 ## TODO:
 blur3d has been used in blur for several years. It uses several blur specific api's and is dependent on several of blur api's that are not currently easily available via open source, and in most cases are completely unnecessary outside of blur. We are migrating blur3d to cross3d we are taking the opportunity to remove the extra dependencies. Here are a list of upcoming changes planned to make cross3d easier to integrate in other pipelines.
