@@ -13,8 +13,8 @@
 
 import time
 
-from PyQt4.QtGui import QColor
-from PyQt4.QtCore import QTimer
+from Qt.QtGui import QColor
+from Qt.QtCore import QTimer
 from pywintypes import com_error
 from cross3d.constants import UpVector
 from cross3d import application, dispatch, FrameRange, constants
@@ -613,7 +613,7 @@ class SoftimageScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if not filename:
-			from PyQt4.QtGui import QFileDialog
+			from Qt.QtGui import QFileDialog
 			filename = QFileDialog.getSaveFileName(None, 'Save Scene File', '', 'Scene files (*.scn);;All files (*.*)')
 		
 		if filename:
@@ -676,7 +676,7 @@ class SoftimageScene(AbstractScene):
 			\remarks	return the render output size for the scene
 			\return		<QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		return QSize(xsi.GetValue("Passes.RenderOptions.ImageWidth"), xsi.GetValue("Passes.RenderOptions.ImageHeight"))
 	
 	def restoreState(self):
@@ -724,7 +724,7 @@ class SoftimageScene(AbstractScene):
 			\param		size	<QSize>
 			\return		<bool> success
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		if isinstance(size, QSize):
 			width = size.width()
 			height = size.height()

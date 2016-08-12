@@ -10,7 +10,7 @@
 
 import blur3d
 dispatch = cross3d.dispatch
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 
 class SignalInspector(QObject):
 	def __init__(self):

@@ -13,7 +13,7 @@ from win32gui import *
 from win32api import *
 import win32con
 from Py3dsMax import GetWindowHandle, mxs
-from PyQt4.QtCore import QRect, QPoint, QTimer, pyqtSignal, QObject
+from Qt.QtCore import QRect, QPoint, QTimer, Signal, QObject
 
 class RescaleTime(QObject):
 	virtualKeyMap = {'del':0x2e, '0':0x30, '1':0x31, '2':0x32, '3':0x33, '4':0x34, '5':0x35, '6':0x36, '7':0x37, '8':0x38, '9':0x39}
@@ -21,7 +21,7 @@ class RescaleTime(QObject):
 	# Listen for this signal to be emitted when calling scaleTime. scaleTime is using QTimers to wait for window animation
 	# so the code execution does not block code exicution moving foward. The int value provided is the framerate requested,
 	# it can be used to check if the change was successfull.
-	scaleTimeFinished = pyqtSignal(int)
+	scaleTimeFinished = Signal(int)
 
 	def __init__(self):
 		super(RescaleTime, self).__init__()
@@ -48,7 +48,7 @@ class RescaleTime(QObject):
 		# Because of the this system works it can not block keyboard and mouse input to Max
 		# TODO: Re-build this in a generic non-blurdev specific way.
 		if Window:
-			from PyQt4.QtGui import QLabel
+			from Qt.QtGui import QLabel
 			self.uiWarningWND = Window()
 			self.uiWarningWND.setWindowTitle(title)
 			x,y,w,h = GetWindowRect(parent)

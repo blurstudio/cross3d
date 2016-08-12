@@ -710,7 +710,7 @@ class AbstractSceneLayer(AbstractContainer):
 		if (clr):
 			return self._scene._fromNativeValue(clr)
 
-		from PyQt4.QtGui import QColor
+		from Qt.QtGui import QColor
 		return QColor()
 
 	@staticmethod

@@ -10,7 +10,7 @@
 
 #------------------------------------------------------------------------------------------------------------------------
 
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 from cross3d import abstractmethod
 from cross3d.constants import ScriptLanguage
 

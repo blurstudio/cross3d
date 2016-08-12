@@ -13,7 +13,7 @@ import re
 import json
 import cross3d
 from collections import OrderedDict
-from PyQt4.QtCore import QTimer as _QTimer
+from Qt.QtCore import QTimer as _QTimer
 
 dispatchObject = cross3d.dispatch.dispatchObject
 

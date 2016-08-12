@@ -22,25 +22,25 @@
 import collections as _collections
 
 import cross3d
-from PyQt4.QtCore import QObject, pyqtSignal
+from Qt.QtCore import QObject, Signal
 from cross3d import abstractmethod, constants
 
 class AbstractScene(QObject):
 	# layer signals
-	layerStateChanged			 = pyqtSignal()
-	layerCreated				 = pyqtSignal(object)
-	layerRenamed				 = pyqtSignal(object)
-	layerRemoved 				 = pyqtSignal(object)
-	layerGroupCreated			 = pyqtSignal(str)
-	layerGroupRemoved			 = pyqtSignal(str)
+	layerStateChanged			 = Signal()
+	layerCreated				 = Signal(object)
+	layerRenamed				 = Signal(object)
+	layerRemoved 				 = Signal(object)
+	layerGroupCreated			 = Signal(str)
+	layerGroupRemoved			 = Signal(str)
 
 	# generic signals
-	progressUpdated				 = pyqtSignal(str, int, str)		# section, % complete (0-100), message
-	progressErrored				 = pyqtSignal(str, str)			# section, error message
+	progressUpdated				 = Signal(str, int, str)		# section, % complete (0-100), message
+	progressErrored				 = Signal(str, str)			# section, error message
 
 	# submit signals
-	submitSuccess				 = pyqtSignal()
-	submitError					 = pyqtSignal(str)
+	submitSuccess				 = Signal()
+	submitError					 = Signal(str)
 
 	# create the scene instance
 	_instance = None
@@ -785,7 +785,7 @@ class AbstractScene(QObject):
 			\param		pyValue	<variant>
 			\return		<variant>
 		"""
-		from PyQt4.QtCore import QString
+		from Qt.QtCore import QString
 
 		# we should not pass back QString value's to an application, as they will not expect it.  Standard python strings/unicodes will be auto-converted
 		if (type(pyValue) == QString):
@@ -1186,7 +1186,7 @@ class AbstractScene(QObject):
 			\remarks	return the render output size for the scene
 			\return		<QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		return QSize()
 
 	@abstractmethod
@@ -1736,8 +1736,8 @@ class AbstractScene(QObject):
 			\param		error				<str>	resulting error feedback
 			\param		progressSection		<str>	the name of the progress section to be updated using emitProgressUpdated
 		"""
-		from PyQt4.QtCore import Qt
-		from PyQt4.QtGui import QApplication
+		from Qt.QtCore import Qt
+		from Qt.QtGui import QApplication
 
 		QApplication.instance().restoreOverrideCursor()
 
@@ -1750,7 +1750,7 @@ class AbstractScene(QObject):
 			\remarks	emits the submit success signal if the signals are not blocked and cleans the submit process
 			\param		progressSection		<str>	the name of the progress section to be updated using emitProgressUpdated
 		"""
-		from PyQt4.QtGui import QApplication
+		from Qt.QtGui import QApplication
 
 		QApplication.instance().restoreOverrideCursor()
 
@@ -2134,7 +2134,7 @@ class AbstractScene(QObject):
 		self._mapCache = mapcache
 
 		# create the progress dialog
-		from PyQt4.QtGui import QProgressDialog
+		from Qt.QtGui import QProgressDialog
 		progress = QProgressDialog('Loading State', '', 0, len(layers) + 1)
 		progress.setWindowTitle('Loading Layer State')
 		progress.show()

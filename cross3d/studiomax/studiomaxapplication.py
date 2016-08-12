@@ -19,7 +19,7 @@ import cross3d
 from cross3d.abstract.abstractapplication import AbstractApplication
 from Py3dsMax import mxs
 from cross3d.enum import EnumGroup, Enum
-from PyQt4.QtCore import QTimer
+from Qt.QtCore import QTimer
 _n = mxs.pyhelper.namify
 dispatch = None
 

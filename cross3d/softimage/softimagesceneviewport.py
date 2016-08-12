@@ -14,7 +14,7 @@ import re
 import time
 
 from PySoftimage import xsi
-from PyQt4.QtCore import QSize
+from Qt.QtCore import QSize
 from cross3d import Exceptions
 from cross3d.classes import FrameRange
 from cross3d.abstract.abstractsceneviewport import AbstractSceneViewport

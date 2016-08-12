@@ -15,8 +15,8 @@ import cross3d
 import math
 
 from Py3dsMax import mxs, AtTime
-from PyQt4.QtGui import QColor
-from PyQt4.QtCore import QSize
+from Qt.QtGui import QColor
+from Qt.QtCore import QSize
 from cross3d import application
 from cross3d.constants import CameraType
 from cross3d.abstract.abstractscenecamera import AbstractSceneCamera

@@ -1,5 +1,5 @@
 import cross3d
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 
 
 class AbstractUndoContext(QObject):
