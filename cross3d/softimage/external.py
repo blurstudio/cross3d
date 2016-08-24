@@ -87,12 +87,12 @@ class External(AbstractExternal):
 		:param architecture: The bit type to query the registry for(32, 64). Default is 64
 		:param language: Optional language that may be required for specific softwares.
 		"""
+		from cross3d.migrate import winregistry
 		hive = 'HKEY_LOCAL_MACHINE'
 		hkey = r'Software\Autodesk\Softimage\InstallPaths'
 		ret = None
 		if version == None:
 			# Find the latest version
-			from cross3d.migrate import winregistry
 			versions = winregistry.listRegKeyValues(hive, hkey, architecture=architecture)
 			for version in sorted(versions, key= lambda i: i[0], reverse=True):
 				if version[0] not in cls._ignoredVersions:
