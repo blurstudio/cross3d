@@ -8,7 +8,7 @@
 #	\date		04/11/10
 #
 
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 
 import cross3d
 from cross3d import abstractmethod

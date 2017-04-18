@@ -2,80 +2,80 @@
 Handles conversion of signals between the host software and cross3d
 
 TODO: Only enable or disable signals that have a connection to them
-TODO: Only emit a single ScenePreInvalidated/SceneInvalidated signal on 
+TODO: Only emit a single ScenePreInvalidated/SceneInvalidated signal on
 file operations, using a reference counter
 
 """
 
-from PyQt4.QtCore import pyqtSignal, QObject
+from Qt.QtCore import Signal, QObject
 
 class Dispatch(QObject):
 	# scene signals
-	sceneClosed				 = pyqtSignal()
-	sceneExportRequested	 = pyqtSignal()
-	sceneExportFinished		 = pyqtSignal()
-	sceneImportRequested	 = pyqtSignal()
-	sceneImportFinished		 = pyqtSignal()
-	scenePreInvalidated		 = pyqtSignal()			# linked signal before a import, open, or merge operation
-	sceneInvalidated		 = pyqtSignal()
-	sceneMergeRequested		 = pyqtSignal()
-	sceneReferenceRequested	 = pyqtSignal()
-	sceneMergeFinished		 = pyqtSignal()
-	sceneReferenceFinished   = pyqtSignal()
-	sceneNewRequested		 = pyqtSignal()
-	sceneNewFinished		 = pyqtSignal()
-	sceneOpenRequested		 = pyqtSignal(str)		# <str> The Filename
-	sceneOpenFinished		 = pyqtSignal(str)		# <str> The Filename
-	scenePreReset			 = pyqtSignal()
-	sceneReset				 = pyqtSignal()
-	sceneSaveRequested		 = pyqtSignal(str)		# <str> The Filename
-	sceneSaveFinished		 = pyqtSignal(str)		# <str> The Filename
+	sceneClosed				 = Signal()
+	sceneExportRequested	 = Signal()
+	sceneExportFinished		 = Signal()
+	sceneImportRequested	 = Signal()
+	sceneImportFinished		 = Signal()
+	scenePreInvalidated		 = Signal()			# linked signal before a import, open, or merge operation
+	sceneInvalidated		 = Signal()
+	sceneMergeRequested		 = Signal()
+	sceneReferenceRequested	 = Signal()
+	sceneMergeFinished		 = Signal()
+	sceneReferenceFinished   = Signal()
+	sceneNewRequested		 = Signal()
+	sceneNewFinished		 = Signal()
+	sceneOpenRequested		 = Signal(str)		# <str> The Filename
+	sceneOpenFinished		 = Signal(str)		# <str> The Filename
+	scenePreReset			 = Signal()
+	sceneReset				 = Signal()
+	sceneSaveRequested		 = Signal(str)		# <str> The Filename
+	sceneSaveFinished		 = Signal(str)		# <str> The Filename
 
 	# layer signals
-	layerCreated			 = pyqtSignal()
-	layerDeleted			 = pyqtSignal()
-	layersModified			 = pyqtSignal()
-	layerStateChanged		 = pyqtSignal()
+	layerCreated			 = Signal()
+	layerDeleted			 = Signal()
+	layersModified			 = Signal()
+	layerStateChanged		 = Signal()
 
 	# object signals
-	selectionChanged		 = pyqtSignal()
-	objectFreeze			 = pyqtSignal(object)
-	objectUnfreeze			 = pyqtSignal(object)
-	objectHide				 = pyqtSignal(object)
-	objectUnHide			 = pyqtSignal(object)
-	objectRenamed			 = pyqtSignal(str, str, object)		# oldName, newName, Object
-	valueChanged			 = pyqtSignal(object, str, object)
+	selectionChanged		 = Signal()
+	objectFreeze			 = Signal(object)
+	objectUnfreeze			 = Signal(object)
+	objectHide				 = Signal(object)
+	objectUnHide			 = Signal(object)
+	objectRenamed			 = Signal(str, str, object)		# oldName, newName, Object
+	valueChanged			 = Signal(object, str, object)
 	# object signals that may need disabled during imports, merges, file opening
-	newObject				 = pyqtSignal()		# linked signal for object creation
-	objectCreated			 = pyqtSignal(object)
-	objectCloned			 = pyqtSignal(object)
-	objectAdded				 = pyqtSignal(object)
-	objectDeleted			 = pyqtSignal(str)		# returns the name of the object that was just deleted
-	objectPreDelete			 = pyqtSignal(object)
-	objectPostDelete		 = pyqtSignal()
-	objectParented			 = pyqtSignal(object)	# the object that had its parenting changed
+	newObject				 = Signal()		# linked signal for object creation
+	objectCreated			 = Signal(object)
+	objectCloned			 = Signal(object)
+	objectAdded				 = Signal(object)
+	objectDeleted			 = Signal(str)		# returns the name of the object that was just deleted
+	objectPreDelete			 = Signal(object)
+	objectPostDelete		 = Signal()
+	objectParented			 = Signal(object)	# the object that had its parenting changed
 	# User props changes
-	customPropChanged		 = pyqtSignal(object)
-	blurTagChanged			 = pyqtSignal(object)
+	customPropChanged		 = Signal(object)
+	blurTagChanged			 = Signal(object)
 
 	# render signals
-	rednerFrameRequested	 = pyqtSignal(int)
-	renderFrameFinished		 = pyqtSignal()
-	renderSceneRequested	 = pyqtSignal(list)
-	renderSceneFinished		 = pyqtSignal()
+	rednerFrameRequested	 = Signal(int)
+	renderFrameFinished		 = Signal()
+	renderSceneRequested	 = Signal(list)
+	renderSceneFinished		 = Signal()
 
 	# time signals
-	currentFrameChanged		 = pyqtSignal(int)
-	frameRangeChanged		 = pyqtSignal()
+	currentFrameChanged		 = Signal(int)
+	frameRangeChanged		 = Signal()
 
 	# application signals
-	startupFinished			 = pyqtSignal()
-	shutdownStarted			 = pyqtSignal()
+	startupFinished			 = Signal()
+	shutdownStarted			 = Signal()
 
 	# viewport signals
-	viewportRedrawn			 = pyqtSignal()
+	viewportRedrawn			 = Signal()
 
-	eventCalled = pyqtSignal(list)
+	eventCalled = Signal(list)
 
 	_instance = None
 
@@ -182,7 +182,7 @@ class Dispatch(QObject):
 				else:
 					cross3d.logger.debug('The function %s for signal %s has been disconnected, but was not recorded as connected' % (str(function), signal))
 			else:
-				
+
 				cross3d.logger.debug('The signal %s has been disconnected, but was not recorded as connected.' % signal)
 		# disconnect signals if nothing is connected
 		if self._isConnected and not self._connections:
@@ -198,13 +198,13 @@ class Dispatch(QObject):
 		if cross3d.application.shouldBlockSignal(signal, self.signalsBlocked()):
 			return
 
-		# emit a defined pyqtSignal
+		# emit a defined Signal
 		if (hasattr(self, signal) and type(getattr(self, signal)).__name__ == 'pyqtBoundSignal'):
 			getattr(self, signal).emit(*args)
 
 		# otherwise emit a custom signal
 		else:
-			from PyQt4.QtCore import SIGNAL
+			from Qt.QtCore import SIGNAL
 			self.emit(SIGNAL(signal), *args)
 
 		# emit linked signals
@@ -231,13 +231,13 @@ class Dispatch(QObject):
 		if cross3d.application.shouldBlockSignal(signal, self.signalsBlocked()):
 			return
 
-		# emit a defined pyqtSignal
+		# emit a defined Signal
 		if (hasattr(self, signal) and type(getattr(self, signal)).__name__ == 'pyqtBoundSignal') and args[0]:
 			getattr(self, signal).emit(cross3d.SceneObject(cross3d.Scene.instance(), args[0]))
 
 		# otherwise emit a custom signal
 		else:
-			from PyQt4.QtCore import SIGNAL
+			from Qt.QtCore import SIGNAL
 			self.emit(SIGNAL(signal), *args)
 
 		# emit linked signals

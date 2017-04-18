@@ -1,5 +1,5 @@
 
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 from PySoftimage import xsi
 
 import cross3d

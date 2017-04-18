@@ -10,7 +10,7 @@
 #
 
 import cross3d
-from PyQt4.QtGui import QColor
+from Qt.QtGui import QColor
 from cross3d import SceneWrapper, abstractmethod
 from cross3d.constants import ObjectType, RotationOrder
 

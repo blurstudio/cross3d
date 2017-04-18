@@ -19,7 +19,7 @@ import math
 
 import cross3d
 from Py3dsMax import mxs
-from PyQt4.QtCore import QTimer
+from Qt.QtCore import QTimer
 from cross3d import UserProps, application, FrameRange, constants
 from cross3d.abstract.abstractscene import AbstractScene
 from cross3d.constants import UpVector, ExtrapolationType, RendererType
@@ -627,7 +627,7 @@ class StudiomaxScene(AbstractScene):
 
 		# return the value as a QColor
 		if (cls == mxs.Color):
-			from PyQt4.QtGui import QColor
+			from Qt.QtGui import QColor
 			return QColor(nativeValue.r, nativeValue.g, nativeValue.b)
 
 		# convert value from a Time
@@ -670,7 +670,7 @@ class StudiomaxScene(AbstractScene):
 			\param		filename	<str>
 			\return		<list> [ <Py3dsMax.mxs.TextureMap> nativeMaterial, .. ]
 		"""
-		from PyQt4.QtGui import QFileDialog
+		from Qt.QtGui import QFileDialog
 		filename = QFileDialog.getOpenFileName(None, 'Load Material Library', '', 'Material Library files (*.mat)')
 		if (filename):
 			is_kindof = mxs.isKindOf
@@ -691,7 +691,7 @@ class StudiomaxScene(AbstractScene):
 			\param		filename	<str>
 			\return		<bool>		success
 		"""
-		from PyQt4.QtGui import QFileDialog
+		from Qt.QtGui import QFileDialog
 		filename = QFileDialog.getSaveFileName(None, 'Save Material Library', '', 'Material Library files (*.mat)')
 		filename = str(filename)
 		if (filename):
@@ -1328,7 +1328,7 @@ class StudiomaxScene(AbstractScene):
 			\param		pyValue	<variant>
 			\return		<variant>
 		"""
-		from PyQt4.QtGui import QColor
+		from Qt.QtGui import QColor
 
 		# convert the value from a color
 		if (isinstance(pyValue, QColor)):
@@ -2070,7 +2070,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if (not filename):
-			from PyQt4.QtGui import QFileDialog
+			from Qt.QtGui import QFileDialog
 			filename = QFileDialog.getOpenFileName(None, 'Load Max File', '', 'Max files (*.max);;All files (*.*)')
 
 		if (filename):
@@ -2569,7 +2569,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders
 			\return		<QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		return QSize(mxs.renderWidth, mxs.renderHeight)
 
 	def reset(self, silent=False):
@@ -2614,7 +2614,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if (not filename):
-			from PyQt4.QtGui import QFileDialog
+			from Qt.QtGui import QFileDialog
 			filename = QFileDialog.getSaveFileName(None, 'Save Max File', '', 'Max files (*.max);;All files (*.*)')
 
 		if (filename):

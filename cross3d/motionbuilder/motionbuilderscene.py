@@ -10,7 +10,7 @@
 
 import pyfbsdk as mob
 from cross3d.abstract.abstractscene import AbstractScene
-from PyQt4.QtGui import QFileDialog
+from Qt.QtGui import QFileDialog
 
 #------------------------------------------------------------------------------------------------------------------------
 

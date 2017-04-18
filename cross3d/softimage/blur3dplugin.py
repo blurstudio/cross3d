@@ -12,7 +12,7 @@
 # define python plugin information
 
 from win32com.client 	import constants
-from PyQt4.QtCore		import Qt
+from Qt.QtCore		import Qt
 import cross3d
 from cross3d import dispatch
 dispatchRename = cross3d.dispatch.dispatchRename
