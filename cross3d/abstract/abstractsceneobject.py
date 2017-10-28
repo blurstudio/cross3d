@@ -10,7 +10,7 @@
 #
 
 import cross3d
-from PyQt4.QtGui import QColor
+from Qt.QtGui import QColor
 from cross3d import SceneWrapper, abstractmethod
 from cross3d.constants import ObjectType, RotationOrder
 
@@ -618,7 +618,7 @@ class AbstractSceneObject(SceneWrapper):
 	def setWireColor(self, color):
 		"""Sets the wirecolor for the object to the inputed QColor
 		
-		:param color: :class:`PyQt4.QtGui.QColor`
+		:param color: :class:`Qt.QtGui.QColor`
 
 		"""
 		return self._setNativeWireColor(self._scene._toNativeValue(QColor(color)))
@@ -665,7 +665,7 @@ class AbstractSceneObject(SceneWrapper):
 	def wireColor(self):
 		"""Returns the color for the wireframe of this object in the scene
 
-		:return: :class:`PyQt4.QtGui.QColor`
+		:return: :class:`Qt.QtGui.QColor`
 		"""
 		return self._scene._fromNativeValue(self._nativeWireColor())
 

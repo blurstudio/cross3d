@@ -13,8 +13,9 @@ import xml.dom.minidom
 import blurdev.XML.minidom
 from blurdev.XML.minidom import escape, unescape
 
-from PyQt4.QtCore	import QRect, QRectF, QPoint, QPointF, QSize, QSizeF, QDate, QDateTime, QString, QByteArray, Qt
-from PyQt4.QtGui	import QColor, QFont
+from Qt.QtCore import (QRect, QRectF, QPoint, QPointF, QSize, QSizeF, QDate, QDateTime,
+    QByteArray, Qt)
+from Qt.QtGui import QColor, QFont
 
 class XMLElement:
 	"""Ease of use wrapper class for :class:`xml.dom.minidom.Element` 
@@ -95,9 +96,6 @@ class XMLElement:
 	def recordValue( self, value ):
 		
 		# Convert Qt basics to python basics where possible
-		if ( type( value ) == QString ):
-			value = unicode( value )
-			
 		valtype = type( value )
 		
 		# Record a list of properties
@@ -385,8 +383,6 @@ class XMLElement:
 		return []
 	
 	def findColor( self, name, fail = None ):
-		from PyQt4.QtGui	import QColor
-		
 		element = self.findChild( name )
 		if ( element ):
 			return QColor( float( element.attribute( 'red' ) ), float( element.attribute( 'green' ) ), float( element.attribute( 'blue' ) ), float( element.attribute( 'alpha' ) ) )
@@ -419,11 +415,11 @@ class XMLElement:
 		return self._findPoint(name, QPointF, float)
 	
 	def findRect( self, name ):
-		from PyQt4.QtCore import QRect
+		from Qt.QtCore import QRect
 		return self._findRect( name, QRect, int )
 	
 	def findRectF( self, name ):
-		from PyQt4.QtCore import QRectF
+		from Qt.QtCore import QRectF
 		return self._findRect( name, QRectF, float )
 	
 	def findSize(self, name):

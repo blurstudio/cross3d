@@ -695,7 +695,7 @@ class AbstractSceneLayer(AbstractContainer):
 	def setWireColor(self, color):
 		"""Set the wire color for this layer
 
-		:param color: :class:`PyQt4.QtGui.QColor`
+		:param color: :class:`Qt.QtGui.QColor`
 
 		"""
 		return self._setNativeWireColor(self._scene._toNativeValue(color))
@@ -703,14 +703,14 @@ class AbstractSceneLayer(AbstractContainer):
 	def wireColor(self):
 		"""Return the wire color for this layer
 
-		:rtype: :class:`PyQt4.QtGui.QColor`
+		:rtype: :class:`Qt.QtGui.QColor`
 
 		"""
 		clr = self._nativeWireColor()
 		if (clr):
 			return self._scene._fromNativeValue(clr)
 
-		from PyQt4.QtGui import QColor
+		from Qt.QtGui import QColor
 		return QColor()
 
 	@staticmethod

@@ -15,7 +15,7 @@ the method.  All @abstractmethod methods MUST be implemented in a subclass.
 import re
 
 import cross3d
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 from cross3d import abstractmethod
 from contextlib import contextmanager
 
@@ -98,7 +98,7 @@ class AbstractApplication(QObject):
 		Args:
 			text (str): Set the text in the paste buffer to this text.
 		"""
-		from PyQt4.QtGui import QApplication
+		from Qt.QtWidgets import QApplication
 		QApplication.clipboard().setText(text)
 
 	@abstractmethod

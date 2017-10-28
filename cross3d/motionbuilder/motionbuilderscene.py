@@ -10,7 +10,6 @@
 
 import pyfbsdk as mob
 from cross3d.abstract.abstractscene import AbstractScene
-from PyQt4.QtGui import QFileDialog
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +26,10 @@ class MotionBuilderScene( AbstractScene ):
 		:return	: Success, Bool
 		"""		
 		if not filename:
-			filename = unicode(QFileDialog.getSaveFileName(None, 'Save Motion Builder File', '', 'FBX (*.fbx);;All files (*.*)'))
+			# NOTE: This requires Qt.py 1.1.0.b3 or newer. PyQt4 is the only binding of QFileDialog
+			# that does not include the selectedFilter in its return. The QtCompat fixes this.
+			from Qt.QtCompat import QFileDialog
+			filename, selectedFilter = QFileDialog.getSaveFileName(None, 'Save Motion Builder File', '', 'FBX (*.fbx);;All files (*.*)')
 		print 'filename', filename, self._fbapp
 		if filename:
 			return self._fbapp.FileSave(unicode(filename).encode('utf8'))

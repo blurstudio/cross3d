@@ -12,7 +12,6 @@ import os
 import xml.dom.minidom
 
 from xmlelement import XMLElement
-from PyQt4.QtCore import QString
 
 
 class XMLDocument(XMLElement):
@@ -63,10 +62,7 @@ class XMLDocument(XMLElement):
 
 	def parse(self, xmlString):
 		success = False
-		if isinstance(xmlString, QString):
-			xmlString = unicode(xmlString)
-		else:
-			xmlString = xmlString.encode('utf-8')
+		xmlString = xmlString.encode('utf-8')
 		if (xmlString):
 			tempObject = xml.dom.minidom.parseString(xmlString)
 			if (tempObject):
@@ -124,7 +120,7 @@ class XMLDocument(XMLElement):
 			except:
 				print 'Encoding error while saving XML'
 				if showDialog:
-					from PyQt4.QtGui	import QMessageBox
+					from Qt.QtWidgets import QMessageBox
 					QMessageBox.critical(None, 'Encoding Error', 'Unable to save xml data, please check for unsupported characters.')
 				return False
 			f = open(fileName, 'w')
@@ -132,7 +128,7 @@ class XMLDocument(XMLElement):
 			f.close()
 			return True
 		if showDialog:
-			from PyQt4.QtGui	import QMessageBox
+			from Qt.QtWidgets import QMessageBox
 			QMessageBox.warning(None, 'Unable to Save', 'Unable to save xml data, please verify you have the correct privileges.')
 		return False
 
@@ -147,7 +143,7 @@ class XMLDocument(XMLElement):
 
 	@staticmethod
 	def formatXml(xmltext, indented=4):
-		from PyQt4.QtXml import QDomDocument
+		from Qt.QtXml import QDomDocument
 		doc = QDomDocument()
-		doc.setContent(QString(xmltext))
+		doc.setContent(xmltext)
 		return unicode(doc.toString(indented))

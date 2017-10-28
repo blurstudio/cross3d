@@ -13,8 +13,8 @@
 
 import time
 
-from PyQt4.QtGui import QColor
-from PyQt4.QtCore import QTimer
+from Qt.QtGui import QColor
+from Qt.QtCore import QTimer, QSize
 from pywintypes import com_error
 from cross3d.constants import UpVector
 from cross3d import application, dispatch, FrameRange, constants
@@ -613,9 +613,11 @@ class SoftimageScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if not filename:
-			from PyQt4.QtGui import QFileDialog
-			filename = QFileDialog.getSaveFileName(None, 'Save Scene File', '', 'Scene files (*.scn);;All files (*.*)')
-		
+			# NOTE: This requires Qt.py 1.1.0.b3 or newer. PyQt4 is the only binding of QFileDialog
+			# that does not include the selectedFilter in its return. The QtCompat fixes this.
+			from Qt.QtCompat import QFileDialog
+			filename, selectedFilter = QFileDialog.getSaveFileName(None, 'Save Scene File', '', 'Scene files (*.scn);;All files (*.*)')
+
 		if filename:
 			xsi.SaveSceneAs(str(filename))
 			return True
@@ -676,7 +678,6 @@ class SoftimageScene(AbstractScene):
 			\remarks	return the render output size for the scene
 			\return		<QSize>
 		"""
-		from PyQt4.QtCore import QSize
 		return QSize(xsi.GetValue("Passes.RenderOptions.ImageWidth"), xsi.GetValue("Passes.RenderOptions.ImageHeight"))
 	
 	def restoreState(self):
@@ -724,7 +725,6 @@ class SoftimageScene(AbstractScene):
 			\param		size	<QSize>
 			\return		<bool> success
 		"""
-		from PyQt4.QtCore import QSize
 		if isinstance(size, QSize):
 			width = size.width()
 			height = size.height()

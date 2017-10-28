@@ -19,7 +19,8 @@ import math
 
 import cross3d
 from Py3dsMax import mxs
-from PyQt4.QtCore import QTimer
+from Qt.QtGui import QColor
+from Qt.QtCore import QTimer
 from cross3d import UserProps, application, FrameRange, constants
 from cross3d.abstract.abstractscene import AbstractScene
 from cross3d.constants import UpVector, ExtrapolationType, RendererType
@@ -627,7 +628,6 @@ class StudiomaxScene(AbstractScene):
 
 		# return the value as a QColor
 		if (cls == mxs.Color):
-			from PyQt4.QtGui import QColor
 			return QColor(nativeValue.r, nativeValue.g, nativeValue.b)
 
 		# convert value from a Time
@@ -670,9 +670,11 @@ class StudiomaxScene(AbstractScene):
 			\param		filename	<str>
 			\return		<list> [ <Py3dsMax.mxs.TextureMap> nativeMaterial, .. ]
 		"""
-		from PyQt4.QtGui import QFileDialog
-		filename = QFileDialog.getOpenFileName(None, 'Load Material Library', '', 'Material Library files (*.mat)')
-		if (filename):
+		# NOTE: This requires Qt.py 1.1.0.b3 or newer. PyQt4 is the only binding of QFileDialog
+		# that does not include the selectedFilter in its return. The QtCompat fixes this.
+		from Qt.QtCompat import QFileDialog
+		filename, selectedFilter = QFileDialog.getOpenFileName(None, 'Load Material Library', '', 'Material Library files (*.mat)')
+		if filename:
 			is_kindof = mxs.isKindOf
 			TextureMap = mxs.TextureMap
 			mlib = mxs.loadTempMaterialLibrary(str(filename))
@@ -691,7 +693,7 @@ class StudiomaxScene(AbstractScene):
 			\param		filename	<str>
 			\return		<bool>		success
 		"""
-		from PyQt4.QtGui import QFileDialog
+		from Qt.QtCompat import QFileDialog
 		filename = QFileDialog.getSaveFileName(None, 'Save Material Library', '', 'Material Library files (*.mat)')
 		filename = str(filename)
 		if (filename):
@@ -1328,8 +1330,6 @@ class StudiomaxScene(AbstractScene):
 			\param		pyValue	<variant>
 			\return		<variant>
 		"""
-		from PyQt4.QtGui import QColor
-
 		# convert the value from a color
 		if (isinstance(pyValue, QColor)):
 			return mxs.Color(pyValue.red(), pyValue.green(), pyValue.blue())
@@ -2070,7 +2070,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if (not filename):
-			from PyQt4.QtGui import QFileDialog
+			from Qt.QtCompat import QFileDialog
 			filename = QFileDialog.getOpenFileName(None, 'Load Max File', '', 'Max files (*.max);;All files (*.*)')
 
 		if (filename):
@@ -2132,11 +2132,14 @@ class StudiomaxScene(AbstractScene):
 		return True
 
 	def property(self, key, default=None):
-		"""
-			\remarks	implements AbstractScene.property to return a global scene value
-			\param		key			<str> || <QString>
-			\param		default		<variant>	default value to return if no value was found
-			\return		<variant>
+		""" implements AbstractScene.property to return a global scene value
+
+		Args:
+			key (str):
+			default (variant): default value to return if no value was found
+
+		Returns:
+			variant
 		"""
 		value = getattr(mxs, str(key))
 		if (not value):
@@ -2569,7 +2572,7 @@ class StudiomaxScene(AbstractScene):
 			\remarks	implements AbstractScene.renderSize method to return the current output width and height for renders
 			\return		<QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		return QSize(mxs.renderWidth, mxs.renderHeight)
 
 	def reset(self, silent=False):
@@ -2614,7 +2617,7 @@ class StudiomaxScene(AbstractScene):
 			\return		<bool> success
 		"""
 		if (not filename):
-			from PyQt4.QtGui import QFileDialog
+			from Qt.QtCompat import QFileDialog
 			filename = QFileDialog.getSaveFileName(None, 'Save Max File', '', 'Max files (*.max);;All files (*.*)')
 
 		if (filename):
@@ -2876,11 +2879,14 @@ class StudiomaxScene(AbstractScene):
 		return True
 
 	def setProperty(self, key, value):
-		"""
-			\remarks	implements AbstractScene.setProperty to set the global scene property to the inputed value
-			\param		key			<str> || <QString>
-			\param		value		<variant>
-			\return		<bool>
+		""" implements AbstractScene.setProperty to set the global scene property to the inputed value
+
+		Args:
+			key (str):
+			value (variant):
+
+		Returns:
+			bool:
 		"""
 		return setattr(mxs, str(key), self._toNativeValue(value))
 

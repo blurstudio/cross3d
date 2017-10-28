@@ -10,7 +10,7 @@
 #
 
 from Py3dsMax import mxs
-from PyQt4.QtCore import QDate, QString
+from Qt.QtCore import QDate
 from datetime import date
 from cross3d.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 import os
@@ -151,7 +151,7 @@ class StudiomaxFileProps(AbstractFileProps):
 		elif isinstance(value, date):
 			value = value.strftime('%m/%d/%Y')
 			isDate = True
-		elif not isinstance(value, (float, int, str, unicode, QString)):
+		elif not isinstance(value, (float, int, str, unicode)):
 			value = repr(value)
 		# addProperty is also setProperty
 		if isDate:

@@ -521,19 +521,26 @@ class MayaScene(AbstractScene):
 		return False
 
 	def property(self, key, default=None):
-		"""
-			\remarks	returns a global scene value
-			\param		key			<str> || <QString>
-			\param		default		<variant>	default value to return if no value was found
-			\return		<variant>
+		""" returns a global scene value
+
+		Args:
+			key (str):
+			default (variant): default value to return if no value was found
+
+		Returns:
+			variant:
 		"""
 		return cmds.getAttr(key)
 	
 	def setProperty(self, key, value):
 		""" Sets the global scene property to the inputed value
-			\param		key			<str> || <QString>
-			\param		value		<variant>
-			\return		<bool>
+
+		Args:
+			key (str):
+			value (variant):
+
+		Returns:
+			bool
 		"""
 		return cmds.setAttr(key, value)
 	
@@ -549,7 +556,7 @@ class MayaScene(AbstractScene):
 		""" Return the render output size for the scene
 			:return: <QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		width = cmds.getAttr('defaultResolution.width')
 		height = cmds.getAttr('defaultResolution.height')
 		return QSize(width, height)
@@ -562,7 +569,7 @@ class MayaScene(AbstractScene):
 		""" Set the render output size for the scene
 			:param size: <QSize>
 		"""
-		from PyQt4.QtCore import QSize
+		from Qt.QtCore import QSize
 		if isinstance(size, QSize):
 			width = size.width()
 			height = size.height()

@@ -363,7 +363,7 @@ class FileSequence(object):
 			if self.count() == output.count():
 				inputExtension = self.extension()
 				outputExtension = output.extension()
-				from PyQt4.QtGui import QImage
+				from Qt.QtGui import QImage
 				if inputExtension.lower() == 'exr' and outputExtension.lower() == 'jpg':
 					for i, o in zip(self.paths(), output.paths()):
 						QImage(i, 'exr_nogamma').save(o)

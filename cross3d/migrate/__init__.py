@@ -8,7 +8,7 @@
 # TODO: Find and remove these blurdev imports
 
 
-# This PyQt4 signal is used to notify modules that they are about to be cleared.
+# This Qt signal is used to notify modules that they are about to be cleared.
 # This means that their paths will be removed from sys.path and any modules
 # for those paths will be removed from sys.modules.
 try:

@@ -213,7 +213,7 @@ class MayaSceneViewport(AbstractSceneViewport):
 				cmds.modelEditor(panel, edit=True, **{option: value})
 			
 #			# Uncomment this code to update the ui so you can see what options get disabled in the toolbar
-#			from PyQt4.QtGui import QApplication, QMessageBox
+#			from Qt.QtWidgets import QApplication, QMessageBox
 #			QApplication.processEvents()
 #			QMessageBox.question(None, 'Temp', 'update')
 			

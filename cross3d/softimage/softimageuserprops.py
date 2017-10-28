@@ -12,7 +12,6 @@
 import re
 import json
 import cross3d
-from PyQt4.QtCore import QString
 from win32com.client import constants
 from cross3d.abstract.abstractuserprops 	import AbstractUserProps, AbstractFileProps
 

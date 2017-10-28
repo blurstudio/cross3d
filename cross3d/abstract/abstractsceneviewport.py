@@ -8,7 +8,7 @@
 #	\date		04/11/10
 #
 
-from PyQt4.QtCore import QObject
+from Qt.QtCore import QObject
 
 import cross3d
 from cross3d import abstractmethod
@@ -81,7 +81,7 @@ class AbstractSceneViewport(QObject):
 		
 		:param filename: path to file
 		:param frameRange: two-item list of frames ie. (start, end)
-		:param resolution: a :class:`PyQt4.QtCore.QSize` object
+		:param resolution: a :class:`Qt.QtCore.QSize` object
 
 		"""
 		return False
